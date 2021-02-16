@@ -1,0 +1,28 @@
+This package provides the following modificaitons to the VenusOS GUI:
+    move Settings and Notifications to the top of the list man page
+    hides the Tiles Overview
+    replaces the Mobile Overview with an enhanced version
+
+each of these modifications is optional and
+    can be selected at install time
+
+This script should be run manually initally.
+It will then called from reinstallMods to reinstall functionality after a Venus update
+
+Setup:
+
+Copy the entire repo from GitHub as a zip file to /data on the Venus device
+then unzip it. This should populate /data/VeCanSetup with the package contents.
+
+You must also install SetupHelper from here:
+
+https://github.com/kwindrem/SetupHelper-for-VenusOs
+
+Once both packages are installed run setup and follow the prompts.
+./setup
+
+You will need root access to the Venus device. Instructions can be found here:
+https://www.victronenergy.com/live/ccgx:root_access
+The root password needs to be reentered following a Venus update.
+Setting up an authorization key (see documentation referenced above) will save time and avoid having to reset the root password after each update.
+

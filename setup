@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# this script provides the following modificaitons:
+#   move Settings and Notifications to the top of the list man page
+#   hides the Tiles Overview
+#   replaces the Mobile Overview with an enhanced version
+#
+# each of these modifications is optional and can be selected
+#   at install time
+
+qmlDir=/opt/victronenergy/gui/qml
+deviceListFile="$qmlDir/PageMain.qml"
+mainPagesFile="$qmlDir/main.qml"
+overviewMobileEnhancedFile="$qmlDir/OverviewMobileEnhanced.qml"
+reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
+
+
+# log file for this package
+# if not a null string, options to display the log file are presented
+packageLogFile="/var/log/gui/current"
+
+#### following lines incorporate SetupHelper utilities into this script
+# Refer to the SetupHelper ReadMe file for details.
+    
+source "/data/SetupHelper/CommonResources"
+
+if [ $scriptAction == 'EXIT' ] ; then
+    exit
+fi
+
+checkFileSets
+
+#### end of lines to include SetupHelper
+
+#### running manually and OK to proceed - prompt for input
+if [ $scriptAction == 'NONE' ] ; then
+    # display innitial message
+    echo
+    echo "this package:"
+    echo "    puts Settings and Notifications at the begging of the man page"
+    echo "    hides the Tile Overview"
+    echo "    enhances the Mobile Overview"
+
+    standardActionPrompt
+    
+    # prompt for remaining parameters needed for activation
+    if [ $scriptAction == 'INSTALL' ]; then
+        echo
+        echo "The Enhanced overview includes the following changes:"
+        echo "  1) Tiles are arranged to more cloesly follow the power flow through the system"
+        echo "  2) Voltage, current and frequency values are added to the AC in and out tiles"
+        echo "  3) Battery remaining time is added to the Battery tile"
+        echo "  4) ESS reason codes are replaced with a text version to make them more meaningful"
+        echo "  5) ESS reason text and other notifications are combined into a single "marquee" line"
+        echo "  6) The pump switch is hidden unless the Venus relay is configured for pump control"
+        echo "  7) AC Mode switch includes INVERTER ONLY mode"
+        echo
+        
+        yesNoPrompt "Do you wish to install the Enhanced Mobile Overview Page? (y/n): "
+        if $yesResponse ; then
+            touch $scriptDir/useEnhancedOverview
+       else
+            rm -f $scriptDir/useEnhancedOverview
+        fi
+
+        yesNoPrompt "Do you wish to move Settings and Notifications to the top of the Device List? (y/n): "
+        if $yesResponse ; then
+            touch $scriptDir/moveSettings
+       else
+            rm -f $scriptDir/moveSettings
+        fi
+
+        yesNoPrompt "Do you wish to move hide the Tile Overview? (y/n): "
+        if $yesResponse ; then
+            touch $scriptDir/hideTileOverview
+       else
+            rm -f $scriptDir/hideTileOverview
+        fi
+    fi
+fi
+
+#### installing
+if [ $scriptAction == 'INSTALL' ] ; then
+    if [ -f "$scriptDir/moveSettings" ]; then
+        logMessage "Moving Settings & Notifications to top of Device List"
+        updateActiveFile "$deviceListFile"
+    fi
+    if [ -f "$scriptDir/hideTileOverview" ]; then
+        logMessage "Hiding the Tile Overview"
+        updateActiveFile "$mainPagesFile"
+    fi
+    if [ -f "$scriptDir/useEnhancedOverview" ] ; then
+        logMessage "installing Enhanced Mobile Overview"
+        updateActiveFile "$overviewMobileEnhancedFile"
+        logMessage "installing System Reason Message"
+        updateActiveFile "$reasonMessageFile"
+
+        # backup main.qml if it still stock
+        if [ ! -f "$scriptDir/hideTileOverview" ]; then   
+            backupActiveFile "$mainPagesFile"
+        fi
+        # modify main.qml to show enhanced movile overview
+        sed -i -e 's/OverviewMobile.qml/OverviewMobileEnhanced.qml/' "$mainPagesFile"
+    fi
+    logMessage "++ Package installed"
+
+fi
+
+# uninstalling - check scriptAction again
+# if an install step failed package needs to be removed
+if [ $scriptAction == 'UNINSTALL' ] ; then
+    restoreActiveFile "$deviceListFile"
+    restoreActiveFile "$mainPagesFile"
+    restoreActiveFile "$overviewMobileEnhancedFile"
+    restoreActiveFile "$reasonMessageFile"
+    logMessage "++ Package uninstalled"
+fi
+
+if $filesUpdated ; then
+    restartGui=true
+fi
+
+# thats all folks - SCRIPT EXITS INSIDE THE FUNCTION
+endScript
