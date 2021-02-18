@@ -11,15 +11,30 @@ It will then called from reinstallMods to reinstall functionality after a Venus 
 
 Setup:
 
-Copy the entire repo from GitHub as a zip file to /data on the Venus device
-then unzip it. This should populate /data/VeCanSetup with the package contents.
+The easiest way to install this code IF the Venus device has internet access is to run the following command:
 
-You must also install SetupHelper from here:
+wget -qO - https://github.com/kwindrem/GuiMods/archive/current.tar.gz | tar -xzf - -C /data
 
-https://github.com/kwindrem/SetupHelper-for-VenusOs
+If not, run the following commands on a computer that does have internet access
+
+wget https://github.com/kwindrem/TankRepeater/archive/current.tar.gz
+mv current.tar.gz GuiMods.tar.gz
+
+then move the resulting .tar.gx file to a USB stick,
+put the stick in the Venus device and reboot.
+
+
+You must also install SetupHelper
+
+wget -qO - https://github.com/kwindrem/SetupHelper/archive/current.tar.gz | tar -xzf - -C /data
+
+or
+
+wget https://github.com/kwindrem/TankRepeater/archive/current.tar.gz
+mv current.tar.gz SetupHelper.tar.gz
 
 Once both packages are installed run setup and follow the prompts.
-./setup
+/data/GuiMods/setup
 
 You will need root access to the Venus device. Instructions can be found here:
 https://www.victronenergy.com/live/ccgx:root_access
