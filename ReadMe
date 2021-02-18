@@ -14,6 +14,7 @@ Setup:
 The easiest way to install this code IF the Venus device has internet access is to run the following command:
 
 wget -qO - https://github.com/kwindrem/GuiMods/archive/current.tar.gz | tar -xzf - -C /data
+mv /data/GuiMods-current /data/GuiMods
 
 If not, run the following commands on a computer that does have internet access
 
@@ -27,11 +28,13 @@ put the stick in the Venus device and reboot.
 You must also install SetupHelper
 
 wget -qO - https://github.com/kwindrem/SetupHelper/archive/current.tar.gz | tar -xzf - -C /data
+mv /data/SetupHelper-current /data/SetupHelper
 
 or
 
 wget https://github.com/kwindrem/TankRepeater/archive/current.tar.gz
 mv current.tar.gz SetupHelper.tar.gz
+
 
 Once both packages are installed run setup and follow the prompts.
 /data/GuiMods/setup
