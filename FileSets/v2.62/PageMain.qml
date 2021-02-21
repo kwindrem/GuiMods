@@ -1,4 +1,6 @@
-///////////////////////////////// test - no match
+// modified order to put Settings, then Notifications at top of list
+//// search for MODIFIED
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 
@@ -6,56 +8,31 @@ MbPage {
 	id: root
 	title: qsTr("Device List")
 
-	model: VisualModels {
-		VisualDataModel {
-			model: VeSortFilterProxyModel {
-				model: DeviceList {
-					id: deviceList
-					onRowsAboutToBeRemoved: {
-						for (var i = first; i <= last; i++)
-							deviceList.page(i).destroy()
-					}
-				}
-				sortRole: DeviceList.DescriptionRole
-				dynamicSortFilter: true
-				naturalSort: true
-				sortCaseSensitivity: Qt.CaseInsensitive
-			}
+	model: VisualItemModel {
+// MODIFIED put Settings at top of list
+        MbSubMenu {
+            description: qsTr("Settings")
+            subpage: Component { PageSettings {} }
+        }
 
-			delegate: MbDevice {
-				iconId: "icon-toolbar-enter"
-				service: model.page.service
-				subpage: model.page
+// MODIFIED put Notifications second
+		MbSubMenu {
+			id: menuNotifications
+			description: qsTr("Notifications")
+			item: VBusItem {
+				property variant active: NotificationCenter.notifications.filter(
+											 function isActive(obj) { return obj.active} )
+				value: active.length > 0 ? active.length : ""
 			}
+			subpage: Component { PageNotifications {} }
 		}
-		VisualItemModel {
-			MbSubMenu {
-				id: menuNotifications
-				description: qsTr("Notifications")
-				item: VBusItem {
-					property variant active: NotificationCenter.notifications.filter(
-												 function isActive(obj) { return obj.active} )
-					value: active.length > 0 ? active.length : ""
-				}
-				subpage: Component { PageNotifications {} }
-			}
 
-			MbSubMenu {
-				description: qsTr("Settings")
-				subpage: Component { PageSettings {} }
-			}
+	}
 
-			MbOK {
-				description: qsTr("Remove disconnected devices")
-				value: qsTr("Press to remove")
-				show: deviceList.disconnectedDevices != 0
-				editable: true
-
-				function clicked() {
-					listview.decrementCurrentIndex()
-					deviceList.removeDisconnected()
-				}
-			}
+	Component {
+		id: submenuLoader
+		MbDevice {
+			iconId: "icon-toolbar-enter"
 		}
 	}
 
@@ -195,13 +172,33 @@ MbPage {
 			return;
 		}
 
-		deviceList.append(service, page.createObject(root, {service: service, bindPrefix: service.name}))
+		var submenu = submenuLoader.createObject(root)
+		submenu.service = service
+
+		// option 1, load when being opened
+		// submenu.subpage = page
+		// submenu.subpageProperties = {service: service}
+
+		// option 2, create it now
+		submenu.subpage = page.createObject(submenu, {service: service, bindPrefix: service.name})
+
+		// sort on (initial) description
+		var i = 0
+// MODIFIED leave Settings and Notifications at top of list (don't sort first 2 entries)
+		for (i = 2; i < model.count - 2; i++ ) {
+			if (model.children[i].description.localeCompare(service.description) > 0)
+				break;
+		}
+
+		model.insert(i, submenu)
+
 		initListView()
 	}
 
 	Component.onCompleted: {
 		for (var i = 0; i < DBusServices.count; i++)
 			addService(DBusServices.at(i))
+		listview.currentIndex = 0
 	}
 
 	Connections {
