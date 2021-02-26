@@ -24,7 +24,7 @@
 // Ignore the real incoming tank dBus service because it's information changes
 // Changes in TileText.qml are also part of the TankRepeater  package
 
-// Search for //////// TANK REPEATER to find changes
+// Search for //////// to find changes
 
 import QtQuick 1.1
 import com.victron.velib 1.0
