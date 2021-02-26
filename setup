@@ -7,6 +7,10 @@
 #
 # each of these modifications is optional and can be selected
 #   at install time
+#
+# Note: both Enhanced Mobile Overview and hiding the Tile Overview modify main.qml
+# so order of operations is important.
+# The code also relies on a second request to backup an active file will not touch an existing backup
 
 qmlDir=/opt/victronenergy/gui/qml
 deviceListFile="$qmlDir/PageMain.qml"
@@ -84,10 +88,14 @@ if [ $scriptAction == 'INSTALL' ] ; then
     if [ -f "$scriptDir/moveSettings" ]; then
         logMessage "Moving Settings & Notifications to top of Device List"
         updateActiveFile "$deviceListFile"
+    else
+        restoreActiveFile "$deviceListFile"
     fi
     if [ -f "$scriptDir/hideTileOverview" ]; then
         logMessage "Hiding the Tile Overview"
         updateActiveFile "$mainPagesFile"
+    else
+        restoreActiveFile "$mainPagesFile"
     fi
     if [ -f "$scriptDir/useEnhancedOverview" ] ; then
         logMessage "installing Enhanced Mobile Overview"
@@ -95,12 +103,19 @@ if [ $scriptAction == 'INSTALL' ] ; then
         logMessage "installing System Reason Message"
         updateActiveFile "$reasonMessageFile"
 
-        # backup main.qml if it still stock
-        if [ ! -f "$scriptDir/hideTileOverview" ]; then   
-            backupActiveFile "$mainPagesFile"
-        fi
         # modify main.qml to show enhanced movile overview
-        sed -i -e 's/OverviewMobile.qml/OverviewMobileEnhanced.qml/' "$mainPagesFile"
+        if [ $(grep -c OverviewMobileEnhanced.qml "$mainPagesFile") == 0 ]; then
+            backupActiveFile "$mainPagesFile"
+            sed -i -e 's/OverviewMobile.qml/OverviewMobileEnhanced.qml/' "$mainPagesFile"
+            filesUpdated=true
+        fi
+    else
+        restoreActiveFile "$overviewMobileEnhancedFile"
+        restoreActiveFile "$reasonMessageFile"
+        if [ $(grep -c OverviewMobileEnhanced.qml "$mainPagesFile") != 0 ]; then
+            sed -i -e 's/OverviewMobileEnhanced.qml/OverviewMobile.qml/' "$mainPagesFile"
+            filesUpdated=true
+        fi
     fi
     logMessage "++ Package installed"
 
