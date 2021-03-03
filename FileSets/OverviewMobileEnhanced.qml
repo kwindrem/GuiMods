@@ -234,7 +234,8 @@ OverviewPage {
 		},
 		TileText {
                     text: !sys.dcSystem.power.valid ? "---" :
-                          sys.dcSystem.power.value < 0 ? qsTr("to battery") : qsTr("from battery")
+////// replace to/from battery with current
+                         (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(1) + "A"
                     visible: hasDcSys.value === 1
                 }
             ]
