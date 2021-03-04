@@ -214,8 +214,10 @@ OverviewPage {
                 ]
             } // end Tile BATTERY
 
-	Tile {
-	    title: qsTr("DC SYSTEM")
+	Tile {  // DC SYSTEM
+////// use title to reflect load or source from DC system
+	    title: qsTr(hasDcSys.value != 1 ? "NO DC SYSTEM": 
+                !sys.dcSystem.power.valid ? "NO DC POWER" : sys.dcSystem.power.value >= 0 ? "DC LOADS" : "DC CHARGER")
 	    id: dcSystem
 	    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
 	    width: root.infoWidth3Column
@@ -230,7 +232,8 @@ OverviewPage {
 	    values: [
 		TileText {
 		    font.pixelSize: 22
-	    text: hasDcSys.value === 1 ? sys.dcSystem.power.format(0) : "none"
+            text: sys.dcSystem.power.format(0)
+            visible: hasDcSys.value === 1
 		},
 		TileText {
                     text: !sys.dcSystem.power.valid ? "---" :
@@ -266,7 +269,14 @@ OverviewPage {
 
 //////// add AC INPUT tile
         Tile {
-            title: qsTr("AC INPUT")
+            title: {
+            switch(sys.acSource) {
+                case 1: return qsTr("GRID")
+                case 2: return qsTr("GENERATOR")
+                case 3: return qsTr("SHORE POWER")
+                default: return qsTr("UNKNOWN AC INPUT")
+                }
+            }
             id: acInputTile
             anchors { left: parent.left; bottom: parent.bottom }
             width: root.infoWidth2Column
