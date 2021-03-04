@@ -3,6 +3,9 @@
 // This version supports Venus versions 2.4, 2.5 and 2.60
 // Removed logo and added AC INPUT and SYSTEM tiles originally displayed on other overviews
 // Added voltage, current and frequency to AC INPUT and AC LOADS tiles
+// Added source (Grid, Generator, Shore Power) to AC INPUT tile
+// Replaced to/from battery with current in DC SYSTEM tile
+// DC SYSTEM tile title now reflects direction: "DC LOADS, DC CHARGER"
 // Rearranged tiles to match a left to right signal flow : sources on left, loads on right
 // Standardized "info" tile sizes to 1 or 1.5 wide x 1 or 2 high
 // infoArea defines usable space for info tiles and all tiles are a child of infoArea
@@ -274,7 +277,7 @@ OverviewPage {
                 case 1: return qsTr("GRID")
                 case 2: return qsTr("GENERATOR")
                 case 3: return qsTr("SHORE POWER")
-                default: return qsTr("UNKNOWN AC INPUT")
+                default: return qsTr("AC INPUT")
                 }
             }
             id: acInputTile
