@@ -56,7 +56,7 @@ Item {
         // spacer to avoid connection dot
         TileText {
             text: ""
-            visible: phaseCount >= 2
+            visible: phaseCount >= 2 && parrent.height >= 120
             font.pixelSize: 11
         }
         TileText {
@@ -76,7 +76,7 @@ Item {
         // spacer
         TileText {
             text: ""
-            visible: phaseCount === 2
+            visible: phaseCount === 2 && parrent.height >= 120
             font.pixelSize: 11
         }
         // frequency and input current limit single leg
