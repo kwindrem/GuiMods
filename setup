@@ -16,9 +16,9 @@ qmlDir=/opt/victronenergy/gui/qml
 deviceListFile="$qmlDir/PageMain.qml"
 mainPagesFile="$qmlDir/main.qml"
 overviewMobileEnhancedFile="$qmlDir/OverviewMobileEnhanced.qml"
+reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
 overviewAcValues="$qmlDir/OverviewAcValues.qml"
 objectAcConnection="$qmlDir/ObjectAcConnection.qml"
-reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
 
 
 # log file for this package
