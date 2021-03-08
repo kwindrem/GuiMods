@@ -16,6 +16,8 @@ qmlDir=/opt/victronenergy/gui/qml
 deviceListFile="$qmlDir/PageMain.qml"
 mainPagesFile="$qmlDir/main.qml"
 overviewMobileEnhancedFile="$qmlDir/OverviewMobileEnhanced.qml"
+overviewAcValues="$qmlDir/OverviewAcValues.qml"
+objectAcConnection="$qmlDir/ObjectAcConnection.qml"
 reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
 
 
@@ -80,6 +82,13 @@ if [ $scriptAction == 'NONE' ] ; then
        else
             rm -f $scriptDir/hideTileOverview
         fi
+
+        yesNoPrompt "Do you wish to add AC voltage, current and frequency to flow Overview? (y/n): "
+        if $yesResponse ; then
+            touch $scriptDir/enhancedFlow
+       else
+            rm -f $scriptDir/enhancedFlow
+        fi
     fi
 fi
 
@@ -117,8 +126,15 @@ if [ $scriptAction == 'INSTALL' ] ; then
             filesUpdated=true
         fi
     fi
+    if [ -f "$scriptDir/enhancedFlow" ]; then
+        logMessage "Adding AC volgage, current, frequeny to flow Overview"
+        updateActiveFile "$overviewAcValues"
+        updateActiveFile "$objectAcConnection"
+    else
+        restoreActiveFile "$overviewAcValues"
+        restoreActiveFile "$objectAcConnection"
+    fi
     logMessage "++ Package installed"
-
 fi
 
 # uninstalling - check scriptAction again
@@ -128,6 +144,8 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$mainPagesFile"
     restoreActiveFile "$overviewMobileEnhancedFile"
     restoreActiveFile "$reasonMessageFile"
+    restoreActiveFile "$overviewAcValues"
+    restoreActiveFile "$objectAcConnection"
     logMessage "++ Package uninstalled"
 fi
 

@@ -2,6 +2,8 @@ This package provides the following modificaitons to the VenusOS GUI:
     move Settings and Notifications to the top of the list man page
     hides the Tiles Overview
     replaces the Mobile Overview with an enhanced version
+    adds AC voltage, current, frequency and input current limit to flow Overview
+        accommodates 1, 2 and 3-leg systems but only with a single inverter per leg
 
 each of these modifications is optional and
     can be selected at install time
