@@ -1,5 +1,7 @@
 ////// modified to show voltage, current and frequency in flow overview
-// probably doesn't support paralleled Multis/Quatros
+// only displays values for sys.acInput and sys.acLoad
+// because other connections don't have related parameters
+// may not support paralleled Multis/Quatros
 
 
 import QtQuick 1.1
@@ -10,14 +12,113 @@ Item {
 
 	// NOTE: data is taken by qml, hence it is called connection
 	property variant connection
- 
-    property variant phaseCount: root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
-    property variant l1voltage: root.connection == sys.acInput ? root.connection.inVoltageL1 : root.connection.outVoltageL1
-    property variant l2voltage: root.connection == sys.acInput ? root.connection.inVoltageL2 : root.connection.outVoltageL2
-    property variant l3voltage: root.connection == sys.acInput ? root.connection.inVoltageL3 : root.connection.outVoltageL3
-    property variant l1current: root.connection == sys.acInput ? root.connection.inCurrentL1 : root.connection.outCurrentL1
-    property variant l2current: root.connection == sys.acInput ? root.connection.inCurrentL2 : root.connection.outCurrentL2
-    property variant l3current: root.connection == sys.acInput ? root.connection.inCurrentL3 : root.connection.outCurrentL3
+
+    property int phaseCount: root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
+    
+    function voltageL1 ()
+    {
+        switch (root.connection)
+        {
+            case sys.acInput:   return root.connection.inVoltageL1.format(0);
+            case sys.acLoad:    return root.connection.outVoltageL1.format(0);
+            default:            return "";
+        }
+    }
+    function voltageL2 ()
+    {
+        switch (root.connection)
+        {
+            case sys.acInput:   return root.connection.inVoltageL2.format(0);
+            case sys.acLoad:    return root.connection.outVoltageL2.format(0);
+            default:            return "";
+        }
+    }
+    function voltageL3 ()
+    {
+        switch (root.connection)
+        {
+            case sys.acInput:   return root.connection.inVoltageL3.format(0);
+            case sys.acLoad:    return root.connection.outVoltageL3.format(0);
+            default:            return "";
+        }
+    }
+    function currentL1 ()
+    {
+        var current
+        switch (root.connection)
+        {
+            case sys.acInput:
+                current = root.connection.inCurrentL1
+                return current >= 1000 ? current.format(0) : current.format(1);
+            case sys.acLoad: 
+                current = root.connection.outCurrentL1
+                return current >= 1000 ? current.format(0) : current.format(1);
+            default:
+                return "";
+        }
+    }
+    function currentL2 ()
+    {
+        var current
+        switch (root.connection)
+        {
+            case sys.acInput:
+                current = root.connection.inCurrentL2
+                return current >= 1000 ? current.format(0) : current.format(1);
+            case sys.acLoad: 
+                current = root.connection.outCurrentL2
+                return current >= 1000 ? current.format(0) : current.format(1);
+            default:
+                return "";
+        }
+    }
+    function currentL3 ()
+    {
+        var current
+        switch (root.connection)
+        {
+            case sys.acInput:
+                current = root.connection.inCurrentL3
+                return current >= 1000 ? current.format(0) : current.format(1);
+            case sys.acLoad: 
+                current = root.connection.outCurrentL3
+                return current >= 1000 ? current.format(0) : current.format(1);
+            default:
+                return "";
+        }
+    }
+    function frequency ()
+    {
+        switch (root.connection)
+        {
+            case sys.acInput:   return root.connection.inFrequencyL1.format(1);
+            case sys.acLoad:   return root.connection.outFrequencyL1.format(1);
+            default:            return "";
+        }
+    }
+    function currentLimit ()
+    {
+        switch (root.connection)
+        {
+            case sys.acInput:
+                return "Limit: " + root.connection.inCurrentLimit.format(1);
+            default:
+                return "";
+        }
+    }
+    function powerL1 ()
+    {
+        return root.connection ? root.connection.powerL1.format(0) : "";
+    }
+    function powerL2 ()
+    {
+        return root.connection ? root.connection.powerL2.format(0) : "";
+    }
+    function powerL3 ()
+    {
+        return root.connection ? root.connection.powerL3.format(0) : "";
+    }
+
 
 	Column {
 		y: 0
@@ -29,27 +130,25 @@ Item {
 		TileText {
 			text: root.connection ? root.connection.power.format(0) : ""
 			font.pixelSize: 25
-			height: 27
+            height: 27
 		}
 
         // voltage for single leg
         TileText {
-            text: l1voltage.format(0)
+            text: voltageL1 ()
             visible: phaseCount === 1
             font.pixelSize: 15
         }
         // current for single leg
         TileText {
-            text: l1current.format(1)
+            text: currentL1 ()
             font.pixelSize: 15
             visible: phaseCount === 1
         }
 
         // power, voltage and current for multiple legs
         TileText {
-            text: l1current.value >= 1000
-                ? "L1:" + root.connection.powerL1.format(0) + " " + l1voltage.format(0) + " " + l1current.format(0)
-                : "L1: " + root.connection.powerL1.format(0) + " " + l1voltage.format(0) + " " + l1current.format(1)
+            text: powerL1 () + voltageL1 () + currentL1 ()
             visible: phaseCount >= 2
             font.pixelSize: 11
         }
@@ -60,16 +159,12 @@ Item {
             font.pixelSize: 11
         }
         TileText {
-            text: l1current.value >= 1000
-                ? "L2:" + root.connection.powerL2.format(0) + " " + l2voltage.format(0) + " " + l2current.format(0)
-                : "L2: " + root.connection.powerL2.format(0) + " " + l2voltage.format(0) + " " + l2current.format(1)
+            text: powerL2 () + voltageL2 () + currentL2 ()
             visible: phaseCount >= 2
             font.pixelSize: 11
         }
         TileText {
-            text: l1current.value >= 1000
-                ? "L3:" + root.connection.powerL3.format(0) + " " + l3voltage.format(0) + " " + l3current.format(0)
-                : "L3: " + root.connection.powerL3.format(0) + " " + l3voltage.format(0) + " " + l3current.format(1)
+            text: powerL3 () + voltageL3 () + currentL3 ()
             visible: phaseCount >= 3
             font.pixelSize: 11
         }
@@ -81,22 +176,18 @@ Item {
         }
         // frequency and input current limit single leg
         TileText {
-            text: root.connection == sys.acInput
-                ? root.connection.inFrequencyL1.format(1)
-                : root.connection.outFrequencyL1.format(1)
+            text: frequency ()
             font.pixelSize: 15
             visible: phaseCount === 1
         }
         TileText {
-            text: "Limit: " + root.connection.inCurrentLimit.format(1)
+            text: currentLimit ()
             font.pixelSize: 15
             visible: phaseCount === 1 && root.connection == sys.acInput
         }
         // frequency and input current limit for multiple legs
         TileText {
-            text: root.connection == sys.acInput
-                ? root.connection.inFrequencyL1.format(1) + " Limit: " + root.connection.inCurrentLimit.format(1)
-                : root.connection.outFrequencyL1.format(1)
+            text: frequency () + currentLimit ()
             font.pixelSize: 11
             visible: phaseCount >= 2
         }
