@@ -4,6 +4,8 @@ This package provides the following modificaitons to the VenusOS GUI:
     replaces the Mobile Overview with an enhanced version
     adds AC voltage, current, frequency and input current limit to flow Overview
         accommodates 1, 2 and 3-leg systems but only with a single inverter per leg
+        also, only provides values for AC input and AC load tiles since other tiles
+        lack the necessary parameters
 
 each of these modifications is optional and
     can be selected at install time
