@@ -1,14 +1,26 @@
 This package provides the following modificaitons to the VenusOS GUI:
     move Settings and Notifications to the top of the list man page
     hides the Tiles Overview
-    replaces the Mobile Overview with an enhanced version
+    enhances the Mobile Overview
+        all new layout and tile organization
+        add Inverter Only mode
+        shows voltages current and frequency for AC in and out
+        shows current for DC loads
+        shows solar voltage and current
+        hides Pump switch if not enabled to make more space for tanks
+        tanks column scrolls if there are more tanks than space allows
+    enhances the Tank Tile
+        red indicates low/high fluid levels instead of blinking
+        indicates NO RESPONSE if no signal received from tank
+        tile shrinks if needed to show more tanks (6-7 vs 4 for stock)
+        display custom tank names
+        displays absolute fluid quantity (e.g., gallons) in addition to percentage
+    adds tank information to the flow Overview
+        4 tanks fit along the bottom of the page
+        for more than 4 tanks, the list scrolls
     adds AC voltage, current, frequency and input current limit to flow Overview
-        accommodates 1, 2 and 3-leg systems but only with a single inverter per leg
-        also, only provides values for AC input and AC load tiles since other tiles
-        lack the necessary parameters
-
-each of these modifications is optional and
-    can be selected at install time
+    
+each of these modifications can be selected individually at install time
 
 This script should be run manually initally.
 It will then called from reinstallMods to reinstall functionality after a Venus update

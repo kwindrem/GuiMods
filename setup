@@ -18,8 +18,11 @@ mainPagesFile="$qmlDir/main.qml"
 overviewMobileEnhancedFile="$qmlDir/OverviewMobileEnhanced.qml"
 reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
 overviewAcValues="$qmlDir/OverviewAcValues.qml"
-objectAcConnection="$qmlDir/ObjectAcConnection.qml"
+overviewHub="$qmlDir/OverviewHub.qml"
+overviewSolarCharger="$qmlDir/OverviewSolarCharger.qml"
+tileTankFile="$qmlDir/TileTank.qml"
 
+installEnhancedTank=false
 
 # log file for this package
 # if not a null string, options to display the log file are presented
@@ -42,15 +45,13 @@ checkFileSets
 if [ $scriptAction == 'NONE' ] ; then
     # display innitial message
     echo
-    echo "this package:"
-    echo "    puts Settings and Notifications at the begging of the man page"
-    echo "    hides the Tile Overview"
-    echo "    enhances the Mobile Overview"
+    echo "This package modifies the GUI in several areas"
+    echo "All modificaitons are explained below with a choice to install each one individually"
 
-    standardActionPrompt
+    standardActionPrompt enableReinstall
     
     # prompt for remaining parameters needed for activation
-    if [ $scriptAction == 'INSTALL' ]; then
+    if [ $scriptAction == 'PROMPT' ]; then
         echo
         echo "The Enhanced overview includes the following changes:"
         echo "  1) Tiles are arranged to more cloesly follow the power flow through the system"
@@ -61,34 +62,52 @@ if [ $scriptAction == 'NONE' ] ; then
         echo "  6) The pump switch is hidden unless the Venus relay is configured for pump control"
         echo "  7) AC Mode switch includes INVERTER ONLY mode"
         echo
-        
+        echo "Tank enhancements are also included:"
+        echo "  1) Bar text turns red and indicates NO RESPONSE for sensor connection errors"
+        echo "  2) Color of bar turns red on limits instead of blinking"
+        echo "  3) Color of bar text turns red when bar lenght is too short to be seen"
+        echo "  4) If space is limited, bar graph height and associated text are reduced"
+        echo "  5) Added custom tank name"
+        echo "  6) Added absolute quantity (e.g., gallons) next to %"
+        echo "  7) List scrolls if all tanks don't fit"
+        echo        
         yesNoPrompt "Do you wish to install the Enhanced Mobile Overview Page? (y/n): "
         if $yesResponse ; then
             touch $scriptDir/useEnhancedOverview
        else
             rm -f $scriptDir/useEnhancedOverview
         fi
-
+        echo
         yesNoPrompt "Do you wish to move Settings and Notifications to the top of the Device List? (y/n): "
         if $yesResponse ; then
             touch $scriptDir/moveSettings
        else
             rm -f $scriptDir/moveSettings
         fi
-
-        yesNoPrompt "Do you wish to move hide the Tile Overview? (y/n): "
+        echo
+        yesNoPrompt "Do you wish to hide the Tile Overview? (y/n): "
         if $yesResponse ; then
             touch $scriptDir/hideTileOverview
        else
             rm -f $scriptDir/hideTileOverview
         fi
-
-        yesNoPrompt "Do you wish to add AC voltage, current and frequency to flow Overview? (y/n): "
+        echo
+        echo "The Enhanced flow includes the following changes:"
+        echo "  1) Voltage, current and frequency are shown for AC in and out"
+        echo "  2) Current is shown for DC Loads"
+        echo "  3) Tanks are shown along the bottom of the page"
+        echo "      List scrolls horizontally if necessary"
+        echo "  4) Other Tank enhancements listed above are also included"
+        echo "  5) PV Charger tile shows voltage and current"
+        echo "  6) Time is displayed in inverter icon"
+        echo        
+        yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
         if $yesResponse ; then
             touch $scriptDir/enhancedFlow
        else
             rm -f $scriptDir/enhancedFlow
         fi
+        scriptAction='INSTALL'
     fi
 fi
 
@@ -111,8 +130,9 @@ if [ $scriptAction == 'INSTALL' ] ; then
         updateActiveFile "$overviewMobileEnhancedFile"
         logMessage "installing System Reason Message"
         updateActiveFile "$reasonMessageFile"
+        installEnhancedTank=true
 
-        # modify main.qml to show enhanced movile overview
+        # modify main.qml to show enhanced mobile overview
         if [ $(grep -c OverviewMobileEnhanced.qml "$mainPagesFile") == 0 ]; then
             backupActiveFile "$mainPagesFile"
             sed -i -e 's/OverviewMobile.qml/OverviewMobileEnhanced.qml/' "$mainPagesFile"
@@ -127,12 +147,24 @@ if [ $scriptAction == 'INSTALL' ] ; then
         fi
     fi
     if [ -f "$scriptDir/enhancedFlow" ]; then
-        logMessage "Adding AC volgage, current, frequeny to flow Overview"
+        logMessage "installing enhanced Flow overview"
         updateActiveFile "$overviewAcValues"
         updateActiveFile "$objectAcConnection"
+        updateActiveFile "$overviewHub"
+        updateActiveFile "$overviewSolarCharger"
+        installEnhancedTank=true
     else
         restoreActiveFile "$overviewAcValues"
         restoreActiveFile "$objectAcConnection"
+        restoreActiveFile "$overviewHub"
+        restoreActiveFile "$overviewSolarCharger"
+    fi
+    if $installEnhancedTank ; then
+        logMessage "installing enhanced Tank tile"
+        updateActiveFile "$tileTankFile"
+    # restore tank file in case install was run again manually
+    else
+        restoreActiveFile "$tileTankFile"
     fi
     logMessage "++ Package installed"
 fi
@@ -146,6 +178,9 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$reasonMessageFile"
     restoreActiveFile "$overviewAcValues"
     restoreActiveFile "$objectAcConnection"
+    restoreActiveFile "$overviewHub"
+    restoreActiveFile "$overviewSolarCharger"
+    restoreActiveFile "$tileTankFile"
     logMessage "++ Package uninstalled"
 fi
 

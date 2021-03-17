@@ -330,10 +330,11 @@ OverviewPage {
     ListView {
         id: tanksColum
 
-        property int tankTileHeight: Math.ceil(height / Math.max(count, 2))
-//////// change - group layout parameters in one place
+        property int minimumTankHeight: 39
+        property int tankTileHeight: Math.max (Math.ceil(height / Math.max(count, 2)), minimumTankHeight)
+
         width: root.tankWidth
-        interactive: false // static tiles
+        interactive: true // flickable list
 
 		model: tanksModel
 		delegate: TileTank {
