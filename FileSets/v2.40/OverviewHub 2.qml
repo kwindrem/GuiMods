@@ -25,19 +25,15 @@ OverviewPage {
     property int numberOfTanks: 0
     property bool showTanks: showStatusBar ? false : numberOfTanks > 0 ? true : false
 //////// add for PV CHARGER voltage and current
-    property string pvChargerPrefix1: ""
-    property string pvChargerPrefix2: ""
+    property string pvChargerPrefix: ""
     property int numberOfPvChargers: 0
 
     Component.onCompleted: discoverTanks()
 
 //////// add voltage and current
-    VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
-    VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
-    VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
-    VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
-    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
-    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
+    VBusItem { id: pvCurrent; bind: Utils.path(pvChargerPrefix, "/Pv/I") }
+    VBusItem { id: pvVoltage;  bind: Utils.path(pvChargerPrefix, "/Pv/V") }
+
 
 	title: qsTr("Overview")
 
@@ -105,7 +101,7 @@ OverviewPage {
 		color: "#27AE60"
 		titleColor: "#2ECC71"
 		width: 148
-		height: showStatusBar ? 80 : 100
+		height: showStatusBar ? 100 : 120
 
 		anchors {
 			right: parent.right; rightMargin: 10
@@ -188,7 +184,7 @@ OverviewPage {
 		id: blueSolarCharger
 
 ////// MODIFIED to show tanks
-        height: hasDcAndAcSolar ? 65 : showTanks ? bottomTileHeight + 20 : 114
+        height: hasDcAndAcSolar ? 65 : showTanks ? bottomTileHeight : 114
         width: 148
 		title: qsTr("PV Charger")
 ////// MODIFIED - always hide icon peaking out from under PV tile
@@ -209,27 +205,11 @@ OverviewPage {
                 font.pixelSize: 25
             },
             TileText {
-                y: 28
-                text: numberOfPvChargers > 0 && pvName1.valid ? pvName1.text : ""
-                visible: numberOfPvChargers > 0
-            },
-            TileText {
-                y: 44
-                text: numberOfPvChargers > 0 ? pvVoltage1.text + " " + pvCurrent1.text : ""
+                y: 30
+                text: numberOfPvChargers === 1 ? pvVoltage.text + " " + pvCurrent.text : ""
                 font.pixelSize: 15
-                visible: numberOfPvChargers > 0 && pvVoltage1.valid && pvCurrent1.valid
-            },
-            TileText {
-                y: 60
-                text: numberOfPvChargers > 0 && pvName2.valid ? pvName2.text : ""
-                visible: numberOfPvChargers > 0
-            },
-            TileText {
-                y: 74
-                text: numberOfPvChargers > 1 ? pvVoltage2.text + " " + pvCurrent2.text : ""
-                font.pixelSize: 15
-                visible: numberOfPvChargers > 1 && pvVoltage2.valid && pvCurrent2.valid
             }
+
         ]
 	}
 
@@ -442,10 +422,8 @@ OverviewPage {
 //////// add for PV CHARGER voltage and current display
         if (service.type === DBusService.DBUS_SERVICE_SOLAR_CHARGER) {
             numberOfPvChargers++
-            if (numberOfPvChargers === 1)
-                pvChargerPrefix1 = name;
-            else if (numberOfPvChargers === 2)
-                pvChargerPrefix2 = name;
+            if (pvChargerPrefix === "")
+                pvChargerPrefix = name;
         }
     }
 

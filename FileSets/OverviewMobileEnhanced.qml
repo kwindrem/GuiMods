@@ -258,16 +258,16 @@ OverviewPage {
 	    VBusItem { id: pvCurrent; bind: Utils.path(pvChargerPrefix, "/Pv/I") }
 	    VBusItem { id: pvVoltage;  bind: Utils.path(pvChargerPrefix, "/Pv/V") }
 	    values: [
-		TileText {
-                    font.pixelSize: 22
-                    text: sys.pvCharger.power.valid ? sys.pvCharger.power.uiText : "none"
-		},
-//////// add voltage and current
-		TileText {
-                    text: numberOfPvChargers === 1 ? pvVoltage.text + " " + pvCurrent.text : ""
-                    visible: sys.pvCharger.power.valid
-                }
-            ]
+            TileText {
+                font.pixelSize: 22
+                text: sys.pvCharger.power.valid ? sys.pvCharger.power.uiText : "none"
+            },
+    //////// add voltage and current
+            TileText {
+                text: numberOfPvChargers > 0 ? pvVoltage.text + " " + pvCurrent.text : ""
+                visible: numberOfPvChargers > 0 && pvVoltage.valid && pvCurrent.valid
+            }
+        ]
 	} // end Tile PV CHARGER
 
 //////// add AC INPUT tile
