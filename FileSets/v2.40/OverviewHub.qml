@@ -166,7 +166,7 @@ OverviewPage {
 	OverviewBox {
 		id: dcSystemBox
 ////// wider to make room for current
-		width: multi.width
+		width: multi.width + 20
 		height: 45
 		visible: hasDcSys.value > 0
 		title: qsTr("DC Loads")
@@ -179,8 +179,9 @@ OverviewPage {
 
 		values: TileText {
 			anchors.centerIn: parent
-			text: sys.dcSystem.power.format(0) + "  "
-                + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(1) + "A"
+			text: Math.abs (sys.dcSystem.power.value / sys.battery.voltage.value) <= 100
+                ? sys.dcSystem.power.format(0) + " " + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(1) + "A"
+                : sys.dcSystem.power.format(0) + " " + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(0) + "A"
 		}
 	}
 
