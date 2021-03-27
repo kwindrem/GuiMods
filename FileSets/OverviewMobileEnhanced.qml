@@ -203,10 +203,10 @@ OverviewPage {
                     },
                     TileText {
                         text: {
-                        if (timeToGo.valid)
-                            return Utils.secondsToString(timeToGo.value)
-                        else
-                            return "> 10d"
+                            if (timeToGo.valid)
+                                return Utils.secondsToString(timeToGo.value)
+                            else
+                                return "∞"
                         }
                         
                         VBusItem {
