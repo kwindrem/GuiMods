@@ -13,7 +13,10 @@ Item {
 	// NOTE: data is taken by qml, hence it is called connection
 	property variant connection
 
-    property int phaseCount: root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
+    property bool phaseCountValid: root.connection !== undefined ? root.connection.phaseCount.valid : false
+    // only update phaseCount if data is valid - this retains previous display configuration
+    // results in "--" until phaseCount becomes valid for the first time
+    property int phaseCount: phaseCountValid ? root.connection.phaseCount.value : phaseCount
 
 	Column {
 		y: 0
@@ -25,7 +28,6 @@ Item {
 		TileText {
 			text: root.connection ? root.connection.power.format(0) : ""
 			font.pixelSize: 25
-            height: 27
 		}
 
         // voltage for single leg

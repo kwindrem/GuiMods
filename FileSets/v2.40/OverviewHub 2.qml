@@ -1,10 +1,5 @@
-////// MODIFIED to show:
-//////  tanks in a row along bottom
-//////  PV voltage and current and DC power current (up to two MPPTs)
-//////  voltage, current, frequency in AC tiles (plus current limit for AC input)
-//////  time of day
-//////  current in DC Loads
-//////  remaining time in Battery tile
+////// MODIFIED to show tanks in a row along bottom
+////// and to show PV voltage and current and DC power current
 
 import QtQuick 1.1
 import "utils.js" as Utils
@@ -36,14 +31,13 @@ OverviewPage {
 
     Component.onCompleted: discoverTanks()
 
-//////// add for mods
+//////// add voltage and current
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
     VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
     VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
     VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
     VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
     VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
-    VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
 	title: qsTr("Overview")
 
@@ -138,8 +132,22 @@ OverviewPage {
 			width: parent.width
 
 			TileText {
-				text: sys.battery.soc.value === undefined ? "--" : sys.battery.soc.format (0)
-				font.pixelSize: 25
+				// Use value here instead of format() because format adds the unit to the number and we
+				// show the percentage symbol in a separated smaller text.
+				text: sys.battery.soc.value === undefined ? "--" : sys.battery.soc.value.toFixed(0)
+				font.pixelSize: 40
+
+				Text {
+					anchors {
+						bottom: parent.bottom; bottomMargin: 9
+						horizontalCenter: parent.horizontalCenter; horizontalCenterOffset: parent.paintedWidth / 2 + 5
+					}
+					visible: sys.battery.soc.valid
+					text: "%"
+					color: "white"
+					font.bold: true
+					font.pixelSize: 12
+				}
 			}
 			TileText {
 				text: sys.battery.power.format(0)
@@ -147,15 +155,7 @@ OverviewPage {
 			TileText {
 				text: sys.battery.voltage.format(1) + "   " + sys.battery.current.format(1)
 			}
-            TileText {
-                text: {
-                    if (timeToGo.valid)
-                        return "Remain: " + Utils.secondsToString(timeToGo.value)
-                    else
-                        return "Remain: ∞"
-                    }
-            }
-        }
+		}
 	}
 
 	VBusItem {
