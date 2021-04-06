@@ -1,1 +1,1 @@
-../v2.60/OverviewAcValues.qml
+../v2.40/OverviewAcValues.qml

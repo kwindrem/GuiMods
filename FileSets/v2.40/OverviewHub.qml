@@ -5,6 +5,7 @@
 //////  time of day
 //////  current in DC Loads
 //////  remaining time in Battery tile
+//////  bar graphs on AC in/out and Multi
 
 import QtQuick 1.1
 import "utils.js" as Utils
@@ -29,12 +30,13 @@ OverviewPage {
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
     property int numberOfTanks: 0
     property bool showTanks: showStatusBar ? false : numberOfTanks > 0 ? true : false
+    property string incomingTankServiceName: ""
 //////// add for PV CHARGER voltage and current
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
     property int numberOfPvChargers: 0
 
-    Component.onCompleted: discoverTanks()
+    Component.onCompleted: discoverServices()
 
 //////// add for mods
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
@@ -73,6 +75,19 @@ OverviewPage {
 			}
 			opacity: 0.5
 		}
+////// add power bar graph
+        PowerGuage
+        {
+            id: acInBar
+            width: parent.width
+            height: 12
+            anchors
+            {
+                top: parent.top; topMargin: 16
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: sys.acInput
+        }
 	}
 
 	Multi {
@@ -81,6 +96,20 @@ OverviewPage {
 			horizontalCenter: parent.horizontalCenter
 			top: parent.top; topMargin: 5
 		}
+////// add power bar graph
+        PowerGuage
+        {
+            id: multiBar
+            width: multi.width
+            height: 12
+            useMultiInfo: true
+            anchors
+            {
+                top: parent.top; topMargin: 23
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: undefined
+        }
 	}
 
 ////// ADDED to show time inside inverter icon
@@ -121,6 +150,19 @@ OverviewPage {
 		values: OverviewAcValues {
 			connection: sys.acLoad
 		}
+////// add power bar graph
+        PowerGuage
+        {
+            id: acLoadBar
+            width: parent.width
+            height: 12
+            anchors
+            {
+                top: parent.top; topMargin: 16
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: sys.acLoad
+        }
 	}
 
 	Battery {
@@ -153,7 +195,7 @@ OverviewPage {
                         return "Remain: " + Utils.secondsToString(timeToGo.value)
                     else
                         return "Remain: ∞"
-                    }
+                }
             }
         }
 	}
@@ -432,7 +474,8 @@ OverviewPage {
     function addService(service)
     {
         var name = service.name
-        if (service.type === DBusService.DBUS_SERVICE_TANK) {
+        if (service.type === DBusService.DBUS_SERVICE_TANK)
+        {
             // hide the service for the physical sensor
             if (name !== incomingTankServiceName) // hide incoming N2K tank dBus object
             {
@@ -441,7 +484,8 @@ OverviewPage {
             }
         }
 //////// add for PV CHARGER voltage and current display
-        if (service.type === DBusService.DBUS_SERVICE_SOLAR_CHARGER) {
+        if (service.type === DBusService.DBUS_SERVICE_SOLAR_CHARGER)
+        {
             numberOfPvChargers++
             if (numberOfPvChargers === 1)
                 pvChargerPrefix1 = name;
@@ -450,21 +494,16 @@ OverviewPage {
         }
     }
 
-    // Check available services to find tank sesnsors
-    function discoverTanks()
+    // Detect available services of interest
+    function discoverServices()
     {
         incomingTankServiceName = incomingTankName.valid ? incomingTankName.value : ""
         tanksModel.clear()
-        for (var i = 0; i < DBusServices.count; i++) {
-            if (DBusServices.at(i).type === DBusService.DBUS_SERVICE_TANK) {
-                addService(DBusServices.at(i))
-            }
-            if (DBusServices.at(i).type === DBusService.DBUS_SERVICE_SOLAR_CHARGER) {
-                addService(DBusServices.at(i))
-            }
+        for (var i = 0; i < DBusServices.count; i++)
+        {
+            addService(DBusServices.at(i))
         }
     }
-    property string incomingTankServiceName: ""
     VBusItem { id: incomingTankName;
         bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
 }

@@ -19,11 +19,33 @@ This package provides the following modificaitons to the VenusOS GUI:
         4 tanks fit along the bottom of the page
         for more than 4 tanks, the list scrolls
     adds AC voltage, current, frequency and input current limit to flow Overview
+    adds power guages to AC In, AC Out and Inverter tiles
     
 each of these modifications can be selected individually at install time
 
 This script should be run manually initally.
 It will then called from reinstallMods to reinstall functionality after a Venus update
+
+The power guages require additional information during installation.
+    The first three values can be taken from the spec sheet for your specific Multi/Quatro, etc.
+    The inverter's peak power provides a maximum displayable value.
+        Use the value at which the inverter will continue to run only for a short period of time.
+            For some inverters, this value is double the continuous value,
+                so you may wish to set this to a lower value in order to favor more space
+                to display lower values.
+    The inverter's maximum continuous power sets the overload threshold.
+        The intent is to show the power at which the inverter will run forever
+        at least if ambient temperature is within reason.
+        This value should be set to the inverer's maximum output power spec at 25 C.        
+    The inverter's caution level indicates a power level at which the user should start
+            looking at system power in order to prevent an overload.
+        Set this parameter to something like the maximum power spec at highest temperature.
+    The maximum system power is the point at which the components down stream will overload.
+        For example, this could be set to the power equivalent to the power distribution panel's
+        ain breaker (e.g., 50 amps on a 120volt system would be 6000 watts).
+        This parameter is optional. Setting it allows the AC output guage to show an overload
+            at this value rather than the sum of input and inverter powers (power assist).
+        If you do not want this limitation, set the value to 0.
 
 Setup:
 

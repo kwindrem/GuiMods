@@ -2,6 +2,7 @@
 // only displays values for sys.acInput and sys.acLoad
 // because other connections don't have related parameters
 // may not support paralleled Multis/Quatros
+////// modified to show power bar graphs
 
 
 import QtQuick 1.1
@@ -16,15 +17,19 @@ Item {
     property int phaseCount: root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
 
 	Column {
-		y: 0
+////// modified to show power bar graphs
+		y: 6
 
 		width: parent.width
 		spacing: 0
 
         // total power
 		TileText {
-			text: root.connection ? root.connection.power.format(0) : ""
-			font.pixelSize: 25
+            text: root.connection ? root.connection.power.format(0) : ""
+////// modified to show power bar graphs
+			font.pixelSize: 19
+            height: 23
+            visible: phaseCount >= 1
 		}
 
         // voltage for single leg

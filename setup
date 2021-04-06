@@ -22,8 +22,16 @@ objectAcConnection="$qmlDir/ObjectAcConnection.qml"
 overviewHub="$qmlDir/OverviewHub.qml"
 overviewSolarCharger="$qmlDir/OverviewSolarCharger.qml"
 tileTankFile="$qmlDir/TileTank.qml"
+powerGuageFile="$qmlDir/PowerGuage.qml"
+multiFile="$qmlDir/Multi.qml"
 
 installEnhancedTank=false
+
+
+typeset -i inverterPeakPower
+typeset -i inverterContiuousPower
+typeset -i inverterCautionPower
+typeset -i systemPowerLimit
 
 # log file for this package
 # if not a null string, options to display the log file are presented
@@ -101,12 +109,47 @@ if [ $scriptAction == 'NONE' ] ; then
         echo "  4) Other Tank enhancements listed above are also included"
         echo "  5) PV Charger tile shows voltage and current"
         echo "  6) Time is displayed in inverter icon"
+        echo "  7) Power bar graphs for AC in/out and inverter"
         echo        
         yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
         if $yesResponse ; then
             touch $scriptDir/enhancedFlow
        else
             rm -f $scriptDir/enhancedFlow
+        fi
+        if [ -f $scriptDir/enhancedFlow ]; then
+            echo
+            echo "Power bar guages require inverter power limits"
+            echo " you will need to get this informaiton from the inverter's spec sheet"
+            echo " You also need to input the output power limit (if any) based on the master AC breaker size"
+            echo " These values determine the color of the guage scale and background regions"
+            echo
+            yesNoPrompt "Do you wish install show power guages? (y/n): "
+            if $yesResponse ; then
+                while true ; do
+                    read -p "Enter a value for caution level of the power graph: " inverterCautionPower
+                    read -p "Enter the inverter's MAXIMUM CONTINUOUS power spec: " inverterContiuousPower
+                    read -p "Enter the inverter's PEAK power spec: " inverterPeakPower
+                    read -p "Enter the maximum power of your breaker panel (0 to disable this limit): " systemPowerLimit
+                    echo
+                    if (( $inverterPeakPower >= $inverterContiuousPower )) && (( $inverterContiuousPower >= $inverterCautionPower )); then
+                        break;
+                    else
+                        echo "Error: values must increase in order shown below - reenter all"
+                        echo "  caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower"
+                        echo
+                    fi
+                done
+                echo $inverterPeakPower > $scriptDir/inverterPeakPower
+                echo $inverterContiuousPower > $scriptDir/inverterContiuousPower
+                echo $inverterCautionPower > $scriptDir/inverterCautionPower
+                echo $systemPowerLimit > $scriptDir/systemPowerLimit
+            else
+                echo "0" > $scriptDir/inverterPeakPower
+                echo "0" > $scriptDir/inverterContiuousPower
+                echo "0" > $scriptDir/inverterCautionPower
+                echo "0" > $scriptDir/systemPowerLimit
+            fi
         fi
         scriptAction='INSTALL'
     fi
@@ -153,12 +196,57 @@ if [ $scriptAction == 'INSTALL' ] ; then
         updateActiveFile "$objectAcConnection"
         updateActiveFile "$overviewHub"
         updateActiveFile "$overviewSolarCharger"
+        updateActiveFile "$powerGuageFile"
+        updateActiveFile "$multiFile"
+        logMessage "creating inverter power limit settings"
+        dbus -y com.victronenergy.settings /Settings AddSettings\
+            '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
+            {"path":"/InverterLimits/ContiuousPower", "type":"float", "default":0},\
+            {"path":"/InverterLimits/CautionPower", "type":"float", "default":0},\
+            {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0}]'  > /dev/null
+        if [ -f $scriptDir/inverterPeakPower ]; then
+            inverterPeakPower=$(cat $scriptDir/inverterPeakPower)
+        else
+            inverterPeakPower=0
+        fi
+         if [ -f $scriptDir/inverterContiuousPower ] ; then
+            inverterContiuousPower=$(cat $scriptDir/inverterContiuousPower)
+        else
+            inverterContiuousPower=0
+        fi
+        if [ $scriptDir/inverterContiuousPower ]; then
+            inverterCautionPower=$(cat $scriptDir/inverterCautionPower)
+        else
+            inverterCautionPower=0
+        fi
+
+        if [ -f $scriptDir/inverterCautionPower ]; then
+            systemPowerLimit=$(cat $scriptDir/systemPowerLimit)
+        else
+            systemPowerLimit=0
+        fi
+        if (( $inverterPeakPower > 0)); then
+            logMessage "setting power limits caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower  outputPower: $systemPowerLimit"
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue $inverterPeakPower > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue $inverterContiuousPower > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue $inverterCautionPower > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
+        else
+            logMessage "power guages not enabled"
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
+        fi
+        # enhanced flow requires enhanced tank tile
         installEnhancedTank=true
     else
         restoreActiveFile "$overviewAcValues"
         restoreActiveFile "$objectAcConnection"
         restoreActiveFile "$overviewHub"
         restoreActiveFile "$overviewSolarCharger"
+        restoreActiveFile "$powerGuageFile"
+        restoreActiveFile "$multiFile"
+        dbus -y com.victronenergy.settings /Settings RemoveSettings\
+            '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
+            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit"]' > /dev/null
     fi
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
@@ -182,6 +270,11 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$overviewHub"
     restoreActiveFile "$overviewSolarCharger"
     restoreActiveFile "$tileTankFile"
+    restoreActiveFile "$powerGuageFile"
+    restoreActiveFile "$multiFile"
+    dbus -y com.victronenergy.settings /Settings RemoveSettings\
+            '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
+            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit"]' > /dev/null
     logMessage "++ Package uninstalled"
 fi
 

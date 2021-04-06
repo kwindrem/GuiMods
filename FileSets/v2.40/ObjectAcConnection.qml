@@ -1,4 +1,5 @@
 ////// modified to show voltage, current and frequency in flow overview
+////// modified to show bar graphs
 // probably doesn't support paralleled Multis/Quatros
 
 import QtQuick 1.1
@@ -11,10 +12,12 @@ QtObject {
 	property VBusItem powerL1: VBusItem { bind: Utils.path(bindPrefix, "/L1/Power"); unit: "W"}
 	property VBusItem powerL2: VBusItem { bind: Utils.path(bindPrefix, "/L2/Power"); unit: "W"}
 	property VBusItem powerL3: VBusItem { bind: Utils.path(bindPrefix, "/L3/Power"); unit: "W"}
-	property VBusItem phaseCount: VBusItem { bind: Utils.path(bindPrefix, "/NumberOfPhases") }
 	property VBusItem power: VBusItem { unit: "W" }
+////// added to show bar graphs
+    property VBusItem phaseCount: VBusItem { bind: Utils.path(bindPrefix, "/NumberOfPhases") }
+    property VBusItem inverterState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State" ) }
  
- ////// add to show voltage, current and frequency
+ ////// add to show voltage, current, frequency and bar graphs
     property VBusItem vebusService: VBusItem { bind: Utils.path(systemPrefix, "/VebusService") }
     property VBusItem inCurrentLimit: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/CurrentLimit"); unit: "A"}
 
