@@ -15,6 +15,8 @@ Item {
     // if connection is undefined, then this instance is for the inverter, so use it's phase count
     property VBusItem vebusService: VBusItem { bind: Utils.path("com.victronenergy.system", "/VebusService") }
     property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(vebusService.value, "/Ac/NumberOfPhases" ) }
+    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(vebusService.value, "/Mode" ) }
+    property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
 
     property int phaseCount: useMultiInfo
             ? inverterPhaseCount.valid ? inverterPhaseCount.value : 0
@@ -30,7 +32,7 @@ Item {
     property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
     property real outPowerLimit: outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
     property real inPowerLimit: sys.acInput.inCurrentLimit.value * sys.acInput.inVoltageL1.value
-    property int inverterState: systemStateItem.valid ? systemStateItem.value : 0
+    property int systemState: systemStateItem.valid ? systemStateItem.value : 0
 
     property real barMax: 0
     property real overload: 0
@@ -157,27 +159,61 @@ Item {
             overload = inPowerLimit
             caution = inPowerLimit // no caution - overload range
         }
-        // acLoad and inverter power limits
-        else
+        // acLoad power limits
+        else if (root.connection === sys.acLoad)
         {
-            barMax = inverterPeakPower
-            overload = inverterContinuousPower
-            caution = inverterCautionPower
-            if (root.connection === sys.acLoad)
+            // Inverter Only - only multi contribution
+            if (inverterMode === 2 || systemState === 9)
             {
-                // if acLoads and not inverting, add in shore power limit
-                if (inverterState != 9)
-                {
-                    barMax += inPowerLimit
-                    overload += inPowerLimit
-                    caution += inPowerLimit
-                }
-                // apply system output limit
-                if (outPowerLimit != 0 && overload > outPowerLimit)
-                {
-                    overload = outPowerLimit
-                    barMax = outPowerLimit * 1.2                
-                }
+                barMax = inverterPeakPower
+                overload = inverterContinuousPower
+                caution = inverterCautionPower
+            }
+            // Charger Only - only AC input contribution
+            else if (inverterMode === 1)
+            {
+                barMax = inPowerLimit * 1.2
+                overload = inPowerLimit
+                caution = inPowerLimit
+            }
+            // On - AC input + multi contribution
+            else if (inverterMode === 3 && systemState >= 3)
+            {
+                barMax = inPowerLimit + inverterPeakPower
+                overload = inPowerLimit + inverterContinuousPower
+                caution = inPowerLimit + inverterCautionPower
+            }
+            // inverter is off or undefined - no AC output
+            else
+            {
+                barMax = 0
+                overload = 0
+                caution = 0
+            }
+            // apply system output limit
+            if (outPowerLimit != 0 && overload > outPowerLimit)
+            {
+                overload = outPowerLimit
+                barMax = outPowerLimit * 1.2                
+            }
+        }
+        // inverter power limits
+        else 
+        {
+            // inverter not producing output - hide the guage
+            // Mode:  undefined, Charger Only, Off
+            // SystemState: Off, Fault
+            if (inverterMode <= 1 || inverterMode === 4 || systemState === 0 || systemState === 2)
+            {
+                barMax = 0
+                overload = 0
+                caution = 0
+            }
+            else
+            {
+                barMax = inverterPeakPower
+                overload = inverterContinuousPower
+                caution = inverterCautionPower
             }
         }
         
