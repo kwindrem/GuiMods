@@ -8,12 +8,13 @@ This package provides the following modificaitons to the VenusOS GUI:
         shows current for DC loads
         shows solar voltage and current
         hides Pump switch if not enabled to make more space for tanks
+            (this became standard in v2.70~9)
         tanks column scrolls if there are more tanks than space allows
     enhances the Tank Tile
-        red indicates low/high fluid levels instead of blinking
+        red indicates low/high fluid levels
         indicates NO RESPONSE if no signal received from tank
-        tile shrinks if needed to show more tanks (6-7 vs 4 for stock)
-        display custom tank names
+        tile shrinks if needed to show more tanks, then list scrolls
+        display custom tank names (stock in v2.70~9)
         displays absolute fluid quantity (e.g., gallons) in addition to percentage
     adds tank information to the flow Overview
         4 tanks fit along the bottom of the page

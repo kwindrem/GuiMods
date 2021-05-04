@@ -101,7 +101,7 @@ Rectangle
             font.pixelSize: 12
 			font.bold: true
 // handle level value that indicates a no sensor response, sensor error #### TBD not sure what those are
-// include actual level in display
+// include remaint level in display
 			text: !connectedItem.value ? "NO RESPONSE" : level >= 0 ? root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value) : "ERROR"
 			color: !connectedItem.value ? "red" : level <= emptyWarningLevel ? "red" : "white"
 			anchors.centerIn: parent

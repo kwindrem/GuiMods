@@ -449,8 +449,8 @@ OverviewPage {
             left: root.left
         }
 
-/////// flickable list if more than will fit across bottom of screen
-        interactive: count > 4 ? true : false
+
+        interactive: true // flickable list
         orientation: ListView.Horizontal
 
         model: tanksModel
