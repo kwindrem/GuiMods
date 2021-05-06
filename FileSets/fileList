@@ -4,6 +4,7 @@
 /opt/victronenergy/gui/qml/OverviewAcValues.qml
 /opt/victronenergy/gui/qml/OverviewHub.qml
 /opt/victronenergy/gui/qml/OverviewSolarCharger.qml
+/opt/victronenergy/gui/qml/OverviewMobileEnhanced.qml
 /opt/victronenergy/gui/qml/TileTank.qml
 /opt/victronenergy/gui/qml/Multi.qml
 
