@@ -334,7 +334,7 @@ OverviewPage {
         property int tankTileHeight: Math.max (Math.ceil(height / Math.max(count, 2)), minimumTankHeight)
 
         width: root.tankWidth
-        interactive: true // flickable list
+        interactive: tankTileHeight > minimumTankHeight ? false : true
 
 		model: tanksModel
 		delegate: TileTank {
