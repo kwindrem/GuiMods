@@ -330,19 +330,20 @@ OverviewPage {
     ListView {
         id: tanksColum
 
-        property int minimumTankHeight: 45
-        property int tankTileHeight: Math.max (Math.ceil(height / Math.max(count, 2)), minimumTankHeight)
+        property int minimumTankHeight: 21
+        property int compactThreshold: 45   // height below this will be compacted vertically
+        property int tankTileHeight: Math.max (Math.ceil (height / Math.max (count, 2)), minimumTankHeight)
 
         width: root.tankWidth
 //////// make list flickable if more tiles than will fit completely
-        interactive: tankTileHeight > minimumTankHeight ? false : true
+        interactive: tankTileHeight * count > (tanksColum.height + 1) ? true : false
 
 		model: tanksModel
 		delegate: TileTank {
 			width: tanksColum.width
 			height: tanksColum.tankTileHeight
 			pumpBindPrefix: root.pumpBindPreffix
-            compact: tanksModel.count > (pumpButton.pumpEnabled ? 4 : 5)
+            compact: tanksColum.tankTileHeight < tanksColum.compactThreshold
             Connections {
                 target: scrollTimer
                 onTriggered: doScroll()

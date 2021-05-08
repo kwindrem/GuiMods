@@ -22,7 +22,7 @@ Tile {
 //// add to allow show "NO RESPONSE"
     property VBusItem connectedItem: VBusItem { id:connectedItem; bind: Utils.path(bindPrefix, "/Connected") }
     // small tile height threshold
-    property bool squeeze: height < 48
+    property bool squeeze: height < 50
 
 	property VBusItem levelItem: VBusItem { id: levelItem; bind: Utils.path(bindPrefix, "/Level"); decimals: 0; unit: "%" }
 	property VBusItem fluidTypeItem: VBusItem { id: fluidTypeItem; bind: Utils.path(bindPrefix, "/FluidType") }
@@ -38,6 +38,8 @@ Tile {
 	property bool blink: true
 	property bool compact: false
 	property string tankName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : fluidTypeItem.valid ? fluidTypes[fluidTypeItem.value] : "TANK"
+ 
+    property bool connected: connectedItem.valid && connectedItem.value
 
 ///// modified to keep mixed case names
 	title: compact ? "" : tankName
@@ -103,7 +105,7 @@ Tile {
 				height: parent.height - 1
 				color: warning() ? "#e74c3c" : "#34495e"
 //// modified to accommodate "NO RESPONSE"
-				opacity: connectedItem.value === 0 ? 0.2 : blink ? 1 : 0.5
+				opacity: ! connected ? 0.2 : blink ? 1 : 0.5
 				anchors {
 					verticalCenter: parent.verticalCenter;
 					left: parent.left; leftMargin: 1
@@ -111,13 +113,13 @@ Tile {
 			}
 
 			Text {
-				font.pixelSize: 12
+				font.pixelSize: compact ? ! connected ? 9 : 11 : 12
 				font.bold: true
 //// handle level value that indicates a no sensor response, sensor error #### TBD not sure what those are
 //// include actual level in display
-                text: ! connectedItem.value || connectedItem.value === 0 ? "No Response" : level >= 0 ? root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value) : "ERROR"
-                color: connectedItem.value === 0 ? "red" : "white"
-                opacity: connectedItem.value === 0 ? 1 : blink ? 1 : 0.5
+                text: ! connected ? "No Response" : level >= 0 ? root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value) : "ERROR"
+                color: connected ? "white" : "red"
+                opacity: ! connected ? 1 : blink ? 1 : 0.5
 				anchors.centerIn: parent
 			}
 		}
