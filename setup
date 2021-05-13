@@ -27,7 +27,6 @@ multiFile="$qmlDir/Multi.qml"
 
 installEnhancedTank=false
 
-
 typeset -i inverterPeakPower
 typeset -i inverterContiuousPower
 typeset -i inverterCautionPower
@@ -110,6 +109,7 @@ if [ $scriptAction == 'NONE' ] ; then
         echo "  5) PV Charger tile shows voltage and current"
         echo "  6) Time is displayed in inverter icon"
         echo "  7) Power bar graphs for AC in/out and inverter"
+        echo "  8) Adds inverter mode to the inverter icon"
         echo        
         yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
         if $yesResponse ; then

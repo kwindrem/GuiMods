@@ -14,6 +14,61 @@ MbIcon {
 
 	Component.onCompleted: discoverMultis()
 
+////// added to show inverter mode in switch area
+    VBusItem
+    { id: inverterMode;
+        bind: Utils.path(sys.vebusPrefix, "/Mode")
+    }
+    SvgRectangle
+    {
+        id:inverterModeBackground
+        width: 15
+        height: 42
+        radius: 3
+        color: "#000000"
+        anchors
+        {
+            horizontalCenter: multi.horizontalCenter; horizontalCenterOffset: -6.5
+            verticalCenter: multi.verticalCenter; verticalCenterOffset: 8
+        }
+        visible: inverterMode.valid
+    }
+    Text
+    {
+        anchors
+        {
+            horizontalCenter: multi.horizontalCenter; horizontalCenterOffset: -6.7
+            verticalCenter: multi.verticalCenter; verticalCenterOffset: 5
+        }
+        horizontalAlignment: Text.AlignHCenter
+        width: 10
+        wrapMode: Text.WrapAnywhere
+        color: "white"
+        font {pixelSize: 14; bold: true}
+        text: inverterModeText ()
+        lineHeightMode: Text.FixedHeight
+        lineHeight: 12
+        visible: inverterMode.valid
+    }
+    function inverterModeText ()
+    {
+        switch (inverterMode.value)
+        {
+            case 4:
+                return "O f f"
+                break;
+            case 1:
+                return "C h"
+                break;
+            case 2:
+                return "I n v"
+                break;
+            case 3:
+                return "O n"
+                break;
+        }
+    }
+
 	Column {
 		spacing: 3
 		x: 26

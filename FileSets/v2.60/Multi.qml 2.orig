@@ -1,5 +1,3 @@
-////// modified to show power bar graphs
-
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -14,67 +12,10 @@ MbIcon {
 
 	Component.onCompleted: discoverMultis()
 
-////// added to show inverter mode in switch area
-    VBusItem
-    { id: inverterMode;
-        bind: Utils.path(sys.vebusPrefix, "/Mode")
-    }
-    SvgRectangle
-    {
-        id:inverterModeBackground
-        width: 13
-        height: 38
-        radius: 3
-        color: "#000000"
-        anchors
-        {
-            horizontalCenter: multi.horizontalCenter; horizontalCenterOffset: -6.5
-            verticalCenter: multi.verticalCenter; verticalCenterOffset: 10.5
-        }
-        visible: inverterMode.valid
-    }
-    Text
-    {
-        anchors
-        {
-            horizontalCenter: multi.horizontalCenter; horizontalCenterOffset: -6.5
-            verticalCenter: multi.verticalCenter; verticalCenterOffset: 7.5
-        }
-        horizontalAlignment: Text.AlignHCenter
-        width: 8
-        wrapMode: Text.WrapAnywhere
-        color: "white"
-        font {pixelSize: 12; bold: true}
-        text: inverterModeText ()
-        lineHeightMode: Text.FixedHeight
-        lineHeight: 11
-        visible: inverterMode.valid
-    }
-    function inverterModeText ()
-    {
-        switch (inverterMode.value)
-        {
-            case 4:
-                return "O f f"
-                break;
-            case 1:
-                return "C h g"
-                break;
-            case 2:
-                return "I n v"
-                break;
-            case 3:
-                return "O n"
-                break;
-        }
-    }
-
 	Column {
 		spacing: 3
-		anchors {
-			left: parent.left; leftMargin: 28
-			top: parent.top; topMargin: 62
-		}
+		x: 26
+		y: 62
 
 		Led {
 			bind: Utils.path(sys.vebusPrefix, "/Leds/Mains")
@@ -96,10 +37,8 @@ MbIcon {
 
 	Column {
 		spacing: 3
-		anchors {
-			right: parent.right; rightMargin: 28
-			top: parent.top; topMargin: 62
-		}
+		x: multi.width - 28
+		y: 62
 
 		Led {
 			bind: Utils.path(sys.vebusPrefix, "/Leds/Inverter")
@@ -125,13 +64,11 @@ MbIcon {
 	Text {
 		anchors {
 			horizontalCenter: multi.horizontalCenter
-////// modified to show power bar graphs
-			top: multi.top; topMargin: 4
+			top: multi.top; topMargin: 8
 		}
 		horizontalAlignment: Text.AlignHCenter
 		color: "white"
-////// modified to show power bar graphs
-		font {pixelSize: 14; bold: true}
+		font {pixelSize: 16; bold: true}
 		text: vebusState.text
 
 		SystemState {

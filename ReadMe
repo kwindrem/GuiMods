@@ -21,6 +21,7 @@ This package provides the following modificaitons to the VenusOS GUI:
         for more than 4 tanks, the list scrolls
     adds AC voltage, current, frequency and input current limit to flow Overview
     adds power guages to AC In, AC Out and Inverter tiles
+    adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
     
 each of these modifications can be selected individually at install time
 
