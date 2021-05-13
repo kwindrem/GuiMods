@@ -71,7 +71,7 @@ mv /data/SetupHelper-current /data/SetupHelper
 
 or
 
-wget https://github.com/kwindrem/TankRepeater/archive/current.tar.gz
+wget https://github.com/kwindrem/SetupHelper/archive/current.tar.gz
 mv current.tar.gz SetupHelper.tar.gz
 
 
