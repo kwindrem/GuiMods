@@ -55,10 +55,17 @@ The easiest way to install this code IF the Venus device has internet access is 
 wget -qO - https://github.com/kwindrem/GuiMods/archive/current.tar.gz | tar -xzf - -C /data
 mv /data/GuiMods-current /data/GuiMods
 
-If not, run the following commands on a computer that does have internet access
+If not, do the following a computer that does have internet access
 
-wget https://github.com/kwindrem/GuiMods/archive/current.tar.gz
-mv current.tar.gz GuiMods.tar.gz
+click on this link in a web browser:
+https://github.com/kwindrem/GuiMods/archive/current.tar.gz
+
+rename the resulting .tar.gz file to venus-data.tar.gz
+copy the venus-data.tar.gz to a USB stick,
+put the stick in the Venus device and reboot.
+When Venus boots, it will unarchive the file to /data/GuiMods-current
+
+mv /data/GuiMods-current /data/GuiMods
 
 then move the resulting .tar.gx file to a USB stick,
 put the stick in the Venus device and reboot.
@@ -69,11 +76,21 @@ You must also install SetupHelper
 wget -qO - https://github.com/kwindrem/SetupHelper/archive/current.tar.gz | tar -xzf - -C /data
 mv /data/SetupHelper-current /data/SetupHelper
 
-or
+or click on this link in a web browser:
 
-wget https://github.com/kwindrem/SetupHelper/archive/current.tar.gz
+https://github.com/kwindrem/SetupHelper/archive/current.tar.gz
 mv current.tar.gz SetupHelper.tar.gz
 
+rename the resulting .tar.gz file to venus-data.tar.gz
+copy the venus-data.tar.gz to a USB stick,
+put the stick in the Venus device and reboot.
+
+mv /data/SetupHelper-current /data/SetupHelper
+
+Note, you must do GuiMods and SetupHelper on a separate flash drive since they use
+the same file name on the flash drive. 
+
+If you are installing multiple packages, SetupHelper need only be installed once.
 
 Once both packages are installed run setup and follow the prompts.
 /data/GuiMods/setup
