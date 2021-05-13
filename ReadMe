@@ -57,7 +57,7 @@ mv /data/GuiMods-current /data/GuiMods
 
 If not, run the following commands on a computer that does have internet access
 
-wget https://github.com/kwindrem/TankRepeater/archive/current.tar.gz
+wget https://github.com/kwindrem/GuiMods/archive/current.tar.gz
 mv current.tar.gz GuiMods.tar.gz
 
 then move the resulting .tar.gx file to a USB stick,
