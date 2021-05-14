@@ -24,6 +24,7 @@ overviewSolarCharger="$qmlDir/OverviewSolarCharger.qml"
 tileTankFile="$qmlDir/TileTank.qml"
 powerGuageFile="$qmlDir/PowerGuage.qml"
 multiFile="$qmlDir/Multi.qml"
+inverterPopupFile="$qmlDir/InverterModePopUp.qml"
 
 installEnhancedTank=false
 
@@ -110,6 +111,7 @@ if [ $scriptAction == 'NONE' ] ; then
         echo "  6) Time is displayed in inverter icon"
         echo "  7) Power bar graphs for AC in/out and inverter"
         echo "  8) Adds inverter mode to the inverter icon"
+        echo "  9) Popups to change the AC input current limit and inverter mode"
         echo        
         yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
         if $yesResponse ; then
@@ -198,6 +200,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
         updateActiveFile "$overviewSolarCharger"
         updateActiveFile "$powerGuageFile"
         updateActiveFile "$multiFile"
+        updateActiveFile "$inverterPopupFile"
         logMessage "creating inverter power limit settings"
         dbus -y com.victronenergy.settings /Settings AddSettings\
             '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
@@ -244,6 +247,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$overviewSolarCharger"
         restoreActiveFile "$powerGuageFile"
         restoreActiveFile "$multiFile"
+        restoreActiveFile "$inverterPopupFile"
         dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit"]' > /dev/null
@@ -272,6 +276,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$tileTankFile"
     restoreActiveFile "$powerGuageFile"
     restoreActiveFile "$multiFile"
+    restoreActiveFile "$inverterPopupFile"
     dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit"]' > /dev/null

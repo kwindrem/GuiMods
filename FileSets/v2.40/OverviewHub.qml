@@ -6,11 +6,14 @@
 //////  current in DC Loads
 //////  remaining time in Battery tile
 //////  bar graphs on AC in/out and Multi
+//////  popups for AC input current limit and inverter mode
 
 import QtQuick 1.1
 import "utils.js" as Utils
 ////// ADDED to show tanks
 import com.victron.velib 1.0
+
+
 
 OverviewPage {
 	id: root
@@ -35,6 +38,9 @@ OverviewPage {
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
     property int numberOfPvChargers: 0
+    property int numberOfMultis: 0
+    property string vebusPrefix: ""
+
 
     Component.onCompleted: discoverServices()
 
@@ -51,7 +57,6 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
-
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title: getAcSourceName(sys.acSource)
@@ -89,6 +94,7 @@ OverviewPage {
             connection: sys.acInput
         }
 	}
+
 
 	Multi {
 		id: multi
@@ -483,7 +489,7 @@ OverviewPage {
                 numberOfTanks++
             }
         }
-//////// add for PV CHARGER voltage and current display
+//////// add for PV CHARGER voltage and current display and popups
         if (service.type === DBusService.DBUS_SERVICE_SOLAR_CHARGER)
         {
             numberOfPvChargers++
@@ -491,6 +497,11 @@ OverviewPage {
                 pvChargerPrefix1 = name;
             else if (numberOfPvChargers === 2)
                 pvChargerPrefix2 = name;
+        }
+        else if (service.type === DBusService.DBUS_SERVICE_MULTI) {
+            numberOfMultis++
+            if (vebusPrefix === "")
+                vebusPrefix = name;
         }
     }
 
@@ -506,4 +517,57 @@ OverviewPage {
     }
     VBusItem { id: incomingTankName;
         bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
+
+
+////// popup over AC input tile for current limit
+    MouseArea {
+        anchors.fill: parent
+        enabled: parent.active
+        onPressed: mouse.accepted = acCurrentButton.expanded
+        onClicked: { acCurrentButton.cancel(); inverterModePopUp.cancel() }
+    }
+////// popup current limit box over the AC Input tile
+    TileSpinBox {
+        title: qsTr("AC Current Limit")
+        id: acCurrentButton
+        // hide button until it is expanded
+        // 0 opacity blocks clicks so use a small value instead (0.001 appears to be smallest that works)
+        opacity: expanded ? 1 : 0.001
+        anchors.top: parent.top; anchors.topMargin: expanded ? 0 : acInBox.height * 2 /3
+        anchors.left: acInBox.left
+        isCurrentItem: false // don't show the edit icon
+        focus: true
+
+        bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimit")
+        color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
+        width: show ? acInBox.width : 0
+        fontPixelSize: 14
+        unit: "A"
+        readOnly: currentLimitIsAdjustable.value !== 1 || numberOfMultis > 1
+        buttonColor: "#979797"
+
+        VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
+    }
+    
+////// popup inverter mode selector over the Mulit tile
+    InverterModePopUp
+    {
+        title: qsTr("Inverter Mode")
+        id: inverterModePopUp
+        // hide button until it is expanded
+        // 0 opacity blocks clicks so use a small value instead (0.001 appears to be smallest that works)
+        opacity: expanded ? 1 : 0.001
+        anchors.top: parent.top; anchors.topMargin: expanded ? 0 : multi.height / 3
+        anchors.left: multi.left
+        width: show ? multi.width : 0
+        readOnly: !modeIsAdjustable.valid || modeIsAdjustable.value !== 1 || numberOfMultis > 1
+        // disable mouse area if can't make the adjustment
+        visible: !readOnly
+        buttonColor: "#979797"
+        color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
+
+        bind: Utils.path(vebusPrefix, "/Mode")
+        VBusItem { id: inverterMode; bind: Utils.path(vebusPrefix, "/Mode") }
+        VBusItem { id: modeIsAdjustable; bind: Utils.path(vebusPrefix,"/ModeIsAdjustable") }
+    }
 }

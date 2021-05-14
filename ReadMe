@@ -16,17 +16,24 @@ This package provides the following modificaitons to the VenusOS GUI:
         tile shrinks if needed to show more tanks, then list scrolls
         display custom tank names (stock in v2.70~9)
         displays absolute fluid quantity (e.g., gallons) in addition to percentage
-    adds tank information to the flow Overview
-        4 tanks fit along the bottom of the page
-        for more than 4 tanks, the list scrolls
-    adds AC voltage, current, frequency and input current limit to flow Overview
-    adds power guages to AC In, AC Out and Inverter tiles
-    adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
+    enhances the Flow Overview
+        adds tank information to the flow Overview
+            4 tanks fit along the bottom of the page
+            for more than 4 tanks, the list scrolls
+        adds AC voltage, current, frequency and input current limit to flow Overview
+        adds power guages to AC In, AC Out and Inverter tiles
+        adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
+        adds popups for AC input current limit and inverter mode
     
 each of these modifications can be selected individually at install time
 
 This script should be run manually initally.
 It will then called from reinstallMods to reinstall functionality after a Venus update
+
+The buttons for the popups are hidden and the touchable area is kept to a minimum
+    to avoid confusion with activating the bottom menu bar and swiping to other overviews
+The AC input current limit popup is activated by touching the lower third of the AC Input tile
+The Inverter mode popup is activated by touching the middle of the Multi tile
 
 The power guages require additional information during installation.
     The first three values can be taken from the spec sheet for your specific Multi/Quatro, etc.
