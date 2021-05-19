@@ -21,7 +21,7 @@ This package provides the following modificaitons to the VenusOS GUI:
             4 tanks fit along the bottom of the page
             for more than 4 tanks, the list scrolls
         adds AC voltage, current, frequency and input current limit to flow Overview
-        adds power guages to AC In, AC Out and Inverter tiles
+        adds power gauges to AC In, AC Out and Inverter tiles
         adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
         adds popups for AC input current limit and inverter mode
     
@@ -35,7 +35,7 @@ The buttons for the popups are hidden and the touchable area is kept to a minimu
 The AC input current limit popup is activated by touching the lower third of the AC Input tile
 The Inverter mode popup is activated by touching the middle of the Multi tile
 
-The power guages require additional information during installation.
+The power gauges require additional information during installation.
     The first three values can be taken from the spec sheet for your specific Multi/Quatro, etc.
     The inverter's peak power provides a maximum displayable value.
         Use the value at which the inverter will continue to run only for a short period of time.
@@ -52,7 +52,7 @@ The power guages require additional information during installation.
     The maximum system power is the point at which the components down stream will overload.
         For example, this could be set to the power equivalent to the power distribution panel's
         ain breaker (e.g., 50 amps on a 120volt system would be 6000 watts).
-        This parameter is optional. Setting it allows the AC output guage to show an overload
+        This parameter is optional. Setting it allows the AC output gauge to show an overload
             at this value rather than the sum of input and inverter powers (power assist).
         If you do not want this limitation, set the value to 0.
 

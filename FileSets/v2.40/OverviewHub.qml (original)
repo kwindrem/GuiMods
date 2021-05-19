@@ -81,7 +81,7 @@ OverviewPage {
 			opacity: 0.5
 		}
 ////// add power bar graph
-        PowerGauge
+        PowerGuage
         {
             id: acInBar
             width: parent.width
@@ -103,7 +103,7 @@ OverviewPage {
 			top: parent.top; topMargin: 5
 		}
 ////// add power bar graph
-        PowerGauge
+        PowerGuage
         {
             id: multiBar
             width: multi.width
@@ -157,7 +157,7 @@ OverviewPage {
 			connection: sys.acLoad
 		}
 ////// add power bar graph
-        PowerGauge
+        PowerGuage
         {
             id: acLoadBar
             width: parent.width
@@ -175,21 +175,9 @@ OverviewPage {
 		id: battery
 
 		soc: sys.battery.soc.valid ? sys.battery.soc.value : 0
-////// add battery current bar graph
-        PowerGaugeBattery
-        {
-            id: batteryBar
-            width: parent.width
-            height: 10
-            anchors
-            {
-                top: parent.top; topMargin: 52
-                horizontalCenter: parent.horizontalCenter
-            }
-        }
 
 ////// MODIFIED to show tanks
-        height: bottomTileHeight + 5
+        height: bottomTileHeight
 		anchors {
 			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 5 : 5;
 			left: parent.left; leftMargin: 10
@@ -204,10 +192,6 @@ OverviewPage {
 			TileText {
 				text: sys.battery.power.format(0)
 			}
-            TileText {
-                text: " "
-                font.pixelSize: 6
-            }
 			TileText {
 				text: sys.battery.voltage.format(1) + "   " + sys.battery.current.format(1)
 			}

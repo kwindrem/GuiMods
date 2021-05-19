@@ -22,7 +22,8 @@ objectAcConnection="$qmlDir/ObjectAcConnection.qml"
 overviewHub="$qmlDir/OverviewHub.qml"
 overviewSolarCharger="$qmlDir/OverviewSolarCharger.qml"
 tileTankFile="$qmlDir/TileTank.qml"
-powerGuageFile="$qmlDir/PowerGuage.qml"
+powerGaugeFile="$qmlDir/PowerGauge.qml"
+powerGaugeBatteryFile="$qmlDir/PowerGaugeBattery.qml"
 multiFile="$qmlDir/Multi.qml"
 inverterPopupFile="$qmlDir/InverterModePopUp.qml"
 
@@ -32,6 +33,7 @@ typeset -i inverterPeakPower
 typeset -i inverterContiuousPower
 typeset -i inverterCautionPower
 typeset -i systemPowerLimit
+typeset -i maxDischargeCurrent
 
 # log file for this package
 # if not a null string, options to display the log file are presented
@@ -42,12 +44,6 @@ packageLogFile="/var/log/gui/current"
     
 source "/data/SetupHelper/CommonResources"
 
-if [ $scriptAction == 'EXIT' ] ; then
-    exit
-fi
-
-checkFileSets
-
 #### end of lines to include SetupHelper
 
 #### running manually and OK to proceed - prompt for input
@@ -57,10 +53,12 @@ if [ $scriptAction == 'NONE' ] ; then
     echo "This package modifies the GUI in several areas"
     echo "All modificaitons are explained below with a choice to install each one individually"
 
-    standardActionPrompt enableReinstall
-    
+    standardActionPrompt 'MORE_PROMPTS'
+
     # prompt for remaining parameters needed for activation
-    if [ $scriptAction == 'PROMPT' ]; then
+    # PROMPT is left over from a previous version of SetupHelper
+    #  it is included here for backward compatibility
+    if [ $scriptAction == 'NONE' ] || [ $scriptAction == 'PROMPT' ]; then
         echo
         echo "The Enhanced overview includes the following changes:"
         echo "  1) Tiles are arranged to more cloesly follow the power flow through the system"
@@ -73,32 +71,31 @@ if [ $scriptAction == 'NONE' ] ; then
         echo
         echo "Tank enhancements are also included:"
         echo "  1) Bar text turns red and indicates NO RESPONSE for sensor connection errors"
-        echo "  2) Color of bar turns red on limits instead of blinking"
-        echo "  3) Color of bar text turns red when bar lenght is too short to be seen"
-        echo "  4) If space is limited, bar graph height and associated text are reduced"
-        echo "  5) Added custom tank name"
-        echo "  6) Added absolute quantity (e.g., gallons) next to %"
-        echo "  7) List scrolls if all tanks don't fit"
+        echo "  2) Color of bar turns red on limits"
+        echo "  3) If space is limited, bar graph height and associated text are reduced"
+        echo "  4) Added custom tank name"
+        echo "  5) Added absolute quantity (e.g., gallons) next to %"
+        echo "  6) List scrolls if all tanks don't fit"
         echo        
         yesNoPrompt "Do you wish to install the Enhanced Mobile Overview Page? (y/n): "
         if $yesResponse ; then
-            touch $scriptDir/useEnhancedOverview
+            touch $setupOptionsDir/useEnhancedOverview
        else
-            rm -f $scriptDir/useEnhancedOverview
+            rm -f $setupOptionsDir/useEnhancedOverview
         fi
         echo
         yesNoPrompt "Do you wish to move Settings and Notifications to the top of the Device List? (y/n): "
         if $yesResponse ; then
-            touch $scriptDir/moveSettings
+            touch $setupOptionsDir/moveSettings
        else
-            rm -f $scriptDir/moveSettings
+            rm -f $setupOptionsDir/moveSettings
         fi
         echo
         yesNoPrompt "Do you wish to hide the Tile Overview? (y/n): "
         if $yesResponse ; then
-            touch $scriptDir/hideTileOverview
+            touch $setupOptionsDir/hideTileOverview
        else
-            rm -f $scriptDir/hideTileOverview
+            rm -f $setupOptionsDir/hideTileOverview
         fi
         echo
         echo "The Enhanced flow includes the following changes:"
@@ -115,24 +112,25 @@ if [ $scriptAction == 'NONE' ] ; then
         echo        
         yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
         if $yesResponse ; then
-            touch $scriptDir/enhancedFlow
+            touch $setupOptionsDir/enhancedFlow
        else
-            rm -f $scriptDir/enhancedFlow
+            rm -f $setupOptionsDir/enhancedFlow
         fi
-        if [ -f $scriptDir/enhancedFlow ]; then
+        if [ -f $setupOptionsDir/enhancedFlow ]; then
             echo
-            echo "Power bar guages require inverter power limits"
+            echo "Power bar gauges require inverter power limits"
             echo " you will need to get this informaiton from the inverter's spec sheet"
             echo " You also need to input the output power limit (if any) based on the master AC breaker size"
-            echo " These values determine the color of the guage scale and background regions"
+            echo " These values determine the color of the gauge scale and background regions"
             echo
-            yesNoPrompt "Do you wish install show power guages? (y/n): "
+            yesNoPrompt "Do you wish install show power gauges? (y/n): "
             if $yesResponse ; then
                 while true ; do
                     read -p "Enter a value for caution level of the power graph: " inverterCautionPower
                     read -p "Enter the inverter's MAXIMUM CONTINUOUS power spec: " inverterContiuousPower
                     read -p "Enter the inverter's PEAK power spec: " inverterPeakPower
                     read -p "Enter the maximum power of your breaker panel (0 to disable this limit): " systemPowerLimit
+                    read -p "Enter the battery bank maximum discharge current: " maxDischargeCurrent
                     echo
                     if (( $inverterPeakPower >= $inverterContiuousPower )) && (( $inverterContiuousPower >= $inverterCautionPower )); then
                         break;
@@ -142,15 +140,17 @@ if [ $scriptAction == 'NONE' ] ; then
                         echo
                     fi
                 done
-                echo $inverterPeakPower > $scriptDir/inverterPeakPower
-                echo $inverterContiuousPower > $scriptDir/inverterContiuousPower
-                echo $inverterCautionPower > $scriptDir/inverterCautionPower
-                echo $systemPowerLimit > $scriptDir/systemPowerLimit
+                echo $inverterPeakPower > $setupOptionsDir/inverterPeakPower
+                echo $inverterContiuousPower > $setupOptionsDir/inverterContiuousPower
+                echo $inverterCautionPower > $setupOptionsDir/inverterCautionPower
+                echo $systemPowerLimit > $setupOptionsDir/systemPowerLimit
+                echo $maxDischargeCurrent > $setupOptionsDir/maxDischargeCurrent
             else
-                echo "0" > $scriptDir/inverterPeakPower
-                echo "0" > $scriptDir/inverterContiuousPower
-                echo "0" > $scriptDir/inverterCautionPower
-                echo "0" > $scriptDir/systemPowerLimit
+                echo "0" > $setupOptionsDir/inverterPeakPower
+                echo "0" > $setupOptionsDir/inverterContiuousPower
+                echo "0" > $setupOptionsDir/inverterCautionPower
+                echo "0" > $setupOptionsDir/systemPowerLimit
+                echo "0" > $setupOptionsDir/maxDischargeCurrent
             fi
         fi
         scriptAction='INSTALL'
@@ -159,19 +159,19 @@ fi
 
 #### installing
 if [ $scriptAction == 'INSTALL' ] ; then
-    if [ -f "$scriptDir/moveSettings" ]; then
+    if [ -f "$setupOptionsDir/moveSettings" ]; then
         logMessage "Moving Settings & Notifications to top of Device List"
         updateActiveFile "$deviceListFile"
     else
         restoreActiveFile "$deviceListFile"
     fi
-    if [ -f "$scriptDir/hideTileOverview" ]; then
+    if [ -f "$setupOptionsDir/hideTileOverview" ]; then
         logMessage "Hiding the Tile Overview"
         updateActiveFile "$mainPagesFile"
     else
         restoreActiveFile "$mainPagesFile"
     fi
-    if [ -f "$scriptDir/useEnhancedOverview" ] ; then
+    if [ -f "$setupOptionsDir/useEnhancedOverview" ] ; then
         logMessage "installing Enhanced Mobile Overview"
         updateActiveFile "$overviewMobileEnhancedFile"
         logMessage "installing System Reason Message"
@@ -192,13 +192,14 @@ if [ $scriptAction == 'INSTALL' ] ; then
             filesUpdated=true
         fi
     fi
-    if [ -f "$scriptDir/enhancedFlow" ]; then
+    if [ -f "$setupOptionsDir/enhancedFlow" ]; then
         logMessage "installing enhanced Flow overview"
         updateActiveFile "$overviewAcValues"
         updateActiveFile "$objectAcConnection"
         updateActiveFile "$overviewHub"
         updateActiveFile "$overviewSolarCharger"
-        updateActiveFile "$powerGuageFile"
+        updateActiveFile "$powerGaugeFile"
+        updateActiveFile "$powerGaugeBatteryFile"
         updateActiveFile "$multiFile"
         updateActiveFile "$inverterPopupFile"
         logMessage "creating inverter power limit settings"
@@ -206,25 +207,31 @@ if [ $scriptAction == 'INSTALL' ] ; then
             '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
             {"path":"/InverterLimits/ContiuousPower", "type":"float", "default":0},\
             {"path":"/InverterLimits/CautionPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0}]'  > /dev/null
-        if [ -f $scriptDir/inverterPeakPower ]; then
-            inverterPeakPower=$(cat $scriptDir/inverterPeakPower)
+            {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0},\
+            {"path":"/SystemSetup/MaxDischargeCurrent", "type":"float", "default":0} ]'  > /dev/null
+        if [ -f $setupOptionsDir/inverterPeakPower ]; then
+            inverterPeakPower=$(cat $setupOptionsDir/inverterPeakPower)
         else
             inverterPeakPower=0
         fi
-         if [ -f $scriptDir/inverterContiuousPower ] ; then
-            inverterContiuousPower=$(cat $scriptDir/inverterContiuousPower)
+        if [ -f $setupOptionsDir/inverterContiuousPower ] ; then
+            inverterContiuousPower=$(cat $setupOptionsDir/inverterContiuousPower)
         else
             inverterContiuousPower=0
         fi
-        if [ $scriptDir/inverterContiuousPower ]; then
-            inverterCautionPower=$(cat $scriptDir/inverterCautionPower)
+        if [ $setupOptionsDir/inverterContiuousPower ]; then
+            inverterCautionPower=$(cat $setupOptionsDir/inverterCautionPower)
         else
             inverterCautionPower=0
         fi
 
-        if [ -f $scriptDir/inverterCautionPower ]; then
-            systemPowerLimit=$(cat $scriptDir/systemPowerLimit)
+        if [ -f $setupOptionsDir/maxDischargeCurrent ]; then
+            maxDischargeCurrent=$(cat $setupOptionsDir/maxDischargeCurrent)
+        else
+            maxDischargeCurrent=0
+        fi
+        if [ -f $setupOptionsDir/inverterCautionPower ]; then
+            systemPowerLimit=$(cat $setupOptionsDir/systemPowerLimit)
         else
             systemPowerLimit=0
         fi
@@ -234,9 +241,12 @@ if [ $scriptAction == 'INSTALL' ] ; then
             dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue $inverterContiuousPower > /dev/null
             dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue $inverterCautionPower > /dev/null
             dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
+            logMessage "setting battery discharge limit: $maxDischargeCurrent"
+            dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue $maxDischargeCurrent > /dev/null
         else
-            logMessage "power guages not enabled"
+            logMessage "power gauges not enabled"
             dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
         fi
         # enhanced flow requires enhanced tank tile
         installEnhancedTank=true
@@ -245,12 +255,14 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$objectAcConnection"
         restoreActiveFile "$overviewHub"
         restoreActiveFile "$overviewSolarCharger"
-        restoreActiveFile "$powerGuageFile"
+        restoreActiveFile "$powerGaugeFile"
+        restoreActiveFile "$powerGaugeBatteryFile"
         restoreActiveFile "$multiFile"
         restoreActiveFile "$inverterPopupFile"
         dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
-            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit"]' > /dev/null
+            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
+            "SystemSetup/MaxDischargeCurrent" ]' > /dev/null
     fi
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
@@ -274,12 +286,14 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$overviewHub"
     restoreActiveFile "$overviewSolarCharger"
     restoreActiveFile "$tileTankFile"
-    restoreActiveFile "$powerGuageFile"
+    restoreActiveFile "$powerGaugeFile"
+    restoreActiveFile "$powerGaugeBatteryFile"
     restoreActiveFile "$multiFile"
     restoreActiveFile "$inverterPopupFile"
     dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
-            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit"]' > /dev/null
+            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
+            "SystemSetup/MaxDischargeCurrent" ]' > /dev/null
     logMessage "++ Package uninstalled"
 fi
 
