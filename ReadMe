@@ -22,6 +22,7 @@ This package provides the following modificaitons to the VenusOS GUI:
             for more than 4 tanks, the list scrolls
         adds AC voltage, current, frequency and input current limit to flow Overview
         adds power gauges to AC In, AC Out and Inverter tiles
+        adds power gauge to battery that shows both charge and discharge level
         adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
         adds popups for AC input current limit and inverter mode
     

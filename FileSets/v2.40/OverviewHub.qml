@@ -28,7 +28,7 @@ OverviewPage {
 	property bool hasDcAndAcSolar: hasAcSolar && hasDcSolar
 ////// ADDED to show tanks
     property int tanksHeight: 45
-    property int bottomTileHeight: 91
+    property int batteryHeight: 91
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
     property int numberOfTanks: 0
@@ -100,7 +100,7 @@ OverviewPage {
 		id: multi
 		anchors {
 			horizontalCenter: parent.horizontalCenter
-			top: parent.top; topMargin: 5
+			top: parent.top; topMargin: 3
 		}
 ////// add power bar graph
         PowerGauge
@@ -146,7 +146,7 @@ OverviewPage {
 		color: "#27AE60"
 		titleColor: "#2ECC71"
 		width: 148
-		height: showStatusBar ? 80 : 100
+		height: showStatusBar ? 80 : 102
 
 		anchors {
 			right: parent.right; rightMargin: 10
@@ -173,7 +173,7 @@ OverviewPage {
 
 	Battery {
 		id: battery
-
+        width: acInBox.width
 		soc: sys.battery.soc.valid ? sys.battery.soc.value : 0
 ////// add battery current bar graph
         PowerGaugeBattery
@@ -189,9 +189,9 @@ OverviewPage {
         }
 
 ////// MODIFIED to show tanks
-        height: bottomTileHeight + 5
+        height: batteryHeight + 5
 		anchors {
-			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 5 : 5;
+			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 3 : 5;
 			left: parent.left; leftMargin: 10
 		}
 		values: Column {
@@ -237,8 +237,9 @@ OverviewPage {
 
 		anchors {
 			horizontalCenter: multi.horizontalCenter
+            horizontalCenterOffset: 2
 ////// MODIFIED to show tanks
-			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 5 : 5
+			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 3 : 5
 		}
 
 		values: TileText {
@@ -253,7 +254,7 @@ OverviewPage {
 		id: blueSolarCharger
 
 ////// MODIFIED to show tanks
-        height: hasDcAndAcSolar ? 65 : showTanks ? bottomTileHeight + 20 : 114
+        height: hasDcAndAcSolar ? 65 : showTanks ? batteryHeight + 20 : 114
         width: 148
 		title: qsTr("PV Charger")
 ////// MODIFIED - always hide icon peaking out from under PV tile
@@ -262,7 +263,7 @@ OverviewPage {
 
 		anchors {
 			right: root.right; rightMargin: 10
-            bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 5 : 5
+            bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 3 : 5
 		}
 
 //////// add voltage and current

@@ -22,17 +22,43 @@ Item {
             ? inverterPhaseCount.valid ? inverterPhaseCount.value : 0
             : root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
     
-    property VBusItem inverterContinuousPowerItem: VBusItem { bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/ContiuousPower") }
-    property VBusItem inverterPeakPowerItem: VBusItem { bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/PeakPower") }
-    property VBusItem inverterCautionPowerItem: VBusItem { bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/CautionPower") }
-    property VBusItem outputPowerLimitItem: VBusItem { bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/OutputPowerLimit") }
-    property VBusItem systemStateItem: VBusItem { bind: Utils.path("com.victronenergy.system", "/SystemState/State") }
+    VBusItem
+    {
+        id: inverterContinuousPowerItem
+        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/ContiuousPower")
+        onValueChanged: setLimits ()
+    }
     property real inverterContinuousPower: inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
+    VBusItem
+    {
+        id: inverterPeakPowerItem
+        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/PeakPower")
+        onValueChanged: setLimits ()
+    }
     property real inverterPeakPower: inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
+    VBusItem
+    {
+        id: inverterCautionPowerItem
+        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/CautionPower")
+        onValueChanged: setLimits ()
+    }
     property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
+    VBusItem
+    {
+        id: outputPowerLimitItem
+        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/OutputPowerLimit")
+        onValueChanged: setLimits ()
+    }
     property real outPowerLimit: outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
-    property real inPowerLimit: sys.acInput.inCurrentLimit.value * sys.acInput.inVoltageL1.value
+    VBusItem
+    {
+        id: systemStateItem
+        bind: Utils.path("com.victronenergy.system", "/SystemState/State")
+        onValueChanged: setLimits ()
+    }
     property int systemState: systemStateItem.valid ? systemStateItem.value : 0
+
+    property real inPowerLimit: sys.acInput.inCurrentLimit.value * sys.acInput.inVoltageL1.value
 
     property real barMax: 0
     property real overload: 0
@@ -45,15 +71,8 @@ Item {
     property color bar2color: "black"
     property color bar3color: "black"
     
-    // reset bar limits every 2 seconds since there is no other real way to trigger this
-    property Timer timer: Timer
-    {
-        interval: 2000
-        running: true
-        repeat: true
-        onTriggered: setLimits ()
-    }
-    
+    Component.onCompleted: setLimits ()
+
     // OK range (0 to caution)
     Rectangle
     {
