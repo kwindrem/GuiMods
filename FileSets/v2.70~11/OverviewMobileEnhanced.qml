@@ -67,7 +67,6 @@ OverviewPage {
 //////// add for PV CHARGER voltage and current
     property string pvChargerPrefix: ""
     property int numberOfPvChargers: 0
-
  
  //////// standard tile sizes
  //////// positions are left, center, right and top, center, bottom of infoArea
@@ -331,8 +330,10 @@ OverviewPage {
         id: tanksColum
 
         property int minimumTankHeight: 21
-        property int compactThreshold: 45   // height below this will be compacted vertically
         property int tankTileHeight: Math.max (Math.ceil (height / Math.max (count, 2)), minimumTankHeight)
+//////// modified to control compact differently
+        property int compactThreshold: 45   // height below this will be compacted vertically
+        property bool compact: tanksColum.tankTileHeight < tanksColum.compactThreshold
 
         width: root.tankWidth
 //////// make list flickable if more tiles than will fit completely
@@ -343,7 +344,8 @@ OverviewPage {
 			width: tanksColum.width
 			height: tanksColum.tankTileHeight
 			pumpBindPrefix: root.pumpBindPreffix
-            compact: tanksColum.tankTileHeight < tanksColum.compactThreshold
+//////// modified to control compact differently
+            compact: tanksColum.compact
             Connections {
                 target: scrollTimer
                 onTriggered: doScroll()
@@ -361,7 +363,8 @@ OverviewPage {
             id: scrollTimer
             interval: 15000
             repeat: true
-            running: root.active && tanksModel.count > 4
+//////// modified to control compact differently
+            running: root.active && tanksColum.compact
         }
 
 		Tile {

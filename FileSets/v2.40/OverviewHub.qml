@@ -536,11 +536,11 @@ OverviewPage {
         bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
 
 
-////// popup over AC input tile for current limit
+////// handle clicks outside popup areas
     MouseArea {
         anchors.fill: parent
         enabled: parent.active
-        onPressed: mouse.accepted = acCurrentButton.expanded
+        onPressed: mouse.accepted = acCurrentButton.expanded || inverterModePopUp.expanded
         onClicked: { acCurrentButton.cancel(); inverterModePopUp.cancel() }
     }
 ////// popup current limit box over the AC Input tile

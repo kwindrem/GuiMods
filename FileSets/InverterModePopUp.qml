@@ -14,9 +14,12 @@ Tile {
 	property bool expanded: false // If the tile is 'expanded', additional touch buttons are shown
 	property color buttonColor
 	property alias containsMouse: mouseArea.containsMouse
+    property int inverterMode
 
 	height: contentHeight + 2
 	editable: true
+
+    Component.onCompleted: highlightMode ()
 
 	Behavior on height {
 		PropertyAnimation {
@@ -28,6 +31,7 @@ Tile {
 
 	VBusItem {
 		id: vItem
+        onValueChanged: highlightMode ()
 	}
 
 	values:
@@ -50,41 +54,41 @@ Tile {
 			Button
             {
 				id: onButton
-				baseColor: root.buttonColor
+				baseColor: inverterMode === 3 ? "black" : root.buttonColor
 				pressedColor: root.color
 				height: 40
 				width: parent.width - 6
-				onClicked: edit(3)
+				onClicked: changeMode(3)
 				content: TileText { text: qsTr("On"); font.bold: true }
 			}
             Button
             {
                 id: offButton
-                baseColor: root.buttonColor
+                baseColor: inverterMode === 4 ? "black" : root.buttonColor
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
-                onClicked: edit(4)
+                onClicked: changeMode(4)
                 content: TileText { text: qsTr("Off"); font.bold: true }
             }
             Button
             {
                 id: invertOnlyButton
-                baseColor: root.buttonColor
+                baseColor: inverterMode === 2 ? "black" : root.buttonColor
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
-                onClicked: edit(2)
+                onClicked: changeMode(2)
                 content: TileText { text: qsTr("Inverter\nOnly"); font.bold: true }
             }
             Button 
             {
                 id: chargeOnlyButton
-                baseColor: root.buttonColor
+                baseColor: inverterMode === 1 ? "black" : root.buttonColor
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
-                onClicked: edit(1)
+                onClicked: changeMode(1)
                 content: TileText { text: qsTr("Charger\nOnly"); font.bold: true }
             }
 			Button
@@ -100,7 +104,7 @@ Tile {
 		}
 	]
 
-	function edit(newMode)
+	function changeMode(newMode)
 	{
 		if (!root.valid || root.readOnly)
 			return
@@ -114,6 +118,14 @@ Tile {
 	{
 		root.expanded = false
 	}
+ 
+    function highlightMode ()
+    {
+        if (vItem.valid)
+            inverterMode = vItem.value
+        else
+            inverterMode = 0
+    }
 
 	MouseArea {
 		id: mouseArea
