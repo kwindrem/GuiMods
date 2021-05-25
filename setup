@@ -26,6 +26,7 @@ powerGaugeFile="$qmlDir/PowerGauge.qml"
 powerGaugeBatteryFile="$qmlDir/PowerGaugeBattery.qml"
 multiFile="$qmlDir/Multi.qml"
 inverterPopupFile="$qmlDir/InverterModePopUp.qml"
+acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
 
 installEnhancedTank=false
 
@@ -34,6 +35,11 @@ typeset -i inverterContiuousPower
 typeset -i inverterCautionPower
 typeset -i systemPowerLimit
 typeset -i maxDischargeCurrent
+typeset -i acCurrentLimitPreset1
+typeset -i acCurrentLimitPreset2
+typeset -i acCurrentLimitPreset3
+typeset -i acCurrentLimitPreset4
+
 
 # log file for this package
 # if not a null string, options to display the log file are presented
@@ -109,6 +115,7 @@ if [ $scriptAction == 'NONE' ] ; then
         echo "  7) Power bar graphs for AC in/out and inverter"
         echo "  8) Adds inverter mode to the inverter icon"
         echo "  9) Popups to change the AC input current limit and inverter mode"
+        echo " 10) AC input current limit presets"
         echo        
         yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
         if $yesResponse ; then
@@ -151,6 +158,16 @@ if [ $scriptAction == 'NONE' ] ; then
                 echo "0" > $setupOptionsDir/inverterCautionPower
                 echo "0" > $setupOptionsDir/systemPowerLimit
                 echo "0" > $setupOptionsDir/maxDischargeCurrent
+            fi
+            yesNoPrompt "Do you wish set presets for AC current limit? (y/n): "
+            if $yesResponse ; then
+                read -p "Enter a value for AC current limit preset 1: " acCurrentLimitPreset1
+                read -p "Enter a value for AC current limit preset 2: " acCurrentLimitPreset2
+                read -p "Enter a value for AC current limit preset 3: " acCurrentLimitPreset3
+                read -p "Enter a value for AC current limit preset 4: " acCurrentLimitPreset4
+                echo $acCurrentLimitPreset1  $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4> $setupOptionsDir/acCurrentLimitPresets
+            else
+                echo "0 0 0 0"> $setupOptionsDir/acCurrentLimitPresets
             fi
         fi
         scriptAction='INSTALL'
@@ -202,13 +219,19 @@ if [ $scriptAction == 'INSTALL' ] ; then
         updateActiveFile "$powerGaugeBatteryFile"
         updateActiveFile "$multiFile"
         updateActiveFile "$inverterPopupFile"
+        updateActiveFile "$acCurrentLimitPopUpFile"
         logMessage "creating inverter power limit settings"
         dbus -y com.victronenergy.settings /Settings AddSettings\
             '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
             {"path":"/InverterLimits/ContiuousPower", "type":"float", "default":0},\
             {"path":"/InverterLimits/CautionPower", "type":"float", "default":0},\
             {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0},\
-            {"path":"/SystemSetup/MaxDischargeCurrent", "type":"float", "default":0} ]'  > /dev/null
+            {"path":"/SystemSetup/MaxDischargeCurrent", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset2", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0} ]'  > /dev/null
         if [ -f $setupOptionsDir/inverterPeakPower ]; then
             inverterPeakPower=$(cat $setupOptionsDir/inverterPeakPower)
         else
@@ -248,6 +271,16 @@ if [ $scriptAction == 'INSTALL' ] ; then
             dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
             dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
         fi
+        if [ -f "$setupOptionsDir/acCurrentLimitPresets" ]; then
+            read acCurrentLimitPreset1 acCurrentLimitPreset2 acCurrentLimitPreset3 acCurrentLimitPreset4 <<< $(cat "$setupOptionsDir/acCurrentLimitPresets")
+            logMessage "setting AC current limit presets: $acCurrentLimitPreset1 $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4"
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue $acCurrentLimitPreset1 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue $acCurrentLimitPreset2 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue $acCurrentLimitPreset3 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue $acCurrentLimitPreset4 > /dev/null
+        fi
+
+
         # enhanced flow requires enhanced tank tile
         installEnhancedTank=true
     else
@@ -259,10 +292,13 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$powerGaugeBatteryFile"
         restoreActiveFile "$multiFile"
         restoreActiveFile "$inverterPopupFile"
+        restoreActiveFile "$acCurrentLimitPopUpFile"
         dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
-            "SystemSetup/MaxDischargeCurrent" ]' > /dev/null
+            "SystemSetup/MaxDischargeCurrent",\
+            "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
+            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4" ]' > /dev/null
     fi
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
@@ -290,10 +326,13 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$powerGaugeBatteryFile"
     restoreActiveFile "$multiFile"
     restoreActiveFile "$inverterPopupFile"
-    dbus -y com.victronenergy.settings /Settings RemoveSettings\
+    restoreActiveFile "$acCurrentLimitPopUpFile"
+        dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
-            "SystemSetup/MaxDischargeCurrent" ]' > /dev/null
+            "SystemSetup/MaxDischargeCurrent",\
+            "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
+            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4" ]' > /dev/null
     logMessage "++ Package uninstalled"
 fi
 

@@ -25,6 +25,8 @@ This package provides the following modificaitons to the VenusOS GUI:
         adds power gauge to battery that shows both charge and discharge level
         adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
         adds popups for AC input current limit and inverter mode
+        adds presets for AC current limits, plus a "spinner" to adjust new value between presets
+        inverter popup has colored buttons to help select the desired mode
     
 each of these modifications can be selected individually at install time
 

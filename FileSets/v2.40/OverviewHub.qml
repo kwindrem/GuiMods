@@ -540,29 +540,26 @@ OverviewPage {
     MouseArea {
         anchors.fill: parent
         enabled: parent.active
-        onPressed: mouse.accepted = acCurrentButton.expanded || inverterModePopUp.expanded
-        onClicked: { acCurrentButton.cancel(); inverterModePopUp.cancel() }
+        onPressed: mouse.accepted = acCurrentLimitPopUp.expanded || inverterModePopUp.expanded
+        onClicked: { acCurrentLimitPopUp.cancel(); inverterModePopUp.cancel() }
     }
 ////// popup current limit box over the AC Input tile
-    TileSpinBox {
+    AcCurrentLimitPopUp {
         title: qsTr("AC Current Limit")
-        id: acCurrentButton
+        id: acCurrentLimitPopUp
         // hide button until it is expanded
         // 0 opacity blocks clicks so use a small value instead (0.001 appears to be smallest that works)
         opacity: expanded ? 1 : 0.001
         anchors.top: parent.top; anchors.topMargin: expanded ? 0 : acInBox.height * 2 /3
         anchors.left: acInBox.left
-        isCurrentItem: false // don't show the edit icon
-        focus: true
-
-        bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimit")
-        color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
         width: show ? acInBox.width : 0
+
+        color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
         fontPixelSize: 14
-        unit: "A"
         readOnly: currentLimitIsAdjustable.value !== 1 || numberOfMultis > 1
         buttonColor: "#979797"
 
+        bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimit")
         VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
     }
     

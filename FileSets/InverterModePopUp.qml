@@ -54,42 +54,58 @@ Tile {
 			Button
             {
 				id: onButton
-				baseColor: inverterMode === 3 ? "black" : root.buttonColor
+				baseColor: inverterMode === 3 ? "green" : "#e6ffe6"
 				pressedColor: root.color
 				height: 40
 				width: parent.width - 6
 				onClicked: changeMode(3)
-				content: TileText { text: qsTr("On"); font.bold: true }
+				content: TileText
+                        {
+                            text: qsTr("On"); font.bold: true;
+                            color: inverterMode === 3 ? "white" : "black"
+                        }
 			}
             Button
             {
                 id: offButton
-                baseColor: inverterMode === 4 ? "black" : root.buttonColor
+                baseColor: inverterMode === 4 ? "black" : "#e6e6e6"
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
                 onClicked: changeMode(4)
-                content: TileText { text: qsTr("Off"); font.bold: true }
+                content: TileText
+                        {
+                            text: qsTr("Off"); font.bold: true;
+                            color: inverterMode === 4 ? "white" : "black"
+                        }
             }
             Button
             {
                 id: invertOnlyButton
-                baseColor: inverterMode === 2 ? "black" : root.buttonColor
+                baseColor: inverterMode === 2 ? "blue" : "#ccccff"
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
                 onClicked: changeMode(2)
-                content: TileText { text: qsTr("Inverter\nOnly"); font.bold: true }
+                content: TileText
+                        {
+                            text: qsTr("Inverter\nOnly"); font.bold: true;
+                            color: inverterMode === 2 ? "white" : "black"
+                        }
             }
             Button 
             {
                 id: chargeOnlyButton
-                baseColor: inverterMode === 1 ? "black" : root.buttonColor
+                baseColor: inverterMode === 1 ? "orange" : "#ffedcc"
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
                 onClicked: changeMode(1)
-                content: TileText { text: qsTr("Charger\nOnly"); font.bold: true }
+                content: TileText
+                        {
+                            text: qsTr("Charger\nOnly"); font.bold: true;
+                            color: inverterMode === 1 ? "white" : "black"
+                        }
             }
 			Button
             {
@@ -99,7 +115,7 @@ Tile {
 				height: 40
 				width: parent.width - 2
 				onClicked: cancel()
-                content: TileText { text: qsTr("Cancel"); font.bold: true }
+                content: TileText { text: qsTr("Cancel"); font.bold: true; color: "white" }
 			}
 		}
 	]
