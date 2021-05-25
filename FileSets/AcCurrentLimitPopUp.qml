@@ -99,11 +99,13 @@ Tile {
                 Button
                 {
                     id: preset1button
-                    baseColor: root.buttonColor
+                    baseColor: newCurrentLimit === acLimitPreset1 ? "black" : root.buttonColor
                     pressedColor: root.color
+                    opacity: acLimitPreset1 === 0 ? 0.001 : 1
                     height: 40
                     width: parent.width
                     onClicked: setNewValue (acLimitPreset1)
+                    enabled: acLimitPreset1 === 0 ? false : true
                     content: TileText
                             {
                                 text: qsTr(acLimitPreset1 + " A"); font.bold: true;
@@ -113,11 +115,13 @@ Tile {
                 Button
                 {
                     id: preset2button
-                    baseColor: root.buttonColor
+                    baseColor: newCurrentLimit === acLimitPreset2 ? "black" : root.buttonColor
                     pressedColor: root.color
+                    opacity: acLimitPreset2 === 0 ? 0.001 : 1
                     height: 40
                     width: parent.width
                     onClicked: setNewValue (acLimitPreset2)
+                    enabled: acLimitPreset2 === 0 ? false : true
                     content: TileText
                             {
                                 text: qsTr(acLimitPreset2 + " A"); font.bold: true;
@@ -132,11 +136,13 @@ Tile {
                 Button
                 {
                     id: preset3button
-                    baseColor: root.buttonColor
+                    baseColor: newCurrentLimit === acLimitPreset3 ? "black" : root.buttonColor
                     pressedColor: root.color
+                    opacity: acLimitPreset3 === 0 ? 0.001 : 1
                     height: 40
                     width: parent.width
                     onClicked: setNewValue (acLimitPreset3)
+                    enabled: acLimitPreset3 === 0 ? false : true
                     content: TileText
                             {
                                 text: qsTr(acLimitPreset3 + " A"); font.bold: true;
@@ -146,11 +152,13 @@ Tile {
                 Button
                 {
                     id: preset4button
-                    baseColor: root.buttonColor
+                    baseColor: newCurrentLimit === acLimitPreset4 ? "black" : root.buttonColor
                     pressedColor: root.color
+                    opacity: acLimitPreset4 === 0 ? 0.001 : 1
                     height: 40
                     width: parent.width
                     onClicked: setNewValue (acLimitPreset4)
+                    enabled: acLimitPreset4 === 0 ? false : true
                     content: TileText
                             {
                                 text: qsTr(acLimitPreset4 + " A"); font.bold: true;
@@ -171,6 +179,7 @@ Tile {
                     width: parent.width
                     enablePressAndHold: true
                     onClicked: trimNewValue (-1)
+                    enabled: newCurrentLimit === acLimitPreset4 ? false : true
                     content: TileText
                             {
                                 text: qsTr("-1 A"); font.bold: true;

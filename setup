@@ -159,12 +159,15 @@ if [ $scriptAction == 'NONE' ] ; then
                 echo "0" > $setupOptionsDir/systemPowerLimit
                 echo "0" > $setupOptionsDir/maxDischargeCurrent
             fi
+            echo
+            echo "AC current limit presets offer a quick way to change the AC input current limit"
             yesNoPrompt "Do you wish set presets for AC current limit? (y/n): "
+            echo "For each preset enter the value desired (0 disables the associated preset button)"
             if $yesResponse ; then
-                read -p "Enter a value for AC current limit preset 1: " acCurrentLimitPreset1
-                read -p "Enter a value for AC current limit preset 2: " acCurrentLimitPreset2
-                read -p "Enter a value for AC current limit preset 3: " acCurrentLimitPreset3
-                read -p "Enter a value for AC current limit preset 4: " acCurrentLimitPreset4
+                read -p "Preset 1: " acCurrentLimitPreset1
+                read -p "Preset 2: " acCurrentLimitPreset2
+                read -p "Preset 3: " acCurrentLimitPreset3
+                read -p "Preset 4: " acCurrentLimitPreset4
                 echo $acCurrentLimitPreset1  $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4> $setupOptionsDir/acCurrentLimitPresets
             else
                 echo "0 0 0 0"> $setupOptionsDir/acCurrentLimitPresets

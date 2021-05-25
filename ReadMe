@@ -59,6 +59,23 @@ The power gauges require additional information during installation.
             at this value rather than the sum of input and inverter powers (power assist).
         If you do not want this limitation, set the value to 0.
 
+Configuration:
+    Each set of modificaions can be enabled/disabled separately during installation
+    For the power gauges, you must also specify a set of power limits
+        The spec sheet for the inverter is a good guide for these
+        Caution level defines level at which the inverter may have difficulty supplying that much power
+            The inverter's max power under the most adverse contitions is a recommended value
+        Maxium continuous power is the power the inverter can sustain under best conditions
+        Peak power is the inverter's peak power capability.
+            This number is often twice the max continuous so you may want to choose a lower value
+        Maximum output power is generally defined by the master breaker in the distribution panel.
+            For example, set this parameter to 3600 for a 30 amp main breaker for a 120 volt system.
+        Maximum battery bank discharge current is the continuous current based on the battery specs.
+            Factor in the number of batteries in parallel.
+            For example, set this to 400 for 4 100 AH batteries in parallel.
+    For the AC input current limit presets, enter the desired value for each preset.
+        A value of 0 disables that preset.
+
 Setup:
 
 The easiest way to install this code IF the Venus device has internet access is to run the following command:
