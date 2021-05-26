@@ -1,6 +1,5 @@
 // Enhancements to OverviewMobile screen
 
-// This version supports Venus versions 2.4, 2.5 and 2.60
 // Removed logo and added AC INPUT and SYSTEM tiles originally displayed on other overviews
 // Added voltage, current and frequency to AC INPUT and AC LOADS tiles
 // Added source (Grid, Generator, Shore Power) to AC INPUT tile
@@ -22,10 +21,11 @@
 // that is  no height adjustments when a tile provides no information
 // Adjust button widths so that pump button fits within tank column
 // Hide pump button when not enabled giving more room for tanks
+// Add temperature sensors to tanks column
 
 // Includes changes to handle SeeLevel NMEA2000 tank sensor:
 // Ignore the real incoming tank dBus service because it's information changes
-// Changes in TileText.qml are also part of the TankRepeater  package
+// Changes in TileText.qml are also part of this package
 
 // Search for //////// to find changes
 
@@ -52,6 +52,20 @@ OverviewPage {
 										   "Possible reasons are \"Overruled by remote\" is not enabled or " +
 										   "an assistant is preventing the adjustment. Please, check " +
 										   "the inverter configuration with VEConfigure.")
+
+//////// added to keep track of tanks and temps
+    property int numberOfTanks: 0
+    property int numberOfTemps: 0
+    property int tankTempCount: numberOfTanks + numberOfTemps
+    property int tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? buttonRowHeight : 0)
+    property int tanksHeight: tanksTempsHeight * numberOfTanks / tankTempCount
+    property int tempsHeight: tanksTempsHeight - tanksHeight
+    property int minimumTankHeight: 21
+    property int maxTankHeight: 80
+    property int compactThreshold: 45   // height below this will be compacted vertically
+
+    property int tankTileHeight: Math.min (Math.max (height / tankTempCount, minimumTankHeight), maxTankHeight)
+
     property int numberOfMultis: 0
     property string vebusPrefix: ""
     
@@ -326,23 +340,37 @@ OverviewPage {
 
     } // end ListView infoArea
 
+
+
+
+    // Synchronise tank name text scroll start
+    Timer {
+        id: scrollTimer
+        interval: 15000
+        repeat: true
+//////// modified to control compact differently
+        running: root.active && (tanksColum.compact || tempsColumn.compact)
+    }
+
     ListView {
         id: tanksColum
 
-        property int minimumTankHeight: 21
-        property int tankTileHeight: Math.max (Math.ceil (height / Math.max (count, 2)), minimumTankHeight)
+        anchors {
+            top: root.top
+            right: root.right
+        }
+        height: root.tanksHeight
 //////// modified to control compact differently
-        property int compactThreshold: 45   // height below this will be compacted vertically
-        property bool compact: tanksColum.tankTileHeight < tanksColum.compactThreshold
+        property bool compact: root.tankTileHeight < root.compactThreshold
 
         width: root.tankWidth
 //////// make list flickable if more tiles than will fit completely
-        interactive: tankTileHeight * count > (tanksColum.height + 1) ? true : false
+        interactive: root.tankTileHeight * count > (tanksColum.height + 1) ? true : false
 
 		model: tanksModel
 		delegate: TileTank {
 			width: tanksColum.width
-			height: tanksColum.tankTileHeight
+			height: root.tankTileHeight
 			pumpBindPrefix: root.pumpBindPreffix
 //////// modified to control compact differently
             compact: tanksColum.compact
@@ -351,37 +379,61 @@ OverviewPage {
                 onTriggered: doScroll()
             }
 		}
-
-		anchors {
-			top: root.top
-			bottom: pumpButton.pumpEnabled ? acModeButton.top : acModeButton.bottom
-			right: root.right
-		}
-
-        // Synchronise tank name text scroll start
-        Timer {
-            id: scrollTimer
-            interval: 15000
-            repeat: true
-//////// modified to control compact differently
-            running: root.active && tanksColum.compact
+        Tile {
+            title: qsTr("TANKS")
+            anchors.fill: parent
+            values: TileText {
+                text: qsTr("")
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+            z: -1
         }
-
-		Tile {
-			title: qsTr("TANKS")
-			anchors.fill: parent
-			values: TileText {
-				text: qsTr("")
-				width: parent.width
-				wrapMode: Text.WordWrap
-			}
-			z: -1
-		}
 	}
+	ListModel { id: tanksModel }
 
-	ListModel {
-		id: tanksModel
-	}
+    ListView {
+        id: tempsColumn
+
+        anchors {
+            top: tanksColum.bottom
+            right: root.right
+        }
+        height: root.tempsHeight
+//////// modified to control compact differently
+        property bool compact: root.tankTileHeight < root.compactThreshold
+
+        width: root.tankWidth
+//////// make list flickable if more tiles than will fit completely
+        interactive: root.tankTileHeight * count > (tempsColumn.height + 1) ? true : false
+
+        model: tempsModel
+        delegate: TileTemp
+        {
+            width: tempsColumn.width
+            height: root.tankTileHeight
+//////// modified to control compact differently
+            compact: tempsColumn.compact
+            Connections
+            {
+                target: scrollTimer
+                onTriggered: doScroll()
+            }
+        }
+        Tile
+        {
+            title: qsTr("TEMPS")
+            anchors.fill: parent
+            values: TileText
+            {
+                text: qsTr("")
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+            z: -1
+        }
+    }
+    ListModel { id: tempsModel }
 
 	Keys.forwardTo: [keyHandler]
 
@@ -705,43 +757,42 @@ OverviewPage {
 		onDbusServiceFound: addService(service)
 	}
 
-	function addService(service)
-	{
-		var name = service.name
-		if (service.type === DBusService.DBUS_SERVICE_TANK) {
-                tanksModel.append({serviceName: service.name})
-		}
-        if (service.type === DBusService.DBUS_SERVICE_MULTI) {
+//////// rewrite to use switch in place of if statements
+    function addService(service)
+    {
+        switch (service.type)
+        {
+        case DBusService.DBUS_SERVICE_TANK:
+            numberOfTanks++
+            tanksModel.append({serviceName: service.name})
+            break;;
+//////// add for temp sensors
+        case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
+            numberOfTemps++
+            tempsModel.append({serviceName: service.name})
+            break;;
+        case DBusService.DBUS_SERVICE_MULTI:
             numberOfMultis++
             if (vebusPrefix === "")
-                vebusPrefix = name;
-        }
+                vebusPrefix = service.name;
+            break;;
 //////// add for PV CHARGER voltage and current display
-        if (service.type === DBusService.DBUS_SERVICE_SOLAR_CHARGER) {
+        case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
             numberOfPvChargers++
             if (pvChargerPrefix === "")
-                pvChargerPrefix = name;
+                pvChargerPrefix = service.name;
+            break;;
         }
-	}
+    }
 
-	// Check available services to find tank sesnsors
-	function discoverTanks()
-	{
-		tanksModel.clear()
-		for (var i = 0; i < DBusServices.count; i++) {
-			if (DBusServices.at(i).type === DBusService.DBUS_SERVICE_TANK) {
-				addService(DBusServices.at(i))
-			}
-//////// add for Muitl voltage and current display
-            if (DBusServices.at(i).type === DBusService.DBUS_SERVICE_MULTI) {
+    // Check available services to find tank sesnsors
+//////// rewrite to always call addService, removing redundant service type checks
+    function discoverTanks()
+    {
+        tanksModel.clear()
+        for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
-            }
-//////// add for PV CHARGER voltage and current display
-            if (DBusServices.at(i).type === DBusService.DBUS_SERVICE_SOLAR_CHARGER) {
-                addService(DBusServices.at(i))
-            }
-		}
-	}
+    }
 
 	function notificationText()
 	{

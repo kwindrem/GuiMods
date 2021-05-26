@@ -27,6 +27,7 @@ powerGaugeBatteryFile="$qmlDir/PowerGaugeBattery.qml"
 multiFile="$qmlDir/Multi.qml"
 inverterPopupFile="$qmlDir/InverterModePopUp.qml"
 acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
+tileTempFile="$qmlDir/TileTemp.qml"
 
 installEnhancedTank=false
 
@@ -306,9 +307,11 @@ if [ $scriptAction == 'INSTALL' ] ; then
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
         updateActiveFile "$tileTankFile"
+        updateActiveFile "$tileTempFile"
     # restore tank file in case install was run again manually
     else
         restoreActiveFile "$tileTankFile"
+        restoreActiveFile "$tileTempFile"
     fi
     logMessage "++ Package installed"
 fi
@@ -325,6 +328,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$overviewHub"
     restoreActiveFile "$overviewSolarCharger"
     restoreActiveFile "$tileTankFile"
+    restoreActiveFile "$tileTempFile"
     restoreActiveFile "$powerGaugeFile"
     restoreActiveFile "$powerGaugeBatteryFile"
     restoreActiveFile "$multiFile"

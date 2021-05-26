@@ -10,6 +10,10 @@ This package provides the following modificaitons to the VenusOS GUI:
         hides Pump switch if not enabled to make more space for tanks
             (this became standard in v2.70~9)
         tanks column scrolls if there are more tanks than space allows
+        add temeratore sensors to tanks column
+            The tanks column is split into separte columns for tanks and temerature sensors
+            A common tile height is set for both columns, then each column is filled in separtly
+            Any tank that apepars as a dBus temperature sensor should appear
     enhances the Tank Tile
         red indicates low/high fluid levels
         indicates NO RESPONSE if no signal received from tank
