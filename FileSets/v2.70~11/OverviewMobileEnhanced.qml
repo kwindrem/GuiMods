@@ -344,7 +344,8 @@ OverviewPage {
 
 
     // Synchronise tank name text scroll start
-    Timer {
+    Timer
+    {
         id: scrollTimer
         interval: 15000
         repeat: true
@@ -352,10 +353,12 @@ OverviewPage {
         running: root.active && (tanksColum.compact || tempsColumn.compact)
     }
 
-    ListView {
+    ListView
+    {
         id: tanksColum
 
-        anchors {
+        anchors
+        {
             top: root.top
             right: root.right
         }
@@ -368,7 +371,8 @@ OverviewPage {
         interactive: root.tankTileHeight * count > (tanksColum.height + 1) ? true : false
 
 		model: tanksModel
-		delegate: TileTank {
+		delegate: TileTank
+        {
 			width: tanksColum.width
 			height: root.tankTileHeight
 			pumpBindPrefix: root.pumpBindPreffix
@@ -379,10 +383,12 @@ OverviewPage {
                 onTriggered: doScroll()
             }
 		}
-        Tile {
+        Tile
+        {
             title: qsTr("TANKS")
             anchors.fill: parent
-            values: TileText {
+            values: TileText
+            {
                 text: qsTr("")
                 width: parent.width
                 wrapMode: Text.WordWrap
@@ -392,10 +398,12 @@ OverviewPage {
 	}
 	ListModel { id: tanksModel }
 
-    ListView {
+    ListView
+    {
         id: tempsColumn
 
-        anchors {
+        anchors
+        {
             top: tanksColum.bottom
             right: root.right
         }
@@ -763,8 +771,12 @@ OverviewPage {
         switch (service.type)
         {
         case DBusService.DBUS_SERVICE_TANK:
-            numberOfTanks++
-            tanksModel.append({serviceName: service.name})
+            // hide incoming N2K tank dBus object if TankRepeater is running
+            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
+            {
+                numberOfTanks++
+                tanksModel.append({serviceName: service.name})
+            }
             break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:

@@ -3,17 +3,18 @@
 //  same tile sizes and look
 //  no blink or color change for limits
 //  displays temperature rather that tank level
+//  bar grows from 0 C not from left end
+//  bar has blueish tint if temp < 0 or greenish tint if >= 0
 
 import QtQuick 1.1
 import "utils.js" as Utils
-//// add to display of remaining volume
 import "tanksensor.js" as TankSensor
 
 Tile {
 	id: root
 
     property VBusItem volumeUnit: VBusItem { bind: "com.victronenergy.settings/Settings/System/VolumeUnit" }
-//// small tile height threshold
+    // small tile height threshold
     property bool squeeze: height < 50
 
 	property string bindPrefix: serviceName
@@ -32,7 +33,6 @@ Tile {
     property real maxTemp: 60
     property real tempSpan: (maxTemp - minTemp)
 
-///// modified to keep mixed case names
     title: compact ? "" : tempName
 	color: tempColor
 
@@ -41,48 +41,38 @@ Tile {
 		tempText.doScroll()
 	}
 
-	values: Item {
+	values: Item
+    {
 		width: root.width - 10
-//// modified to squeeze bar height if space is tight
         height: compact ? root.height : squeeze ? 17 : 21
 
-		Marquee {
+		Marquee
+        {
 			id: tempText
-//// modified to give bar more horizontal space
-			width: parent.width * 0.3
+            width: Math.floor (parent.width * 0.3 )
 			height: compact ? 13 : parent.height
 			text: compact ? tempName : ""
 			textHorizontalAlignment: Text.AlignLeft
 			visible: compact
 			scroll: false
-			anchors {
-//// modified to give move bar over title's line if space is tight
+			anchors
+            {
                 verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
 			}
 		}
 
-		Rectangle {
+		Rectangle
+        {
 			color: "#c0c0bd"
 			border { width:1; color: "white" }
 			width: root.width - 10 -  (compact ? tempText.width + 3 : 0)
 			height: compact ? 13 : parent.height
             clip: true
 			anchors {
-//// modified to give move bar over title's line if space is tight
                 verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
 				right: parent.right
 			}
 
-//            Rectangle {
-//                id: valueBar
-//                width: Math.min ((temperature - root.minTemp) / (root.tempSpan), 1) * parent.width - 2
-//                height: parent.height - 1
-//                color: "#34495e"
-//                anchors {
-//                    verticalCenter: parent.verticalCenter;
-//                    left: parent.left; leftMargin: 1
-//                }
-//            }
             Rectangle
             {
                 id: valueBarPos
@@ -109,7 +99,7 @@ Tile {
                     right: zeroLine.horizontalCenter
                 }
             }
-            // zero line - just for a reference for valueBar
+            // zero line - not visible, just for a reference for valueBar
             Rectangle
             {
                 id: zeroLine
@@ -124,7 +114,6 @@ Tile {
                     left: parent.left;  leftMargin: -root.minTemp / root.tempSpan * parent.width -2
                 }
             }
-
 
 			Text {
 				font.pixelSize: 12

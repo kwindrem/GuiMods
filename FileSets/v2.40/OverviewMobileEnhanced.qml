@@ -761,8 +761,12 @@ OverviewPage {
         switch (service.type)
         {
         case DBusService.DBUS_SERVICE_TANK:
-            numberOfTanks++
-            tanksModel.append({serviceName: service.name})
+            // hide incoming N2K tank dBus object if TankRepeater is running
+            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
+            {
+                numberOfTanks++
+                tanksModel.append({serviceName: service.name})
+            }
             break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
@@ -815,7 +819,6 @@ OverviewPage {
 	VBusItem { id: bms; bind: Utils.path(vebusPrefix, "/Devices/Bms/Version") }
 
 //////// TANK REPEATER - add to hide the service for the physical sensor
-    property string incomingTankServiceName: ""
     VBusItem { id: incomingTankName;
         bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
 //////// TANK REPEATER - end add

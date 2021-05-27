@@ -27,20 +27,26 @@ OverviewPage {
 	property bool hasDcSolar: sys.pvCharger.power.valid
 	property bool hasDcAndAcSolar: hasAcSolar && hasDcSolar
 ////// ADDED to show tanks
-    property int tanksHeight: 45
-    property int batteryHeight: 91
+    property int bottomOffset: 45
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
     property int numberOfTanks: 0
+    property int numberOfTemps: 0
+    property int tankTempCount: numberOfTanks + numberOfTemps
     property bool showTanks: showStatusBar ? false : numberOfTanks > 0 ? true : false
-    property string incomingTankServiceName: ""
+    property bool showTemps: showStatusBar ? false : numberOfTemps > 0 ? true : false
+    property bool showTanksTemps: showTanks || showTemps
+    property int compactThreshold: 45   // height below this will be compacted vertically
+    property int batteryHeight: 91
+    property bool compact: showTanks && showTemps && tankTempCount > 4
+    property int tanksHeight: compact ? 22 : 45
+
 //////// add for PV CHARGER voltage and current
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
     property int numberOfPvChargers: 0
     property int numberOfMultis: 0
     property string vebusPrefix: ""
-
 
     Component.onCompleted: discoverServices()
 
@@ -191,7 +197,7 @@ OverviewPage {
 ////// MODIFIED to show tanks
         height: batteryHeight + 5
 		anchors {
-			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 3 : 5;
+			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5;
 			left: parent.left; leftMargin: 10
 		}
 		values: Column {
@@ -239,7 +245,7 @@ OverviewPage {
 			horizontalCenter: multi.horizontalCenter
             horizontalCenterOffset: 2
 ////// MODIFIED to show tanks
-			bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 3 : 5
+			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
 
 		values: TileText {
@@ -254,7 +260,7 @@ OverviewPage {
 		id: blueSolarCharger
 
 ////// MODIFIED to show tanks
-        height: hasDcAndAcSolar ? 65 : showTanks ? batteryHeight + 20 : 114
+        height: hasDcAndAcSolar ? 65 : showTanksTemps ? batteryHeight + 20 : 114
         width: 148
 		title: qsTr("PV Charger")
 ////// MODIFIED - always hide icon peaking out from under PV tile
@@ -263,7 +269,7 @@ OverviewPage {
 
 		anchors {
 			right: root.right; rightMargin: 10
-            bottom: parent.bottom; bottomMargin: showTanks ? tanksHeight + 3 : 5
+            bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
 
 //////// add voltage and current
@@ -330,13 +336,6 @@ OverviewPage {
             visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
         }
     }
-
-	OverviewEssReason {
-		anchors {
-			bottom: parent.bottom; bottomMargin: dcSystemBox.visible ? battery.height + 15 : 5
-			horizontalCenter: parent.horizontalCenter; horizontalCenterOffset: dcSystemBox.visible ? -(root.width / 2 - battery.width / 2 - 10)  : 0
-		}
-	}
 
 	OverviewConnection {
 		id: acInToMulti
@@ -458,74 +457,147 @@ OverviewPage {
 			bottom: dcSystemBox.verticalCenter
 		}
 	}
+////// moved order so it covers connections
+////// moved to under Multi
+    OverviewEssReason {
+        anchors {
+            bottom: parent.bottom; bottomMargin: dcSystemBox.visible ? battery.height + 15 : 5
+            horizontalCenter: parent.horizontalCenter
+        }
+    }
 
-////// ADDED to show tanks
-    ListView {
+////// ADDED to show tanks & temps
+    // Synchronise tank name text scroll start
+    Timer
+    {
+        id: scrollTimer
+        interval: 15000
+        repeat: true
+        running: root.active && root.compact
+    }
+    ListView
+    {
         id: tanksColumn
 
-        width: parent.width
-        property int tileWidth: width / Math.min (count, 4.5)
-        height: tanksHeight
+        visible: showTanks
+        width: compact ? root.width : root.width * numberOfTanks / tankTempCount
+        property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
+        height: root.tanksHeight
         anchors
         {
             bottom: root.bottom
             left: root.left
         }
 
-/////// flickable list if more than will fit across bottom of screen
-        interactive: count > 4 ? true : false
+        // flickable list if more than will fit across bottom of screen
+        interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
         orientation: ListView.Horizontal
 
         model: tanksModel
-        delegate: TileTank {
+        delegate: TileTank
+        {
             width: tanksColumn.tileWidth
-            height: root.tanksHeight
+            height: tanksColumn.height
+            compact: root.compact
             pumpBindPrefix: root.pumpBindPreffix
+            Connections
+            {
+                target: scrollTimer
+                onTriggered: doScroll()
+            }
+        }
+    }
+    ListModel { id: tanksModel }
+
+    ListView
+    {
+        id: tempsColumn
+
+        visible: showTemps
+        width: compact ? root.width : root.width * numberOfTemps / tankTempCount
+        property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
+        height: root.tanksHeight
+        anchors
+        {
+            bottom: root.bottom
+            bottomMargin: compact ? root.tanksHeight : 0
+            right: root.right
         }
 
-    }
+        // make list flickable if more tiles than will fit completely
+        interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
+        orientation: ListView.Horizontal
 
-    ListModel {
-        id: tanksModel
+        model: tempsModel
+        delegate: TileTemp
+        {
+            width: tempsColumn.tileWidth
+            height: tempsColumn.height
+            compact: root.compact
+            Connections
+            {
+                target: scrollTimer
+                onTriggered: doScroll()
+            }
+        }
+        Tile
+        {
+            title: qsTr("TEMPS")
+            anchors.fill: parent
+            values: TileText
+            {
+                text: qsTr("")
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+            z: -1
+        }
     }
+    ListModel { id: tempsModel }
+
     // When new service is found check if is a tank sensor
-    Connections {
+    Connections
+    {
         target: DBusServices
         onDbusServiceFound: addService(service)
     }
 
     function addService(service)
     {
-        var name = service.name
-        if (service.type === DBusService.DBUS_SERVICE_TANK)
+         switch (service.type)
         {
-            // hide the service for the physical sensor
-            if (name !== incomingTankServiceName) // hide incoming N2K tank dBus object
+        case DBusService.DBUS_SERVICE_TANK:
+            // hide incoming N2K tank dBus object if TankRepeater is running
+            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
             {
                 tanksModel.append({serviceName: service.name})
                 numberOfTanks++
             }
-        }
-//////// add for PV CHARGER voltage and current display and popups
-        if (service.type === DBusService.DBUS_SERVICE_SOLAR_CHARGER)
-        {
-            numberOfPvChargers++
-            if (numberOfPvChargers === 1)
-                pvChargerPrefix1 = name;
-            else if (numberOfPvChargers === 2)
-                pvChargerPrefix2 = name;
-        }
-        else if (service.type === DBusService.DBUS_SERVICE_MULTI) {
+            break;;
+//////// add for temp sensors
+        case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
+            numberOfTemps++
+            tempsModel.append({serviceName: service.name})
+            break;;
+        case DBusService.DBUS_SERVICE_MULTI:
             numberOfMultis++
             if (vebusPrefix === "")
-                vebusPrefix = name;
+                vebusPrefix = service.name;
+            break;;
+//////// add for PV CHARGER voltage and current display
+        case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
+            numberOfPvChargers++
+            if (pvChargerPrefix1 === "")
+                pvChargerPrefix1 = service.name;
+            if (pvChargerPrefix2 === "")
+                pvChargerPrefix2 = service.name;
+            break;;
         }
     }
 
     // Detect available services of interest
     function discoverServices()
     {
-        incomingTankServiceName = incomingTankName.valid ? incomingTankName.value : ""
         tanksModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
         {

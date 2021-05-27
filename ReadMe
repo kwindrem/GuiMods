@@ -31,6 +31,10 @@ This package provides the following modificaitons to the VenusOS GUI:
         adds popups for AC input current limit and inverter mode
         adds presets for AC current limits, plus a "spinner" to adjust new value between presets
         inverter popup has colored buttons to help select the desired mode
+        add temps information
+            A combination of up to 4 tanks and temps fit across the bottom
+            For more, the bottom row splits into separate rows for temps and tanks
+            Each row scrolls horizontally if more than 4 items exist in the row
     
 each of these modifications can be selected individually at install time
 
