@@ -40,6 +40,7 @@ typeset -i acCurrentLimitPreset1
 typeset -i acCurrentLimitPreset2
 typeset -i acCurrentLimitPreset3
 typeset -i acCurrentLimitPreset4
+typeset -i pvChargerMaxPower
 
 
 # log file for this package
@@ -139,6 +140,7 @@ if [ $scriptAction == 'NONE' ] ; then
                     read -p "Enter the inverter's PEAK power spec: " inverterPeakPower
                     read -p "Enter the maximum power of your breaker panel (0 to disable this limit): " systemPowerLimit
                     read -p "Enter the battery bank maximum discharge current: " maxDischargeCurrent
+                    read -p "Enter the maximum power of all PV chargers in the system: " pvChargerMaxPower
                     echo
                     if (( $inverterPeakPower >= $inverterContiuousPower )) && (( $inverterContiuousPower >= $inverterCautionPower )); then
                         break;
@@ -153,12 +155,14 @@ if [ $scriptAction == 'NONE' ] ; then
                 echo $inverterCautionPower > $setupOptionsDir/inverterCautionPower
                 echo $systemPowerLimit > $setupOptionsDir/systemPowerLimit
                 echo $maxDischargeCurrent > $setupOptionsDir/maxDischargeCurrent
+                echo $pvChargerMaxPower > $setupOptionsDir/pvChargerMaxPower
             else
                 echo "0" > $setupOptionsDir/inverterPeakPower
                 echo "0" > $setupOptionsDir/inverterContiuousPower
                 echo "0" > $setupOptionsDir/inverterCautionPower
                 echo "0" > $setupOptionsDir/systemPowerLimit
                 echo "0" > $setupOptionsDir/maxDischargeCurrent
+                echo "0" > $setupOptionsDir/pvChargerMaxPower
             fi
             echo
             echo "AC current limit presets offer a quick way to change the AC input current limit"
@@ -235,7 +239,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
             {"path":"/InverterLimits/AcCurrentLimit/Preset2", "type":"float", "default":0},\
             {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0} ]'  > /dev/null
+            {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
+            {"path":"/PvCharger/MaxPower", "type":"float", "default":0} ]'  > /dev/null
         if [ -f $setupOptionsDir/inverterPeakPower ]; then
             inverterPeakPower=$(cat $setupOptionsDir/inverterPeakPower)
         else
@@ -251,16 +256,21 @@ if [ $scriptAction == 'INSTALL' ] ; then
         else
             inverterCautionPower=0
         fi
+        if [ -f $setupOptionsDir/inverterCautionPower ]; then
+            systemPowerLimit=$(cat $setupOptionsDir/systemPowerLimit)
+        else
+            systemPowerLimit=0
+        fi
 
         if [ -f $setupOptionsDir/maxDischargeCurrent ]; then
             maxDischargeCurrent=$(cat $setupOptionsDir/maxDischargeCurrent)
         else
             maxDischargeCurrent=0
         fi
-        if [ -f $setupOptionsDir/inverterCautionPower ]; then
-            systemPowerLimit=$(cat $setupOptionsDir/systemPowerLimit)
+        if [ -f $setupOptionsDir/pvChargerMaxPower ]; then
+            pvChargerMaxPower=$(cat $setupOptionsDir/pvChargerMaxPower)
         else
-            systemPowerLimit=0
+            pvChargerMaxPower=0
         fi
         if (( $inverterPeakPower > 0)); then
             logMessage "setting power limits caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower  outputPower: $systemPowerLimit"
@@ -270,10 +280,12 @@ if [ $scriptAction == 'INSTALL' ] ; then
             dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
             logMessage "setting battery discharge limit: $maxDischargeCurrent"
             dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue $maxDischargeCurrent > /dev/null
+            dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue $pvChargerMaxPower > /dev/null
         else
             logMessage "power gauges not enabled"
             dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
             dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue 0 > /dev/null
         fi
         if [ -f "$setupOptionsDir/acCurrentLimitPresets" ]; then
             read acCurrentLimitPreset1 acCurrentLimitPreset2 acCurrentLimitPreset3 acCurrentLimitPreset4 <<< $(cat "$setupOptionsDir/acCurrentLimitPresets")
@@ -302,7 +314,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
             "SystemSetup/MaxDischargeCurrent",\
             "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
-            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4" ]' > /dev/null
+            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
+            "PvCharger/MaxPower" ]' > /dev/null
     fi
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
@@ -339,7 +352,8 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
             "SystemSetup/MaxDischargeCurrent",\
             "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
-            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4" ]' > /dev/null
+            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
+            "PvCharger/MaxPower" ]' > /dev/null
     logMessage "++ Package uninstalled"
 fi
 

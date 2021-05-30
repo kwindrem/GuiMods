@@ -26,6 +26,7 @@ This package provides the following modificaitons to the VenusOS GUI:
             for more than 4 tanks, the list scrolls
         adds AC voltage, current, frequency and input current limit to flow Overview
         adds power gauges to AC In, AC Out and Inverter tiles
+        adds power gauge to PV Charger tile
         adds power gauge to battery that shows both charge and discharge level
         adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
         adds popups for AC input current limit and inverter mode
@@ -66,6 +67,7 @@ The power gauges require additional information during installation.
         This parameter is optional. Setting it allows the AC output gauge to show an overload
             at this value rather than the sum of input and inverter powers (power assist).
         If you do not want this limitation, set the value to 0.
+    The maximum PV Charger power is the maximum power expected from all PV charger arrays.
 
 Configuration:
     Each set of modificaions can be enabled/disabled separately during installation

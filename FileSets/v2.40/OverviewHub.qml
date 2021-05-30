@@ -7,6 +7,7 @@
 //////  remaining time in Battery tile
 //////  bar graphs on AC in/out and Multi
 //////  popups for AC input current limit and inverter mode
+//////  bar gauge on PV Charger tile
 
 import QtQuick 1.1
 import "utils.js" as Utils
@@ -276,33 +277,46 @@ OverviewPage {
 		values: 
         [
             TileText {
-                y: 0
+                y: 8
                 text: sys.pvCharger.power.format(0)
-                font.pixelSize: 25
+                font.pixelSize: 19
             },
             TileText {
-                y: 28
+                y: 29
                 text: numberOfPvChargers > 0 && pvName1.valid ? pvName1.text : ""
                 visible: numberOfPvChargers > 0
             },
             TileText {
-                y: 44
+                y: 45
                 text: numberOfPvChargers > 0 ? pvVoltage1.text + " " + pvCurrent1.text : ""
                 font.pixelSize: 15
                 visible: numberOfPvChargers > 0 && pvVoltage1.valid && pvCurrent1.valid
             },
             TileText {
-                y: 60
-                text: numberOfPvChargers > 0 && pvName2.valid ? pvName2.text : ""
-                visible: numberOfPvChargers > 0
+                y: 61
+                text: numberOfPvChargers > 1 && pvName2.valid ? pvName2.text : ""
+                visible: numberOfPvChargers > 1
             },
             TileText {
-                y: 74
+                y: 75
                 text: numberOfPvChargers > 1 ? pvVoltage2.text + " " + pvCurrent2.text : ""
                 font.pixelSize: 15
                 visible: numberOfPvChargers > 1 && pvVoltage2.valid && pvCurrent2.valid
             }
         ]
+////// add power bar graph
+        PowerGauge
+        {
+            id: pvChargerBar
+            width: parent.width
+            height: 12
+            anchors
+            {
+                top: parent.top; topMargin: -2
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: sys.pvCharger
+        }
 	}
 
     OverviewSolarInverter {

@@ -20,7 +20,6 @@ Item {
 
     property int phaseCount: useMultiInfo
             ? inverterPhaseCount.valid ? inverterPhaseCount.value : 0
-            : root.connection === sys.pvCharger ? 1
             : root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
     
     VBusItem
@@ -51,13 +50,6 @@ Item {
         onValueChanged: setLimits ()
     }
     property real outPowerLimit: outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
-    VBusItem
-    {
-        id: pvChargerMaxPowerItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/PvCharger/MaxPower")
-        onValueChanged: setLimits ()
-    }
-    property real pvChargerMaxPower: pvChargerMaxPowerItem.valid ? pvChargerMaxPowerItem.value : 0
     VBusItem
     {
         id: systemStateItem
@@ -184,7 +176,7 @@ Item {
         {
             barMax = inPowerLimit * 1.2
             overload = inPowerLimit
-            caution = overload // no caution - overload range
+            caution = inPowerLimit // no caution - overload range
         }
         // acLoad power limits
         else if (root.connection === sys.acLoad)
@@ -224,12 +216,6 @@ Item {
                 barMax = outPowerLimit * 1.2                
             }
         }
-        else if (root.connection === sys.pvCharger)
-        {
-            overload = pvChargerMaxPower
-            barMax = overload * 1.2
-            caution = overload // no caution - overload range
-        }
         // inverter power limits
         else 
         {
@@ -262,11 +248,7 @@ Item {
         var currentValue
         if (phaseCount < 1)
             return 0
-        if (root.connection === sys.pvCharger)
-        {
-            currentValue = sys.pvCharger.power.valid ? sys.pvCharger.power.value : 0
-        }
-        else if (root.connection === sys.acInput)
+        if (root.connection === sys.acInput)
             currentValue = sys.acInput.powerL1.valid ? sys.acInput.powerL1.value : 0
         else
         {
