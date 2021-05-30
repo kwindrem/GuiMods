@@ -119,63 +119,99 @@ if [ $scriptAction == 'NONE' ] ; then
         echo "  9) Popups to change the AC input current limit and inverter mode"
         echo " 10) AC input current limit presets"
         echo        
-        yesNoPrompt "Do you wish install flow Overview enhancements? (y/n): "
+        yesNoPrompt "Do you wish install Flow Overview enhancements? (y/n): "
         if $yesResponse ; then
             touch $setupOptionsDir/enhancedFlow
        else
             rm -f $setupOptionsDir/enhancedFlow
         fi
         if [ -f $setupOptionsDir/enhancedFlow ]; then
-            echo
-            echo "Power bar gauges require inverter power limits"
-            echo " you will need to get this informaiton from the inverter's spec sheet"
-            echo " You also need to input the output power limit (if any) based on the master AC breaker size"
-            echo " These values determine the color of the gauge scale and background regions"
-            echo
-            yesNoPrompt "Do you wish install show power gauges? (y/n): "
-            if $yesResponse ; then
-                while true ; do
-                    read -p "Enter a value for caution level of the power graph: " inverterCautionPower
-                    read -p "Enter the inverter's MAXIMUM CONTINUOUS power spec: " inverterContiuousPower
-                    read -p "Enter the inverter's PEAK power spec: " inverterPeakPower
-                    read -p "Enter the maximum power of your breaker panel (0 to disable this limit): " systemPowerLimit
-                    read -p "Enter the battery bank maximum discharge current: " maxDischargeCurrent
-                    read -p "Enter the maximum power of all PV chargers in the system: " pvChargerMaxPower
-                    echo
-                    if (( $inverterPeakPower >= $inverterContiuousPower )) && (( $inverterContiuousPower >= $inverterCautionPower )); then
-                        break;
-                    else
-                        echo "Error: values must increase in order shown below - reenter all"
-                        echo "  caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower"
-                        echo
-                    fi
-                done
-                echo $inverterPeakPower > $setupOptionsDir/inverterPeakPower
-                echo $inverterContiuousPower > $setupOptionsDir/inverterContiuousPower
-                echo $inverterCautionPower > $setupOptionsDir/inverterCautionPower
-                echo $systemPowerLimit > $setupOptionsDir/systemPowerLimit
-                echo $maxDischargeCurrent > $setupOptionsDir/maxDischargeCurrent
-                echo $pvChargerMaxPower > $setupOptionsDir/pvChargerMaxPower
+            if [ -e "$setupOptionsDir/inverterPeakPower" ]; then
+                echo
+                echo "The following power guage limits were found from a previous install"
+                echo "  Inverter Caution: $(cat "$setupOptionsDir/inverterCautionPower")"
+                echo "  Inverter Max Continuous: $(cat "$setupOptionsDir/inverterContiuousPower")"
+                echo "  Inverter Peak: $(cat "$setupOptionsDir/inverterPeakPower")"
+                echo "  Battery Max Discharge: $(cat "$setupOptionsDir/maxDischargeCurrent")"
+                echo "  Max PV (Solar): $(cat "$setupOptionsDir/pvChargerMaxPower")"
+                echo
+                yesNoPrompt "Do you wish to use these limits? (y/n): "
+                if $yesResponse ; then
+                    changeLimits=false
+                else
+                    changeLimits=true
+                fi
             else
-                echo "0" > $setupOptionsDir/inverterPeakPower
-                echo "0" > $setupOptionsDir/inverterContiuousPower
-                echo "0" > $setupOptionsDir/inverterCautionPower
-                echo "0" > $setupOptionsDir/systemPowerLimit
-                echo "0" > $setupOptionsDir/maxDischargeCurrent
-                echo "0" > $setupOptionsDir/pvChargerMaxPower
+                changeLimits=true
+            fi
+            if $changeLimits ; then
+                echo
+                echo "Power bar gauges require power limits be set manually"
+                echo "  You will need to get this informaiton from the inverter's spec sheet"
+                echo "  You also need to input the output power limit (if any) based on the master AC breaker size"
+                echo "  These values determine the gauge's scale and background regions"
+                echo
+                yesNoPrompt "Do you wish to show power gauges? (y/n): "
+                if $yesResponse ; then
+                    while true ; do
+                        read -p "Enter a value for caution level of the power graph: " inverterCautionPower
+                        read -p "Enter the inverter's MAXIMUM CONTINUOUS power spec: " inverterContiuousPower
+                        read -p "Enter the inverter's PEAK power spec: " inverterPeakPower
+                        read -p "Enter the maximum power of your breaker panel (0 to disable this limit): " systemPowerLimit
+                        read -p "Enter the battery bank maximum discharge current: " maxDischargeCurrent
+                        read -p "Enter the maximum power of all PV chargers in the system: " pvChargerMaxPower
+                        echo
+                        if (( $inverterPeakPower >= $inverterContiuousPower )) && (( $inverterContiuousPower >= $inverterCautionPower )); then
+                            break;
+                        else
+                            echo "Error: values must increase in order shown below - reenter all"
+                            echo "  caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower"
+                            echo
+                        fi
+                    done
+                    echo $inverterPeakPower > "$setupOptionsDir/inverterPeakPower"
+                    echo $inverterContiuousPower > "$setupOptionsDir/inverterContiuousPower"
+                    echo $inverterCautionPower > $setupOptionsDir/inverterCautionPower
+                    echo $systemPowerLimit > $setupOptionsDir/systemPowerLimit
+                    echo $maxDischargeCurrent > "$setupOptionsDir/maxDischargeCurrent"
+                    echo $pvChargerMaxPower > "$setupOptionsDir/pvChargerMaxPower"
+                else
+                    rm -f "$setupOptionsDir/inverterPeakPower"
+                    rm -f "$setupOptionsDir/inverterContiuousPower"
+                    rm -f "$setupOptionsDir/inverterCautionPower"
+                    rm -f "$setupOptionsDir/systemPowerLimit"
+                    rm -f "$setupOptionsDir/maxDischargeCurrent"
+                    rm -f "$setupOptionsDir/pvChargerMaxPower"
+                fi
             fi
             echo
             echo "AC current limit presets offer a quick way to change the AC input current limit"
-            yesNoPrompt "Do you wish set presets for AC current limit? (y/n): "
-            echo "For each preset enter the value desired (0 disables the associated preset button)"
-            if $yesResponse ; then
-                read -p "Preset 1: " acCurrentLimitPreset1
-                read -p "Preset 2: " acCurrentLimitPreset2
-                read -p "Preset 3: " acCurrentLimitPreset3
-                read -p "Preset 4: " acCurrentLimitPreset4
-                echo $acCurrentLimitPreset1  $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4> $setupOptionsDir/acCurrentLimitPresets
+            echo
+            if [ -e "$setupOptionsDir/acCurrentLimitPresets" ]; then
+                echo "The following presets were found from a previous install"
+                echo "  $(cat "$setupOptionsDir/acCurrentLimitPresets")"
+                echo
+                yesNoPrompt "Do you wish to use these presets? (y/n): "
+                if $yesResponse ; then
+                    changePresets=false
+                else
+                    changePresets=true
+                fi
             else
-                echo "0 0 0 0"> $setupOptionsDir/acCurrentLimitPresets
+                changePresets=true
+            fi
+            if $changePresets ; then
+                yesNoPrompt "Do you wish set presets for AC current limit? (y/n): "
+                if $yesResponse ; then
+                    echo "For each preset enter the value desired (0 disables the associated preset button)"
+                    read -p "Preset 1: " acCurrentLimitPreset1
+                    read -p "Preset 2: " acCurrentLimitPreset2
+                    read -p "Preset 3: " acCurrentLimitPreset3
+                    read -p "Preset 4: " acCurrentLimitPreset4
+                    echo $acCurrentLimitPreset1  $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4> "$setupOptionsDir/acCurrentLimitPresets"
+                else
+                    rm -f "$setupOptionsDir/acCurrentLimitPresets"
+                fi
             fi
         fi
         scriptAction='INSTALL'
@@ -241,17 +277,17 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
             {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
             {"path":"/PvCharger/MaxPower", "type":"float", "default":0} ]'  > /dev/null
-        if [ -f $setupOptionsDir/inverterPeakPower ]; then
-            inverterPeakPower=$(cat $setupOptionsDir/inverterPeakPower)
+        if [ -f "$setupOptionsDir/inverterPeakPower" ]; then
+            inverterPeakPower=$(cat "$setupOptionsDir/inverterPeakPower")
         else
             inverterPeakPower=0
         fi
-        if [ -f $setupOptionsDir/inverterContiuousPower ] ; then
-            inverterContiuousPower=$(cat $setupOptionsDir/inverterContiuousPower)
+        if [ -f "$setupOptionsDir/inverterContiuousPower" ] ; then
+            inverterContiuousPower=$(cat "$setupOptionsDir/inverterContiuousPower")
         else
             inverterContiuousPower=0
         fi
-        if [ $setupOptionsDir/inverterContiuousPower ]; then
+        if [ "$setupOptionsDir/inverterContiuousPower" ]; then
             inverterCautionPower=$(cat $setupOptionsDir/inverterCautionPower)
         else
             inverterCautionPower=0
@@ -262,13 +298,13 @@ if [ $scriptAction == 'INSTALL' ] ; then
             systemPowerLimit=0
         fi
 
-        if [ -f $setupOptionsDir/maxDischargeCurrent ]; then
-            maxDischargeCurrent=$(cat $setupOptionsDir/maxDischargeCurrent)
+        if [ -f "$setupOptionsDir/maxDischargeCurrent" ]; then
+            maxDischargeCurrent=$(cat "$setupOptionsDir/maxDischargeCurrent")
         else
             maxDischargeCurrent=0
         fi
-        if [ -f $setupOptionsDir/pvChargerMaxPower ]; then
-            pvChargerMaxPower=$(cat $setupOptionsDir/pvChargerMaxPower)
+        if [ -f "$setupOptionsDir/pvChargerMaxPower" ]; then
+            pvChargerMaxPower=$(cat "$setupOptionsDir/pvChargerMaxPower")
         else
             pvChargerMaxPower=0
         fi
@@ -280,10 +316,13 @@ if [ $scriptAction == 'INSTALL' ] ; then
             dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
             logMessage "setting battery discharge limit: $maxDischargeCurrent"
             dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue $maxDischargeCurrent > /dev/null
+            logMessage "setting PV charger limit: $pvChargerMaxPower"
             dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue $pvChargerMaxPower > /dev/null
         else
             logMessage "power gauges not enabled"
             dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue 0 > /dev/null
             dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
             dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue 0 > /dev/null
         fi
@@ -294,6 +333,12 @@ if [ $scriptAction == 'INSTALL' ] ; then
             dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue $acCurrentLimitPreset2 > /dev/null
             dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue $acCurrentLimitPreset3 > /dev/null
             dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue $acCurrentLimitPreset4 > /dev/null
+        else
+            logMessage "current presets not set"
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue 0 > /dev/null
+            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue 0 > /dev/null
         fi
 
 
