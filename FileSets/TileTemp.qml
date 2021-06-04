@@ -13,7 +13,8 @@ import "tanksensor.js" as TankSensor
 Tile {
 	id: root
 
-    property VBusItem volumeUnit: VBusItem { bind: "com.victronenergy.settings/Settings/System/VolumeUnit" }
+    property VBusItem tempScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/TemperatureScale" }
+    property int tempScale: tempScaleItem.valid ? tempScaleItem.value : 0
     // small tile height threshold
     property bool squeeze: height < 50
 
@@ -118,7 +119,15 @@ Tile {
 			Text {
 				font.pixelSize: 12
 				font.bold: true
-                text: root.temperature.toFixed (0) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
+                text:
+                {   
+                    if (tempScale == 1)
+                        return root.temperature.toFixed (0) + "°C"
+                    else if (tempScale == 2)
+                        return ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
+                    else 
+                        return root.temperature.toFixed (0) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
+                }
                 anchors.centerIn: parent
 				color: "white"
 			}
