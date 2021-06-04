@@ -122,7 +122,7 @@ if [ $scriptAction == 'NONE' ] ; then
         yesNoPrompt "Do you wish install Flow Overview enhancements? (y/n): "
         if $yesResponse ; then
             touch $setupOptionsDir/enhancedFlow
-       else
+        else
             rm -f $setupOptionsDir/enhancedFlow
         fi
         if [ -f $setupOptionsDir/enhancedFlow ]; then
@@ -214,12 +214,49 @@ if [ $scriptAction == 'NONE' ] ; then
                 fi
             fi
         fi
+        
+        echo
+        while true ; do
+            read -p "Select the desired temperature scale (C/F/b (both)): " tempScale
+            case $tempScale in
+                [cC]*)
+                    echo "1" > "$setupOptionsDir/temperatureScale"
+                    break
+                    ;;
+                [fF]*)
+                    echo "2" > "$setupOptionsDir/temperatureScale"
+                    break
+                    ;;
+                 [bB]*)
+                    echo "0" > "$setupOptionsDir/temperatureScale"
+                    break
+                    ;;
+                *)
+                   ;;
+            esac
+        done
         scriptAction='INSTALL'
     fi
 fi
 
 #### installing
 if [ $scriptAction == 'INSTALL' ] ; then
+    # set defaults if options have not been set before
+    # all modifications enabled, default power limits, default input current limit presets
+    if [ ! -f "$setupOptionsDir/optionsSet" ]; then
+        touch "$setupOptionsDir/moveSettings"
+        touch "$setupOptionsDir/hideTileOverview"
+        touch "$setupOptionsDir/useEnhancedOverview"
+        echo "3000" "$setupOptionsDir/inverterPeakPower"
+        echo "2000" "$setupOptionsDir/inverterContiuousPower"
+        echo "1400" "$setupOptionsDir/inverterCautionPower"
+        echo "3600" "$setupOptionsDir/systemPowerLimit"
+        echo "200" "$setupOptionsDir/maxDischargeCurrent"
+        echo "360" "$setupOptionsDir/pvChargerMaxPower"
+        echo "10 15 20 30" > "$setupOptionsDir/acCurrentLimitPresets"
+        echo "0" "$setupOptionsDir/temperatureScale"
+        touch "$setupOptionsDir/optionsSet"
+    fi
     if [ -f "$setupOptionsDir/moveSettings" ]; then
         logMessage "Moving Settings & Notifications to top of Device List"
         updateActiveFile "$deviceListFile"
@@ -276,7 +313,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/InverterLimits/AcCurrentLimit/Preset2", "type":"float", "default":0},\
             {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
             {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
-            {"path":"/PvCharger/MaxPower", "type":"float", "default":0} ]'  > /dev/null
+            {"path":"/PvCharger/MaxPower", "type":"float", "default":0},\
+            {"path":"/GuiMods/TemperatureScale", "type":"int", "default":0} ]'  > /dev/null
         if [ -f "$setupOptionsDir/inverterPeakPower" ]; then
             inverterPeakPower=$(cat "$setupOptionsDir/inverterPeakPower")
         else
@@ -340,6 +378,19 @@ if [ $scriptAction == 'INSTALL' ] ; then
             dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue 0 > /dev/null
             dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue 0 > /dev/null
         fi
+        if [ -f "$setupOptionsDir/temperatureScale" ]; then
+            temperatureScale=$(cat "$setupOptionsDir/temperatureScale")
+        else
+            temperatureScale=0
+        fi
+        if [ $temperatureScale == 1 ]; then
+            logMessage "setting Temperature Scale to °C"
+        elif [ $temperatureScale == 2 ]; then
+            logMessage "setting Temperature Scale to °F"
+        else
+            logMessage "setting Temperature Scale to both °C and °F"
+        fi
+        dbus -y com.victronenergy.settings /Settings/GuiMods/TemperatureScale SetValue $temperatureScale > /dev/null
 
 
         # enhanced flow requires enhanced tank tile
@@ -360,7 +411,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
             "SystemSetup/MaxDischargeCurrent",\
             "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
             "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
-            "PvCharger/MaxPower" ]' > /dev/null
+            "PvCharger/MaxPower", "GuiMods/TemperatureScale" ]' > /dev/null
     fi
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
@@ -398,7 +449,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
             "SystemSetup/MaxDischargeCurrent",\
             "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
             "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
-            "PvCharger/MaxPower" ]' > /dev/null
+            "PvCharger/MaxPower", "GuiMods/TemperatureScale" ]' > /dev/null
     logMessage "++ Package uninstalled"
 fi
 
