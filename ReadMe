@@ -117,7 +117,6 @@ mv /data/SetupHelper-current /data/SetupHelper
 or click on this link in a web browser:
 
 https://github.com/kwindrem/SetupHelper/archive/current.tar.gz
-mv current.tar.gz SetupHelper.tar.gz
 
 rename the resulting .tar.gz file to venus-data.tar.gz
 copy the venus-data.tar.gz to a USB stick,

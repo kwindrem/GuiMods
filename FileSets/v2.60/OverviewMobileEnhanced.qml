@@ -520,7 +520,8 @@ OverviewPage {
 		anchors.bottom: parent.bottom
 		property variant texts: { 4: qsTr("OFF"), 3: qsTr("ON"), 1: qsTr("CHARGER ONLY"), 2: qsTr("INVERTER ONLY") }
 		property int value: mode.valid ? mode.value : 3
-        property bool reset: false
+        property int shownValue: applyAnimation2.running ? applyAnimation2.pendingValue : value
+
 		isCurrentItem: (buttonIndex == 1)
 		focus: root.active && isCurrentItem
 
@@ -533,7 +534,7 @@ OverviewPage {
 
 		values: [
 			TileText {
-                text: modeIsAdjustable.valid && numberOfMultis === 1 ? qsTr("%1").arg(acModeButton.texts[acModeButton.value]) : qsTr("NOT AVAILABLE")
+                text: modeIsAdjustable.valid && numberOfMultis === 1 ? qsTr("%1").arg(acModeButton.texts[acModeButton.shownValue]) : qsTr("NOT AVAILABLE")
 			}
 		]
 
@@ -562,26 +563,25 @@ OverviewPage {
 				return
 			}
 
-            reset = true
-            applyAnimation2.restart()
-            reset = false
-            switch(value) {
+            switch (shownValue) {
             case 4:
-                value--
+                applyAnimation2.pendingValue = 3
                 break;
             case 3:
-                value = 1
+                applyAnimation2.pendingValue = 1
                 break;
             case 1:
  //////// modify to add inverter only (was = 4)
-                value = 2
+                applyAnimation2.pendingValue = 2
                 break;
 //////// add case 2 (inverter only)
             case 2:
-                value = 4
+                applyAnimation2.pendingValue = 4
                 break;
             }
-        }
+
+            applyAnimation2.restart()
+		}
 
 		MouseArea {
 			id: acModeButtonMouseArea
@@ -606,6 +606,8 @@ OverviewPage {
 
 		SequentialAnimation {
 			id: applyAnimation2
+            property int pendingValue
+
             NumberAnimation {
 				target: timerRect2
 				property: "width"
@@ -634,112 +636,114 @@ OverviewPage {
 				property: "width"
 				value: 0
 			}
-            onCompleted: if (!acModeButton.reset) mode.setValue(acModeButton.value)
+            ScriptAction { script: mode.setValue(applyAnimation2.pendingValue) }
+
+            PauseAnimation { duration: 1000 }
 		}
 	}
 
 	Tile {
-		id: pumpButton
+        id: pumpButton
 
-		anchors.left: acModeButton.right
-		anchors.bottom: parent.bottom
+        anchors.left: acModeButton.right
+        anchors.bottom: parent.bottom
 
-		property variant texts: [ qsTr("AUTO"), qsTr("ON"), qsTr("OFF")]
-		property int value: 0
-		property bool reset: false
-		property bool pumpEnabled: pumpRelay.value === 3
-		isCurrentItem: (buttonIndex == 2)
-		focus: root.active && isCurrentItem
+        property variant texts: [ qsTr("AUTO"), qsTr("ON"), qsTr("OFF")]
+        property int value: 0
+        property bool reset: false
+        property bool pumpEnabled: pumpRelay.value === 3
+        isCurrentItem: (buttonIndex == 2)
+        focus: root.active && isCurrentItem
 
-		title: qsTr("PUMP")
-		width: show && pumpEnabled ? root.tankWidth : 0
-		height: buttonRowHeight
-		editable: true
-		readOnly: false
-		color: pumpButtonMouseArea.containsPressed ? "#d3d3d3" : "#A8A8A8"
+        title: qsTr("PUMP")
+        width: show ? 160 : 0
+        height: 45
+        editable: true
+        readOnly: false
+        color: pumpButtonMouseArea.containsPressed ? "#d3d3d3" : "#A8A8A8"
 
-		VBusItem { id: pump; bind: Utils.path(settingsBindPreffix, "/Settings/Pump0/Mode") }
-		VBusItem { id: pumpRelay; bind: Utils.path(settingsBindPreffix, "/Settings/Relay/Function") }
+        VBusItem { id: pump; bind: Utils.path(settingsBindPreffix, "/Settings/Pump0/Mode") }
+        VBusItem { id: pumpRelay; bind: Utils.path(settingsBindPreffix, "/Settings/Relay/Function") }
 
-		values: [
-			TileText {
-				text: pumpButton.pumpEnabled ? qsTr("%1").arg(pumpButton.texts[pumpButton.value]) : qsTr("DISABLED")
-			}
-		]
+        values: [
+            TileText {
+                text: pumpButton.pumpEnabled ? qsTr("%1").arg(pumpButton.texts[pumpButton.value]) : qsTr("DISABLED")
+            }
+        ]
 
-		Keys.onSpacePressed: edit()
+        Keys.onSpacePressed: edit()
 
-		function edit() {
-			if (!pumpEnabled) {
-				toast.createToast(qsTr("Pump functionality is not enabled. To enable it go to the relay settings page and set function to \"Tank pump\""), 5000)
-				return
-			}
+        function edit() {
+            if (!pumpEnabled) {
+                toast.createToast(qsTr("Pump functionality is not enabled. To enable it go to the relay settings page and set function to \"Tank pump\""), 5000)
+                return
+            }
 
-			reset = true
-			applyAnimation.restart()
-			reset = false
+            reset = true
+            applyAnimation.restart()
+            reset = false
 
-			if (value < 2)
-				value++
-			else
-				value = 0
-		}
+            if (value < 2)
+                value++
+            else
+                value = 0
+        }
 
-		MouseArea {
-			id: pumpButtonMouseArea
-			property bool containsPressed: containsMouse && pressed
-			anchors.fill: parent
-			onClicked: {
-				buttonIndex = 2
-				parent.edit()
-			}
-		}
+        MouseArea {
+            id: pumpButtonMouseArea
+            property bool containsPressed: containsMouse && pressed
+            anchors.fill: parent
+            onClicked: {
+                buttonIndex = 2
+                parent.edit()
+            }
+        }
 
-		Rectangle {
-			id: timerRect
-			height: 2
-			width: pumpButton.width * 0.8
-			visible: applyAnimation.running
-			anchors {
-				bottom: parent.bottom; bottomMargin: 5
-				horizontalCenter: parent.horizontalCenter
-			}
-		}
+        Rectangle {
+            id: timerRect
+            height: 2
+            width: pumpButton.width * 0.8
+            visible: applyAnimation.running
+            anchors {
+                bottom: parent.bottom; bottomMargin: 5
+                horizontalCenter: parent.horizontalCenter
+            }
+        }
 
-		SequentialAnimation {
-			id: applyAnimation
-			alwaysRunToEnd: false
-			NumberAnimation {
-				target: timerRect
-				property: "width"
-				from: 0
-				to: pumpButton.width * 0.8
-				duration: 3000
-			}
+        SequentialAnimation {
+            id: applyAnimation
+            alwaysRunToEnd: false
+            NumberAnimation {
+                target: timerRect
+                property: "width"
+                from: 0
+                to: pumpButton.width * 0.8
+                duration: 3000
+            }
 
-			ColorAnimation {
-				target: pumpButton
-				property: "color"
-				from: "#A8A8A8"
-				to: "#4789d0"
-				duration: 200
-			}
+            ColorAnimation {
+                target: pumpButton
+                property: "color"
+                from: "#A8A8A8"
+                to: "#4789d0"
+                duration: 200
+            }
 
-			ColorAnimation {
-				target: pumpButton
-				property: "color"
-				from: "#4789d0"
-				to: "#A8A8A8"
-				duration: 200
-			}
-			PropertyAction {
-				target: timerRect
-				property: "width"
-				value: 0
-			}
-			// Do not set value if the animation is restarted by user pressing the button
-			// to move between options
-			onCompleted: if (!pumpButton.reset) pump.setValue(pumpButton.value)
+            ColorAnimation {
+                target: pumpButton
+                property: "color"
+                from: "#4789d0"
+                to: "#A8A8A8"
+                duration: 200
+            }
+            PropertyAction {
+                target: timerRect
+                property: "width"
+                value: 0
+            }
+            // Do not set value if the animation is restarted by user pressing the button
+            // to move between options
+            onCompleted: if (!pumpButton.reset) pump.setValue(pumpButton.value)
 		}
 	}
 
