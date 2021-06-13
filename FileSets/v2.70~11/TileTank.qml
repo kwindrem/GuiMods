@@ -1,14 +1,5 @@
-// This file has been modified:
-//   Show mixed case text names in tile title even when not in compact display
-//   A sliver of the level bar remains when the tank is empty so there is some indication of empty
-//   Show actual level in addition to percentage
-//   reduce tile height when needed, mainly to fit on Flow overview page
-//   changes in prevous versions have been restored to stock
-
 import QtQuick 1.1
 import "utils.js" as Utils
-//// add to display of remaining volume
-import "tanksensor.js" as TankSensor
 
 Tile {
 	id: root
@@ -64,13 +55,13 @@ Tile {
 
 	values: Item {
 		width: root.width - 10
-//// modified to squeeze bar height if space is tight
-        height: compact ? root.height : squeeze ? 17 : 21
+///// modified to keep mixed case names
+        title: compact ? "" : tankName
 
 		Marquee {
 			id: tankText
 //// modified to give bar more horizontal space
-			width: Math.floor (parent.width * 0.3 )
+            width: Math.floor (parent.width * 0.3 )
 			height: compact ? 13 : parent.height
 			text: compact ? tankName : ""
 			textHorizontalAlignment: Text.AlignLeft
@@ -110,7 +101,7 @@ Tile {
 				font.pixelSize: 12
 				font.bold: true
 //// include actual level in display
-				text: root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value)
+                text: root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value)
 				anchors.centerIn: parent
 				color: "white"
 			}

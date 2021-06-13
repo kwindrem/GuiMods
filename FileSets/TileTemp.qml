@@ -53,6 +53,7 @@ Tile {
             width: Math.floor (parent.width * 0.3 )
 			height: compact ? 13 : parent.height
 			text: compact ? tempName : ""
+            textHorizontalAlignment: Text.AlignLeft /////////////////////////////////////////////
 			visible: compact
 			scroll: false
 			anchors

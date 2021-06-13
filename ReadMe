@@ -88,12 +88,16 @@ Configuration:
 
 Setup:
 
-The easiest way to install this code IF the Venus device has internet access is to run the following command:
+The easiest way to install this or other of my packages is to first install SetupHelper,
+then use its package install tool. Refer to the SetupHelper ReadMe for instructions.
+
+There are two other methods to fetch a package archive.
+
+IF the Venus device has internet access is to run the following command:
 
 wget -qO - https://github.com/kwindrem/GuiMods/archive/current.tar.gz | tar -xzf - -C /data
-mv /data/GuiMods-current /data/GuiMods
 
-If not, do the following a computer that does have internet access
+If the Venus device does not have internet access, you will need to fetch the archive using a computer that does have internet access:
 
 click on this link in a web browser:
 https://github.com/kwindrem/GuiMods/archive/current.tar.gz
@@ -103,33 +107,13 @@ copy the venus-data.tar.gz to a USB stick,
 put the stick in the Venus device and reboot.
 When Venus boots, it will unarchive the file to /data/GuiMods-current
 
+Move the directory into it's active locaiton:
+rm -rf /data/GuiMods
 mv /data/GuiMods-current /data/GuiMods
 
-then move the resulting .tar.gx file to a USB stick,
-put the stick in the Venus device and reboot.
+Repeat the above for SetupHelper if you haven't done so for another package.
 
-
-You must also install SetupHelper
-
-wget -qO - https://github.com/kwindrem/SetupHelper/archive/current.tar.gz | tar -xzf - -C /data
-mv /data/SetupHelper-current /data/SetupHelper
-
-or click on this link in a web browser:
-
-https://github.com/kwindrem/SetupHelper/archive/current.tar.gz
-
-rename the resulting .tar.gz file to venus-data.tar.gz
-copy the venus-data.tar.gz to a USB stick,
-put the stick in the Venus device and reboot.
-
-mv /data/SetupHelper-current /data/SetupHelper
-
-Note, you must do GuiMods and SetupHelper on a separate flash drive since they use
-the same file name on the flash drive. 
-
-If you are installing multiple packages, SetupHelper need only be installed once.
-
-Once both packages are installed run setup and follow the prompts.
+Finally, run the setup script to complete the installation
 /data/GuiMods/setup
 
 You will need root access to the Venus device. Instructions can be found here:

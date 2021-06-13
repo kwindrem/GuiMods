@@ -656,7 +656,7 @@ OverviewPage {
         focus: root.active && isCurrentItem
 
         title: qsTr("PUMP")
-        width: show ? 160 : 0
+        width: show && pumpEnabled ? root.tankWidth : 0
         height: 45
         editable: true
         readOnly: false

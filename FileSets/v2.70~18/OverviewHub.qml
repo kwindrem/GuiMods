@@ -31,10 +31,9 @@ OverviewPage {
     property int bottomOffset: 45
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
-    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: numberOfTanks + numberOfTemps
-    property bool showTanks: showStatusBar ? false : numberOfTanks > 0 ? true : false
+    property int tankTempCount: tankModel.rowCount + numberOfTemps
+    property bool showTanks: showStatusBar ? false : tankModel.rowCount > 0 ? true : false
     property bool showTemps: showStatusBar ? false : numberOfTemps > 0 ? true : false
     property bool showTanksTemps: showTanks || showTemps
     property int compactThreshold: 45   // height below this will be compacted vertically
@@ -494,7 +493,7 @@ OverviewPage {
         id: tanksColumn
 
         visible: showTanks
-        width: compact ? root.width : root.width * numberOfTanks / tankTempCount
+        width: compact ? root.width : root.width * tankModel.rowCount / tankTempCount
         property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
         height: root.tanksHeight
         anchors
@@ -507,21 +506,31 @@ OverviewPage {
         interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
         orientation: ListView.Horizontal
 
-        model: tanksModel
-        delegate: TileTank
-        {
+        model: TankModel { id: tankModel }
+        delegate: TileTank {
+            // Without an intermediate assignment this will trigger a binding loop warning.
+            property variant theService: DBusServices.get(buddy.id)
+            service: theService
             width: tanksColumn.tileWidth
-            height: tanksColumn.height
-            compact: root.compact
+            height: root.tanksHeight
             pumpBindPrefix: root.pumpBindPreffix
-            Connections
-            {
+            compact: root.compact
+            Connections {
                 target: scrollTimer
                 onTriggered: doScroll()
             }
         }
+        Tile {
+            title: qsTr("TANKS")
+            anchors.fill: parent
+            values: TileText {
+                text: qsTr("")
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+            z: -1
+        }
     }
-    ListModel { id: tanksModel }
 
     ListView
     {
@@ -580,14 +589,6 @@ OverviewPage {
     {
          switch (service.type)
         {
-        case DBusService.DBUS_SERVICE_TANK:
-            // hide incoming N2K tank dBus object if TankRepeater is running
-            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
-            {
-                tanksModel.append({serviceName: service.name})
-                numberOfTanks++
-            }
-            break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
@@ -612,8 +613,6 @@ OverviewPage {
     // Detect available services of interest
     function discoverServices()
     {
-        tanksModel.clear()
-        numberOfTanks = 0
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfMultis = 0

@@ -55,11 +55,10 @@ OverviewPage {
 										   "the inverter configuration with VEConfigure.")
 
 //////// added to keep track of tanks and temps
-    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: numberOfTanks + numberOfTemps
+    property int tankTempCount: tankModel.rowCount + numberOfTemps
     property int tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? buttonRowHeight : 0)
-    property int tanksHeight: tanksTempsHeight * numberOfTanks / tankTempCount
+    property int tanksHeight: tanksTempsHeight * tankModel.rowCount / tankTempCount
     property int tempsHeight: tanksTempsHeight - tanksHeight
     property int minimumTankHeight: 21
     property int maxTankHeight: 80
@@ -428,7 +427,8 @@ OverviewPage {
             anchors.fill: parent
             values: TileText
             {
-                text: qsTr("")
+//                text: qsTr("")
+                text: root.numberOfTemps
                 width: parent.width
                 wrapMode: Text.WordWrap
             }
@@ -658,7 +658,7 @@ OverviewPage {
         focus: root.active && isCurrentItem
 
         title: qsTr("PUMP")
-        width: show ? 160 : 0
+        width: show && pumpEnabled ? root.tankWidth : 0
         height: 45
         editable: true
         readOnly: false
@@ -783,7 +783,7 @@ OverviewPage {
 //////// rewrite to always call addService, removing redundant service type checks
     function discoverMulti()
     {
-        tanksModel.clear()
+        tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
     }
