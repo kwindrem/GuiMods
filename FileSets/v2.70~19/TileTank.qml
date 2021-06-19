@@ -22,7 +22,7 @@ Tile {
     property string bindPrefix: service ? service.name : ""
 	property string pumpBindPrefix
 	property VBusItem levelItem: VBusItem { id: levelItem; bind: Utils.path(bindPrefix, "/Level"); decimals: 0; unit: "%" }
-	property VBusItem fluidTypeItem: VBusItem { id: fluidTypeItem; bind: Utils.path(bindPrefix, "/FluidType") }
+    property VBusItem fluidTypeItem: VBusItem { id: fluidTypeItem; bind: Utils.path(bindPrefix, "/FluidType") }
     property VBusItem pumpStateItem: VBusItem { id: pumpStateItem; bind: Utils.path(pumpBindPrefix, "/State") }
     property VBusItem pumpActiveService: VBusItem { id: pumpActiveService; bind: Utils.path(pumpBindPrefix, "/ActiveTankService") }
     property alias valueBarColor: valueBar.color
@@ -31,7 +31,30 @@ Tile {
     property int emptyWarningLevel: !([2, 5].indexOf(fluidTypeItem.value) > -1) ? 20 : -1
     property bool blink: true
     property bool compact: false
-    property string tankName: service ? service.description : ""
+
+//// modified to truncate tank name to 1 word if compact is true or 2 words if not
+//// and to replace "Waste" with "Gray"
+    property VBusItem customNameTypeItem: VBusItem { id: customNameTypeItem; bind: Utils.path(bindPrefix, "/CustomName") }
+    property VBusItem shortenTankNames: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/ShortenTankNames" }
+    property string tankName: truncateTankName ()
+
+    function truncateTankName ()
+    {
+        var stringList = service ? service.description.split (" ") : ""
+        if (customNameTypeItem.valid && customNameTypeItem.value != "")
+            return customNameTypeItem.value
+        else if (shortenTankNames.valid && shortenTankNames.value == 1)
+        {
+            if (stringList[0] == "Waste")
+                        stringList[0] = "Gray"
+                    if (compact)
+                        return stringList[0]
+                    else
+                        return stringList[0] + " " + stringList[1]
+        }
+        else
+            return service ? service.description : ""
+    }
 
 ///// modified to keep mixed case names
     title: compact ? "" : tankName

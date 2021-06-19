@@ -235,6 +235,18 @@ if [ $scriptAction == 'NONE' ] ; then
                    ;;
             esac
         done
+
+        echo "Beginning with Venus v2.70~16, names for NMEA2000 tanks won't fit in the available space"
+        echo "If custom names exist, they are used"
+        echo "The long names can be shortened to two words (one word for compact tiles)"
+        echo "  and Waste replaced with Gray"
+        yesNoPrompt "Do you wish to shorten NMEA2000 tank names? (y/n): "
+        if $yesResponse ; then
+            touch "$setupOptionsDir/shortenTankNames"
+        else
+            rm -f "$setupOptionsDir/shortenTankNames"
+        fi
+
         scriptAction='INSTALL'
     fi
 fi
@@ -256,6 +268,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
         echo "10 15 20 30" > "$setupOptionsDir/acCurrentLimitPresets"
         echo "0" "$setupOptionsDir/temperatureScale"
         touch "$setupOptionsDir/optionsSet"
+        touch "$setupOptionsDir/shortenTankNames"
     fi
     if [ -f "$setupOptionsDir/moveSettings" ]; then
         logMessage "Moving Settings & Notifications to top of Device List"
@@ -314,6 +327,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
             {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
             {"path":"/PvCharger/MaxPower", "type":"float", "default":0},\
+            {"path":"/GuiMods/ShortenTankNames", "type":"int", "default":0},\
             {"path":"/GuiMods/TemperatureScale", "type":"int", "default":0} ]'  > /dev/null
         if [ -f "$setupOptionsDir/inverterPeakPower" ]; then
             inverterPeakPower=$(cat "$setupOptionsDir/inverterPeakPower")
@@ -392,7 +406,6 @@ if [ $scriptAction == 'INSTALL' ] ; then
         fi
         dbus -y com.victronenergy.settings /Settings/GuiMods/TemperatureScale SetValue $temperatureScale > /dev/null
 
-
         # enhanced flow requires enhanced tank tile
         installEnhancedTank=true
     else
@@ -422,8 +435,15 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$tileTankFile"
         restoreActiveFile "$tileTempFile"
     fi
+    
+    if $shortenTankNames ; then
+        dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 1 > /dev/null
+    else
+        dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 0 > /dev/null
+    fi
     logMessage "++ Package installed"
 fi
+
 
 # uninstalling - check scriptAction again
 # if an install step failed package needs to be removed
@@ -443,13 +463,14 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$multiFile"
     restoreActiveFile "$inverterPopupFile"
     restoreActiveFile "$acCurrentLimitPopUpFile"
-        dbus -y com.victronenergy.settings /Settings RemoveSettings\
+    dbus -y com.victronenergy.settings /Settings RemoveSettings\
             '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
             "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
             "SystemSetup/MaxDischargeCurrent",\
             "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
             "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
-            "PvCharger/MaxPower", "GuiMods/TemperatureScale" ]' > /dev/null
+            "PvCharger/MaxPower", "GuiMods/TemperatureScale", "GuiMods/ShortenTankNames" ]' > /dev/null
+
     logMessage "++ Package uninstalled"
 fi
 
