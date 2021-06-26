@@ -173,7 +173,7 @@ Item {
     function setLimits ()
     {
         // guages disabled if inverterPeakPower is 0
-        if (inverterPeakPower === 0)
+        if (inverterPeakPower === 0 || sys === undefined)
         {
             barMax = 0
             overload = 0

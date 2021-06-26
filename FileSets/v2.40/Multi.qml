@@ -52,21 +52,29 @@ MbIcon {
     }
     function inverterModeText ()
     {
-        switch (inverterMode.value)
+        if (inverterMode.valid)
         {
-            case 4:
-                return "O f f"
-                break;
-            case 1:
-                return "C h g"
-                break;
-            case 2:
-                return "I n v"
-                break;
-            case 3:
-                return "O n"
-                break;
+            switch (inverterMode.value)
+            {
+                case 4:
+                    return "O f f"
+                    break;
+                case 1:
+                    return "C h g"
+                    break;
+                case 2:
+                    return "I n v"
+                    break;
+                case 3:
+                    return "O n"
+                    break;
+                default:
+                    return "?"
+                    break;
+            }
         }
+        else
+            return ""
     }
 
 	Column {

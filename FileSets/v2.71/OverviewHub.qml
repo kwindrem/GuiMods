@@ -490,7 +490,7 @@ OverviewPage {
     }
     ListView
     {
-        id: tanksColumn
+        id: tanksColum
 
         visible: showTanks
         width: compact ? root.width : root.width * tankModel.rowCount / tankTempCount
@@ -511,7 +511,7 @@ OverviewPage {
             // Without an intermediate assignment this will trigger a binding loop warning.
             property variant theService: DBusServices.get(buddy.id)
             service: theService
-            width: tanksColumn.tileWidth
+            width: tanksColum.tileWidth
             height: root.tanksHeight
             pumpBindPrefix: root.pumpBindPreffix
             compact: root.compact
@@ -578,7 +578,7 @@ OverviewPage {
     }
     ListModel { id: tempsModel }
 
-    // When new service is found check if is a tank sensor
+    // When new service is found add resources as appropriate
     Connections
     {
         target: DBusServices
@@ -618,6 +618,7 @@ OverviewPage {
         numberOfMultis = 0
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
+        tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
         {
             addService(DBusServices.at(i))
@@ -635,7 +636,8 @@ OverviewPage {
         onClicked: { acCurrentLimitPopUp.cancel(); inverterModePopUp.cancel() }
     }
 ////// popup current limit box over the AC Input tile
-    AcCurrentLimitPopUp {
+    AcCurrentLimitPopUp
+    {
         title: qsTr("AC Current Limit")
         id: acCurrentLimitPopUp
         // hide button until it is expanded

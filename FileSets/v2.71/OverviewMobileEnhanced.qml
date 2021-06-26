@@ -427,8 +427,7 @@ OverviewPage {
             anchors.fill: parent
             values: TileText
             {
-//                text: qsTr("")
-                text: root.numberOfTemps
+                text: qsTr("")
                 width: parent.width
                 wrapMode: Text.WordWrap
             }
@@ -749,7 +748,7 @@ OverviewPage {
 		}
 	}
 
-	// When new service is found check if is a tank sensor
+	// When new service is found add resources as appropriate
 	Connections {
 		target: DBusServices
 		onDbusServiceFound: addService(service)
@@ -783,6 +782,9 @@ OverviewPage {
 //////// rewrite to always call addService, removing redundant service type checks
     function discoverMulti()
     {
+        numberOfTemps = 0
+        numberOfPvChargers = 0
+        numberOfMultis = 0
         tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))

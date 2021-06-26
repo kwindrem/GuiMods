@@ -12,12 +12,6 @@ import "tanksensor.js" as TankSensor
 Tile {
 	id: root
 
-//// add to allow displaying remaining volume
-    property VBusItem remainingItem: VBusItem { id: remainingItem; bind: Utils.path(bindPrefix, "/Remaining"); decimals: 0 }
-    property VBusItem volumeUnit: VBusItem { bind: "com.victronenergy.settings/Settings/System/VolumeUnit" }
-//// small tile height threshold
-    property bool squeeze: height < 50
-
     property variant service
     property string bindPrefix: service ? service.name : ""
 	property string pumpBindPrefix
@@ -26,34 +20,60 @@ Tile {
     property VBusItem pumpStateItem: VBusItem { id: pumpStateItem; bind: Utils.path(pumpBindPrefix, "/State") }
     property VBusItem pumpActiveService: VBusItem { id: pumpActiveService; bind: Utils.path(pumpBindPrefix, "/ActiveTankService") }
     property alias valueBarColor: valueBar.color
-    property alias level: levelItem.value
+    property int level: levelItem.valid ? levelItem.value : 0
     property int fullWarningLevel: ([2, 5].indexOf(fluidTypeItem.value) > -1) ? 80 : -1
     property int emptyWarningLevel: !([2, 5].indexOf(fluidTypeItem.value) > -1) ? 20 : -1
     property bool blink: true
     property bool compact: false
 
+//// add to allow displaying remaining volume
+    property VBusItem remainingItem: VBusItem { id: remainingItem; bind: Utils.path(bindPrefix, "/Remaining"); decimals: 0 }
+    property VBusItem volumeUnit: VBusItem { bind: "com.victronenergy.settings/Settings/System/VolumeUnit" }
+//// small tile height threshold
+    property bool squeeze: height < 50
+
 //// modified to truncate tank name to 1 word if compact is true or 2 words if not
 //// and to replace "Waste" with "Gray"
-    property VBusItem customNameTypeItem: VBusItem { id: customNameTypeItem; bind: Utils.path(bindPrefix, "/CustomName") }
+    property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
     property VBusItem shortenTankNames: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/ShortenTankNames" }
     property string tankName: truncateTankName ()
 
     function truncateTankName ()
     {
-        var stringList = service ? service.description.split (" ") : ""
-        if (customNameTypeItem.valid && customNameTypeItem.value != "")
-            return customNameTypeItem.value
-        else if (shortenTankNames.valid && shortenTankNames.value == 1)
+        if (customNameItem.valid && customNameItem.value != "")
+            return customNameItem.value
+        else if (service && shortenTankNames.valid && shortenTankNames.value == 1)
         {
+            var stringList = service ? service.description.split (" ") : "???"
             if (stringList[0] == "Waste")
                         stringList[0] = "Gray"
-                    if (compact)
+                    if (compact || stringList.count < 2)
                         return stringList[0]
                     else
                         return stringList[0] + " " + stringList[1]
         }
         else
-            return service ? service.description : ""
+            return service ? service.description : "???"
+    }
+
+    function formatLevelText ()
+    {
+        var levelText
+        var remainingText
+        
+        
+         remainingItem.valid ? remainingItem.value : 0
+        if (levelItem.valid)
+            levelText = levelItem.text
+        else
+            levelText = "?"
+
+        if (remainingItem.valid)
+            remainingText = TankSensor.formatVolume(volumeUnit.value, remainingItem.value)
+        else
+            remainingText = "?"
+
+        return levelText + " " + remainingText
     }
 
 ///// modified to keep mixed case names
@@ -116,7 +136,7 @@ Tile {
 			Rectangle {
 				id: valueBar
 //// modified to always show a sliver of a bar even if tank is empty
-                width: Math.max (root.level / 100 * parent.width - 2, 2)
+                width: Math.max (level / 100 * parent.width - 2, 2)
 				height: parent.height - 1
 				color: warning() ? "#e74c3c" : "#34495e"
 				opacity: blink ? 1 : 0.5
@@ -130,7 +150,7 @@ Tile {
 				font.pixelSize: 12
 				font.bold: true
 //// include actual level in display
-				text: root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value)
+				text: formatLevelText ()
 				anchors.centerIn: parent
 				color: "white"
 			}
