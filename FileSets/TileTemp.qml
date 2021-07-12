@@ -22,12 +22,13 @@ Tile {
 	property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, "/Temperature"); decimals: 0; unit: "°" }
     property real temperature: temperatureItem.valid ? temperatureItem.value : -99
 	property VBusItem temperatureTypeItem: VBusItem { id: temperatureTypeItem; bind: Utils.path(bindPrefix, "/TemperatureType") }
-	property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
+    property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
+    property VBusItem statusItem: VBusItem { id: statusItem; bind: Utils.path(bindPrefix, "/Status") }
 	property bool compact: false
 
     property variant tempNames: [qsTr("Battery"), qsTr("Fridge"), qsTr("Generic")]
     property string tempName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : temperatureTypeItem.valid ? tempNames [temperatureTypeItem.value] : "TEMP"
-    property variant tempColors: ["#1abc9c", "#dcc6e0", "#F39C12"]
+    property variant tempColors: ["#4aa3df", "#1abc9c", "#F39C12"]
     property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : "#7f8c8d"
 
     property real minTemp: -30
@@ -50,10 +51,10 @@ Tile {
 		Marquee
         {
 			id: tempText
-            width: Math.floor (parent.width * 0.3 )
+            width: Math.max (Math.floor (parent.width * 0.3 ), 44)
 			height: compact ? 13 : parent.height
 			text: compact ? tempName : ""
-            textHorizontalAlignment: Text.AlignLeft /////////////////////////////////////////////
+            textHorizontalAlignment: Text.AlignLeft
 			visible: compact
 			scroll: false
 			anchors
@@ -66,7 +67,7 @@ Tile {
         {
 			color: "#c0c0bd"
 			border { width:1; color: "white" }
-			width: root.width - 10 -  (compact ? tempText.width + 3 : 0)
+			width: root.width - 10 - (compact ? tempText.width + 3 : 0)
 			height: compact ? 13 : parent.height
             clip: true
 			anchors {
@@ -77,10 +78,11 @@ Tile {
             Rectangle
             {
                 id: valueBarPos
-                width: Math.max (temperature / root.tempSpan * parent.width - 2, 2)
+                width: Math.max (Math.min (temperature, root.maxTemp) / root.tempSpan * (parent.width - 2), 2)
                 height: parent.height - 1
                 color: "#006600"
-                visible: temperature >= 0
+                visible: temperature >= 0 && statusItem.value === 0
+                clip: true
                 anchors
                 {
                     verticalCenter: parent.verticalCenter;
@@ -90,10 +92,11 @@ Tile {
             Rectangle
             {
                 id: valueBarNeg
-                width: Math.max (-temperature / root.tempSpan * parent.width - 2, 2)
+                width: Math.max (Math.min (-temperature, -root.minTemp) / root.tempSpan * (parent.width - 2), 2)
                 height: parent.height - 1
                 color: "#000066"
-                visible: temperature < 0
+                visible: temperature < 0 && statusItem.value === 0
+                clip: true
                 anchors
                 {
                     verticalCenter: parent.verticalCenter;
@@ -112,7 +115,7 @@ Tile {
                 anchors
                 {
                     verticalCenter: parent.verticalCenter;
-                    left: parent.left;  leftMargin: -root.minTemp / root.tempSpan * parent.width -2
+                    left: parent.left;  leftMargin: -root.minTemp / root.tempSpan * parent.width
                 }
             }
 
@@ -121,11 +124,15 @@ Tile {
 				font.bold: true
                 text:
                 {   
-                    if (tempScale == 1)
+                    if (statusItem.value !== 0)
+                        return "???"
+                    else if (tempScale == 1)
                         return root.temperature.toFixed (0) + "°C"
                     else if (tempScale == 2)
                         return ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
-                    else 
+                    else if (root.compact)
+                        return root.temperature.toFixed (0) + "C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "F"
+                    else
                         return root.temperature.toFixed (0) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
                 }
                 anchors.centerIn: parent

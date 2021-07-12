@@ -23,6 +23,7 @@
 // Adjust button widths so that pump button fits within tank column
 // Hide pump button when not enabled giving more room for tanks
 // Add temperature sensors to tanks column
+// add control of VE.Direct inverters
 
 // Includes changes to handle SeeLevel NMEA2000 tank sensor:
 // Ignore the real incoming tank dBus service because it's information changes
@@ -518,7 +519,8 @@ OverviewPage {
 		id: acModeButton
 		anchors.left: acCurrentButton.right
 		anchors.bottom: parent.bottom
-		property variant texts: { 4: qsTr("OFF"), 3: qsTr("ON"), 1: qsTr("CHARGER ONLY"), 2: qsTr("INVERTER ONLY") }
+  //////// add VE.Direct inverter modes      
+        property variant texts: { 4: qsTr("OFF"), 3: qsTr("ON"), 1: qsTr("CHARGER ONLY"), 2: qsTr("INVERTER ONLY"), 5: qsTr("ECO") }
 		property int value: mode.valid ? mode.value : 3
         property int shownValue: applyAnimation2.running ? applyAnimation2.pendingValue : value
 
@@ -540,6 +542,8 @@ OverviewPage {
 
 		VBusItem { id: mode; bind: Utils.path(vebusPrefix, "/Mode") }
 		VBusItem { id: modeIsAdjustable; bind: Utils.path(vebusPrefix,"/ModeIsAdjustable") }
+  //////// add for VE.Direct inverters      
+        VBusItem { id: numberOfAcInputs; bind: Utils.path(vebusPrefix,"/Ac/NumberOfAcInputs") }
 
 		Keys.onSpacePressed: edit()
 
@@ -563,21 +567,46 @@ OverviewPage {
 				return
 			}
 
-            switch (shownValue) {
-            case 4:
-                applyAnimation2.pendingValue = 3
-                break;
-            case 3:
-                applyAnimation2.pendingValue = 1
-                break;
-            case 1:
- //////// modify to add inverter only (was = 4)
-                applyAnimation2.pendingValue = 2
-                break;
-//////// add case 2 (inverter only)
-            case 2:
-                applyAnimation2.pendingValue = 4
-                break;
+//////// add/modified for VE.Direct inverter
+            // Multi/Quatro (inverter/charger)
+            if (numberOfAcInputs.valid && numberOfAcInputs.value > 0)
+            {
+                switch(shownValue) {
+                case 4:
+                    applyAnimation2.pendingValue = 3
+                    break;
+                case 3:
+                    applyAnimation2.pendingValue = 1
+                    break;
+                case 1:
+     //////// modify to add inverter only (was = 4)
+                    applyAnimation2.pendingValue = 2
+                    break;
+    //////// add case 2 (inverter only)
+                case 2:
+                    applyAnimation2.pendingValue = 4
+                    break;
+                }
+            }
+            // VE.Direct inverter
+            else
+            {
+                switch(shownValue)
+                {
+                // On (and Inverter Only) to Eco
+                case 2:
+                case 3:
+                    applyAnimation2.pendingValue = 5
+                    break;
+                // Off to On
+                case 4:
+                    applyAnimation2.pendingValue = 2
+                    break;
+                // ay other state to Off
+                default:
+                    applyAnimation2.pendingValue = 4
+                    break;
+                }
             }
 
             applyAnimation2.restart()

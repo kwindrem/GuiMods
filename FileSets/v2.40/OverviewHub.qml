@@ -251,11 +251,25 @@ OverviewPage {
 
 		values: TileText {
 			anchors.centerIn: parent
-			text: Math.abs (sys.dcSystem.power.value / sys.battery.voltage.value) <= 100
-                ? sys.dcSystem.power.format(0) + " " + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(1) + "A"
-                : sys.dcSystem.power.format(0) + " " + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(0) + "A"
+////// modified to show current
+			text: dcSystemText ()
 		}
 	}
+
+    function dcSystemText ()
+    {
+        if (sys.dcSystem.power.valid)
+        {
+            var current = sys.dcSystem.power.value / sys.battery.voltage.value
+            if (Math.abs (current) <= 100)
+                return sys.dcSystem.power.format(0) + " " + current.toFixed(1) + "A"
+            else
+                return sys.dcSystem.power.format(0) + " " + current.toFixed(0) + "A"
+        }
+        else
+            return "--"
+    }
+
 
 	OverviewSolarCharger {
 		id: blueSolarCharger
@@ -495,7 +509,7 @@ OverviewPage {
 
         visible: showTanks
         width: compact ? root.width : root.width * numberOfTanks / tankTempCount
-        property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
+        property int tileWidth: width / Math.min (count, 4.2)
         height: root.tanksHeight
         anchors
         {
@@ -504,7 +518,7 @@ OverviewPage {
         }
 
         // flickable list if more than will fit across bottom of screen
-        interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
+        interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
         model: tanksModel
@@ -529,7 +543,7 @@ OverviewPage {
 
         visible: showTemps
         width: compact ? root.width : root.width * numberOfTemps / tankTempCount
-        property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
+        property int tileWidth: width / Math.min (count, 4.2)
         height: root.tanksHeight
         anchors
         {
@@ -539,7 +553,7 @@ OverviewPage {
         }
 
         // make list flickable if more tiles than will fit completely
-        interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
+        interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
         model: tempsModel
@@ -594,6 +608,8 @@ OverviewPage {
             tempsModel.append({serviceName: service.name})
             break;;
         case DBusService.DBUS_SERVICE_MULTI:
+//////// add for VE.Direct inverters
+        case DBusService.DBUS_SERVICE_INVERTER:
             numberOfMultis++
             if (vebusPrefix === "")
                 vebusPrefix = service.name;
@@ -675,5 +691,6 @@ OverviewPage {
         bind: Utils.path(vebusPrefix, "/Mode")
         VBusItem { id: inverterMode; bind: Utils.path(vebusPrefix, "/Mode") }
         VBusItem { id: modeIsAdjustable; bind: Utils.path(vebusPrefix,"/ModeIsAdjustable") }
+        VBusItem { id: numberOfAcInputs; bind: Utils.path(vebusPrefix,"/Ac/NumberOfAcInputs") }
     }
 }

@@ -110,7 +110,7 @@ Tile {
 		Marquee {
 			id: tankText
 //// modified to give bar more horizontal space
-			width: Math.floor (parent.width * 0.3 )
+            width: Math.max (Math.floor (parent.width * 0.3 ), 44)
 			height: compact ? 13 : parent.height
 			text: compact ? tankName : ""
 			textHorizontalAlignment: Text.AlignLeft

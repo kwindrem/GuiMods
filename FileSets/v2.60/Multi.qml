@@ -19,6 +19,10 @@ MbIcon {
     { id: inverterMode;
         bind: Utils.path(sys.vebusPrefix, "/Mode")
     }
+    VBusItem
+    { id: numberOfAcInputs;
+        bind: Utils.path(sys.vebusPrefix, "/Ac/NumberOfAcInputs")
+    }
     SvgRectangle
     {
         id:inverterModeBackground
@@ -52,21 +56,29 @@ MbIcon {
     }
     function inverterModeText ()
     {
-        switch (inverterMode.value)
+        if (inverterMode.valid)
         {
-            case 4:
-                return "O f f"
-                break;
-            case 1:
-                return "C h"
-                break;
-            case 2:
-                return "I n v"
-                break;
-            case 3:
-                return "O n"
-                break;
+            switch (inverterMode.value)
+            {
+                case 4:
+                    return "O f f"
+                    break;
+                case 1:
+                    return "C h"
+                    break;
+                case 2:
+                    if (numberOfAcInputs.valid && numberOfAcInputs.value > 0)
+                        return "I n v"
+                    else
+                        return "O n"
+                    break;
+                case 3:
+                    return "O n"
+                    break;
+            }
         }
+        else
+            return ""
     }
 
 	Column {

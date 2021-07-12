@@ -15,6 +15,7 @@ Tile {
 	property color buttonColor
 	property alias containsMouse: mouseArea.containsMouse
     property int inverterMode
+    property bool isInverterCharger: numberOfAcInputs.valid && numberOfAcInputs.value > 0 ? true : false
 
 	height: contentHeight + 2
 	editable: true
@@ -58,12 +59,13 @@ Tile {
 				pressedColor: root.color
 				height: 40
 				width: parent.width - 6
+                visible: isInverterCharger            
 				onClicked: changeMode(3)
 				content: TileText
-                        {
-                            text: qsTr("On"); font.bold: true;
-                            color: inverterMode === 3 ? "white" : "black"
-                        }
+                {
+                    text: qsTr("On"); font.bold: true;
+                    color: inverterMode === 3 ? "white" : "black"
+                }
 			}
             Button
             {
@@ -74,10 +76,10 @@ Tile {
                 width: parent.width - 6
                 onClicked: changeMode(4)
                 content: TileText
-                        {
-                            text: qsTr("Off"); font.bold: true;
-                            color: inverterMode === 4 ? "white" : "black"
-                        }
+                {
+                    text: qsTr("Off"); font.bold: true;
+                    color: inverterMode === 4 ? "white" : "black"
+                }
             }
             Button
             {
@@ -88,10 +90,10 @@ Tile {
                 width: parent.width - 6
                 onClicked: changeMode(2)
                 content: TileText
-                        {
-                            text: qsTr("Inverter\nOnly"); font.bold: true;
-                            color: inverterMode === 2 ? "white" : "black"
-                        }
+                {
+                    text: isInverterCharger ? qsTr("Inverter\nOnly") : qsTr("On"); font.bold: true;
+                    color: inverterMode === 2 ? "white" : "black"
+                }
             }
             Button 
             {
@@ -100,12 +102,28 @@ Tile {
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
+                visible: isInverterCharger            
                 onClicked: changeMode(1)
                 content: TileText
-                        {
-                            text: qsTr("Charger\nOnly"); font.bold: true;
-                            color: inverterMode === 1 ? "white" : "black"
-                        }
+                {
+                    text: qsTr("Charger\nOnly"); font.bold: true;
+                    color: inverterMode === 1 ? "white" : "black"
+                }
+            }
+            Button 
+            {
+                id: ecoButton
+                baseColor: inverterMode === 5 ? "orange" : "#ffedcc"
+                pressedColor: root.color
+                height: 40
+                width: parent.width - 6
+                visible: !isInverterCharger            
+                onClicked: changeMode(5)
+                content: TileText
+                {
+                    text: qsTr("Eco"); font.bold: true;
+                    color: inverterMode === 5 ? "white" : "black"
+                }
             }
 			Button
             {

@@ -19,6 +19,10 @@ MbIcon {
     { id: inverterMode;
         bind: Utils.path(sys.vebusPrefix, "/Mode")
     }
+    VBusItem
+    { id: numberOfAcInputs;
+        bind: Utils.path(sys.vebusPrefix, "/Ac/NumberOfAcInputs")
+    }
     SvgRectangle
     {
         id:inverterModeBackground
@@ -63,7 +67,10 @@ MbIcon {
                     return "C h g"
                     break;
                 case 2:
-                    return "I n v"
+                    if (numberOfAcInputs.valid && numberOfAcInputs.value > 0)
+                        return "I n v"
+                    else
+                        return "O n"
                     break;
                 case 3:
                     return "O n"
