@@ -14,11 +14,12 @@ Tile {
 	property bool expanded: false // If the tile is 'expanded', additional touch buttons are shown
 	property color buttonColor
 	property alias containsMouse: mouseArea.containsMouse
-    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(sys.vebusPrefix, "/Mode") }
+    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode") }
     property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
     // flag a VE.Direct inverter
-    property VBusItem isInverterChargerItem: VBusItem { bind: Utils.path(sys.vebusPrefix, "/IsInverterCharger") }
+    property VBusItem isInverterChargerItem: VBusItem { bind: Utils.path(inverterService, "/IsInverterCharger") }
     property bool isInverter: isInverterChargerItem.valid ? true : false
+    property string inverterService: ""
 
 
 	height: contentHeight + 2

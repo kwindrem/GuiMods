@@ -46,10 +46,12 @@ OverviewPage {
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
     property int numberOfPvChargers: 0
+
     property int numberOfMultis: 0
-//////// add for VE.Direct inverter
+    property string multiPrefix: ""
+//////// add for VE.Direct inverters
     property int numberOfInverters: 0
-    property string inverterPrefix: ""
+    property string inverterService: ""
 
     Component.onCompleted: discoverServices()
 
@@ -111,6 +113,7 @@ OverviewPage {
 			horizontalCenter: parent.horizontalCenter
 			top: parent.top; topMargin: 3
 		}
+        inverterService: root.inverterService
 ////// add power bar graph
         PowerGauge
         {
@@ -124,6 +127,7 @@ OverviewPage {
             }
             connection: undefined
             useInverterInfo: true
+            inverterService: root.inverterService
         }
 	}
 
@@ -177,6 +181,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acLoad
+            inverterService: root.inverterService
         }
 	}
 
@@ -609,14 +614,17 @@ OverviewPage {
             numberOfTemps++
             tempsModel.append({serviceName: service.name})
             break;;
+
         case DBusService.DBUS_SERVICE_MULTI:
             numberOfMultis++
+            if (numberOfMultis === 1)
+                inverterService = service.name;
             break;;
 //////// add for VE.Direct inverters
         case DBusService.DBUS_SERVICE_INVERTER:
             numberOfInverters++
-            if (inverterPrefix === "")
-                inverterPrefix = service.name;
+            if (numberOfInverters === 1 && inverterService == "")
+                inverterService = service.name;
             break;;
 
 //////// add for PV CHARGER voltage and current display
@@ -638,6 +646,8 @@ OverviewPage {
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfMultis = 0
+        numberOfInverters = 0
+        inverterService = ""
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
         for (var i = 0; i < DBusServices.count; i++)
@@ -669,11 +679,11 @@ OverviewPage {
 
         color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
         fontPixelSize: 14
-        readOnly: currentLimitIsAdjustable.value !== 1 || numberOfMultis > 1
+        readOnly: numberOfMultis != 1 || currentLimitIsAdjustable.value !== 1
         buttonColor: "#979797"
 
-        bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/CurrentLimit")
-        VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
+        bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimit")
+        VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
     }
     
 ////// popup inverter mode selector over the Mulit tile
@@ -701,7 +711,7 @@ OverviewPage {
         visible: !readOnly
         buttonColor: "#979797"
         color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
-        bind: Utils.path(sys.vebusPrefix, "/Mode")
-        VBusItem { id: modeIsAdjustable; bind: Utils.path(sys.vebusPrefix,"/ModeIsAdjustable") }
+        bind: Utils.path(inverterService, "/Mode")
+        VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
     }
 }

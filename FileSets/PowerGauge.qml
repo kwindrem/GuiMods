@@ -11,9 +11,10 @@ Item {
     property variant connection
 
     // if connection is undefined, then this instance is for the inverter, so use it's phase count
+    property string inverterService: ""
     property bool useInverterInfo: false
-    property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(sys.vebusPrefix, "/Ac/NumberOfPhases" ) }
-    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(sys.vebusPrefix, "/Mode" ) }
+    property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(inverterService, "/Ac/NumberOfPhases" ) }
+    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
     property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
 
     property int phaseCount: 0

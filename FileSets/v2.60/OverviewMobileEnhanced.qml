@@ -69,9 +69,10 @@ OverviewPage {
     property int tankTileHeight: Math.min (Math.max (height / tankTempCount, minimumTankHeight), maxTankHeight)
 
     property int numberOfMultis: 0
+    property string multiPrefix: ""
 //////// add for VE.Direct inverters
     property int numberOfInverters: 0
-    property string inverterPrefix: ""
+    property string inverterService: ""
     
     // Keeps track of which button on the bottom row is active
     property int buttonIndex: 0
@@ -161,7 +162,7 @@ OverviewPage {
 
                     SystemState {
                         id: systemState
-                        bind: hasSystemState?Utils.path(systemPrefix, "/SystemState/State"):Utils.path(sys.vebusPrefix, "/State")
+                        bind: hasSystemState?Utils.path(systemPrefix, "/SystemState/State"):Utils.path(inverterService, "/State")
                     }
                 },
 
@@ -304,9 +305,9 @@ OverviewPage {
             height: root.infoTileHeight
             color: "#82acde"
 //////// add voltage and current
-            VBusItem { id: inVoltage; bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/L1/V") }
-            VBusItem { id: inCurrent; bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/L1/I") }
-            VBusItem { id: inFrequency; bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/L1/F") }
+            VBusItem { id: inVoltage; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/V") }
+            VBusItem { id: inCurrent; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/I") }
+            VBusItem { id: inFrequency; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/F") }
             values: [
                 TileText {
                     text: sys.acInput.power.uiText
@@ -327,22 +328,22 @@ OverviewPage {
             height: root.infoTileHeight
             color: "#e68e8a"
 //////// add voltage and current
-            VBusItem { id: outVoltage; bind: Utils.path(sys.vebusPrefix, "/Ac/Out/L1/V") }
-            VBusItem { id: outCurrent; bind: Utils.path(sys.vebusPrefix, "/Ac/Out/L1/I") }
-            VBusItem { id: outFrequency; bind: Utils.path(sys.vebusPrefix, "/Ac/Out/L1/F") }
+            VBusItem { id: outVoltage; bind: Utils.path(inverterService, "/Ac/Out/L1/V") }
+            VBusItem { id: outCurrent; bind: Utils.path(inverterService, "/Ac/Out/L1/I") }
+            VBusItem { id: outFrequency; bind: Utils.path(inverterService, "/Ac/Out/L1/F") }
 
             values: [
                 TileText {
                     text: sys.acLoad.power.uiText
                     font.pixelSize: 22
                 },
-//////// add voltage and current
+//////// add voltage and current - no frequency for VE.Direct inverter
                 TileText {
-                    text: outVoltage.text + "  " + outCurrent.text + "  " + outFrequency.text
+                    text: numberOfMultis > 0 ? outVoltage.text + "  " + outCurrent.text + "  " + outFrequency.text
+                            : numberOfMultis > 0 ? outVoltage.text + "  " + outCurrent.text : ""
                 }
             ]
         }
-
     } // end ListView infoArea
 
     // Synchronise tank name text scroll start
@@ -475,7 +476,7 @@ OverviewPage {
 		isCurrentItem: (buttonIndex == 0)
 		focus: root.active && isCurrentItem
 
-		bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/CurrentLimit")
+		bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimit")
 		color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
 		width: show ? root.infoWidth2Column : 0
 		fontPixelSize: 14
@@ -483,7 +484,7 @@ OverviewPage {
 		readOnly: currentLimitIsAdjustable.value !== 1 || numberOfMultis > 1
 		buttonColor: "#979797"
 
-		VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
+		VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
 
 		Keys.onSpacePressed: showErrorToast(event)
 
@@ -530,7 +531,15 @@ OverviewPage {
 		focus: root.active && isCurrentItem
 
 		editable: true
-		readOnly: !modeIsAdjustable.valid || modeIsAdjustable.value !== 1 || numberOfMultis > 1
+        readOnly:
+        {
+            if (numberOfMultis === 1)
+                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1
+            else if (numberOfInverters === 1)
+                return false
+            else
+                return true
+        }
 		width: root.infoWidth2Column
 		height: buttonRowHeight
 		color: acModeButtonMouseArea.containsPressed ? "#d3d3d3" : "#A8A8A8"
@@ -538,12 +547,12 @@ OverviewPage {
 
 		values: [
 			TileText {
-                text: modeIsAdjustable.valid && numberOfMultis === 1 ? qsTr("%1").arg(acModeButton.texts[acModeButton.shownValue]) : qsTr("NOT AVAILABLE")
+                text: numberOfMultis === 1 && modeIsAdjustable.valid || numberOfInverters > 0 ? qsTr("%1").arg(acModeButton.texts[acModeButton.shownValue]) : qsTr("NOT AVAILABLE")
 			}
 		]
 
-		VBusItem { id: mode; bind: Utils.path(sys.vebusPrefix, "/Mode") }
-		VBusItem { id: modeIsAdjustable; bind: Utils.path(sys.vebusPrefix,"/ModeIsAdjustable") }
+		VBusItem { id: mode; bind: Utils.path(inverterService, "/Mode") }
+		VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
 
 		Keys.onSpacePressed: edit()
 
@@ -802,12 +811,14 @@ OverviewPage {
             break;;
         case DBusService.DBUS_SERVICE_MULTI:
             numberOfMultis++
+            if (numberOfMultis === 1)
+                inverterService = service.name;
             break;;
 //////// add for VE.Direct inverters
         case DBusService.DBUS_SERVICE_INVERTER:
             numberOfInverters++
-            if (inverterPrefix === "")
-                inverterPrefix = service.name;
+            if (numberOfInverters === 1 && inverterService == "")
+                inverterService = service.name;
             break;;
 
 //////// add for PV CHARGER voltage and current display
@@ -823,7 +834,12 @@ OverviewPage {
 //////// rewrite to always call addService, removing redundant service type checks
     function discoverTanks()
     {
-        tanksModel.clear()
+        numberOfTemps = 0
+        numberOfPvChargers = 0
+        numberOfMultis = 0
+        numberOfInverters = 0
+        inverterService = ""
+        tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
     }
@@ -847,8 +863,8 @@ OverviewPage {
 		return descr.join("  |  ")
 	}
 
-	VBusItem { id: dmc; bind: Utils.path(sys.vebusPrefix, "/Devices/Dmc/Version") }
-	VBusItem { id: bms; bind: Utils.path(sys.vebusPrefix, "/Devices/Bms/Version") }
+	VBusItem { id: dmc; bind: Utils.path(inverterService, "/Devices/Dmc/Version") }
+	VBusItem { id: bms; bind: Utils.path(inverterService, "/Devices/Bms/Version") }
 
 //////// TANK REPEATER - add to hide the service for the physical sensor
     VBusItem { id: incomingTankName;
