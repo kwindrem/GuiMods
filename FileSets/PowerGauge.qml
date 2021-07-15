@@ -10,19 +10,15 @@ Item {
 
     property variant connection
 
-    property bool useMultiInfo: false
-
     // if connection is undefined, then this instance is for the inverter, so use it's phase count
-    property VBusItem vebusService: VBusItem { bind: Utils.path("com.victronenergy.system", "/VebusService") }
-    property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(vebusService.value, "/Ac/NumberOfPhases" ) }
-    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(vebusService.value, "/Mode" ) }
+    property string inverterService: ""
+    property bool useInverterInfo: false
+    property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(inverterService, "/Ac/NumberOfPhases" ) }
+    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
     property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
 
-    property int phaseCount: useMultiInfo
-            ? inverterPhaseCount.valid ? inverterPhaseCount.value : 0
-            : root.connection === sys.pvCharger ? 1
-            : root.connection !== undefined && root.connection.phaseCount.valid ? root.connection.phaseCount.value : 0
-    
+    property int phaseCount: 0
+
     VBusItem
     {
         id: inverterContinuousPowerItem
@@ -66,7 +62,7 @@ Item {
     }
     property int systemState: systemStateItem.valid ? systemStateItem.value : 0
 
-    property real inPowerLimit: sys.acInput.inCurrentLimit.value * sys.acInput.inVoltageL1.value
+    property real inPowerLimit: sys.acInput.inCurrentLimit.value * sys.acInput.voltageL1.value
 
     property real barMax: 0
     property real overload: 0
@@ -79,7 +75,11 @@ Item {
     property color bar2color: "black"
     property color bar3color: "black"
     
-    Component.onCompleted: setLimits ()
+    Component.onCompleted:
+    {
+        setPhaseCount ()
+        setLimits ()
+    } 
 
     // OK range (0 to caution)
     Rectangle
@@ -172,6 +172,7 @@ Item {
 
     function setLimits ()
     {
+
         // guages disabled if inverterPeakPower is 0
         if (inverterPeakPower === 0 || sys === undefined)
         {
@@ -314,5 +315,34 @@ Item {
 
         bar3color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"
         return Math.max (currentValue, 0)
+    }
+
+    // phaseCount comes from the connection (if defined)
+    // phaseCount is always 1 for the PV charger connection
+    // for the inverter/multi, connection will not be defined
+    function setPhaseCount ()
+    {
+        // connection passed from parent
+        if (root.connection !== undefined)
+        {
+            if (root.connection === sys.pvCharger)
+                phaseCount = 1
+            else if (root.connection.phaseCount.valid)
+                phaseCount = root.connection.phaseCount.value
+            else
+                phaseCount = 0
+        }
+        // Multi or inverter can't define a connection
+        // so service name is passed from parent
+        // VE.Direct inverters don't set the phase count - only single phase
+        else if (useInverterInfo)
+        {
+            if (inverterPhaseCount.valid)
+                phaseCount =  inverterPhaseCount.value
+            else
+                phaseCount = 1
+        }
+        else
+            phaseCount = 0
     }
 }

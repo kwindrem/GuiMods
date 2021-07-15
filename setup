@@ -28,6 +28,7 @@ multiFile="$qmlDir/Multi.qml"
 inverterPopupFile="$qmlDir/InverterModePopUp.qml"
 acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
 tileTempFile="$qmlDir/TileTemp.qml"
+hubDataFile="$qmlDir/HubData.qml"
 
 installEnhancedTank=false
 
@@ -308,6 +309,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
         updateActiveFile "$overviewAcValues"
         updateActiveFile "$objectAcConnection"
         updateActiveFile "$overviewHub"
+        updateActiveFile "$hubDataFile"
         updateActiveFile "$overviewSolarCharger"
         updateActiveFile "$powerGaugeFile"
         updateActiveFile "$powerGaugeBatteryFile"
@@ -412,6 +414,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$overviewAcValues"
         restoreActiveFile "$objectAcConnection"
         restoreActiveFile "$overviewHub"
+        restoreActiveFile "$hubDataFile"
         restoreActiveFile "$overviewSolarCharger"
         restoreActiveFile "$powerGaugeFile"
         restoreActiveFile "$powerGaugeBatteryFile"
@@ -455,6 +458,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$overviewAcValues"
     restoreActiveFile "$objectAcConnection"
     restoreActiveFile "$overviewHub"
+    restoreActiveFile "$hubDataFile"
     restoreActiveFile "$overviewSolarCharger"
     restoreActiveFile "$tileTankFile"
     restoreActiveFile "$tileTempFile"

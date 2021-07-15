@@ -93,84 +93,40 @@ Item {
     }
     function voltageL1 (spacer)
     {
-        switch (root.connection)
-        {
-            case sys.acInput:   return spacer + root.connection.inVoltageL1.format(0);
-            case sys.acLoad:    return spacer + root.connection.outVoltageL1.format(0);
-            default:            return "";
-        }
+        return spacer + root.connection.voltageL1.format(0)
     }
     function voltageL2 (spacer)
     {
-        switch (root.connection)
-        {
-            case sys.acInput:   return spacer + root.connection.inVoltageL2.format(0);
-            case sys.acLoad:    return spacer + root.connection.outVoltageL2.format(0);
-            default:            return "";
-        }
+            return spacer + root.connection.voltageL2.format(0)
     }
     function voltageL3 (spacer)
     {
-        switch (root.connection)
-        {
-            case sys.acInput:   return spacer + root.connection.inVoltageL3.format(0);
-            case sys.acLoad:    return spacer + root.connection.outVoltageL3.format(0);
-            default:            return "";
-        }
+        return spacer + root.connection.voltageL3.format(0)
     }
     function currentL1 (spacer)
     {
         var current
-        switch (root.connection)
-        {
-            case sys.acInput:
-                current = root.connection.inCurrentL1
-                return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
-            case sys.acLoad: 
-                current = root.connection.outCurrentL1
-                return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
-            default:
-                return "";
-        }
+        current = root.connection.currentL1
+        return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
     }
     function currentL2 (spacer)
     {
         var current
-        switch (root.connection)
-        {
-            case sys.acInput:
-                current = root.connection.inCurrentL2
-                return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
-            case sys.acLoad: 
-                current = root.connection.outCurrentL2
-                return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
-            default:
-                return "";
-        }
+        current = root.connection.currentL2
+        return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1)
     }
     function currentL3 (spacer)
     {
         var current
-        switch (root.connection)
-        {
-            case sys.acInput:
-                current = root.connection.inCurrentL3
-                return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
-            case sys.acLoad: 
-                current = root.connection.outCurrentL3
-                return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
-            default:
-                return "";
-        }
+        current = root.connection.currentL3
+        return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1)
     }
     function frequency ()
     {
-        switch (root.connection)
-        {
-            case sys.acInput:   return root.connection.inFrequencyL1.format(1);
-            case sys.acLoad:    return root.connection.outFrequencyL1.format(1);
-            default:            return "";
-        }
+        if (root.connection.frequencyL1.valid)
+            return root.connection.frequencyL1.format(1)
+        else
+            return ""
     }
     function currentLimit (spacer)
     {

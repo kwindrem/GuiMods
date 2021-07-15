@@ -14,6 +14,7 @@ This package provides the following modificaitons to the VenusOS GUI:
             The tanks column is split into separte columns for tanks and temerature sensors
             A common tile height is set for both columns, then each column is filled in separtly
             Any tank that apepars as a dBus temperature sensor should appear
+        Adds VE.Direct inverter status and control
     enhances the Tank Tile
         red indicates low/high fluid levels
         indicates NO RESPONSE if no signal received from tank
@@ -36,6 +37,8 @@ This package provides the following modificaitons to the VenusOS GUI:
             A combination of up to 4 tanks and temps fit across the bottom
             For more, the bottom row splits into separate rows for temps and tanks
             Each row scrolls horizontally if more than 4 items exist in the row
+        Adds VE.Direct inverter status and control
+
     use custom tank name if it exists and optionally shorten tank names
         beginning with Venus v2.70~16, NEMA2000 tank names can be too long to fit in available space
         enabling this option will shorten the tank name to the first two words

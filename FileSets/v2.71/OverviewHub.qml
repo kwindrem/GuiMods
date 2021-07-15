@@ -8,6 +8,7 @@
 //////  bar graphs on AC in/out and Multi
 //////  popups for AC input current limit and inverter mode
 //////  bar gauge on PV Charger tile
+//////  add support for VE.Direct inverters
 
 import QtQuick 1.1
 import "utils.js" as Utils
@@ -45,8 +46,14 @@ OverviewPage {
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
     property int numberOfPvChargers: 0
+
     property int numberOfMultis: 0
-    property string vebusPrefix: ""
+    property string multiPrefix: ""
+//////// add for VE.Direct inverters
+    property int numberOfInverters: 0
+    property string inverterService: ""
+    property bool isMulti: numberOfMultis > 0
+    property bool isInverter: !isMulti && numberOfInverters > 0
 
     Component.onCompleted: discoverServices()
 
@@ -63,12 +70,12 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
+        visible: !isInverter
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title: getAcSourceName(sys.acSource)
 		titleColor: "#E74c3c"
 		color: "#C0392B"
-
 		anchors {
 			top: multi.top
 			left: parent.left; leftMargin: 10
@@ -108,19 +115,21 @@ OverviewPage {
 			horizontalCenter: parent.horizontalCenter
 			top: parent.top; topMargin: 3
 		}
+        inverterService: root.inverterService
 ////// add power bar graph
         PowerGauge
         {
             id: multiBar
             width: multi.width
             height: 12
-            useMultiInfo: true
             anchors
             {
                 top: parent.top; topMargin: 23
                 horizontalCenter: parent.horizontalCenter
             }
             connection: undefined
+            inverterService: root.inverterService
+            useInverterInfo: true
         }
 	}
 
@@ -174,6 +183,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acLoad
+            inverterService: root.inverterService
         }
 	}
 
@@ -248,13 +258,26 @@ OverviewPage {
 			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
 
-		values: TileText {
-			anchors.centerIn: parent
-			text: Math.abs (sys.dcSystem.power.value / sys.battery.voltage.value) <= 100
-                ? sys.dcSystem.power.format(0) + " " + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(1) + "A"
-                : sys.dcSystem.power.format(0) + " " + (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(0) + "A"
-		}
-	}
+        values: TileText {
+            anchors.centerIn: parent
+////// modified to show current
+            text: dcSystemText ()
+        }
+    }
+
+    function dcSystemText ()
+    {
+        if (sys.dcSystem.power.valid)
+        {
+            var current = sys.dcSystem.power.value / sys.battery.voltage.value
+            if (Math.abs (current) <= 100)
+                return sys.dcSystem.power.format(0) + " " + current.toFixed(1) + "A"
+            else
+                return sys.dcSystem.power.format(0) + " " + current.toFixed(0) + "A"
+        }
+        else
+            return "--"
+    }
 
 	OverviewSolarCharger {
 		id: blueSolarCharger
@@ -352,6 +375,7 @@ OverviewPage {
 
 	OverviewConnection {
 		id: acInToMulti
+        visible: !isInverter
 		ballCount: 2
 		path: straight
 		active: root.active
@@ -494,7 +518,7 @@ OverviewPage {
 
         visible: showTanks
         width: compact ? root.width : root.width * tankModel.rowCount / tankTempCount
-        property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
+        property int tileWidth: width / Math.min (count, 4.2)
         height: root.tanksHeight
         anchors
         {
@@ -503,7 +527,7 @@ OverviewPage {
         }
 
         // flickable list if more than will fit across bottom of screen
-        interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
+        interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
         model: TankModel { id: tankModel }
@@ -538,7 +562,7 @@ OverviewPage {
 
         visible: showTemps
         width: compact ? root.width : root.width * numberOfTemps / tankTempCount
-        property int tileWidth: width / Math.min (count, root.compact ? 3.2 : 4.2)
+        property int tileWidth: width / Math.min (count, 4.2)
         height: root.tanksHeight
         anchors
         {
@@ -548,7 +572,7 @@ OverviewPage {
         }
 
         // make list flickable if more tiles than will fit completely
-        interactive: root.compact ? count > 3 ? true : false : count > 4 ? true : false
+        interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
         model: tempsModel
@@ -596,9 +620,16 @@ OverviewPage {
             break;;
         case DBusService.DBUS_SERVICE_MULTI:
             numberOfMultis++
-            if (vebusPrefix === "")
-                vebusPrefix = service.name;
+            if (numberOfMultis === 1)
+                inverterService = service.name;
             break;;
+//////// add for VE.Direct inverters
+        case DBusService.DBUS_SERVICE_INVERTER:
+            numberOfInverters++
+            if (numberOfInverters === 1 && inverterService == "")
+                inverterService = service.name;
+            break;;
+
 //////// add for PV CHARGER voltage and current display
         case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
             numberOfPvChargers++
@@ -616,6 +647,8 @@ OverviewPage {
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfMultis = 0
+        numberOfInverters = 0
+        inverterService = ""
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
         tempsModel.clear()
@@ -649,11 +682,13 @@ OverviewPage {
 
         color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
         fontPixelSize: 14
-        readOnly: currentLimitIsAdjustable.value !== 1 || numberOfMultis > 1
+        readOnly: ! isMulti || currentLimitIsAdjustable.value !== 1
+        // disable mouse area if can't make the adjustment
+        visible: !readOnly
         buttonColor: "#979797"
 
-        bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimit")
-        VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(vebusPrefix, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
+        bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimit")
+        VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
     }
     
 ////// popup inverter mode selector over the Mulit tile
@@ -667,14 +702,23 @@ OverviewPage {
         anchors.top: parent.top; anchors.topMargin: expanded ? 0 : multi.height / 3
         anchors.left: multi.left
         width: show ? multi.width : 0
-        readOnly: !modeIsAdjustable.valid || modeIsAdjustable.value !== 1 || numberOfMultis > 1
+//////// incorporate VE.Direct inverter
+        readOnly:
+        {
+            if (isMulti)
+                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1
+            else if (isInverter)
+                return false
+            else
+                return true
+        }
         // disable mouse area if can't make the adjustment
         visible: !readOnly
         buttonColor: "#979797"
         color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
-
-        bind: Utils.path(vebusPrefix, "/Mode")
-        VBusItem { id: inverterMode; bind: Utils.path(vebusPrefix, "/Mode") }
-        VBusItem { id: modeIsAdjustable; bind: Utils.path(vebusPrefix,"/ModeIsAdjustable") }
+        bind: Utils.path(inverterService, "/Mode")
+        VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
+        inverterService: root.inverterService
+        isInverter: root.isInverter
     }
 }

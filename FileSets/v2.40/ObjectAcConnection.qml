@@ -8,6 +8,8 @@ import "utils.js" as Utils
 
 QtObject {
 	property string bindPrefix
+    property string inverterService: ""   
+    property string inverterSource: ""
 
 	property VBusItem powerL1: VBusItem { bind: Utils.path(bindPrefix, "/L1/Power"); unit: "W"}
 	property VBusItem powerL2: VBusItem { bind: Utils.path(bindPrefix, "/L2/Power"); unit: "W"}
@@ -18,30 +20,17 @@ QtObject {
     property VBusItem inverterState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State" ) }
  
  ////// add to show voltage, current, frequency and bar graphs
-    property VBusItem vebusService: VBusItem { bind: Utils.path(systemPrefix, "/VebusService") }
-    property VBusItem inCurrentLimit: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/CurrentLimit"); unit: "A"}
+    property VBusItem voltageL1: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L1/V"); unit: "V"}
+    property VBusItem voltageL2: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L2/V"); unit: "V"}
+    property VBusItem voltageL3: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L3/V"); unit: "V"}
 
-    property VBusItem inVoltageL1: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L1/V"); unit: "V"}
-    property VBusItem inCurrentL1: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L1/I"); unit: "A"}
-    property VBusItem inFrequencyL1: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L1/F"); unit: "Hz"}
-    property VBusItem outVoltageL1: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L1/V"); unit: "V"}
-    property VBusItem outCurrentL1: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L1/I"); unit: "A"}
-    property VBusItem outFrequencyL1: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L1/F"); unit: "Hz"}
+    property VBusItem currentL1: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L1/I"); unit: "A"}
+    property VBusItem currentL2: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L2/I"); unit: "A"}
+    property VBusItem currentL3: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L3/I"); unit: "A"}
 
-    property VBusItem inVoltageL2: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L2/V"); unit: "V"}
-    property VBusItem inCurrentL2: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L2/I"); unit: "A"}
-    property VBusItem inFrequencyL2: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L2/F"); unit: "Hz"}
-    property VBusItem outVoltageL2: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L2/V"); unit: "V"}
-    property VBusItem outCurrentL2: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L2/I"); unit: "A"}
-    property VBusItem outFrequencyL2: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L2/F"); unit: "Hz"}
-    
+    property VBusItem frequencyL1: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L1/F"); unit: "Hz"}
 
-    property VBusItem inVoltageL3: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L3/V"); unit: "V"}
-    property VBusItem inCurrentL3: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L3/I"); unit: "A"}
-    property VBusItem inFrequencyL3: VBusItem { bind: Utils.path(vebusService.value, "/Ac/ActiveIn/L3/F"); unit: "Hz"}
-    property VBusItem outVoltageL3: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L3/V"); unit: "V"}
-    property VBusItem outCurrentL3: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L3/I"); unit: "A"}
-    property VBusItem outFrequencyL3: VBusItem { bind: Utils.path(vebusService.value, "/Ac/Out/L3/F"); unit: "Hz"}
+    property VBusItem inCurrentLimit: VBusItem { bind: Utils.path(inverterService, inverterSource, "/CurrentLimit"); unit: "A"}
  ////// end add to show voltage, current and frequency
     
 	// As systemcalc doesn't provide the totals anymore we calculate it here.

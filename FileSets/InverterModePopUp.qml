@@ -1,6 +1,7 @@
 ////// popup for setting inverter mode from Flow overview
 
 import QtQuick 1.1
+import "utils.js" as Utils
 
 Tile {
 	id: root
@@ -9,12 +10,15 @@ Tile {
 	property alias bind: vItem.bind
 	property real localValue: valid ? value : 0
 	property alias value: vItem.value
-	property alias item: vItem
 	property int fontPixelSize: 18
 	property bool expanded: false // If the tile is 'expanded', additional touch buttons are shown
 	property color buttonColor
 	property alias containsMouse: mouseArea.containsMouse
-    property int inverterMode
+    property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode") }
+    property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
+    property bool isInverter: false
+    property string inverterService: ""
+
 
 	height: contentHeight + 2
 	editable: true
@@ -58,12 +62,13 @@ Tile {
 				pressedColor: root.color
 				height: 40
 				width: parent.width - 6
+                visible: !isInverter           
 				onClicked: changeMode(3)
 				content: TileText
-                        {
-                            text: qsTr("On"); font.bold: true;
-                            color: inverterMode === 3 ? "white" : "black"
-                        }
+                {
+                    text: qsTr("On"); font.bold: true;
+                    color: inverterMode === 3 ? "white" : "black"
+                }
 			}
             Button
             {
@@ -74,10 +79,10 @@ Tile {
                 width: parent.width - 6
                 onClicked: changeMode(4)
                 content: TileText
-                        {
-                            text: qsTr("Off"); font.bold: true;
-                            color: inverterMode === 4 ? "white" : "black"
-                        }
+                {
+                    text: qsTr("Off"); font.bold: true;
+                    color: inverterMode === 4 ? "white" : "black"
+                }
             }
             Button
             {
@@ -88,10 +93,10 @@ Tile {
                 width: parent.width - 6
                 onClicked: changeMode(2)
                 content: TileText
-                        {
-                            text: qsTr("Inverter\nOnly"); font.bold: true;
-                            color: inverterMode === 2 ? "white" : "black"
-                        }
+                {
+                    text: isInverter ? qsTr("On") : qsTr("Inverter\nOnly"); font.bold: true;
+                    color: inverterMode === 2 ? "white" : "black"
+                }
             }
             Button 
             {
@@ -100,12 +105,28 @@ Tile {
                 pressedColor: root.color
                 height: 40
                 width: parent.width - 6
+                visible: !isInverter           
                 onClicked: changeMode(1)
                 content: TileText
-                        {
-                            text: qsTr("Charger\nOnly"); font.bold: true;
-                            color: inverterMode === 1 ? "white" : "black"
-                        }
+                {
+                    text: qsTr("Charger\nOnly"); font.bold: true;
+                    color: inverterMode === 1 ? "white" : "black"
+                }
+            }
+            Button 
+            {
+                id: ecoButton
+                baseColor: inverterMode === 5 ? "orange" : "#ffedcc"
+                pressedColor: root.color
+                height: 40
+                width: parent.width - 6
+                visible: isInverter         
+                onClicked: changeMode(5)
+                content: TileText
+                {
+                    text: qsTr("Eco"); font.bold: true;
+                    color: inverterMode === 5 ? "white" : "black"
+                }
             }
 			Button
             {
