@@ -1,0 +1,132 @@
+This version includes test code to display VE.Direct inverters
+on the Mobile Overview and Flow Overview pages
+and to control the inverter mode from these pages
+
+This package provides the following modificaitons to the VenusOS GUI:
+    move Settings and Notifications to the top of the list man page
+    hides the Tiles Overview
+    enhances the Mobile Overview
+        all new layout and tile organization
+        add Inverter Only mode
+        shows voltages current and frequency for AC in and out
+        shows current for DC loads
+        shows solar voltage and current
+        hides Pump switch if not enabled to make more space for tanks
+            (this became standard in v2.70~9)
+        tanks column scrolls if there are more tanks than space allows
+        add temeratore sensors to tanks column
+            The tanks column is split into separte columns for tanks and temerature sensors
+            A common tile height is set for both columns, then each column is filled in separtly
+            Any tank that apepars as a dBus temperature sensor should appear
+    enhances the Tank Tile
+        red indicates low/high fluid levels
+        indicates NO RESPONSE if no signal received from tank
+        tile shrinks if needed to show more tanks, then list scrolls
+        display custom tank names (stock in v2.70~9)
+        displays absolute fluid quantity (e.g., gallons) in addition to percentage
+    enhances the Flow Overview
+        adds tank information to the flow Overview
+            4 tanks fit along the bottom of the page
+            for more than 4 tanks, the list scrolls
+        adds AC voltage, current, frequency and input current limit to flow Overview
+        adds power gauges to AC In, AC Out and Inverter tiles
+        adds power gauge to PV Charger tile
+        adds power gauge to battery that shows both charge and discharge level
+        adds inverter mode (Off, On, Inv (Invert Only), Ch (Charge Only)) to the switch area in the inverter tile
+        adds popups for AC input current limit and inverter mode
+        adds presets for AC current limits, plus a "spinner" to adjust new value between presets
+        inverter popup has colored buttons to help select the desired mode
+        add temps information
+            A combination of up to 4 tanks and temps fit across the bottom
+            For more, the bottom row splits into separate rows for temps and tanks
+            Each row scrolls horizontally if more than 4 items exist in the row
+    use custom tank name if it exists and optionally shorten tank names
+        beginning with Venus v2.70~16, NEMA2000 tank names can be too long to fit in available space
+        enabling this option will shorten the tank name to the first two words
+            (first word for compact tank tiles)
+            and repalce "Waste" with "Gray" to be consistent with "Black" label for sewage tank
+    
+each of these modifications can be selected individually at install time
+
+This script should be run manually initally.
+It will then called from reinstallMods to reinstall functionality after a Venus update
+
+The buttons for the popups are hidden and the touchable area is kept to a minimum
+    to avoid confusion with activating the bottom menu bar and swiping to other overviews
+The AC input current limit popup is activated by touching the lower third of the AC Input tile
+The Inverter mode popup is activated by touching the middle of the Multi tile
+
+The power gauges require additional information during installation.
+    The first three values can be taken from the spec sheet for your specific Multi/Quatro, etc.
+    The inverter's peak power provides a maximum displayable value.
+        Use the value at which the inverter will continue to run only for a short period of time.
+            For some inverters, this value is double the continuous value,
+                so you may wish to set this to a lower value in order to favor more space
+                to display lower values.
+    The inverter's maximum continuous power sets the overload threshold.
+        The intent is to show the power at which the inverter will run forever
+        at least if ambient temperature is within reason.
+        This value should be set to the inverer's maximum output power spec at 25 C.        
+    The inverter's caution level indicates a power level at which the user should start
+            looking at system power in order to prevent an overload.
+        Set this parameter to something like the maximum power spec at highest temperature.
+    The maximum system power is the point at which the components down stream will overload.
+        For example, this could be set to the power equivalent to the power distribution panel's
+        ain breaker (e.g., 50 amps on a 120volt system would be 6000 watts).
+        This parameter is optional. Setting it allows the AC output gauge to show an overload
+            at this value rather than the sum of input and inverter powers (power assist).
+        If you do not want this limitation, set the value to 0.
+    The maximum PV Charger power is the maximum power expected from all PV charger arrays.
+
+Configuration:
+    Each set of modificaions can be enabled/disabled separately during installation
+    For the power gauges, you must also specify a set of power limits
+        The spec sheet for the inverter is a good guide for these
+        Caution level defines level at which the inverter may have difficulty supplying that much power
+            The inverter's max power under the most adverse contitions is a recommended value
+        Maxium continuous power is the power the inverter can sustain under best conditions
+        Peak power is the inverter's peak power capability.
+            This number is often twice the max continuous so you may want to choose a lower value
+        Maximum output power is generally defined by the master breaker in the distribution panel.
+            For example, set this parameter to 3600 for a 30 amp main breaker for a 120 volt system.
+        Maximum battery bank discharge current is the continuous current based on the battery specs.
+            Factor in the number of batteries in parallel.
+            For example, set this to 400 for 4 100 AH batteries in parallel.
+    For the AC input current limit presets, enter the desired value for each preset.
+        A value of 0 disables that preset.
+
+Setup:
+
+The easiest way to install this or other of my packages is to first install SetupHelper,
+then use its package install tool. Refer to the SetupHelper ReadMe for instructions.
+
+There are two other methods to fetch a package archive.
+
+IF the Venus device has internet access is to run the following command:
+
+wget -qO - https://github.com/kwindrem/GuiMods/archive/current.tar.gz | tar -xzf - -C /data
+
+If the Venus device does not have internet access, you will need to fetch the archive using a computer that does have internet access:
+
+click on this link in a web browser:
+https://github.com/kwindrem/GuiMods/archive/current.tar.gz
+
+rename the resulting .tar.gz file to venus-data.tar.gz
+copy the venus-data.tar.gz to a USB stick,
+put the stick in the Venus device and reboot.
+When Venus boots, it will unarchive the file to /data/GuiMods-current
+
+Move the directory into it's active locaiton:
+rm -rf /data/GuiMods
+mv /data/GuiMods-current /data/GuiMods
+
+Repeat the above for SetupHelper if you haven't done so for another package.
+
+Finally, run the setup script to complete the installation
+/data/GuiMods/setup
+
+You will need root access to the Venus device. Instructions can be found here:
+https://www.victronenergy.com/live/ccgx:root_access
+The root password needs to be reentered following a Venus update.
+Setting up an authorization key (see documentation referenced above) will save time and avoid having to reset the root password after each update.
+

@@ -1,5 +1,6 @@
 //////// modified for VE.Direct inverter support
 import QtQuick 1.1
+import com.victron.velib 1.0
 import "utils.js" as Utils
 
 Item {
@@ -9,6 +10,9 @@ Item {
 
 	property string systemPrefix: "com.victronenergy.system"
 	property string vebusPrefix: _vebusService.valid ? _vebusService.value : ""
+
+//////// add to support VE.Direct inverters
+    property string inverterService: ""
 
 	property variant battery: _battery
 	property alias dcSystem: _dcSystem
@@ -81,7 +85,7 @@ Item {
 		id: _genset
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Genset")
         inverterSource: "/Ac/ActiveIn"
-        inverterService: sys.vebusPrefix
+        inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
 
 	VBusItem {
@@ -93,14 +97,14 @@ Item {
 		id: _grid
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Grid")
         inverterSource: "/Ac/ActiveIn"
-        inverterService: sys.vebusPrefix
+        inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
 
 	ObjectAcConnection {
 		id: _acLoad
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Consumption")
         inverterSource: "/Ac/Out"
-        inverterService: sys.vebusPrefix
+        inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
 
 	ObjectAcConnection {
@@ -148,4 +152,31 @@ Item {
 		id: _dcSystem
 		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/System/Power"); unit: "W"}
 	}
+
+//////// add to support VE.Direct inverters
+    Component.onCompleted: discoverServices()
+
+    // When new service is found check if is a tank sensor
+    Connections
+    {
+        target: DBusServices
+        onDbusServiceFound: addService(service)
+    }
+    function addService(service)
+    {
+        switch (service.type)
+        {
+        case DBusService.DBUS_SERVICE_INVERTER:
+            if (inverterService === "")
+                inverterService = service.name;
+            break;;
+        }
+    }
+
+    // Check available services inverter services
+    function discoverServices()
+    {
+        for (var i = 0; i < DBusServices.count; i++)
+                addService(DBusServices.at(i))
+    }
 }
