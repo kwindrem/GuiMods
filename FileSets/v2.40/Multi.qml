@@ -73,6 +73,9 @@ MbIcon {
                 case 3:
                     return "O n"
                     break;
+                case 5:
+                    return "E c o"
+                    break;
                 default:
                     return "?"
                     break;

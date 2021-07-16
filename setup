@@ -68,6 +68,21 @@ if [ $scriptAction == 'NONE' ] ; then
     # PROMPT is left over from a previous version of SetupHelper
     #  it is included here for backward compatibility
     if [ $scriptAction == 'NONE' ] || [ $scriptAction == 'PROMPT' ]; then
+        logMessage "creating settings"
+        dbus -y com.victronenergy.settings /Settings AddSettings\
+            '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
+            {"path":"/InverterLimits/ContiuousPower", "type":"float", "default":0},\
+            {"path":"/InverterLimits/CautionPower", "type":"float", "default":0},\
+            {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0},\
+            {"path":"/SystemSetup/MaxDischargeCurrent", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset2", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
+            {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
+            {"path":"/PvCharger/MaxPower", "type":"float", "default":0},\
+            {"path":"/GuiMods/ShortenTankNames", "type":"int", "default":0},\
+            {"path":"/GuiMods/TemperatureScale", "type":"int", "default":0} ]'  > /dev/null
         echo
         echo "The Enhanced overview includes the following changes:"
         echo "  1) Tiles are arranged to more cloesly follow the power flow through the system"
@@ -176,6 +191,16 @@ if [ $scriptAction == 'NONE' ] ; then
                     echo $systemPowerLimit > $setupOptionsDir/systemPowerLimit
                     echo $maxDischargeCurrent > "$setupOptionsDir/maxDischargeCurrent"
                     echo $pvChargerMaxPower > "$setupOptionsDir/pvChargerMaxPower"
+
+                    logMessage "setting power limits caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower  outputPower: $systemPowerLimit"
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue $inverterPeakPower > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue $inverterContiuousPower > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue $inverterCautionPower > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
+                    logMessage "setting battery discharge limit: $maxDischargeCurrent"
+                    dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue $maxDischargeCurrent > /dev/null
+                    logMessage "setting PV charger limit: $pvChargerMaxPower"
+                    dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue $pvChargerMaxPower > /dev/null
                 else
                     rm -f "$setupOptionsDir/inverterPeakPower"
                     rm -f "$setupOptionsDir/inverterContiuousPower"
@@ -183,6 +208,11 @@ if [ $scriptAction == 'NONE' ] ; then
                     rm -f "$setupOptionsDir/systemPowerLimit"
                     rm -f "$setupOptionsDir/maxDischargeCurrent"
                     rm -f "$setupOptionsDir/pvChargerMaxPower"
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue 0 > /dev/null
                 fi
             fi
             echo
@@ -210,8 +240,18 @@ if [ $scriptAction == 'NONE' ] ; then
                     read -p "Preset 3: " acCurrentLimitPreset3
                     read -p "Preset 4: " acCurrentLimitPreset4
                     echo $acCurrentLimitPreset1  $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4> "$setupOptionsDir/acCurrentLimitPresets"
-                else
+ 
+                    logMessage "setting AC current limit presets: $acCurrentLimitPreset1 $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4"
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue $acCurrentLimitPreset1 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue $acCurrentLimitPreset2 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue $acCurrentLimitPreset3 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue $acCurrentLimitPreset4 > /dev/null
+               else
                     rm -f "$setupOptionsDir/acCurrentLimitPresets"
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue 0 > /dev/null
+                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue 0 > /dev/null
                 fi
             fi
         fi
@@ -221,22 +261,24 @@ if [ $scriptAction == 'NONE' ] ; then
             read -p "Select the desired temperature scale (C/F/b (both)): " tempScale
             case $tempScale in
                 [cC]*)
-                    echo "1" > "$setupOptionsDir/temperatureScale"
+                    temperatureScale=1
                     break
                     ;;
                 [fF]*)
-                    echo "2" > "$setupOptionsDir/temperatureScale"
+                    temperatureScale=2
                     break
                     ;;
                  [bB]*)
-                    echo "0" > "$setupOptionsDir/temperatureScale"
+                    temperatureScale=0
                     break
                     ;;
                 *)
                    ;;
             esac
         done
+        dbus -y com.victronenergy.settings /Settings/GuiMods/TemperatureScale SetValue $temperatureScale > /dev/null
 
+        echo
         echo "Beginning with Venus v2.70~16, names for NMEA2000 tanks won't fit in the available space"
         echo "If custom names exist, they are used"
         echo "The long names can be shortened to two words (one word for compact tiles)"
@@ -244,8 +286,10 @@ if [ $scriptAction == 'NONE' ] ; then
         yesNoPrompt "Do you wish to shorten NMEA2000 tank names? (y/n): "
         if $yesResponse ; then
             touch "$setupOptionsDir/shortenTankNames"
+            dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 1 > /dev/null
         else
             rm -f "$setupOptionsDir/shortenTankNames"
+            dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 0 > /dev/null
         fi
 
         scriptAction='INSTALL'
@@ -254,23 +298,6 @@ fi
 
 #### installing
 if [ $scriptAction == 'INSTALL' ] ; then
-    # set defaults if options have not been set before
-    # all modifications enabled, default power limits, default input current limit presets
-    if [ ! -f "$setupOptionsDir/optionsSet" ]; then
-        touch "$setupOptionsDir/moveSettings"
-        touch "$setupOptionsDir/hideTileOverview"
-        touch "$setupOptionsDir/useEnhancedOverview"
-        echo "3000" "$setupOptionsDir/inverterPeakPower"
-        echo "2000" "$setupOptionsDir/inverterContiuousPower"
-        echo "1400" "$setupOptionsDir/inverterCautionPower"
-        echo "3600" "$setupOptionsDir/systemPowerLimit"
-        echo "200" "$setupOptionsDir/maxDischargeCurrent"
-        echo "360" "$setupOptionsDir/pvChargerMaxPower"
-        echo "10 15 20 30" > "$setupOptionsDir/acCurrentLimitPresets"
-        echo "0" "$setupOptionsDir/temperatureScale"
-        touch "$setupOptionsDir/optionsSet"
-        touch "$setupOptionsDir/shortenTankNames"
-    fi
     if [ -f "$setupOptionsDir/moveSettings" ]; then
         logMessage "Moving Settings & Notifications to top of Device List"
         updateActiveFile "$deviceListFile"
@@ -316,98 +343,6 @@ if [ $scriptAction == 'INSTALL' ] ; then
         updateActiveFile "$multiFile"
         updateActiveFile "$inverterPopupFile"
         updateActiveFile "$acCurrentLimitPopUpFile"
-        logMessage "creating inverter power limit settings"
-        dbus -y com.victronenergy.settings /Settings AddSettings\
-            '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/ContiuousPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/CautionPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0},\
-            {"path":"/SystemSetup/MaxDischargeCurrent", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset2", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
-            {"path":"/PvCharger/MaxPower", "type":"float", "default":0},\
-            {"path":"/GuiMods/ShortenTankNames", "type":"int", "default":0},\
-            {"path":"/GuiMods/TemperatureScale", "type":"int", "default":0} ]'  > /dev/null
-        if [ -f "$setupOptionsDir/inverterPeakPower" ]; then
-            inverterPeakPower=$(cat "$setupOptionsDir/inverterPeakPower")
-        else
-            inverterPeakPower=0
-        fi
-        if [ -f "$setupOptionsDir/inverterContiuousPower" ] ; then
-            inverterContiuousPower=$(cat "$setupOptionsDir/inverterContiuousPower")
-        else
-            inverterContiuousPower=0
-        fi
-        if [ "$setupOptionsDir/inverterContiuousPower" ]; then
-            inverterCautionPower=$(cat $setupOptionsDir/inverterCautionPower)
-        else
-            inverterCautionPower=0
-        fi
-        if [ -f $setupOptionsDir/inverterCautionPower ]; then
-            systemPowerLimit=$(cat $setupOptionsDir/systemPowerLimit)
-        else
-            systemPowerLimit=0
-        fi
-
-        if [ -f "$setupOptionsDir/maxDischargeCurrent" ]; then
-            maxDischargeCurrent=$(cat "$setupOptionsDir/maxDischargeCurrent")
-        else
-            maxDischargeCurrent=0
-        fi
-        if [ -f "$setupOptionsDir/pvChargerMaxPower" ]; then
-            pvChargerMaxPower=$(cat "$setupOptionsDir/pvChargerMaxPower")
-        else
-            pvChargerMaxPower=0
-        fi
-        if (( $inverterPeakPower > 0)); then
-            logMessage "setting power limits caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower  outputPower: $systemPowerLimit"
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue $inverterPeakPower > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue $inverterContiuousPower > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue $inverterCautionPower > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
-            logMessage "setting battery discharge limit: $maxDischargeCurrent"
-            dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue $maxDischargeCurrent > /dev/null
-            logMessage "setting PV charger limit: $pvChargerMaxPower"
-            dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue $pvChargerMaxPower > /dev/null
-        else
-            logMessage "power gauges not enabled"
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue 0 > /dev/null
-        fi
-        if [ -f "$setupOptionsDir/acCurrentLimitPresets" ]; then
-            read acCurrentLimitPreset1 acCurrentLimitPreset2 acCurrentLimitPreset3 acCurrentLimitPreset4 <<< $(cat "$setupOptionsDir/acCurrentLimitPresets")
-            logMessage "setting AC current limit presets: $acCurrentLimitPreset1 $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4"
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue $acCurrentLimitPreset1 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue $acCurrentLimitPreset2 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue $acCurrentLimitPreset3 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue $acCurrentLimitPreset4 > /dev/null
-        else
-            logMessage "current presets not set"
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue 0 > /dev/null
-            dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue 0 > /dev/null
-        fi
-        if [ -f "$setupOptionsDir/temperatureScale" ]; then
-            temperatureScale=$(cat "$setupOptionsDir/temperatureScale")
-        else
-            temperatureScale=0
-        fi
-        if [ $temperatureScale == 1 ]; then
-            logMessage "setting Temperature Scale to °C"
-        elif [ $temperatureScale == 2 ]; then
-            logMessage "setting Temperature Scale to °F"
-        else
-            logMessage "setting Temperature Scale to both °C and °F"
-        fi
-        dbus -y com.victronenergy.settings /Settings/GuiMods/TemperatureScale SetValue $temperatureScale > /dev/null
-
         # enhanced flow requires enhanced tank tile
         installEnhancedTank=true
     else
@@ -421,13 +356,6 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$multiFile"
         restoreActiveFile "$inverterPopupFile"
         restoreActiveFile "$acCurrentLimitPopUpFile"
-        dbus -y com.victronenergy.settings /Settings RemoveSettings\
-            '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
-            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
-            "SystemSetup/MaxDischargeCurrent",\
-            "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
-            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
-            "PvCharger/MaxPower", "GuiMods/TemperatureScale" ]' > /dev/null
     fi
     if $installEnhancedTank ; then
         logMessage "installing enhanced Tank tile"
@@ -439,11 +367,6 @@ if [ $scriptAction == 'INSTALL' ] ; then
         restoreActiveFile "$tileTempFile"
     fi
     
-    if $shortenTankNames ; then
-        dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 1 > /dev/null
-    else
-        dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 0 > /dev/null
-    fi
     logMessage "++ Package installed"
 fi
 
