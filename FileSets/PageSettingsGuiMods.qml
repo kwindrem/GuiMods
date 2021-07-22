@@ -17,6 +17,7 @@ MbPage {
             id: showTileOverview
             bind: Utils.path (bindPrefixGuiMods, "/ShowTileOverview")
             name: qsTr ("Show Tile Overview")
+            writeAccessLevel: User.AccessUser
         }
 
         MbSwitch
@@ -24,6 +25,7 @@ MbPage {
             id: moveSettings
             bind: Utils.path (bindPrefixGuiMods, "/MoveSettings")
             name: qsTr ("Move Settings to top of Device List")
+            writeAccessLevel: User.AccessUser
         }
 
         // duplicate mobile overview on/off here for convenience
@@ -31,7 +33,7 @@ MbPage {
             id: mobileOverview
             bind: Utils.path (bindPrefix, "/MobileOverview")
             name: qsTr ("Show boat & motorhome overview")
-            // When enabled set OverviewMobile as default overview
+            writeAccessLevel: User.AccessUser
         }
         MbSwitch
         {
@@ -48,6 +50,7 @@ MbPage {
                 }
             }
             VBusItem { id: showMobileOverview; bind: Utils.path (bindPrefix, "/MobileOverview") }
+            writeAccessLevel: User.AccessUser
         }
 
         MbSwitch
@@ -55,6 +58,7 @@ MbPage {
             id: useEnhFlowOverview
             bind: Utils.path (bindPrefixGuiMods, "/UseEnhancedFlowOverview")
             name: qsTr ("Use Enhanced Flow Overview")
+            writeAccessLevel: User.AccessUser
         }
 
         MbSwitch
@@ -63,6 +67,7 @@ MbPage {
             bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowOverviewTanks")
             name: qsTr ("Show tanks on Flow Overview")
             show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
         }
         MbSwitch
         {
@@ -70,6 +75,7 @@ MbPage {
             bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowOverviewTemps")
             name: qsTr ("Show temperatures on Flow Overview")
             show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
        }
         MbSwitch
         {
@@ -77,6 +83,7 @@ MbPage {
             bind: Utils.path (bindPrefixGuiMods, "/ShortenTankNames")
             name: qsTr ("Shorten tank names")
             show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
+            writeAccessLevel: User.AccessUser
         }
 
         MbSpinBox {
@@ -88,6 +95,7 @@ MbPage {
             min: 0
             max: 999
             show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
         }
 
         MbSpinBox {
@@ -99,6 +107,7 @@ MbPage {
             min: 0
             max: 999
             show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
         }
 
         MbSpinBox {
@@ -110,6 +119,7 @@ MbPage {
             min: 0
             max: 999
             show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
         }
 
         MbSpinBox {
@@ -121,13 +131,13 @@ MbPage {
             min: 0
             max: 999
             show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
         }
 
         MbItemOptions
         {
             id: tempScale
             description: qsTr ("Temperature scale")
-            writeAccessLevel: User.AccessUser
             bind: Utils.path (bindPrefixGuiMods, "/TemperatureScale")
             show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
             possibleValues:
@@ -136,13 +146,13 @@ MbPage {
                 MbOption { description: "°F"; value: 2 },
                 MbOption { description: "both °C & °F"; value: 0 }
             ]
+            writeAccessLevel: User.AccessUser
         }
         
         MbItemOptions
         {
             id: timeFormat
             description: qsTr ("Time format")
-            writeAccessLevel: User.AccessUser
             bind: Utils.path (bindPrefixGuiMods, "/TimeFormat")
             show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
             possibleValues:
@@ -151,6 +161,7 @@ MbPage {
                 MbOption { description: "12 hour AM/PM"; value: 2 },
                 MbOption { description: "don't show time"; value: 0 }
             ]
+            writeAccessLevel: User.AccessUser
         }
         
         MbSubMenu

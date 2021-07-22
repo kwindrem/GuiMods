@@ -16,6 +16,7 @@ MbPage {
             id: showGauges
             bind: Utils.path(bindPrefixGuiMods, "/ShowGauges")
             name: qsTr("Show power gauges")
+            writeAccessLevel: User.AccessUser
         }
 
         MbEditBox
@@ -23,78 +24,78 @@ MbPage {
             description: qsTr ("Inverter peak power (gauge max)")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/PeakPower")
-            writeAccessLevel: User.AccessUser
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
             unit: "W"
             enableSpaceBar: true
             show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
         }
         MbEditBox
         {
             description: qsTr ("Inverter caution power (yellow-red)")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/CautionPower")
-            writeAccessLevel: User.AccessUser
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
             unit: "W"
             enableSpaceBar: true
             show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
         }
         MbEditBox
         {
             description: qsTr ("Inverter max continuous power (greed-yellow)")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/ContiuousPower")
-            writeAccessLevel: User.AccessUser
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
             unit: "W"
             enableSpaceBar: true
             show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
         }
         MbEditBox
         {
             description: qsTr ("Max system AC output power")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/AcOutputMaxPower")
-            writeAccessLevel: User.AccessUser
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
             unit: "W"
             enableSpaceBar: true
             show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
         }
         MbEditBox
         {
             description: qsTr ("Max PV power")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/PvChargerMaxPower")
-            writeAccessLevel: User.AccessUser
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
             unit: "W"
             enableSpaceBar: true
             show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
         }
         MbEditBox
         {
             description: qsTr ("Max battery discharge current")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/BatteryMaxDischargeCurrent")
-            writeAccessLevel: User.AccessUser
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
             unit: "A"
             enableSpaceBar: true
             show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
         }
     }
 }
