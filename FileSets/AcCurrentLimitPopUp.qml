@@ -23,25 +23,25 @@ Tile {
     VBusItem
     {
         id: acLimitPreset1Item
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/AcCurrentLimit/Preset1")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/AcCurrentLimit/Preset1")
     }
     property real acLimitPreset1: acLimitPreset1Item.valid ? acLimitPreset1Item.value : 0
     VBusItem
     {
         id: acLimitPreset2Item
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/AcCurrentLimit/Preset2")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/AcCurrentLimit/Preset2")
     }
     property real acLimitPreset2: acLimitPreset2Item.valid ? acLimitPreset2Item.value : 0
     VBusItem
     {
         id: acLimitPreset3Item
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/AcCurrentLimit/Preset3")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/AcCurrentLimit/Preset3")
     }
     property real acLimitPreset3: acLimitPreset3Item.valid ? acLimitPreset3Item.value : 0
     VBusItem
     {
         id: acLimitPreset4Item
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/AcCurrentLimit/Preset4")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/AcCurrentLimit/Preset4")
     }
     property real acLimitPreset4: acLimitPreset4Item.valid ? acLimitPreset4Item.value : 0
 

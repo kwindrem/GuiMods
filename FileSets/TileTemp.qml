@@ -65,7 +65,7 @@ Tile {
 
 		Rectangle
         {
-			color: "#c0c0bd"
+			color: "#95a5a6"
 			border { width:1; color: "white" }
 			width: root.width - 10 - (compact ? tempText.width + 3 : 0)
 			height: compact ? 13 : parent.height

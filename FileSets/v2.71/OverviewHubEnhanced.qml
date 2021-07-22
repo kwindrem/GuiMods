@@ -8,6 +8,7 @@
 //////  bar graphs on AC in/out and Multi
 //////  popups for AC input current limit and inverter mode
 //////  bar gauge on PV Charger tile
+//////  add support for VE.Direct inverters
 
 import QtQuick 1.1
 import "utils.js" as Utils
@@ -31,11 +32,13 @@ OverviewPage {
     property int bottomOffset: 45
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
-    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: numberOfTanks + numberOfTemps
-    property bool showTanks: showStatusBar ? false : numberOfTanks > 0 ? true : false
-    property bool showTemps: showStatusBar ? false : numberOfTemps > 0 ? true : false
+//////// added/modified for control show/hide gauges, tanks and temps from menus
+    property int tankCount: showTanksEnable ? tankModel.rowCount : 0
+    property int tempCount: showTempsEnable ? numberOfTemps : 0
+    property int tankTempCount: tankCount + tempCount
+    property bool showTanks: showTanksEnable ? showStatusBar ? false : tankCount > 0 ? true : false : false
+    property bool showTemps: showTempsEnable ? showStatusBar ? false : tempCount > 0 ? true : false : false
     property bool showTanksTemps: showTanks || showTemps
     property int compactThreshold: 45   // height below this will be compacted vertically
     property int batteryHeight: 91
@@ -55,9 +58,30 @@ OverviewPage {
     property bool isMulti: numberOfMultis > 0
     property bool isInverter: !isMulti && numberOfInverters > 0
 
-    Component.onCompleted: discoverServices()
+//////// added for control show/hide gauges, tanks and temps from menus
+    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
+    VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
+    property bool showGauges: showGaugesItem.valid ? showGaugesItem.value === 1 ? true : false : false
+    VBusItem { id: showTanksItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTanks") }
+    property bool showTanksEnable: showTanksItem.valid ? showTanksItem.value === 1 ? true : false : false
+    VBusItem { id: showTempsItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTemps") }
+    property bool showTempsEnable: showTempsItem.valid ? showTempsItem.value === 1 ? true : false : false
 
-//////// add for mods
+//////// added to control time display
+    VBusItem { id: timeFormatItem; bind: Utils.path(guiModsPrefix, "/TimeFormat") }
+    property string timeFormat: getTimeFormat ()
+    
+    function getTimeFormat ()
+    {
+        if (!timeFormatItem.valid || timeFormatItem.value === 0)
+            return ""
+        else if (timeFormatItem.value === 2)
+            return "h:mm ap"
+        else
+            return "hh:mm"
+    }
+
+//////// add to display voltage and current
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
     VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
     VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
@@ -65,6 +89,8 @@ OverviewPage {
     VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
     VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
+
+    Component.onCompleted: discoverServices()
 
 	title: qsTr("Overview")
 
@@ -76,7 +102,6 @@ OverviewPage {
 		title: getAcSourceName(sys.acSource)
 		titleColor: "#E74c3c"
 		color: "#C0392B"
-
 		anchors {
 			top: multi.top
 			left: parent.left; leftMargin: 10
@@ -106,6 +131,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acInput
+            show: showGauges
         }
 	}
 
@@ -129,20 +155,20 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: undefined
-            useInverterInfo: true
             inverterService: root.inverterService
+            useInverterInfo: true
+            show: showGauges
         }
 	}
 
 ////// ADDED to show time inside inverter icon
     Timer {
         id: wallClock
-        running: true
+        running: timeFormat != ""
         repeat: true
         interval: 1000
         triggeredOnStart: true
-        onTriggered: time = Qt.formatDateTime(new Date(), "h:mm ap")
-
+        onTriggered: time = Qt.formatDateTime(new Date(), timeFormat)
         property string time
     }
     TileText
@@ -154,6 +180,7 @@ OverviewPage {
             top: multi.top; topMargin: 96
             horizontalCenter: multi.horizontalCenter
         }
+        show: wallClock.running
     }
 
 	OverviewBox {
@@ -185,6 +212,7 @@ OverviewPage {
             }
             connection: sys.acLoad
             inverterService: root.inverterService
+            show: showGauges
         }
 	}
 
@@ -203,6 +231,7 @@ OverviewPage {
                 top: parent.top; topMargin: 52
                 horizontalCenter: parent.horizontalCenter
             }
+            show: showGauges
         }
 
 ////// MODIFIED to show tanks
@@ -259,12 +288,12 @@ OverviewPage {
 			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
 
-		values: TileText {
-			anchors.centerIn: parent
+        values: TileText {
+            anchors.centerIn: parent
 ////// modified to show current
-			text: dcSystemText ()
-		}
-	}
+            text: dcSystemText ()
+        }
+    }
 
     function dcSystemText ()
     {
@@ -279,7 +308,6 @@ OverviewPage {
         else
             return "--"
     }
-
 
 	OverviewSolarCharger {
 		id: blueSolarCharger
@@ -340,6 +368,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.pvCharger
+            show: showGauges
         }
 	}
 
@@ -516,10 +545,10 @@ OverviewPage {
     }
     ListView
     {
-        id: tanksColumn
+        id: tanksColum
 
         visible: showTanks
-        width: compact ? root.width : root.width * numberOfTanks / tankTempCount
+        width: compact ? root.width : root.width * tankCount / tankTempCount
         property int tileWidth: width / Math.min (count, 4.2)
         height: root.tanksHeight
         anchors
@@ -532,28 +561,38 @@ OverviewPage {
         interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
-        model: tanksModel
-        delegate: TileTank
-        {
-            width: tanksColumn.tileWidth
-            height: tanksColumn.height
-            compact: root.compact
+        model: TankModel { id: tankModel }
+        delegate: TileTank {
+            // Without an intermediate assignment this will trigger a binding loop warning.
+            property variant theService: DBusServices.get(buddy.id)
+            service: theService
+            width: tanksColum.tileWidth
+            height: root.tanksHeight
             pumpBindPrefix: root.pumpBindPreffix
-            Connections
-            {
+            compact: root.compact
+            Connections {
                 target: scrollTimer
                 onTriggered: doScroll()
             }
         }
+        Tile {
+            title: qsTr("TANKS")
+            anchors.fill: parent
+            values: TileText {
+                text: qsTr("")
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+            z: -1
+        }
     }
-    ListModel { id: tanksModel }
 
     ListView
     {
         id: tempsColumn
 
         visible: showTemps
-        width: compact ? root.width : root.width * numberOfTemps / tankTempCount
+        width: compact ? root.width : root.width * tempCount / tankTempCount
         property int tileWidth: width / Math.min (count, 4.2)
         height: root.tanksHeight
         anchors
@@ -594,7 +633,7 @@ OverviewPage {
     }
     ListModel { id: tempsModel }
 
-    // When new service is found check if is a tank sensor
+    // When new service is found add resources as appropriate
     Connections
     {
         target: DBusServices
@@ -605,20 +644,11 @@ OverviewPage {
     {
          switch (service.type)
         {
-        case DBusService.DBUS_SERVICE_TANK:
-            // hide incoming N2K tank dBus object if TankRepeater is running
-            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
-            {
-                tanksModel.append({serviceName: service.name})
-                numberOfTanks++
-            }
-            break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
             tempsModel.append({serviceName: service.name})
             break;;
-
         case DBusService.DBUS_SERVICE_MULTI:
             numberOfMultis++
             if (numberOfMultis === 1)
@@ -645,8 +675,6 @@ OverviewPage {
     // Detect available services of interest
     function discoverServices()
     {
-        tanksModel.clear()
-        numberOfTanks = 0
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfMultis = 0
@@ -654,6 +682,7 @@ OverviewPage {
         inverterService = ""
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
+        tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
         {
             addService(DBusServices.at(i))
@@ -671,7 +700,8 @@ OverviewPage {
         onClicked: { acCurrentLimitPopUp.cancel(); inverterModePopUp.cancel() }
     }
 ////// popup current limit box over the AC Input tile
-    AcCurrentLimitPopUp {
+    AcCurrentLimitPopUp
+    {
         title: qsTr("AC Current Limit")
         id: acCurrentLimitPopUp
         // hide button until it is expanded
@@ -719,5 +749,7 @@ OverviewPage {
         color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
         bind: Utils.path(inverterService, "/Mode")
         VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
+        inverterService: root.inverterService
+        isInverter: root.isInverter
     }
 }

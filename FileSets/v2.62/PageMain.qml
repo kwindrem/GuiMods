@@ -1,33 +1,40 @@
-// modified order to put Settings, then Notifications at top of list
-//// search for MODIFIED
+//////// modified order to put Settings, then Notifications at top of list
 
 import QtQuick 1.1
+import "utils.js" as Utils
 import com.victron.velib 1.0
 
 MbPage {
 	id: root
 	title: qsTr("Device List")
+    property VBusItem moveSettings: VBusItem { id: moveSettings; bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/MoveSettings")}
+    property bool settingsAtTop: moveSettings.valid && moveSettings.value === 1
 
 	model: VisualItemModel {
-// MODIFIED put Settings at top of list
+//////// put Settings at top of list
         MbSubMenu {
             description: qsTr("Settings")
             subpage: Component { PageSettings {} }
+            show: settingsAtTop
         }
 
-// MODIFIED put Notifications second
-		MbSubMenu {
-			id: menuNotifications
-			description: qsTr("Notifications")
-			item: VBusItem {
-				property variant active: NotificationCenter.notifications.filter(
-											 function isActive(obj) { return obj.active} )
-				value: active.length > 0 ? active.length : ""
-			}
-			subpage: Component { PageNotifications {} }
-		}
-
-	}
+//////// put Notifications second
+        MbSubMenu {
+            id: menuNotifications
+            description: qsTr("Notifications")
+            item: VBusItem {
+                property variant active: NotificationCenter.notifications.filter(
+                                             function isActive(obj) { return obj.active} )
+                value: active.length > 0 ? active.length : ""
+            }
+            subpage: Component { PageNotifications {} }
+        }
+        MbSubMenu {
+            description: qsTr("Settings")
+            subpage: Component { PageSettings {} }
+            show: !settingsAtTop
+        }
+    }
 
 	Component {
 		id: submenuLoader
@@ -184,8 +191,9 @@ MbPage {
 
 		// sort on (initial) description
 		var i = 0
-// MODIFIED leave Settings and Notifications at top of list (don't sort first 2 entries)
-		for (i = 2; i < model.count - 2; i++ ) {
+//////// leave Settings and Notifications at top of list (don't sort first 2 entries)
+        var i = settingsAtTop ? 2 : 0
+        for (; i < model.count - 2; i++ ) {
 			if (model.children[i].description.localeCompare(service.description) > 0)
 				break;
 		}

@@ -1,24 +1,27 @@
-// modified order to put Settings, then Notifications at top of list
-//// search for MODIFIED
+//////// modified order to put Settings, then Notifications at top of list
 
 import QtQuick 1.1
+import "utils.js" as Utils
 import com.victron.velib 1.0
 
 MbPage {
 	id: root
 	title: qsTr("Device List")
+    property VBusItem moveSettings: VBusItem { id: moveSettings; bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/MoveSettings")}
+    property bool settingsAtTop: moveSettings.valid && moveSettings.value === 1
 
 	model: VisualModels {
-// MODIFIED put Settings at top of list
+//////// put Settings at top of list
         VisualItemModel {
             MbSubMenu {
                 description: qsTr("Settings")
                 subpage: Component { PageSettings {} }
+                show: settingsAtTop
             }
 
-// MODIFIED put Notifications second
+//////// put Notifications second
             MbSubMenu {
-                id: menuNotifications
+                id: menuNotificationsTop
                 description: qsTr("Notifications")
                 item: VBusItem {
                     property variant active: NotificationCenter.notifications.filter(
@@ -26,12 +29,13 @@ MbPage {
                     value: active.length > 0 ? active.length : ""
                 }
                 subpage: Component { PageNotifications {} }
+                show: settingsAtTop
             }
 
             MbOK {
                 description: qsTr("Remove disconnected devices")
                 value: qsTr("Press to remove")
-                show: deviceList.disconnectedDevices != 0
+                show: settingsAtTop && deviceList.disconnectedDevices != 0
                 editable: true
 
                 function clicked() {
@@ -61,7 +65,39 @@ MbPage {
 				subpage: model.page
 			}
 		}
-	}
+
+    VisualItemModel {
+            MbSubMenu {
+                id: menuNotifications
+                description: qsTr("Notifications")
+                item: VBusItem {
+                    property variant active: NotificationCenter.notifications.filter(
+                                                 function isActive(obj) { return obj.active} )
+                    value: active.length > 0 ? active.length : ""
+                }
+                subpage: Component { PageNotifications {} }
+                show: !settingsAtTop
+            }
+
+            MbSubMenu {
+                description: qsTr("Settings")
+                subpage: Component { PageSettings {} }
+                show: !settingsAtTop
+            }
+
+            MbOK {
+                description: qsTr("Remove disconnected devices")
+                value: qsTr("Press to remove")
+                show: !settingsAtTop && deviceList.disconnectedDevices != 0
+                editable: true
+
+                function clicked() {
+                    listview.decrementCurrentIndex()
+                    deviceList.removeDisconnected()
+                }
+            }
+        }
+    }
 
 	Component {
 		id: vebusPage

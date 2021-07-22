@@ -103,6 +103,21 @@ OverviewPage {
     property int infoWidth3Column: infoWidth / 3
     property int infoWidth2Column: infoWidth / 2
 
+//////// added to control time display
+    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
+    VBusItem { id: timeFormatItem; bind: Utils.path(guiModsPrefix, "/TimeFormat") }
+    property string timeFormat: getTimeFormat ()
+    
+    function getTimeFormat ()
+    {
+        if (!timeFormatItem.valid || timeFormatItem.value === 0)
+            return ""
+        else if (timeFormatItem.value === 2)
+            return "h:mm ap"
+        else
+            return "hh:mm"
+    }
+
 	Component.onCompleted: discoverTanks()
 
     ListView {
@@ -132,14 +147,12 @@ OverviewPage {
 
             Timer {
                 id: wallClock
-
-                running: true
+                running: timeFormat != ""
                 repeat: true
                 interval: 1000
                 triggeredOnStart: true
 //////// change time to 12 hour format
-                onTriggered: time = Qt.formatDateTime(new Date(), "h:mm ap")
-
+                onTriggered: time = Qt.formatDateTime(new Date(), timeFormat)
                 property string time
             }
 //////// relorder to give priority to errors
@@ -151,7 +164,7 @@ OverviewPage {
                     width: statusTile.width
                 },
                 TileText {
-                    text: wallClock.time
+                    text: wallClock.running ? wallClock.time : ""
                     font.pixelSize: 20
                 },
 //////// spacer to separate Multi mode from system name

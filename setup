@@ -20,6 +20,7 @@ reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
 overviewAcValues="$qmlDir/OverviewAcValues.qml"
 objectAcConnection="$qmlDir/ObjectAcConnection.qml"
 overviewHub="$qmlDir/OverviewHub.qml"
+overviewHubEnhanced="$qmlDir/OverviewHubEnhanced.qml"
 overviewSolarCharger="$qmlDir/OverviewSolarCharger.qml"
 tileTankFile="$qmlDir/TileTank.qml"
 powerGaugeFile="$qmlDir/PowerGauge.qml"
@@ -30,23 +31,9 @@ acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
 tileTempFile="$qmlDir/TileTemp.qml"
 hubDataFile="$qmlDir/HubData.qml"
 
-installEnhancedTank=false
-
-typeset -i inverterPeakPower
-typeset -i inverterContiuousPower
-typeset -i inverterCautionPower
-typeset -i systemPowerLimit
-typeset -i maxDischargeCurrent
-typeset -i acCurrentLimitPreset1
-typeset -i acCurrentLimitPreset2
-typeset -i acCurrentLimitPreset3
-typeset -i acCurrentLimitPreset4
-typeset -i pvChargerMaxPower
-
-
-# log file for this package
-# if not a null string, options to display the log file are presented
-packageLogFile="/var/log/gui/current"
+settingsDisplayFile="$qmlDir/PageSettingsDisplay.qml"
+guiModsFile="$qmlDir/PageSettingsGuiMods.qml"
+gaugesFile="$qmlDir/PageSettingsGuiModsGauges.qml"
 
 #### following lines incorporate SetupHelper utilities into this script
 # Refer to the SetupHelper ReadMe file for details.
@@ -55,318 +42,183 @@ source "/data/SetupHelper/CommonResources"
 
 #### end of lines to include SetupHelper
 
+# move setting from setup options or from previous dbus Setting
+# $1 is the setup options path
+# $2 is the old dbus path
+# $3 is the new dbus path
+moveSetting ()
+{
+    local setupOption="$1"
+    local oldDbusPath=$2
+    local newDbusPath=$3
+    if [ -f "$setupOption" ]; then
+        oldSetting=$(cat "$setupOption")
+    elif [ ! -z "$oldDbusPath" ]; then
+        oldSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings\
+            $oldDbusPath com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+    else
+        oldSetting=""
+    fi
+    if [ ! -z $oldSetting ] && [ ! -z "$newDbusPath" ]; then
+        dbus -y com.victronenergy.settings $newDbusPath SetValue $oldSetting > /dev/null
+    fi
+}
+# move setting from setup options or from previous dbus Setting
+# $1 is an actual value
+# $2 is the old dbus path
+# $3 is the new dbus path
+moveSettingValue ()
+{
+    local setupValue=$1
+    local oldDbusPath=$2
+    local newDbusPath=$3
+    if [ ! -z $setupValue ]; then
+        oldSetting=$setupValue
+    elif [ ! -z "$oldDbusPath" ]; then
+        oldSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings\
+            $oldDbusPath com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+    else
+        oldSetting=""
+    fi
+    if [ ! -z $oldSetting ] && [ ! -z "$newDbusPath" ]; then
+        dbus -y com.victronenergy.settings $newDbusPath SetValue $oldSetting > /dev/null
+    fi
+}
+
 #### running manually and OK to proceed - prompt for input
 if [ $scriptAction == 'NONE' ] ; then
     # display innitial message
     echo
     echo "This package modifies the GUI in several areas"
-    echo "All modificaitons are explained below with a choice to install each one individually"
+    echo "Refer to the ReadMe for an explaination of each modification"
+    echo "Installation enables all modificaions by default"
+    echo "  however each modificaiton can be enabled/disabled in the Settings Display menus"
 
-    standardActionPrompt 'MORE_PROMPTS'
-
-    # prompt for remaining parameters needed for activation
-    # PROMPT is left over from a previous version of SetupHelper
-    #  it is included here for backward compatibility
-    if [ $scriptAction == 'NONE' ] || [ $scriptAction == 'PROMPT' ]; then
-        logMessage "creating settings"
-        dbus -y com.victronenergy.settings /Settings AddSettings\
-            '%[{"path": "/InverterLimits/PeakPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/ContiuousPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/CautionPower", "type":"float", "default":0},\
-            {"path":"/InverterLimits/OutputPowerLimit", "type":"float", "default":0},\
-            {"path":"/SystemSetup/MaxDischargeCurrent", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset1", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset2", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset3", "type":"float", "default":0},\
-            {"path":"/InverterLimits/AcCurrentLimit/Preset4", "type":"float", "default":0},\
-            {"path":"/PvCharger/MaxPower", "type":"float", "default":0},\
-            {"path":"/GuiMods/ShortenTankNames", "type":"int", "default":0},\
-            {"path":"/GuiMods/TemperatureScale", "type":"int", "default":0} ]'  > /dev/null
-        echo
-        echo "The Enhanced overview includes the following changes:"
-        echo "  1) Tiles are arranged to more cloesly follow the power flow through the system"
-        echo "  2) Voltage, current and frequency values are added to the AC in and out tiles"
-        echo "  3) Battery remaining time is added to the Battery tile"
-        echo "  4) ESS reason codes are replaced with a text version to make them more meaningful"
-        echo "  5) ESS reason text and other notifications are combined into a single "marquee" line"
-        echo "  6) The pump switch is hidden unless the Venus relay is configured for pump control"
-        echo "  7) AC Mode switch includes INVERTER ONLY mode"
-        echo
-        echo "Tank enhancements are also included:"
-        echo "  1) Bar text turns red and indicates NO RESPONSE for sensor connection errors"
-        echo "  2) Color of bar turns red on limits"
-        echo "  3) If space is limited, bar graph height and associated text are reduced"
-        echo "  4) Added custom tank name"
-        echo "  5) Added absolute quantity (e.g., gallons) next to %"
-        echo "  6) List scrolls if all tanks don't fit"
-        echo        
-        yesNoPrompt "Do you wish to install the Enhanced Mobile Overview Page? (y/n): "
-        if $yesResponse ; then
-            touch $setupOptionsDir/useEnhancedOverview
-       else
-            rm -f $setupOptionsDir/useEnhancedOverview
-        fi
-        echo
-        yesNoPrompt "Do you wish to move Settings and Notifications to the top of the Device List? (y/n): "
-        if $yesResponse ; then
-            touch $setupOptionsDir/moveSettings
-       else
-            rm -f $setupOptionsDir/moveSettings
-        fi
-        echo
-        yesNoPrompt "Do you wish to hide the Tile Overview? (y/n): "
-        if $yesResponse ; then
-            touch $setupOptionsDir/hideTileOverview
-       else
-            rm -f $setupOptionsDir/hideTileOverview
-        fi
-        echo
-        echo "The Enhanced flow includes the following changes:"
-        echo "  1) Voltage, current and frequency are shown for AC in and out"
-        echo "  2) Current is shown for DC Loads"
-        echo "  3) Tanks are shown along the bottom of the page"
-        echo "      List scrolls horizontally if necessary"
-        echo "  4) Other Tank enhancements listed above are also included"
-        echo "  5) PV Charger tile shows voltage and current"
-        echo "  6) Time is displayed in inverter icon"
-        echo "  7) Power bar graphs for AC in/out and inverter"
-        echo "  8) Adds inverter mode to the inverter icon"
-        echo "  9) Popups to change the AC input current limit and inverter mode"
-        echo " 10) AC input current limit presets"
-        echo        
-        yesNoPrompt "Do you wish install Flow Overview enhancements? (y/n): "
-        if $yesResponse ; then
-            touch $setupOptionsDir/enhancedFlow
-        else
-            rm -f $setupOptionsDir/enhancedFlow
-        fi
-        if [ -f $setupOptionsDir/enhancedFlow ]; then
-            if [ -e "$setupOptionsDir/inverterPeakPower" ]; then
-                echo
-                echo "The following power guage limits were found from a previous install"
-                echo "  Inverter Caution: $(cat "$setupOptionsDir/inverterCautionPower")"
-                echo "  Inverter Max Continuous: $(cat "$setupOptionsDir/inverterContiuousPower")"
-                echo "  Inverter Peak: $(cat "$setupOptionsDir/inverterPeakPower")"
-                echo "  Battery Max Discharge: $(cat "$setupOptionsDir/maxDischargeCurrent")"
-                echo "  Max PV (Solar): $(cat "$setupOptionsDir/pvChargerMaxPower")"
-                echo
-                yesNoPrompt "Do you wish to use these limits? (y/n): "
-                if $yesResponse ; then
-                    changeLimits=false
-                else
-                    changeLimits=true
-                fi
-            else
-                changeLimits=true
-            fi
-            if $changeLimits ; then
-                echo
-                echo "Power bar gauges require power limits be set manually"
-                echo "  You will need to get this informaiton from the inverter's spec sheet"
-                echo "  You also need to input the output power limit (if any) based on the master AC breaker size"
-                echo "  These values determine the gauge's scale and background regions"
-                echo
-                yesNoPrompt "Do you wish to show power gauges? (y/n): "
-                if $yesResponse ; then
-                    while true ; do
-                        read -p "Enter a value for caution level of the power graph: " inverterCautionPower
-                        read -p "Enter the inverter's MAXIMUM CONTINUOUS power spec: " inverterContiuousPower
-                        read -p "Enter the inverter's PEAK power spec: " inverterPeakPower
-                        read -p "Enter the maximum power of your breaker panel (0 to disable this limit): " systemPowerLimit
-                        read -p "Enter the battery bank maximum discharge current: " maxDischargeCurrent
-                        read -p "Enter the maximum power of all PV chargers in the system: " pvChargerMaxPower
-                        echo
-                        if (( $inverterPeakPower >= $inverterContiuousPower )) && (( $inverterContiuousPower >= $inverterCautionPower )); then
-                            break;
-                        else
-                            echo "Error: values must increase in order shown below - reenter all"
-                            echo "  caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower"
-                            echo
-                        fi
-                    done
-                    echo $inverterPeakPower > "$setupOptionsDir/inverterPeakPower"
-                    echo $inverterContiuousPower > "$setupOptionsDir/inverterContiuousPower"
-                    echo $inverterCautionPower > $setupOptionsDir/inverterCautionPower
-                    echo $systemPowerLimit > $setupOptionsDir/systemPowerLimit
-                    echo $maxDischargeCurrent > "$setupOptionsDir/maxDischargeCurrent"
-                    echo $pvChargerMaxPower > "$setupOptionsDir/pvChargerMaxPower"
-
-                    logMessage "setting power limits caution: $inverterCautionPower  continuous: $inverterContiuousPower  peak: $inverterPeakPower  outputPower: $systemPowerLimit"
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue $inverterPeakPower > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue $inverterContiuousPower > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue $inverterCautionPower > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/OutputPowerLimit SetValue $systemPowerLimit > /dev/null
-                    logMessage "setting battery discharge limit: $maxDischargeCurrent"
-                    dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue $maxDischargeCurrent > /dev/null
-                    logMessage "setting PV charger limit: $pvChargerMaxPower"
-                    dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue $pvChargerMaxPower > /dev/null
-                else
-                    rm -f "$setupOptionsDir/inverterPeakPower"
-                    rm -f "$setupOptionsDir/inverterContiuousPower"
-                    rm -f "$setupOptionsDir/inverterCautionPower"
-                    rm -f "$setupOptionsDir/systemPowerLimit"
-                    rm -f "$setupOptionsDir/maxDischargeCurrent"
-                    rm -f "$setupOptionsDir/pvChargerMaxPower"
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/PeakPower SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/ContiuousPower SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/CautionPower SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/SystemSetup/MaxDischargeCurrent SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/PvCharger/MaxPower SetValue 0 > /dev/null
-                fi
-            fi
-            echo
-            echo "AC current limit presets offer a quick way to change the AC input current limit"
-            echo
-            if [ -e "$setupOptionsDir/acCurrentLimitPresets" ]; then
-                echo "The following presets were found from a previous install"
-                echo "  $(cat "$setupOptionsDir/acCurrentLimitPresets")"
-                echo
-                yesNoPrompt "Do you wish to use these presets? (y/n): "
-                if $yesResponse ; then
-                    changePresets=false
-                else
-                    changePresets=true
-                fi
-            else
-                changePresets=true
-            fi
-            if $changePresets ; then
-                yesNoPrompt "Do you wish set presets for AC current limit? (y/n): "
-                if $yesResponse ; then
-                    echo "For each preset enter the value desired (0 disables the associated preset button)"
-                    read -p "Preset 1: " acCurrentLimitPreset1
-                    read -p "Preset 2: " acCurrentLimitPreset2
-                    read -p "Preset 3: " acCurrentLimitPreset3
-                    read -p "Preset 4: " acCurrentLimitPreset4
-                    echo $acCurrentLimitPreset1  $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4> "$setupOptionsDir/acCurrentLimitPresets"
- 
-                    logMessage "setting AC current limit presets: $acCurrentLimitPreset1 $acCurrentLimitPreset2 $acCurrentLimitPreset3 $acCurrentLimitPreset4"
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue $acCurrentLimitPreset1 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue $acCurrentLimitPreset2 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue $acCurrentLimitPreset3 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue $acCurrentLimitPreset4 > /dev/null
-               else
-                    rm -f "$setupOptionsDir/acCurrentLimitPresets"
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset1 SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset2 SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset3 SetValue 0 > /dev/null
-                    dbus -y com.victronenergy.settings /Settings/InverterLimits/AcCurrentLimit/Preset4 SetValue 0 > /dev/null
-                fi
-            fi
-        fi
-        
-        echo
-        while true ; do
-            read -p "Select the desired temperature scale (C/F/b (both)): " tempScale
-            case $tempScale in
-                [cC]*)
-                    temperatureScale=1
-                    break
-                    ;;
-                [fF]*)
-                    temperatureScale=2
-                    break
-                    ;;
-                 [bB]*)
-                    temperatureScale=0
-                    break
-                    ;;
-                *)
-                   ;;
-            esac
-        done
-        dbus -y com.victronenergy.settings /Settings/GuiMods/TemperatureScale SetValue $temperatureScale > /dev/null
-
-        echo
-        echo "Beginning with Venus v2.70~16, names for NMEA2000 tanks won't fit in the available space"
-        echo "If custom names exist, they are used"
-        echo "The long names can be shortened to two words (one word for compact tiles)"
-        echo "  and Waste replaced with Gray"
-        yesNoPrompt "Do you wish to shorten NMEA2000 tank names? (y/n): "
-        if $yesResponse ; then
-            touch "$setupOptionsDir/shortenTankNames"
-            dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 1 > /dev/null
-        else
-            rm -f "$setupOptionsDir/shortenTankNames"
-            dbus -y com.victronenergy.settings /Settings/"GuiMods/ShortenTankNames" SetValue 0 > /dev/null
-        fi
-
-        scriptAction='INSTALL'
-    fi
+    standardActionPrompt
 fi
 
-#### installing
+#### installing - Settings were handled above since they presist through a Venus update a reinstall can skip setting them
 if [ $scriptAction == 'INSTALL' ] ; then
-    if [ -f "$setupOptionsDir/moveSettings" ]; then
-        logMessage "Moving Settings & Notifications to top of Device List"
-        updateActiveFile "$deviceListFile"
-    else
-        restoreActiveFile "$deviceListFile"
-    fi
-    if [ -f "$setupOptionsDir/hideTileOverview" ]; then
-        logMessage "Hiding the Tile Overview"
-        updateActiveFile "$mainPagesFile"
-    else
-        restoreActiveFile "$mainPagesFile"
-    fi
-    if [ -f "$setupOptionsDir/useEnhancedOverview" ] ; then
-        logMessage "installing Enhanced Mobile Overview"
-        updateActiveFile "$overviewMobileEnhancedFile"
-        logMessage "installing System Reason Message"
-        updateActiveFile "$reasonMessageFile"
-        installEnhancedTank=true
 
-        # modify main.qml to show enhanced mobile overview
-        if [ $(grep -c OverviewMobileEnhanced.qml "$mainPagesFile") == 0 ]; then
-            backupActiveFile "$mainPagesFile"
-            sed -i -e 's/OverviewMobile.qml/OverviewMobileEnhanced.qml/' "$mainPagesFile"
-            filesUpdated=true
+    # create dbus Settings if they haven't been set previously
+    # if one setting exists, assume they are all there
+    # NOTE: if new settings are added in the future, change test for that one
+    # to avoid creating that new parameter !!!!
+    lastSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/TimeFormat\
+            com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+    if [ -z $lastSetting ]; then
+        logMessage "creating GuiMods Settings"
+        dbus -y com.victronenergy.settings /Settings AddSettings\
+            '%[{"path": "/GuiMods/GaugeLimits/PeakPower", "default":3000.0},\
+            {"path":"/GuiMods/GaugeLimits/CautionPower", "default":2000.0},\
+            {"path":"/GuiMods/GaugeLimits/ContiuousPower", "default":1000.0},\
+            {"path":"/GuiMods/GaugeLimits/AcOutputMaxPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/PvChargerMaxPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":100.0},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset1", "default":10},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset2", "default":20},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset3", "default":30},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset4", "default":50},\
+            {"path":"/GuiMods/TemperatureScale", "default":1},\
+            {"path":"/GuiMods/ShortenTankNames", "default":1},\
+            {"path":"/GuiMods/UseEnhancedMobileOverview", "default":1},\
+            {"path":"/GuiMods/UseEnhancedFlowOverview", "default":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1},\
+            {"path":"/GuiMods/ShowGauges", "default":1},\
+            {"path":"/GuiMods/ShowTileOverview", "default":1},\
+            {"path":"/GuiMods/MoveSettings", "type":"i", "default":1},\
+            {"path":"/GuiMods/TimeFormat", "type":"i", "default":1} ]'  > /dev/null
+    fi
+
+    # move setup options to Settings
+    if [ -f "$setupOptionsDir/optionsSet" ]; then
+        if [ -f "$setupOptionsDir/useEnhancedOverview" ] \
+                || [ -f "$setupOptionsDir/moveSettings" ] \
+                || [ -f "$setupOptionsDir/hideTileOverview" ] \
+                || [ -f "$setupOptionsDir/enhancedFlow" ]; then
+            logMessage "moving setup options to GuiMods Settings"
+            
+            if [ -f "$setupOptionsDir/useEnhancedOverview" ]; then
+                moveSettingValue 1 "" /Settings/GuiMods/UseEnhancedMobileOverview
+            else
+                moveSettingValue 0 "" /Settings/GuiMods/UseEnhancedMobileOverview
+            fi
+            if [ -f "$setupOptionsDir/hideTileOverview" ]; then
+                moveSettingValue 1 "" /Settings/GuiMods/ShowTileOverview
+            else
+                moveSettingValue 0 "" /Settings/GuiMods/ShowTileOverview
+            fi
+            if [ -f "$setupOptionsDir/enhancedFlow" ]; then
+                dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 1 > /dev/null
+                moveSetting "$setupOptionsDir/inverterPeakPower" /Settings/InverterLimits/PeakPower /Settings/GuiMods/GaugeLimits/PeakPower
+                moveSetting "$setupOptionsDir/inverterCautionPower" /Settings/InverterLimits/PeakCautionPowerPower /Settings/GuiMods/GaugeLimits/CautionPower
+                moveSetting "$setupOptionsDir/inverterContiuousPower" /Settings/InverterLimits/ContiuousPower /Settings/GuiMods/GaugeLimits/ContiuousPower
+                moveSetting "$setupOptionsDir/systemPowerLimit" /Settings/InverterLimits/OutputPowerLimit /Settings/GuiMods/GaugeLimits/AcOutputMaxPower
+                moveSetting "$setupOptionsDir/maxDischargeCurrent" /Settings/SystemSetup/MaxDischargeCurrent /Settings/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent
+                moveSetting "$setupOptionsDir/pvChargerMaxPower" /Settings/PvCharger/MaxPower /Settings/GuiMods/GaugeLimits/PvChargerMaxPower
+                if [ -f "$setupOptionsDir/acCurrentLimitPresets" ]; then
+                    read acCurrentLimitPreset1 acCurrentLimitPreset2 acCurrentLimitPreset3 acCurrentLimitPreset4 <<< $(cat "$setupOptionsDir/acCurrentLimitPresets")
+                    moveSettingValue acCurrentLimitPreset1 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset1
+                    moveSettingValue acCurrentLimitPreset2 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset2
+                    moveSettingValue acCurrentLimitPreset3 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset3
+                    moveSettingValue acCurrentLimitPreset4 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset4
+                fi
+            else
+                dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 0 > /dev/null
+            fi
+ 
+             # remove unused setup options (now in Settings)
+            rm -f "$setupOptionsDir/useEnhancedOverview"
+            rm -f "$setupOptionsDir/enhancedFlow"
+            rm -f "$setupOptionsDir/hideTileOverview"
+            rm -f "$setupOptionsDir/moveSettings"
+            rm -f "$setupOptionsDir/acCurrentLimitPresets"
+            rm -f "$setupOptionsDir/inverterCautionPower"
+            rm -f "$setupOptionsDir/inverterContiuousPower"
+            rm -f "$setupOptionsDir/inverterPeakPower"
+            rm -f "$setupOptionsDir/maxDischargeCurrent"
+            rm -f "$setupOptionsDir/pvChargerMaxPower"
+            rm -f "$setupOptionsDir/shortenTankNames"
+            rm -f "$setupOptionsDir/systemPowerLimit"
+            rm -f "$setupOptionsDir/temperatureScale"
+            rm -f "$setupOptionsDir/acCurrentLimitPresets"
+
+             # remove old Settings
+            dbus -y com.victronenergy.settings /Settings RemoveSettings\
+                    '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
+                    "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
+                    "SystemSetup/MaxDischargeCurrent",\
+                    "InverterLimits/AcCurrentLimit/Preset1", "InverterLimits/AcCurrentLimit/Preset2",\
+                    "InverterLimits/AcCurrentLimit/Preset3", "InverterLimits/AcCurrentLimit/Preset4",\
+                    "PvCharger/MaxPower" ]' > /dev/null
+
         fi
-    else
-        restoreActiveFile "$overviewMobileEnhancedFile"
-        restoreActiveFile "$reasonMessageFile"
-        if [ $(grep -c OverviewMobileEnhanced.qml "$mainPagesFile") != 0 ]; then
-            sed -i -e 's/OverviewMobileEnhanced.qml/OverviewMobile.qml/' "$mainPagesFile"
-            filesUpdated=true
-        fi
     fi
-    if [ -f "$setupOptionsDir/enhancedFlow" ]; then
-        logMessage "installing enhanced Flow overview"
-        updateActiveFile "$overviewAcValues"
-        updateActiveFile "$objectAcConnection"
-        updateActiveFile "$overviewHub"
-        updateActiveFile "$hubDataFile"
-        updateActiveFile "$overviewSolarCharger"
-        updateActiveFile "$powerGaugeFile"
-        updateActiveFile "$powerGaugeBatteryFile"
-        updateActiveFile "$multiFile"
-        updateActiveFile "$inverterPopupFile"
-        updateActiveFile "$acCurrentLimitPopUpFile"
-        # enhanced flow requires enhanced tank tile
-        installEnhancedTank=true
-    else
-        restoreActiveFile "$overviewAcValues"
-        restoreActiveFile "$objectAcConnection"
-        restoreActiveFile "$overviewHub"
-        restoreActiveFile "$hubDataFile"
-        restoreActiveFile "$overviewSolarCharger"
-        restoreActiveFile "$powerGaugeFile"
-        restoreActiveFile "$powerGaugeBatteryFile"
-        restoreActiveFile "$multiFile"
-        restoreActiveFile "$inverterPopupFile"
-        restoreActiveFile "$acCurrentLimitPopUpFile"
-    fi
-    if $installEnhancedTank ; then
-        logMessage "installing enhanced Tank tile"
-        updateActiveFile "$tileTankFile"
-        updateActiveFile "$tileTempFile"
-    # restore tank file in case install was run again manually
-    else
-        restoreActiveFile "$tileTankFile"
-        restoreActiveFile "$tileTempFile"
-    fi
-    
+        
+    logMessage "installing GuiMods files"
+    updateActiveFile "$deviceListFile"
+    updateActiveFile "$mainPagesFile"
+    updateActiveFile "$overviewMobileEnhancedFile"
+    updateActiveFile "$reasonMessageFile"
+    updateActiveFile "$overviewAcValues"
+    updateActiveFile "$objectAcConnection"
+    updateActiveFile "$overviewHubEnhanced"
+    updateActiveFile "$hubDataFile"
+    updateActiveFile "$overviewSolarCharger"
+    updateActiveFile "$powerGaugeFile"
+    updateActiveFile "$powerGaugeBatteryFile"
+    updateActiveFile "$multiFile"
+    updateActiveFile "$inverterPopupFile"
+    updateActiveFile "$acCurrentLimitPopUpFile"
+    updateActiveFile "$tileTankFile"
+    updateActiveFile "$tileTempFile"
+    updateActiveFile "$settingsDisplayFile"
+    updateActiveFile "$guiModsFile"
+    updateActiveFile "$gaugesFile"
+    # clean up from previous versions
+    restoreActiveFile "$overviewHub"
+
     logMessage "++ Package installed"
 fi
 
@@ -380,7 +232,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$reasonMessageFile"
     restoreActiveFile "$overviewAcValues"
     restoreActiveFile "$objectAcConnection"
-    restoreActiveFile "$overviewHub"
+    restoreActiveFile "$overviewHubEnhanced"
     restoreActiveFile "$hubDataFile"
     restoreActiveFile "$overviewSolarCharger"
     restoreActiveFile "$tileTankFile"
@@ -390,13 +242,22 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$multiFile"
     restoreActiveFile "$inverterPopupFile"
     restoreActiveFile "$acCurrentLimitPopUpFile"
+    restoreActiveFile "$settingsDisplayFile"
+    restoreActiveFile "$guiModsFile"
+    restoreActiveFile "$gaugesFile"
+    restoreActiveFile "$overviewHub"
+
     dbus -y com.victronenergy.settings /Settings RemoveSettings\
-            '%["InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
-            "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
-            "SystemSetup/MaxDischargeCurrent",\
-            "AcCurrentLimit/Preset1", "AcCurrentLimit/Preset2",\
-            "AcCurrentLimit/Preset3", "AcCurrentLimit/Preset4",\
-            "PvCharger/MaxPower", "GuiMods/TemperatureScale", "GuiMods/ShortenTankNames" ]' > /dev/null
+        '%["GuiMods/GaugeLimits/PeakPower", "GuiMods/GaugeLimits/CautionPower",\
+        "GuiMods/GaugeLimits/ContiuousPower", "GuiMods/GaugeLimits/AcOutputMaxPower",\
+        "GuiMods/GaugeLimits/PvChargerMaxPower", "GuiMods/GaugeLimits/BatteryMaxDischargeCurrent",\
+        "GuiMods/AcCurrentLimit/Preset1", "GuiMods/AcCurrentLimit/Preset2",\
+        "GuiMods/AcCurrentLimit/Preset3", "GuiMods/AcCurrentLimit/Preset4",\
+        "GuiMods/TemperatureScale", "GuiMods/ShortenTankNames",\
+        "GuiMods/UseEnhancedMobileOverview", "GuiMods/UseEnhancedFlowOverview",\
+        "GuiMods/ShowEnhancedFlowOverviewTanks", "GuiMods/ShowEnhancedFlowOverviewTemps",\
+        "GuiMods/ShowTileOverview", "GuiMods/ShowGauges", "GuiMods/MoveSettings",\
+        "GuiMods/TimeFormat" ]'  > /dev/null
 
     logMessage "++ Package uninstalled"
 fi

@@ -1,5 +1,6 @@
-//// Modified to hide the OverviewTiles page
-//// Search for MODIFIED to find changes
+//////// Modified to hide the OverviewTiles page
+//////// Modified to substitute OverviewMobileEnhanced page
+//////// Modified to substitute OverviewHubEnhanced page
 
 import QtQuick 1.1
 
@@ -19,7 +20,8 @@ PageStackWindow {
 	property bool completed: false
 	property bool showAlert: NotificationCenter.alert
 	property bool alarm: NotificationCenter.alarm
-	property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid
+//////// added for OverviewHubEnhanced page
+    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid
 	property string bindPrefix: "com.victronenergy.settings"
 
 	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
@@ -27,33 +29,62 @@ PageStackWindow {
 	property bool isOfflineFwUpdatePage: pageStack.currentPage && pageStack.currentPage.objectName === "offlineFwUpdatePage";
 
 
-	property string hubOverviewType: theSystem.systemType.valid ?
-						withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : ""
+//////// modified for OverviewHubEnhanced page
+    property string hubOverviewType: theSystem.systemType.valid ?
+                        withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : "unknown"
+
+//////// added for OverviewHubEnhanced page
+    property string currentHubOverview: "OverviewHub.qml"
+//////// added for OverviewMobileEnhanced page
+    property string currentMobileOverview: ""
 
 	// Keep track of the current view (menu/overview) to show as default next time the
 	// CCGX is restarted
 	onIsOverviewPageChanged: startWithMenu.setValue(isOverviewPage ? 0 : 1)
 
 	// Add the correct OverviewHub page
-	onHubOverviewTypeChanged: {
-		switch(hubOverviewType){
-		case "Hub":
-		case "Hub-1":
-		case "Hub-2":
-		case "Hub-3":
-			replaceOverview("OverviewGridParallel.qml", "OverviewHub.qml");
-			break;
-		case "Hub-4":
-		case "ESS":
-			replaceOverview("OverviewHub.qml", "OverviewGridParallel.qml");
-			break;
-		default:
-			break;
-		}
-		// Workaround the QTBUG-17012 (only the first sentence in each case of Switch Statement can be executed)
-		// by adding a return statement
-		return
-	}
+//////// modified for OverviewHubEnhanced page
+    onHubOverviewTypeChanged: selectHubOverview ()
+
+    VBusItem
+    {
+        id: hubOverviewEnhanced
+        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedFlowOverview"
+        onValueChanged: selectHubOverview ()
+        }
+    }
+
+    // base a new hub selection on the hub type and the enhanced flow overview flag
+    function selectHubOverview ()
+    {
+        var newHubOverview
+        switch(hubOverviewType){
+        case "Hub":
+        case "Hub-1":
+        case "Hub-2":
+        case "Hub-3":
+        case "unknown":
+            if (hubOverviewEnhanced.value === 1)
+                newHubOverview = "OverviewHubEnhanced.qml"
+            else
+                newHubOverview = "OverviewHub.qml"
+
+            replaceOverview(currentHubOverview, newHubOverview);
+            currentHubOverview = newHubOverview
+            break;
+        case "Hub-4":
+        case "ESS":
+            newHubOverview = "OverviewGridParallel.qml"
+            replaceOverview(currentHubOverview, newHubOverview);
+            currentHubOverview = newHubOverview
+            break;
+        default:
+            break;
+        }
+        // Workaround the QTBUG-17012 (only the first sentence in each case of Switch Statement can be executed)
+        // by adding a return statement
+        return
+    }
 
 	VBusItem {
 		id: generatorOverview
@@ -67,13 +98,54 @@ PageStackWindow {
 		onValueChanged: extraOverview("OverviewGeneratorFp.qml", value === 1)
 	}
 
-	VBusItem {
-		id: mobileOverview
-		bind: "com.victronenergy.settings/Settings/Gui/MobileOverview"
-		onValueChanged:{
-			extraOverview("OverviewMobile.qml", value === 1)
-		}
-	}
+//////// handle OverviewMobileEnhanced page
+    VBusItem
+    {
+        id: mobileOverview
+        bind: "com.victronenergy.settings/Settings/Gui/MobileOverview"
+        onValueChanged: selectMobileOverview ()
+    }
+    VBusItem
+    {
+        id: mobileOverviewEnhanced
+        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedMobileOverview"
+        onValueChanged: selectMobileOverview ()
+    }
+
+    // base a new mobile overview selection on the the mobile overview and enhanced mobile overview flags
+    function selectMobileOverview ()
+    {
+        var newMobileOverview
+        if (mobileOverview.value === 1)
+        {
+            if (mobileOverviewEnhanced.value === 1)
+                newMobileOverview = "OverviewMobileEnhanced.qml"
+            else
+                newMobileOverview = "OverviewMobile.qml"
+            if (currentMobileOverview === "")
+                extraOverview (newMobileOverview, true)
+            else
+                replaceOverview (currentMobileOverview, newMobileOverview)
+                currentMobileOverview = newMobileOverview
+        }
+        else
+        {
+            // hide existing mobile overview if any
+            if (currentMobileOverview != "")
+            {
+                extraOverview (currentMobileOverview, false)
+                currentMobileOverview = ""
+            }
+        }
+    }
+
+//////// show/hide the OverviewTiles page
+    VBusItem
+    {
+        id: showOverviewTiles
+        bind: "com.victronenergy.settings/Settings/GuiMods/ShowTileOverview"
+        onValueChanged: extraOverview ("OverviewTiles.qml", value === 1)
+    }
 
 	VBusItem {
 		id: startWithMenu
@@ -215,16 +287,18 @@ PageStackWindow {
 		}
 	}
 
-	Component.onCompleted: {
-		completed = true
-	}
+    Component.onCompleted: {
+//////// modified for OverviewHubEnhanced page
+        selectHubOverview ()
+        completed = true
+    }
 
 	ListModel {
 		id: overviewModel
 		ListElement {
 			pageSource: "OverviewHub.qml"
 		}
-//// MODIFIED (commented out)
+//////// (commented out) -- added dynamically above
 //		ListElement {
 //		pageSource: "OverviewTiles.qml"
 //		}
@@ -300,12 +374,20 @@ PageStackWindow {
 		}
 	}
 
-	function replaceOverview(oldPage, newPage)
-	{
-		for (var i = 0; i < overviewModel.count; i++)
-			if (overviewModel.get(i).pageSource === oldPage)
-				overviewModel.get(i).pageSource = newPage
-	}
+//////// Modified to append page if oldPage not found
+    function replaceOverview(oldPage, newPage)
+    {
+        for (var i = 0; i < overviewModel.count; i++)
+        {      
+            if (overviewModel.get(i).pageSource === oldPage)
+            {         
+                overviewModel.get(i).pageSource = newPage
+                return
+            }
+        }
+        // here if oldPage wasn't found -- append the new page
+        overviewModel.append({"pageSource": newPage})
+    }
 
 	// Central mover for the ball animation on the overviews
 	// Instead of using a timer per line, using a central one

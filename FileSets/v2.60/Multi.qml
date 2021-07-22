@@ -144,7 +144,7 @@ MbIcon {
 		color: "white"
 ////// modified to show power bar graphs
 		font {pixelSize: 14; bold: true}
-		text: vebusState.text
+		text: inverterService != "" ? vebusState.text : "---"
 
 		SystemState {
 			id: vebusState

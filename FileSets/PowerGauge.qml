@@ -22,35 +22,35 @@ Item {
     VBusItem
     {
         id: inverterContinuousPowerItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/ContiuousPower")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/ContiuousPower")
         onValueChanged: setLimits ()
     }
     property real inverterContinuousPower: inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
     VBusItem
     {
         id: inverterPeakPowerItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/PeakPower")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/PeakPower")
         onValueChanged: setLimits ()
     }
     property real inverterPeakPower: inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
     VBusItem
     {
         id: inverterCautionPowerItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/CautionPower")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/CautionPower")
         onValueChanged: setLimits ()
     }
     property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
     VBusItem
     {
         id: outputPowerLimitItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/InverterLimits/OutputPowerLimit")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/AcOutputMaxPower")
         onValueChanged: setLimits ()
     }
     property real outPowerLimit: outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
     VBusItem
     {
         id: pvChargerMaxPowerItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/PvCharger/MaxPower")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/PvChargerMaxPower")
         onValueChanged: setLimits ()
     }
     property real pvChargerMaxPower: pvChargerMaxPowerItem.valid ? pvChargerMaxPowerItem.value : 0
