@@ -593,7 +593,7 @@ OverviewPage {
 			TileText {
                 text:
                 {
-                    if isMulti)
+                    if (isMulti)
                     {
                         if (modeIsAdjustable.valid)
                             return qsTr("%1").arg(acModeButton.texts[acModeButton.shownValue])

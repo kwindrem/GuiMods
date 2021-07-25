@@ -150,11 +150,20 @@ Configuration
         Selects the time format for the Enhanced Mobile and Enhanced Flow overviews:
             24 hour, 12 hour with AM/PM or don't show time at all
 
+    Auto update packages from GitHub
+        If the latest version of SetupHelper is installed,
+        this switch turns on/off automatic updates of all installed packages (not just GuiMods)
+        from GitHub
+        Access level must be set to Installer or above to change this setting. 
+
+
     PowerGauges leads to a second menu
     
     Show power gauges
         When on, power gauges are inserted in the AC input and output tiles, The Multi icon, the Battery tile
         and the PV Charger tile.
+        
+    Access level must be set to Installer or above to change the following gauge limits. 
         
     Inverter peak power is the maximum power the inverter can produce for a limited amount of time.
         This is the maximum power displayed on the gauge

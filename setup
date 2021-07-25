@@ -30,6 +30,7 @@ inverterPopupFile="$qmlDir/InverterModePopUp.qml"
 acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
 tileTempFile="$qmlDir/TileTemp.qml"
 hubDataFile="$qmlDir/HubData.qml"
+marqueeFile="$qmlDir/Marquee.qml"
 
 settingsDisplayFile="$qmlDir/PageSettingsDisplay.qml"
 guiModsFile="$qmlDir/PageSettingsGuiMods.qml"
@@ -41,49 +42,6 @@ gaugesFile="$qmlDir/PageSettingsGuiModsGauges.qml"
 source "/data/SetupHelper/CommonResources"
 
 #### end of lines to include SetupHelper
-
-# move setting from setup options or from previous dbus Setting
-# $1 is the setup options path
-# $2 is the old dbus path
-# $3 is the new dbus path
-moveSetting ()
-{
-    local setupOption="$1"
-    local oldDbusPath=$2
-    local newDbusPath=$3
-    if [ -f "$setupOption" ]; then
-        oldSetting=$(cat "$setupOption")
-    elif [ ! -z "$oldDbusPath" ]; then
-        oldSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings\
-            $oldDbusPath com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
-    else
-        oldSetting=""
-    fi
-    if [ ! -z $oldSetting ] && [ ! -z "$newDbusPath" ]; then
-        dbus -y com.victronenergy.settings $newDbusPath SetValue $oldSetting > /dev/null
-    fi
-}
-# move setting from setup options or from previous dbus Setting
-# $1 is an actual value
-# $2 is the old dbus path
-# $3 is the new dbus path
-moveSettingValue ()
-{
-    local setupValue=$1
-    local oldDbusPath=$2
-    local newDbusPath=$3
-    if [ ! -z $setupValue ]; then
-        oldSetting=$setupValue
-    elif [ ! -z "$oldDbusPath" ]; then
-        oldSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings\
-            $oldDbusPath com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
-    else
-        oldSetting=""
-    fi
-    if [ ! -z $oldSetting ] && [ ! -z "$newDbusPath" ]; then
-        dbus -y com.victronenergy.settings $newDbusPath SetValue $oldSetting > /dev/null
-    fi
-}
 
 #### running manually and OK to proceed - prompt for input
 if [ $scriptAction == 'NONE' ] ; then
@@ -97,7 +55,7 @@ if [ $scriptAction == 'NONE' ] ; then
     standardActionPrompt
 fi
 
-#### installing - Settings were handled above since they presist through a Venus update a reinstall can skip setting them
+#### installing
 if [ $scriptAction == 'INSTALL' ] ; then
 
     # create dbus Settings if they haven't been set previously
@@ -127,8 +85,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1},\
             {"path":"/GuiMods/ShowGauges", "default":1},\
             {"path":"/GuiMods/ShowTileOverview", "default":1},\
-            {"path":"/GuiMods/MoveSettings", "type":"i", "default":1},\
-            {"path":"/GuiMods/TimeFormat", "type":"i", "default":1} ]'  > /dev/null
+            {"path":"/GuiMods/MoveSettings", "default":1},\
+            {"path":"/GuiMods/TimeFormat", "default":1} ]'  > /dev/null
     fi
 
     # move setup options to Settings
@@ -140,14 +98,14 @@ if [ $scriptAction == 'INSTALL' ] ; then
             logMessage "moving setup options to GuiMods Settings"
             
             if [ -f "$setupOptionsDir/useEnhancedOverview" ]; then
-                moveSettingValue 1 "" /Settings/GuiMods/UseEnhancedMobileOverview
+                setSetting 1 /Settings/GuiMods/UseEnhancedMobileOverview
             else
-                moveSettingValue 0 "" /Settings/GuiMods/UseEnhancedMobileOverview
+                setSetting 0 /Settings/GuiMods/UseEnhancedMobileOverview
             fi
             if [ -f "$setupOptionsDir/hideTileOverview" ]; then
-                moveSettingValue 1 "" /Settings/GuiMods/ShowTileOverview
+                setSetting 1 /Settings/GuiMods/ShowTileOverview
             else
-                moveSettingValue 0 "" /Settings/GuiMods/ShowTileOverview
+                setSetting 0 /Settings/GuiMods/ShowTileOverview
             fi
             if [ -f "$setupOptionsDir/enhancedFlow" ]; then
                 dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 1 > /dev/null
@@ -159,10 +117,15 @@ if [ $scriptAction == 'INSTALL' ] ; then
                 moveSetting "$setupOptionsDir/pvChargerMaxPower" /Settings/PvCharger/MaxPower /Settings/GuiMods/GaugeLimits/PvChargerMaxPower
                 if [ -f "$setupOptionsDir/acCurrentLimitPresets" ]; then
                     read acCurrentLimitPreset1 acCurrentLimitPreset2 acCurrentLimitPreset3 acCurrentLimitPreset4 <<< $(cat "$setupOptionsDir/acCurrentLimitPresets")
-                    moveSettingValue acCurrentLimitPreset1 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset1
-                    moveSettingValue acCurrentLimitPreset2 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset2
-                    moveSettingValue acCurrentLimitPreset3 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset3
-                    moveSettingValue acCurrentLimitPreset4 /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset4
+                    setSetting acCurrentLimitPreset1 /Settings/GuiMods/AcCurrentLimit/Preset1
+                    setSetting acCurrentLimitPreset2 /Settings/GuiMods/AcCurrentLimit/Preset2
+                    setSetting acCurrentLimitPreset3 /Settings/GuiMods/AcCurrentLimit/Preset3
+                    setSetting acCurrentLimitPreset4 /Settings/GuiMods/AcCurrentLimit/Preset4
+                else 
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset1
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset2
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset3
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset4
                 fi
             else
                 dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 0 > /dev/null
@@ -216,6 +179,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$settingsDisplayFile"
     updateActiveFile "$guiModsFile"
     updateActiveFile "$gaugesFile"
+    updateActiveFile "$marqueeFile"
     # clean up from previous versions
     restoreActiveFile "$overviewHub"
 
@@ -245,19 +209,9 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$settingsDisplayFile"
     restoreActiveFile "$guiModsFile"
     restoreActiveFile "$gaugesFile"
-    restoreActiveFile "$overviewHub"
+    restoreActiveFile "$marqueeFile"
 
-    dbus -y com.victronenergy.settings /Settings RemoveSettings\
-        '%["GuiMods/GaugeLimits/PeakPower", "GuiMods/GaugeLimits/CautionPower",\
-        "GuiMods/GaugeLimits/ContiuousPower", "GuiMods/GaugeLimits/AcOutputMaxPower",\
-        "GuiMods/GaugeLimits/PvChargerMaxPower", "GuiMods/GaugeLimits/BatteryMaxDischargeCurrent",\
-        "GuiMods/AcCurrentLimit/Preset1", "GuiMods/AcCurrentLimit/Preset2",\
-        "GuiMods/AcCurrentLimit/Preset3", "GuiMods/AcCurrentLimit/Preset4",\
-        "GuiMods/TemperatureScale", "GuiMods/ShortenTankNames",\
-        "GuiMods/UseEnhancedMobileOverview", "GuiMods/UseEnhancedFlowOverview",\
-        "GuiMods/ShowEnhancedFlowOverviewTanks", "GuiMods/ShowEnhancedFlowOverviewTemps",\
-        "GuiMods/ShowTileOverview", "GuiMods/ShowGauges", "GuiMods/MoveSettings",\
-        "GuiMods/TimeFormat" ]'  > /dev/null
+    restoreActiveFile "$overviewHub"
 
     logMessage "++ Package uninstalled"
 fi

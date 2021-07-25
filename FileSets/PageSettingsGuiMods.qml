@@ -164,6 +164,14 @@ MbPage {
             writeAccessLevel: User.AccessUser
         }
         
+         MbSwitch
+        {
+            id: autoUpdate
+            bind: Utils.path (bindPrefixGuiMods, "/GitHubAutoUpdate")
+            name: qsTr ("Auto update packages from GitHub")
+            writeAccessLevel: User.AccessInstaller
+            show: autoUpdate.enabled
+        }
         MbSubMenu
         {
             description: qsTr("PowerGauges")
