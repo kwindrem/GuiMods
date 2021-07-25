@@ -46,7 +46,6 @@ PageStackWindow {
         id: hubOverviewEnhanced
         bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedFlowOverview"
         onValueChanged: selectHubOverview ()
-        }
     }
 
     // base a new hub selection on the hub type and the enhanced flow overview flag
