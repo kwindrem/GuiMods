@@ -1,3 +1,4 @@
+////// use v2.71 version which includes textHorizontalAlignment
 import QtQuick 1.1
 
 Rectangle {

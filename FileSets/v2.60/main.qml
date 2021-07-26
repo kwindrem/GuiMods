@@ -21,7 +21,7 @@ PageStackWindow {
 	property bool showAlert: NotificationCenter.alert
 	property bool alarm: NotificationCenter.alarm
 //////// added for OverviewHubEnhanced page
-    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid
+    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid
 	property string bindPrefix: "com.victronenergy.settings"
 
 	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")

@@ -56,16 +56,17 @@ OverviewPage {
 										   "the inverter configuration with VEConfigure.")
 
 //////// added to keep track of tanks and temps
+    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: tankModel.rowCount + numberOfTemps
-    property int tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? buttonRowHeight : 0)
-    property int tanksHeight: tanksTempsHeight * tankModel.rowCount / tankTempCount
-    property int tempsHeight: tanksTempsHeight - tanksHeight
-    property int minimumTankHeight: 21
-    property int maxTankHeight: 80
-    property int compactThreshold: 45   // height below this will be compacted vertically
+    property int tankTempCount: numberOfTanks + numberOfTemps
+    property real tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? buttonRowHeight : 0)
+    property real tanksHeight: numberOfTanks > 0 ? tanksTempsHeight * numberOfTanks / tankTempCount : 0
+    property real tempsHeight: tanksTempsHeight - tanksHeight
+    property real minimumTankHeight: 21
+    property real maxTankHeight: 80
+    property real tankTileHeight: Math.min (Math.max (tanksTempsHeight / tankTempCount, minimumTankHeight), maxTankHeight)
 
-    property int tankTileHeight: Math.min (Math.max (height / tankTempCount, minimumTankHeight), maxTankHeight)
+    property bool compact: tankTempCount > (pumpButton.pumpEnabled ? 5 : 6)
 
     property int numberOfMultis: 0
     property string multiPrefix: ""
@@ -374,7 +375,7 @@ OverviewPage {
         interval: 15000
         repeat: true
 //////// modified to control compact differently
-        running: root.active && (tanksColum.compact || tempsColumn.compact)
+        running: root.active && root.compact
     }
 
     ListView {
@@ -385,9 +386,6 @@ OverviewPage {
             right: root.right
         }
         height: root.tanksHeight
-//////// modified to control compact differently
-        property bool compact: root.tankTileHeight < root.compactThreshold
-
         width: root.tankWidth
 //////// make list flickable if more tiles than will fit completely
         interactive: root.tankTileHeight * count > (tanksColum.height + 1) ? true : false
@@ -401,7 +399,7 @@ OverviewPage {
             height: root.tankTileHeight
             pumpBindPrefix: root.pumpBindPreffix
 //////// modified to control compact differently
-            compact: tanksColum.compact
+            compact: root.compact
             Connections {
                 target: scrollTimer
                 onTriggered: doScroll()
@@ -428,9 +426,6 @@ OverviewPage {
             right: root.right
         }
         height: root.tempsHeight
-//////// modified to control compact differently
-        property bool compact: root.tankTileHeight < root.compactThreshold
-
         width: root.tankWidth
 //////// make list flickable if more tiles than will fit completely
         interactive: root.tankTileHeight * count > (tempsColumn.height + 1) ? true : false
@@ -441,7 +436,7 @@ OverviewPage {
             width: tempsColumn.width
             height: root.tankTileHeight
 //////// modified to control compact differently
-            compact: tempsColumn.compact
+            compact: root.compact
             Connections
             {
                 target: scrollTimer

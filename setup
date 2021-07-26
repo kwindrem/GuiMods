@@ -31,6 +31,7 @@ acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
 tileTempFile="$qmlDir/TileTemp.qml"
 hubDataFile="$qmlDir/HubData.qml"
 marqueeFile="$qmlDir/Marquee.qml"
+tileFile="$qmlDir/Tile.qml"
 
 settingsDisplayFile="$qmlDir/PageSettingsDisplay.qml"
 guiModsFile="$qmlDir/PageSettingsGuiMods.qml"
@@ -180,6 +181,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$guiModsFile"
     updateActiveFile "$gaugesFile"
     updateActiveFile "$marqueeFile"
+    updateActiveFile "$tileFile"
     # clean up from previous versions
     restoreActiveFile "$overviewHub"
 
@@ -210,6 +212,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$guiModsFile"
     restoreActiveFile "$gaugesFile"
     restoreActiveFile "$marqueeFile"
+    restoreActiveFile "$tileFile"
 
     restoreActiveFile "$overviewHub"
 
