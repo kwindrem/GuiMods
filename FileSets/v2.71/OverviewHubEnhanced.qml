@@ -688,9 +688,6 @@ OverviewPage {
             addService(DBusServices.at(i))
         }
     }
-    VBusItem { id: incomingTankName;
-        bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
-
 
 ////// handle clicks outside popup areas
     MouseArea {

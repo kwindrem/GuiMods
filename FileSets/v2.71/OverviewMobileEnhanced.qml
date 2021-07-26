@@ -56,11 +56,10 @@ OverviewPage {
 										   "the inverter configuration with VEConfigure.")
 
 //////// added to keep track of tanks and temps
-    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: numberOfTanks + numberOfTemps
+    property int tankTempCount: tankModel.rowCount + numberOfTemps
     property real tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? buttonRowHeight : 0)
-    property real tanksHeight: numberOfTanks > 0 ? tanksTempsHeight * numberOfTanks / tankTempCount : 0
+    property real tanksHeight: tankModel.rowCount > 0 ? tanksTempsHeight * tankModel.rowCount / tankTempCount : 0
     property real tempsHeight: tanksTempsHeight - tanksHeight
     property real minimumTankHeight: 21
     property real maxTankHeight: 80
