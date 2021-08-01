@@ -51,7 +51,7 @@ Tile {
 		Marquee
         {
 			id: tempText
-            width: Math.max (Math.floor (parent.width * 0.3 ), 44)
+            width: Math.max (Math.floor (parent.width * 0.5 ), 44)
 			height: compact ? 13 : parent.height
 			text: compact ? tempName : ""
             textHorizontalAlignment: Text.AlignLeft
@@ -63,81 +63,29 @@ Tile {
 			}
 		}
 
-		Rectangle
-        {
-			color: "#95a5a6"
-			border { width:1; color: "white" }
-			width: root.width - 10 - (compact ? tempText.width + 3 : 0)
-			height: compact ? 13 : parent.height
-            clip: true
-			anchors {
+        Text {
+            font.pixelSize: 12
+            font.bold: true
+            color: "white"
+            width: root.width - 10 - (compact ? tempText.width + 3 : 0)
+            anchors {
                 verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
-				right: parent.right
-			}
-
-            Rectangle
-            {
-                id: valueBarPos
-                width: Math.max (Math.min (temperature, root.maxTemp) / root.tempSpan * (parent.width - 2), 2)
-                height: parent.height - 1
-                color: "#006600"
-                visible: temperature >= 0 && statusItem.value === 0
-                clip: true
-                anchors
-                {
-                    verticalCenter: parent.verticalCenter;
-                    left: zeroLine.horizontalCenter
-                }
+                right: parent.right
             }
-            Rectangle
-            {
-                id: valueBarNeg
-                width: Math.max (Math.min (-temperature, -root.minTemp) / root.tempSpan * (parent.width - 2), 2)
-                height: parent.height - 1
-                color: "#000066"
-                visible: temperature < 0 && statusItem.value === 0
-                clip: true
-                anchors
-                {
-                    verticalCenter: parent.verticalCenter;
-                    right: zeroLine.horizontalCenter
-                }
+            horizontalAlignment: compact ? Text.AlignRight : Text.AlignHCenter
+            text:
+            {   
+                if (statusItem.value !== 0)
+                    return "???"
+                else if (tempScale == 1)
+                    return root.temperature.toFixed (0) + "°C"
+                else if (tempScale == 2)
+                    return ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
+                else if (root.compact)
+                    return root.temperature.toFixed (0) + "C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "F"
+                else
+                    return root.temperature.toFixed (0) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
             }
-            // zero line - not visible, just for a reference for valueBar
-            Rectangle
-            {
-                id: zeroLine
-                width: 1
-                height: root.height
-                clip: true
-                color: "white"
-                visible: false
-                anchors
-                {
-                    verticalCenter: parent.verticalCenter;
-                    left: parent.left;  leftMargin: -root.minTemp / root.tempSpan * parent.width
-                }
-            }
-
-			Text {
-				font.pixelSize: 12
-				font.bold: true
-                text:
-                {   
-                    if (statusItem.value !== 0)
-                        return "???"
-                    else if (tempScale == 1)
-                        return root.temperature.toFixed (0) + "°C"
-                    else if (tempScale == 2)
-                        return ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
-                    else if (root.compact)
-                        return root.temperature.toFixed (0) + "C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "F"
-                    else
-                        return root.temperature.toFixed (0) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
-                }
-                anchors.centerIn: parent
-				color: "white"
-			}
-		}
+        }
 	}
 }

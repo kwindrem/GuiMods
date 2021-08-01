@@ -46,6 +46,8 @@ This package provides the following modificaitons to the VenusOS GUI:
             For more, the bottom row splits into separate rows for temps and tanks
             Each row scrolls horizontally if more than 4 items exist in the row
         Adds VE.Direct inverter status and control
+        Adds name, voltage and current for up to 3 PV chargers (2 if tank and temp is displayed)
+        Adds name and for up to 3 PV inverters (2 if tank and temp is displayed)
 
     use custom tank name if it exists and optionally shorten tank names
         beginning with Venus v2.70~16, NEMA2000 tank names can be too long to fit in available space

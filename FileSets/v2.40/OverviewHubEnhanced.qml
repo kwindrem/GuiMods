@@ -1,6 +1,7 @@
 ////// MODIFIED to show:
 //////  tanks in a row along bottom
-//////  PV voltage and current and DC power current (up to two MPPTs)
+//////  PV voltage and current and DC power current (up to 2 MPPTs with tanks and temps or 3 without)
+//////  PV inverter power (up to 2 with tanks and temps or 3 without)
 //////  voltage, current, frequency in AC tiles (plus current limit for AC input)
 //////  time of day
 //////  current in DC Loads
@@ -48,7 +49,13 @@ OverviewPage {
 //////// add for PV CHARGER voltage and current
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
+    property string pvChargerPrefix3: ""
     property int numberOfPvChargers: 0
+//////// add for PV INVERTER power
+    property string pvInverterPrefix1: ""
+    property string pvInverterPrefix2: ""
+    property string pvInverterPrefix3: ""
+    property int numberOfPvInverters: 0
 
     property int numberOfMultis: 0
     property string multiPrefix: ""
@@ -81,14 +88,24 @@ OverviewPage {
             return "hh:mm"
     }
 
-//////// add to display voltage and current
+//////// add to display PV charger voltage and current
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
     VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
     VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
     VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
-    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
-    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
+    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
+    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
+    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix32, "/Pv/V") }
+    VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
+
+//////// add to display PV Inverter power
+    VBusItem { id: pvInverterPower1; bind: Utils.path(pvInverterPrefix1, "/Pv/P") }
+    VBusItem { id: pvInverterName1; bind: Utils.path(pvInverterPrefix1, "/CustomName") }
+    VBusItem { id: pvInverterPower2; bind: Utils.path(pvInverterPrefix2, "/Pv/P") }
+    VBusItem { id: pvInverterName2; bind: Utils.path(pvInverterPrefix2, "/CustomName") }
+    VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Pv/P") }
+    VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
     Component.onCompleted: discoverServices()
 
@@ -315,8 +332,8 @@ OverviewPage {
 	OverviewSolarCharger {
 		id: blueSolarCharger
 
-////// MODIFIED to show tanks
-        height: hasDcAndAcSolar ? 65 : showTanksTemps ? batteryHeight + 20 : 114
+////// MODIFIED to show tanks & provide extra space if not
+        height: hasDcAndAcSolar ? 65 : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
         width: 148
 		title: qsTr("PV Charger")
 ////// MODIFIED - always hide icon peaking out from under PV tile
@@ -357,6 +374,17 @@ OverviewPage {
                 text: numberOfPvChargers > 1 ? pvVoltage2.text + " " + pvCurrent2.text : ""
                 font.pixelSize: 15
                 visible: numberOfPvChargers > 1 && pvVoltage2.valid && pvCurrent2.valid
+            },
+            TileText {
+                y: 91
+                text: numberOfPvChargers > 2 && pvName3.valid ? pvName3.text : ""
+                visible: numberOfPvChargers > 2 && ! showTanksTemps
+            },
+            TileText {
+                y: 105
+                text: numberOfPvChargers > 2 ? pvVoltage3.text + " " + pvCurrent3.text : ""
+                font.pixelSize: 15
+                visible: numberOfPvChargers > 2 && ! showTanksTemps && pvVoltage3.valid && pvCurrent3.valid
             }
         ]
 ////// add power bar graph
@@ -376,7 +404,8 @@ OverviewPage {
 
     OverviewSolarInverter {
         id: pvInverter
-        height: hasDcAndAcSolar ? 65 : 115
+////// MODIFIED to show tanks & provide extra space if not
+        height: hasDcAndAcSolar ? 65 : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
         width: 148
         title: qsTr("PV Inverter")
         showInverterIcon: !hasDcAndAcSolar
@@ -392,18 +421,60 @@ OverviewPage {
             visible: !coupledPvAc.visible
         }
 
-        TileText {
-            id: coupledPvAc
+//////// add individual PV inverter powers
+        values:
+        [
+            TileText {
+                id: coupledPvAc
 
-            property double pvInverterOnAcOut: sys.pvOnAcOut.power.valid ? sys.pvOnAcOut.power.value : 0
-            property double pvInverterOnAcIn1: sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
-            property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
+                property double pvInverterOnAcOut: sys.pvOnAcOut.power.valid ? sys.pvOnAcOut.power.value : 0
+                property double pvInverterOnAcIn1: sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
+                property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
 
-            y: 5
-            text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
-            font.pixelSize: hasDcAndAcSolar ? 20 : 25
-            visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
-        }
+                y: 5
+                text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
+                font.pixelSize: hasDcAndAcSolar ? 20 : 25
+                visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
+            },
+            TileText {
+                y: 8
+                text: sys.pvCharger.power.format(0)
+                font.pixelSize: 19
+            },
+            TileText {
+                y: 29
+                text: numberOfPvInverters > 0 && pvInverterName1.valid ? pvInverterName1.text : ""
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 0
+            },
+            TileText {
+                y: 45
+                text: numberOfPvInverters > 0 ? pvInverterPower1.text : ""
+                font.pixelSize: 15
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 0 && pvInverterPower1.valid
+            },
+            TileText {
+                y: 61
+                text: numberOfPvInverters > 1 && pvInverterName2.valid ? pvInverterName2.text : ""
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
+            },
+            TileText {
+                y: 75
+                text: numberOfPvInverters > 1 ? pvInverterPower2.text : ""
+                font.pixelSize: 15
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 1 && pvInverterPower2.valid
+            },
+            TileText {
+                y: 91
+                text: numberOfPvInverters > 2 && pvInverterName3.valid ? pvInverterName3.text : ""
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
+            },
+            TileText {
+                y: 105
+                text: numberOfPvInverters > 2 ? pvInverterPower3.text : ""
+                font.pixelSize: 15
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && pvInverterPower3.valid
+            }
+        ]
     }
 
 	OverviewConnection {
