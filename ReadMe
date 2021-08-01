@@ -7,6 +7,8 @@ Configuration settings can be found in:
     Device List / Settings / Display & language/ GuiMods
 
 This package provides the following modificaitons to the VenusOS GUI:
+    Adds name and power for up to 3 individual PV interters in that tile in Flow Overview
+        This has NOT been tested on a system with PV inverters !!!
     move Settings and Notifications to the top of the list man page
     hides the Tiles Overview
     enhances the Mobile Overview
