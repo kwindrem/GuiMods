@@ -174,9 +174,14 @@ MbPage {
         }
         MbSubMenu
         {
-            description: qsTr("PowerGauges")
+            description: qsTr("Power Gauges")
             subpage: Component { PageSettingsGuiModsGauges {} }
             show: useEnhFlowOverview.checked
+        }
+        MbSubMenu
+        {
+            description: qsTr("Package Versions")
+            subpage: Component { PageSettingsGuiModsVersions {} }
         }
     }
 }

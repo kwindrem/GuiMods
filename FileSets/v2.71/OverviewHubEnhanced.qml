@@ -473,6 +473,19 @@ OverviewPage {
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && pvInverterPower3.valid
             }
         ]
+////// add power bar graph
+        PowerGauge
+        {
+            id: pvInverterBar
+            width: parent.width
+            height: 12
+            anchors
+            {
+                top: parent.top; topMargin: -2
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: sys.pvInverter
+        }
     }
 
 	OverviewConnection {

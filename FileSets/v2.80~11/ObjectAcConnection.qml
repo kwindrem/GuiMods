@@ -15,12 +15,11 @@ QtObject {
 	property VBusItem powerL2: VBusItem { bind: Utils.path(bindPrefix, "/L2/Power"); unit: "W"}
 	property VBusItem powerL3: VBusItem { bind: Utils.path(bindPrefix, "/L3/Power"); unit: "W"}
 	property VBusItem power: VBusItem { unit: "W" }
-////// added for compatibility with v2.80 changes
+    property VBusItem phaseCount: VBusItem { bind: Utils.path(bindPrefix, "/NumberOfPhases") }
     property bool splitPhaseL2PassthruDisabled: false
     property bool isAcOutput: false
     property bool l1AndL2OutShorted: splitPhaseL2PassthruDisabled && isAcOutput
 ////// added to show bar graphs
-    property VBusItem phaseCount: VBusItem { bind: Utils.path(bindPrefix, "/NumberOfPhases") }
     property VBusItem inverterState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State" ) }
  
  ////// add to show voltage, current, frequency and bar graphs

@@ -36,6 +36,7 @@ tileFile="$qmlDir/Tile.qml"
 settingsDisplayFile="$qmlDir/PageSettingsDisplay.qml"
 guiModsFile="$qmlDir/PageSettingsGuiMods.qml"
 gaugesFile="$qmlDir/PageSettingsGuiModsGauges.qml"
+versionsFile="$qmlDir/PageSettingsGuiModsVersions.qml"
 
 #### following lines incorporate SetupHelper utilities into this script
 # Refer to the SetupHelper ReadMe file for details.
@@ -63,7 +64,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    lastSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/TimeFormat\
+    lastSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /GuiMods/TimeFormat\
             com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
     if [ -z $lastSetting ]; then
         logMessage "creating GuiMods Settings"
@@ -87,7 +88,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/GuiMods/ShowGauges", "default":1},\
             {"path":"/GuiMods/ShowTileOverview", "default":1},\
             {"path":"/GuiMods/MoveSettings", "default":1},\
-            {"path":"/GuiMods/TimeFormat", "default":1} ]'  > /dev/null
+            {"path":"/GuiMods/TimeFormat", "default":1} ]' > /dev/null
     fi
 
     # move setup options to Settings
@@ -109,7 +110,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
                 setSetting 0 /Settings/GuiMods/ShowTileOverview
             fi
             if [ -f "$setupOptionsDir/enhancedFlow" ]; then
-                dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 1 > /dev/null
+                dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 1 &> /dev/null
                 moveSetting "$setupOptionsDir/inverterPeakPower" /Settings/InverterLimits/PeakPower /Settings/GuiMods/GaugeLimits/PeakPower
                 moveSetting "$setupOptionsDir/inverterCautionPower" /Settings/InverterLimits/PeakCautionPowerPower /Settings/GuiMods/GaugeLimits/CautionPower
                 moveSetting "$setupOptionsDir/inverterContiuousPower" /Settings/InverterLimits/ContiuousPower /Settings/GuiMods/GaugeLimits/ContiuousPower
@@ -180,11 +181,12 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$settingsDisplayFile"
     updateActiveFile "$guiModsFile"
     updateActiveFile "$gaugesFile"
+    updateActiveFile "$versionsFile"
     updateActiveFile "$marqueeFile"
     updateActiveFile "$tileFile"
     # clean up from previous versions
     restoreActiveFile "$overviewHub"
-
+    
     logMessage "++ Package installed"
 fi
 
@@ -211,6 +213,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$settingsDisplayFile"
     restoreActiveFile "$guiModsFile"
     restoreActiveFile "$gaugesFile"
+    restoreActiveFile "$versionsFile"
     restoreActiveFile "$marqueeFile"
     restoreActiveFile "$tileFile"
 

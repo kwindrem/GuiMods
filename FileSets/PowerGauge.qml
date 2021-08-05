@@ -225,7 +225,7 @@ Item {
                 barMax = outPowerLimit * 1.2                
             }
         }
-        else if (root.connection === sys.pvCharger)
+        else if (root.connection === sys.pvCharger || root.connection === sys.pvInverter)
         {
             overload = pvChargerMaxPower
             barMax = overload * 1.2
@@ -266,6 +266,10 @@ Item {
         if (root.connection === sys.pvCharger)
         {
             currentValue = sys.pvCharger.power.valid ? sys.pvCharger.power.value : 0
+        }
+        else if (root.connection === sys.pvInverter)
+        {
+            currentValue = sys.pvInverter.power.valid ? sys.pvInverter.power.value : 0
         }
         else if (root.connection === sys.acInput)
             currentValue = sys.acInput.powerL1.valid ? sys.acInput.powerL1.value : 0
@@ -328,7 +332,12 @@ Item {
             if (root.connection === sys.pvCharger)
                 phaseCount = 1
             else if (root.connection.phaseCount.valid)
-                phaseCount = root.connection.phaseCount.value
+            {
+                if (root.connection.l1AndL2OutShorted)
+                    phaseCount = 1
+                else
+                    phaseCount = root.connection.phaseCount.value
+            }
             else
                 phaseCount = 0
         }
