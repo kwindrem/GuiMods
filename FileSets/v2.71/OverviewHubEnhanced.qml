@@ -95,7 +95,7 @@ OverviewPage {
     VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
     VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
     VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
-    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix32, "/Pv/V") }
+    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix3, "/Pv/V") }
     VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
@@ -484,7 +484,7 @@ OverviewPage {
                 top: parent.top; topMargin: -2
                 horizontalCenter: parent.horizontalCenter
             }
-            connection: sys.pvInverter
+            connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
         }
     }
 

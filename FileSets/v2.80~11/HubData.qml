@@ -134,6 +134,8 @@ Item {
     ObjectAcConnection {
         id: _activein
         bindPrefix: Utils.path(systemPrefix, "/Ac/ActiveIn")
+        inverterSource: "/Ac/ActiveIn"
+        inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
     }
 
 	ObjectAcConnection {

@@ -15,7 +15,7 @@ MbPage {
         {
             text: qsTr("uninstalled packages show versions in ()")
             wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignCenter
+            horizontalAlignment: Text.AlignHCenter
         }
         MbItemValue
         {

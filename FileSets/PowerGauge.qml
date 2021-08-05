@@ -225,7 +225,8 @@ Item {
                 barMax = outPowerLimit * 1.2                
             }
         }
-        else if (root.connection === sys.pvCharger || root.connection === sys.pvInverter)
+        else if (root.connection === sys.pvCharger || root.connection === sys.pvOnAcOut
+                || root.connection === sys.pvOnAcIn1 || root.connection === sys.pvOnAcIn2)
         {
             overload = pvChargerMaxPower
             barMax = overload * 1.2
@@ -263,16 +264,24 @@ Item {
         var currentValue
         if (phaseCount < 1)
             return 0
-        if (root.connection === sys.pvCharger)
+        if (root.connection === sys.acInput)
+            currentValue = sys.acInput.powerL1.valid ? sys.acInput.powerL1.value : 0
+        else if (root.connection === sys.pvCharger)
         {
             currentValue = sys.pvCharger.power.valid ? sys.pvCharger.power.value : 0
         }
-        else if (root.connection === sys.pvInverter)
+        else if (root.connection === sys.pvOnAcOut)
         {
-            currentValue = sys.pvInverter.power.valid ? sys.pvInverter.power.value : 0
+            currentValue = sys.pvOnAcOut.power.valid ? sys.pvOnAcOut.power.value : 0
         }
-        else if (root.connection === sys.acInput)
-            currentValue = sys.acInput.powerL1.valid ? sys.acInput.powerL1.value : 0
+        else if (root.connection === sys.pvOnAcIn1)
+        {
+            currentValue = sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
+        }
+        else if (root.connection === sys.pvOnAcIn2)
+        {
+            currentValue = sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
+        }
         else
         {
             currentValue = sys.acLoad.powerL1.valid ? sys.acLoad.powerL1.value : 0 
