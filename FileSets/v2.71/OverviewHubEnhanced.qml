@@ -89,14 +89,18 @@ OverviewPage {
     }
 
 //////// add to display PV charger voltage and current
-    VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
-    VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
     VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
+    VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
+    VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+
+    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
+    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
     VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
-    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
-    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
-    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix3, "/Pv/V") }
+
     VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
+    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix3, "/Pv/V") }
+    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
+
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
 //////// add to display PV Inverter power
@@ -353,7 +357,7 @@ OverviewPage {
             TileText {
                 y: 29
                 text: numberOfPvChargers > 0 && pvName1.valid ? pvName1.text : ""
-                visible: numberOfPvChargers > 0
+                visible: numberOfPvChargers > 0 && pvVoltage1.valid
             },
             TileText {
                 y: 45
@@ -364,7 +368,7 @@ OverviewPage {
             TileText {
                 y: 61
                 text: numberOfPvChargers > 1 && pvName2.valid ? pvName2.text : ""
-                visible: numberOfPvChargers > 1
+                visible: numberOfPvChargers > 1 && pvVoltage2.valid
             },
             TileText {
                 y: 75
@@ -375,7 +379,7 @@ OverviewPage {
             TileText {
                 y: 91
                 text: numberOfPvChargers > 2 && pvName3.valid ? pvName3.text : ""
-                visible: numberOfPvChargers > 2 && ! showTanksTemps
+                visible: numberOfPvChargers > 2 && pvVoltage3.valid && ! showTanksTemps
             },
             TileText {
                 y: 105
