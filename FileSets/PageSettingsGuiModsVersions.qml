@@ -11,6 +11,20 @@ MbPage {
 
 	model: VisualItemModel
     {
+        MbItemOptions
+        {
+            id: autoUpdate
+            description: qsTr ("Automatic Git Hub updates")
+            bind: Utils.path (bindPrefixGuiMods, "/GitHubAutoUpdate")
+            possibleValues:
+            [
+                MbOption { description: "Normal (10 min/pkg)"; value: 1 },
+                MbOption { description: "Fast (10 sec/pkg) then Normal"; value: 2 },
+                MbOption { description: "Check packages once"; value: 3 },
+                MbOption { description: "Disabled"; value: 0 }
+            ]
+            writeAccessLevel: User.AccessUser
+        }
         MbItemText
         {
             text: qsTr("uninstalled packages show versions in ()")

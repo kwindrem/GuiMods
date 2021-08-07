@@ -12,7 +12,12 @@ MbPage {
 
 	model: VisualItemModel
     {
-         MbSwitch
+        MbSubMenu
+        {
+            description: qsTr("Package Versions and updates")
+            subpage: Component { PageSettingsGuiModsVersions {} }
+        }
+        MbSwitch
         {
             id: showTileOverview
             bind: Utils.path (bindPrefixGuiMods, "/ShowTileOverview")
@@ -163,25 +168,11 @@ MbPage {
             ]
             writeAccessLevel: User.AccessUser
         }
-        
-         MbSwitch
-        {
-            id: autoUpdate
-            bind: Utils.path (bindPrefixGuiMods, "/GitHubAutoUpdate")
-            name: qsTr ("Auto update packages from GitHub")
-            writeAccessLevel: User.AccessInstaller
-            show: autoUpdate.enabled
-        }
         MbSubMenu
         {
             description: qsTr("Power Gauges")
             subpage: Component { PageSettingsGuiModsGauges {} }
             show: useEnhFlowOverview.checked
-        }
-        MbSubMenu
-        {
-            description: qsTr("Package Versions")
-            subpage: Component { PageSettingsGuiModsVersions {} }
         }
     }
 }
