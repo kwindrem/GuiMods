@@ -154,12 +154,20 @@ Configuration
         Selects the time format for the Enhanced Mobile and Enhanced Flow overviews:
             24 hour, 12 hour with AM/PM or don't show time at all
 
-    Auto update packages from GitHub
-        If the latest version of SetupHelper is installed,
-        this switch turns on/off automatic updates of all installed packages (not just GuiMods)
-        from GitHub
-        Access level must be set to Installer or above to change this setting. 
+    Automatic GitHub updates
+        If SetupHelper is up to date, this item controls automatic updates from GitHub
+        Normal - enables updates at a rate of 1 package check every 10 minutes
+        Fast - enables updates at a rate of 1 package check every 10 seconds
+            after all packages have been checked once, Normal mode is automatically selected
+            This mode is handy for making a quick check to insure all packages are up to date,
+            then allowing the system to check again at the slower rate
+        Check packages once - makes one pass through all installe packages at the fast rate
+            then disables automatic updates
+        Disabled - prevents the system from checking GitHub for updates
+        Access level must be set to Installer or above to change this setting.
 
+    Package Versions
+        shows the version of all installed and uninstalled packages.
 
     PowerGauges leads to a second menu
     
