@@ -7,7 +7,9 @@ import com.victron.velib 1.0
 MbPage {
 	id: root
 	title: qsTr("Package Versions")
-    property string bindPrefix: "com.victronenergy.settings/Settings/GuiMods/PackageVersions"
+    property string bindPrefix: "com.victronenergy.settings/Settings/GuiMods"
+    VBusItem { id: checkingPackageItem; bind: Utils.path(bindPrefix, "/CheckingPackage") }
+    property string checkingPackage: checkingPackageItem.valid ? checkingPackageItem.value : ""
 
 	model: VisualItemModel
     {
@@ -15,11 +17,11 @@ MbPage {
         {
             id: autoUpdate
             description: qsTr ("Automatic Git Hub updates")
-            bind: Utils.path (bindPrefixGuiMods, "/GitHubAutoUpdate")
+            bind: Utils.path (bindPrefix, "/GitHubAutoUpdate")
             possibleValues:
             [
-                MbOption { description: "Normal (10 min/pkg)"; value: 1 },
-                MbOption { description: "Fast (10 sec/pkg) then Normal"; value: 2 },
+                MbOption { description: "Normal"; value: 1 },
+                MbOption { description: "Fast one pass then Normal"; value: 2 },
                 MbOption { description: "Check packages once"; value: 3 },
                 MbOption { description: "Disabled"; value: 0 }
             ]
@@ -27,50 +29,51 @@ MbPage {
         }
         MbItemText
         {
-            text: qsTr("uninstalled packages show versions in ()")
+            text: checkingPackage
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
+            show: checkingPackage != ""
         }
         MbItemValue
         {
             description: qsTr("SetupHelper")
-            item.bind: Utils.path(root.bindPrefix, "/SetupHelper")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/SetupHelper")
             show: item.valid
         }
         MbItemValue
         {
             description: qsTr("GuiMods")
-            item.bind: Utils.path(root.bindPrefix, "/GuiMods")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/GuiMods")
             show: item.valid
         }
         MbItemValue
         {
             description: qsTr("GeneratorConnector")
-            item.bind: Utils.path(root.bindPrefix, "/GeneratorConnector")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/GeneratorConnector")
             show: item.valid
         }
         MbItemValue
         {
             description: qsTr("RpiDisplaySetup")
-            item.bind: Utils.path(root.bindPrefix, "/RpiDisplaySetup")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/RpiDisplaySetup")
             show: item.valid
         }
         MbItemValue
         {
             description: qsTr("RpiGpioSetup")
-            item.bind: Utils.path(root.bindPrefix, "/RpiGpioSetup")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/RpiGpioSetup")
             show: item.valid
         }
         MbItemValue
         {
             description: qsTr("TankRepeater")
-            item.bind: Utils.path(root.bindPrefix, "/TankRepeater")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/TankRepeater")
             show: item.valid
         }
         MbItemValue
         {
             description: qsTr("VeCanSetup")
-            item.bind: Utils.path(root.bindPrefix, "/VeCanSetup")
+            item.bind: Utils.path(root.bindPrefix, "/PackageVersions/VeCanSetup")
             show: item.valid
         }
     }

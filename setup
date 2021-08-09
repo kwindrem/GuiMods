@@ -64,8 +64,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    lastSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /GuiMods/TimeFormat\
-            com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+    lastSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/TimeFormat\
+                com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
     if [ -z $lastSetting ]; then
         logMessage "creating GuiMods Settings"
         dbus -y com.victronenergy.settings /Settings AddSettings\
