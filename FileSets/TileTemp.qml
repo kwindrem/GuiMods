@@ -19,8 +19,13 @@ Tile {
     property bool squeeze: height < 50
 
 	property string bindPrefix: serviceName
-	property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, "/Temperature"); decimals: 0; unit: "°" }
-    property real temperature: temperatureItem.valid ? temperatureItem.value : -99
+    property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, "/Temperature") }
+    property VBusItem rawValueItem: VBusItem { id: rawValueItem; bind: Utils.path(bindPrefix, "/RawValue") }
+    property VBusItem scaleItem: VBusItem { id: scaleItem; bind: Utils.path(bindPrefix, "/Scale") }
+    property VBusItem offsetItem: VBusItem { id: offsetItem; bind: Utils.path(bindPrefix, "/Offset") }
+    property real scale: scaleItem.valid ? scaleItem.value : 1.0
+    property real offset: offsetItem.valid ? offsetItem.value : 0.0
+    property real temperature: rawValueItem.valid ? ((rawValueItem.value * 100.0) - 273.15) * scale + offset : temperatureItem.valid ? temperatureItem.value : -99
 	property VBusItem temperatureTypeItem: VBusItem { id: temperatureTypeItem; bind: Utils.path(bindPrefix, "/TemperatureType") }
     property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
     property VBusItem statusItem: VBusItem { id: statusItem; bind: Utils.path(bindPrefix, "/Status") }
@@ -78,13 +83,13 @@ Tile {
                 if (statusItem.value !== 0)
                     return "???"
                 else if (tempScale == 1)
-                    return root.temperature.toFixed (0) + "°C"
+                    return root.temperature.toFixed (1) + "°C"
                 else if (tempScale == 2)
-                    return ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
+                    return ((root.temperature * 9 / 5) + 32).toFixed (1) + "°F"
                 else if (root.compact)
-                    return root.temperature.toFixed (0) + "C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "F"
+                    return root.temperature.toFixed (1) + "C " + ((root.temperature * 9 / 5) + 32).toFixed (1) + "F"
                 else
-                    return root.temperature.toFixed (0) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (0) + "°F"
+                    return root.temperature.toFixed (1) + "°C " + ((root.temperature * 9 / 5) + 32).toFixed (1) + "°F"
             }
         }
 	}
