@@ -100,11 +100,11 @@ OverviewPage {
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
 //////// add to display PV Inverter power
-    VBusItem { id: pvInverterPower1; bind: Utils.path(pvInverterPrefix1, "/Pv/P") }
+    VBusItem { id: pvInverterPower1; bind: Utils.path(pvInverterPrefix1, "/Ac/Power") }
     VBusItem { id: pvInverterName1; bind: Utils.path(pvInverterPrefix1, "/CustomName") }
-    VBusItem { id: pvInverterPower2; bind: Utils.path(pvInverterPrefix2, "/Pv/P") }
+    VBusItem { id: pvInverterPower2; bind: Utils.path(pvInverterPrefix2, "/Ac/Power") }
     VBusItem { id: pvInverterName2; bind: Utils.path(pvInverterPrefix2, "/CustomName") }
-    VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Pv/P") }
+    VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Ac/Power") }
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
     Component.onCompleted: discoverServices()
