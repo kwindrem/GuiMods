@@ -15,6 +15,7 @@ Item {
     property bool useInverterInfo: false
     property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(inverterService, "/Ac/NumberOfPhases" ) }
     property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
+    property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
 
     property int phaseCount: 0
 
@@ -24,30 +25,35 @@ Item {
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/ContiuousPower")
         onValueChanged: setLimits ()
     }
+    property real inverterContinuousPower: inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
     VBusItem
     {
         id: inverterPeakPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/PeakPower")
         onValueChanged: setLimits ()
     }
+    property real inverterPeakPower: inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
     VBusItem
     {
         id: inverterCautionPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/CautionPower")
         onValueChanged: setLimits ()
     }
+    property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
     VBusItem
     {
         id: outputPowerLimitItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/AcOutputMaxPower")
         onValueChanged: setLimits ()
     }
+    property real outPowerLimit: outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
     VBusItem
     {
         id: pvChargerMaxPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/PvChargerMaxPower")
         onValueChanged: setLimits ()
     }
+    property real pvChargerMaxPower: pvChargerMaxPowerItem.valid ? pvChargerMaxPowerItem.value : 0
     VBusItem
     {
         id: systemStateItem
@@ -166,12 +172,6 @@ Item {
 
     function setLimits ()
     {
-        var inverterContinuousPower = inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
-        var inverterPeakPower = inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
-        var inverterCautionPower = inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
-        var outPowerLimit = outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
-        var pvChargerMaxPower = pvChargerMaxPowerItem.valid ? pvChargerMaxPowerItem.value : 0
-        var inverterMode = inverterModeItem.valid ? inverterModeItem.value : 0
 
         // guages disabled if inverterPeakPower is 0
         if (inverterPeakPower === 0 || sys === undefined)
@@ -194,8 +194,8 @@ Item {
             if (inverterMode === 2 || systemState === 9)
             {
                 barMax = inverterPeakPower
-                overload = inverterCautionPower
-                caution = inverterContinuousPower
+                overload = inverterContinuousPower
+                caution = inverterCautionPower
             }
             // Charger Only - only AC input contribution
             else if (inverterMode === 1)
@@ -208,8 +208,8 @@ Item {
             else if (inverterMode === 3 && systemState >= 3)
             {
                 barMax = inPowerLimit + inverterPeakPower
-                overload = inPowerLimit + inverterCautionPower
-                caution = inPowerLimit + inverterContinuousPower
+                overload = inPowerLimit + inverterContinuousPower
+                caution = inPowerLimit + inverterCautionPower
             }
             // inverter is off or undefined - no AC output
             else
@@ -247,8 +247,8 @@ Item {
             else
             {
                 barMax = inverterPeakPower
-                overload = inverterCautionPower
-                caution = inverterContinuousPower
+                overload = inverterContinuousPower
+                caution = inverterCautionPower
             }
         }
         
@@ -285,14 +285,9 @@ Item {
         else
         {
             currentValue = sys.acLoad.powerL1.valid ? sys.acLoad.powerL1.value : 0 
-            // subtract off input and PV Inverter power for the inverter bar graph
-            if (root.connection != sys.acLoad)
-            {
-                if (sys.acInput.powerL1.valid)
-                    currentValue -= sys.acInput.powerL1.value
-                if (sys.pvOnAcOut.power.valid)
-                    currentValue -= sys.pvOnAcOut.powerL1.value
-            }
+            // subtract off input power for the inverter bar graph
+            if (root.connection != sys.acLoad && sys.acInput.powerL1.valid )
+                currentValue -= sys.acInput.powerL1.value
         }
         bar1color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"
 
@@ -308,14 +303,9 @@ Item {
         else
         {
             currentValue = sys.acLoad.powerL2.valid ? sys.acLoad.powerL2.value : 0
-            // subtract off input and PV Inverter power for the inverter bar graph
-            if (root.connection != sys.acLoad)
-            {
-                if (sys.acInput.powerL2.valid)
-                    currentValue -= sys.acInput.powerL2.value
-                if (sys.pvOnAcOut.power.valid)
-                    currentValue -= sys.pvOnAcOut.powerL2.value
-            }
+            // subtract off input power for the inverter bar graph
+            if (root.connection != sys.acLoad && sys.acInput.powerL2.valid )
+                currentValue -= sys.acInput.powerL2.value
         }
 
         bar2color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"
@@ -331,14 +321,9 @@ Item {
         else
         {
             currentValue = sys.acLoad.powerL3.valid ? sys.acLoad.powerL3.value : 0
-            // subtract off input and PV Inverter power for the inverter bar graph
-            if (root.connection != sys.acLoad)
-            {
-                if (sys.acInput.powerL3.valid)
-                    currentValue -= sys.acInput.powerL3.value
-                if (sys.pvOnAcOut.power.valid)
-                    currentValue -= sys.pvOnAcOut.powerL3.value
-            }
+            // subtract off input power for the inverter bar graph
+            if (root.connection != sys.acLoad && sys.acInput.powerL3.valid )
+                currentValue -= sys.acInput.powerL3.value
         }
 
         bar3color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"

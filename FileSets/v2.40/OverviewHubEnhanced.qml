@@ -431,48 +431,43 @@ OverviewPage {
                 property double pvInverterOnAcIn1: sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
                 property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
 
-                y: 5
+                y: 8
                 text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
                 font.pixelSize: hasDcAndAcSolar ? 20 : 25
                 visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
             },
             TileText {
-                y: 8
-                text: sys.pvCharger.power.format(0)
-                font.pixelSize: 19
-            },
-            TileText {
                 y: 29
-                text: numberOfPvInverters > 0 && pvInverterName1.valid ? pvInverterName1.text : ""
+                text: pvInverterName1.valid ? pvInverterName1.text : "-"
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 0
             },
             TileText {
                 y: 45
-                text: numberOfPvInverters > 0 ? pvInverterPower1.text : ""
+                text: pvInverterPower1.valid ? pvInverterPower1.text + "W" : "--"
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 0 && pvInverterPower1.valid
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 0
             },
             TileText {
                 y: 61
-                text: numberOfPvInverters > 1 && pvInverterName2.valid ? pvInverterName2.text : ""
+                text: pvInverterName2.valid ? pvInverterName2.text : "-"
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
                 y: 75
-                text: numberOfPvInverters > 1 ? pvInverterPower2.text : ""
+                text: pvInverterPower2.valid ? pvInverterPower2.text + "W" : "--"
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 1 && pvInverterPower2.valid
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
                 y: 91
-                text: numberOfPvInverters > 2 && pvInverterName3.valid ? pvInverterName3.text : ""
+                text: pvInverterName3.valid ? pvInverterName3.text : "-"
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             },
             TileText {
                 y: 105
-                text: numberOfPvInverters > 2 ? pvInverterPower3.text : ""
+                text: pvInverterPower3.valid ? pvInverterPower3.text + "W" : "--"
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && pvInverterPower3.valid
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             }
         ]
 ////// add power bar graph
