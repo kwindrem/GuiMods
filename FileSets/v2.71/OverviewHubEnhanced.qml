@@ -433,41 +433,41 @@ OverviewPage {
                 property double pvInverterOnAcIn1: sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
                 property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
 
-                y: 8
+                y: 10
                 text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
                 font.pixelSize: hasDcAndAcSolar ? 20 : 25
                 visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
             },
             TileText {
-                y: 29
+                y: 31
                 text: pvInverterName1.valid ? pvInverterName1.text : "-"
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 0
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
-                y: 45
-                text: pvInverterPower1.valid ? pvInverterPower1.text + "W" : "--"
+                y: 47
+                text: pvInverterPower1.valid ? pvInverterPower1.text : "--"
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 0
+                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
-                y: 61
+                y: 63
                 text: pvInverterName2.valid ? pvInverterName2.text : "-"
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
-                y: 75
-                text: pvInverterPower2.valid ? pvInverterPower2.text + "W" : "--"
+                y: 77
+                text: pvInverterPower2.valid ? pvInverterPower2.text : "--"
                 font.pixelSize: 15
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
-                y: 91
+                y: 93
                 text: pvInverterName3.valid ? pvInverterName3.text : "-"
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             },
             TileText {
-                y: 105
-                text: pvInverterPower3.valid ? pvInverterPower3.text + "W" : "--"
+                y: 107
+                text: pvInverterPower3.valid ? pvInverterPower3.text : "--"
                 font.pixelSize: 15
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             }
