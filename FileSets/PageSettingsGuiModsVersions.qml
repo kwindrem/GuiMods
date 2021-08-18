@@ -22,7 +22,7 @@ MbPage {
             [
                 MbOption { description: "Normal"; value: 1 },
                 MbOption { description: "Fast one pass then Normal"; value: 2 },
-                MbOption { description: "Check packages once"; value: 3 },
+                MbOption { description: "Check packages once (Fast)"; value: 3 },
                 MbOption { description: "Disabled"; value: 0 }
             ]
             writeAccessLevel: User.AccessUser

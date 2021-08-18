@@ -9,7 +9,8 @@ import QtQuick 1.1
 
 Item {
 	id: root
-	width: parent.width
+    width: parent.width
+    height: parent.height
 
 	// NOTE: data is taken by qml, hence it is called connection
 	property variant connection
@@ -28,38 +29,44 @@ Item {
             text: root.connection ? root.connection.power.format(0) : ""
 ////// modified to show power bar graphs
 			font.pixelSize: 19
-            height: 23
+            height: 21
             visible: phaseCount >= 1
 		}
 
         // voltage for single leg
         TileText {
             text: voltageL1 ("")
-            visible: phaseCount === 1 || root.connection.l1AndL2OutShorted
+            visible: phaseCount === 1
             font.pixelSize: 15
         }
         // current for single leg
         TileText {
             text: currentL1 ("")
             font.pixelSize: 15
-            visible: phaseCount === 1 || root.connection.l1AndL2OutShorted
+            visible: phaseCount === 1
         }
 
         // power, voltage and current for multiple legs
         TileText {
             text: "L1:" + powerL1 () + voltageL1 (" ") + currentL1 (" ")
-            visible: phaseCount >= 2 && !root.connection.l1AndL2OutShorted
+            visible: phaseCount >= 2
             font.pixelSize: 11
         }
         // spacer to avoid connection dot
         TileText {
             text: ""
-            visible: phaseCount >= 2 && parrent.height >= 120 && !root.connection.l1AndL2OutShorted
-            font.pixelSize: 11
+            visible: phaseCount === 2 || phaseCount === 3 && root.height >= 90
+            font.pixelSize: 8
         }
         TileText {
-            text: "L2:" + powerL2 () + voltageL2 (" ") + currentL2 (" ")
-            visible: phaseCount >= 2 && !root.connection.l1AndL2OutShorted
+            text:
+            {
+                if (root.connection.l1AndL2OutShorted)
+                    "L2 included in L1"
+                else
+                    "L2:" + powerL2 () + voltageL2 (" ") + currentL2 (" ")            
+            }
+            visible: phaseCount >= 2
             font.pixelSize: 11
         }
         TileText {
@@ -70,14 +77,14 @@ Item {
         // spacer
         TileText {
             text: ""
-            visible: phaseCount === 2 && parrent.height >= 120 && !root.connection.l1AndL2OutShorted
+            visible: phaseCount === 2 && root.height >= 90
             font.pixelSize: 11
         }
         // frequency and input current limit single leg
         TileText {
             text: frequency ()
             font.pixelSize: 15
-            visible: phaseCount === 1
+            visible: phaseCount === 1 && root.connection == sys.acInput
         }
         TileText {
             text: currentLimit ("")
@@ -86,15 +93,10 @@ Item {
         }
         // frequency and input current limit for multiple legs
         TileText {
-            text:
-            {
-                if (root.connection.l1AndL2OutShorted)
-                    "L1 + L2"
-                else
-                    frequency () + currentLimit (" ")
-            }
+            text: frequency () + currentLimit (" ")
             font.pixelSize: 11
-            visible: phaseCount >= 2        }
+            visible: phaseCount >= 2
+        }
     }
     function voltageL1 (spacer)
     {
@@ -114,8 +116,15 @@ Item {
     function currentL1 (spacer)
     {
         var current
+        var label
+        var valueText
         current = root.connection.currentL1
-        return current >= 1000 ? spacer + current.format(0) : spacer + current.format(1);
+        if (current >= 1000)
+            valueText = current.format(0)
+        else
+            valueText = current.format(1)
+
+        return spacer + valueText;
     }
     function currentL2 (spacer)
     {

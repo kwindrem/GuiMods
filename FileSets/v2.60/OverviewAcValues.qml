@@ -10,6 +10,7 @@ import QtQuick 1.1
 Item {
 	id: root
 	width: parent.width
+    height: parent.height
 
 	// NOTE: data is taken by qml, hence it is called connection
 	property variant connection
@@ -28,7 +29,7 @@ Item {
             text: root.connection ? root.connection.power.format(0) : ""
 ////// modified to show power bar graphs
 			font.pixelSize: 19
-            height: 23
+            height: 21
             visible: phaseCount >= 1
 		}
 
@@ -54,8 +55,8 @@ Item {
         // spacer to avoid connection dot
         TileText {
             text: ""
-            visible: phaseCount >= 2 && parrent.height >= 120
-            font.pixelSize: 11
+            visible: phaseCount === 2 || phaseCount === 3 && root.height >= 90
+            font.pixelSize: 8
         }
         TileText {
             text: "L2:" + powerL2 () + voltageL2 (" ") + currentL2 (" ")
@@ -70,14 +71,14 @@ Item {
         // spacer
         TileText {
             text: ""
-            visible: phaseCount === 2 && parrent.height >= 120
+            visible: phaseCount === 2 && root.height >= 90
             font.pixelSize: 11
         }
         // frequency and input current limit single leg
         TileText {
             text: frequency ()
             font.pixelSize: 15
-            visible: phaseCount === 1
+            visible: phaseCount === 1 && root.connection == sys.acInput
         }
         TileText {
             text: currentLimit ("")
