@@ -110,7 +110,32 @@ Tile {
                 font.pixelSize: 12
                 font.bold: true
 //// include actual level in display
-                text: root.levelItem.text + " " + TankSensor.formatVolume(volumeUnit.value, root.remainingItem.value)
+                text:
+                {
+                    var levelText
+                    var remainingText
+
+                    if (levelItem.valid)
+                        levelText = levelItem.text
+                    else
+                        levelText = "?"
+
+                    if (remainingItem.valid)
+                    {
+                        var remaining = TankSensor.volumeConvertFromSI(volumeUnit.value, remainingItem.value)
+                        var fmt = TankSensor.getVolumeFormat(volumeUnit.value)
+                        var precision = fmt.precision
+                        var remainingFixed = remaining.toFixed(precision)
+                        // increase precision if value is truncated to zero
+                        if (remainingFixed == 0)
+                            remainingFixed = remaining.toFixed(precision + 1)
+                        remainingText = remainingFixed + fmt.unit
+                    }
+                    else
+                        remainingText = "?"
+
+                    return levelText + " " + remainingText
+                }
                 anchors.centerIn: parent
                 color: "white"
             }

@@ -56,26 +56,6 @@ Tile {
             return service ? service.description : "???"
     }
 
-    function formatLevelText ()
-    {
-        var levelText
-        var remainingText
-        
-        
-         remainingItem.valid ? remainingItem.value : 0
-        if (levelItem.valid)
-            levelText = levelItem.text
-        else
-            levelText = "?"
-
-        if (remainingItem.valid)
-            remainingText = TankSensor.formatVolume(volumeUnit.value, remainingItem.value)
-        else
-            remainingText = "?"
-
-        return levelText + " " + remainingText
-    }
-
 ///// modified to keep mixed case names
     title: compact ? "" : tankName
     color: TankSensor.info(fluidTypeItem.value).color
@@ -150,7 +130,33 @@ Tile {
 				font.pixelSize: 12
 				font.bold: true
 //// include actual level in display
-				text: formatLevelText ()
+				text:
+                {
+                    var levelText
+                    var remainingText
+
+                    if (levelItem.valid)
+                        levelText = levelItem.text
+                    else
+                        levelText = "?"
+
+                    if (remainingItem.valid)
+                    {
+                        var remaining = TankSensor.volumeConvertFromSI(volumeUnit.value, remainingItem.value)
+                        var fmt = TankSensor.getVolumeFormat(volumeUnit.value)
+                        var precision = fmt.precision
+                        var remainingFixed = remaining.toFixed(precision)
+                        // increase precision if value is truncated to zero
+                        if (remainingFixed == 0)
+                            remainingFixed = remaining.toFixed(precision + 1)
+                        remainingText = remainingFixed + fmt.unit
+                    }
+                    else
+                        remainingText = "?"
+
+                    return levelText + " " + remainingText
+                }
+            
 				anchors.centerIn: parent
 				color: "white"
 			}

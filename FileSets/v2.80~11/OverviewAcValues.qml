@@ -84,7 +84,7 @@ Item {
         TileText {
             text: frequency ()
             font.pixelSize: 15
-            visible: phaseCount === 1 && root.connection == sys.acInput
+            visible: phaseCount === 1
         }
         TileText {
             text: currentLimit ("")
