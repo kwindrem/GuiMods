@@ -79,11 +79,11 @@ Item {
     Rectangle
     {
         id: okRange
-        width: barMax != 0 ? root.width * caution / barMax : 0
+        width: visible ? root.width * caution / barMax : 0
         height: root.height
         clip: true
         color: "#99ff99"
-        visible: width > 0 && phaseCount > 0
+        visible: phaseCount > 0 && barMax != 0
         anchors
         {
             top: root.top
@@ -94,11 +94,11 @@ Item {
     Rectangle
     {
         id: cautionRange
-        width: barMax != 0 ? root.width * (overload - caution) / barMax : 0
+        width: visible ? root.width * (overload - caution) / barMax : 0
         height: root.height
         clip: true
         color: "#bbbb00"
-        visible: width > 0 && phaseCount > 0
+        visible: phaseCount > 0 && barMax != 0
         anchors
         {
             top: root.top
@@ -109,11 +109,11 @@ Item {
     Rectangle
     {
         id: overloadRange
-        width: barMax != 0 ? root.width * (barMax - overload) / barMax : 0
+        width: visible ? root.width * (barMax - overload) / barMax : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
-        visible: width > 0 && phaseCount > 0
+        visible: phaseCount > 0 && barMax != 0
         anchors
         {
             top: root.top
@@ -124,7 +124,7 @@ Item {
     Rectangle
     {
         id: bar1
-        width: barMax != 0 ? root.width * currentValueL1 () / barMax : 0
+        width: visible ? barWidthL1 () : 0
         height: barHeight
         clip: true
         color: bar1color
@@ -133,12 +133,12 @@ Item {
             top: root.top; topMargin: firstBarVertPos
             left: root.left
         }
-        visible: width > 0 && phaseCount >= 1
+        visible: phaseCount >= 1 && barMax != 0
     }
     Rectangle
     {
         id: bar2
-        width: barMax != 0 ? root.width * currentValueL2 () / barMax : 0
+        width: visible ? barWidthL2 () : 0
         height: barHeight
         clip: true
         color: bar2color
@@ -147,12 +147,12 @@ Item {
             top: root.top; topMargin: firstBarVertPos + barHeight
             left: root.left
         }
-        visible: width > 0 && phaseCount >= 1
+        visible: phaseCount >= 1 && barMax != 0
     }
     Rectangle
     {
         id: bar3
-        width: barMax != 0 ? root.width * currentValueL3 () / barMax : 0
+        width: visible ? barWidthL3 () : 0
         height: barHeight
         clip: true
         color: bar3color
@@ -161,7 +161,7 @@ Item {
             top: root.top; topMargin: firstBarVertPos + barHeight * 2
             left: root.left
         }
-        visible: width > 0 && phaseCount >= 1
+        visible: phaseCount >= 1 && barMax != 0
     }
 
     function setLimits ()
@@ -259,7 +259,7 @@ Item {
             caution = overload
     }
     
-    function currentValueL1 ()
+    function barWidthL1 ()
     {
         var currentValue
         if (phaseCount < 1)
@@ -296,9 +296,9 @@ Item {
         }
         bar1color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"
 
-        return Math.max (currentValue, 0)
+        return Math.max (root.width * currentValue / barMax, 0)
     }
-    function currentValueL2 ()
+    function barWidthL2 ()
     {
         var currentValue
         if (phaseCount < 2)
@@ -319,9 +319,9 @@ Item {
         }
 
         bar2color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"
-        return Math.max (currentValue, 0)
+        return Math.max (root.width * currentValue / barMax, 0)
     }
-    function currentValueL3 ()
+    function barWidthL3 ()
     {
         var currentValue
         if (phaseCount < 3)
@@ -342,7 +342,7 @@ Item {
         }
 
         bar3color = currentValue > overload ? "red" : currentValue > caution ? "yellow" : "green"
-        return Math.max (currentValue, 0)
+        return Math.max (root.width * currentValue / barMax, 0)
     }
 
     // phaseCount comes from the connection (if defined)

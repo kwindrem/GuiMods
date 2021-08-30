@@ -21,6 +21,7 @@ Item {
     property real zeroOffset
     property bool okToDisplay:false
     property bool discharging:false
+    property real barWidth
     
     Component.onCompleted: setLimits ()
 
@@ -40,13 +41,14 @@ Item {
     {
         id: batteryCurrent
         bind: Utils.path("com.victronenergy.system", "/Dc/Battery/Current")
+        onValueChanged: calculateBarWidth ()
     }
 
     // discharge overload range (beginning of bar dischargeOverload)
     Rectangle
     {
         id: dischargeOverloadRange
-        width: scaleFactor * (maxDischargeDisplayed - dischargeOverload)
+        width: okToDisplay ? scaleFactor * (maxDischargeDisplayed - dischargeOverload) : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
@@ -61,7 +63,7 @@ Item {
     Rectangle
     {
         id: dischargeCautionRange
-        width: scaleFactor * (dischargeOverload - dischargeCaution)
+        width: okToDisplay ? scaleFactor * (dischargeOverload - dischargeCaution) : 0
         height: root.height
         clip: true
         color: "#bbbb00"
@@ -76,7 +78,7 @@ Item {
     Rectangle
     {
         id: okRange
-        width: scaleFactor * (dischargeCaution + chargeCaution)
+        width: okToDisplay ? scaleFactor * (dischargeCaution + chargeCaution) : 0
         height: root.height
         clip: true
         color: "#99ff99"
@@ -91,7 +93,7 @@ Item {
     Rectangle
     {
         id: chargeCautionRange
-        width: scaleFactor * (chargeOverload - chargeCaution)
+        width: okToDisplay ? scaleFactor * (chargeOverload - chargeCaution) : 0
         height: root.height
         clip: true
         color: "#bbbb00"
@@ -106,7 +108,7 @@ Item {
     Rectangle
     {
         id: chargeOverloadRange
-        width: scaleFactor * (maxChargeDisplayed - chargeOverload)
+        width: okToDisplay ? scaleFactor * (maxChargeDisplayed - chargeOverload) : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
@@ -134,11 +136,11 @@ Item {
         }
     }
 
-    // charging bar
+    // charging/discharging bar
     Rectangle
     {
         id: chargingBar
-        width: barWidth ()
+        width: okToDisplay ? barWidth : 0
         height: barHeight
         clip: true
         color: barColor
@@ -146,26 +148,12 @@ Item {
         {
             verticalCenter: root.verticalCenter
             left: zeroLine.horizontalCenter
+            leftMargin: root.discharging ? - width : 0
         }
-        visible: okToDisplay && ! discharging
-    }
-    // discharging bar
-    Rectangle
-    {
-        id: dischargingBar
-        width: barWidth ()
-        height: barHeight
-        clip: true
-        color: barColor
-        anchors
-        {
-            verticalCenter: root.verticalCenter
-            right: zeroLine.horizontalCenter
-        }
-        visible: okToDisplay && discharging
+        visible: okToDisplay
     }
     
-    function barWidth ()
+    function calculateBarWidth ()
     {
         var current = batteryCurrent.valid ? batteryCurrent.value : 0
     
@@ -178,7 +166,7 @@ Item {
             else
                 barColor = "green"
             discharging = false
-            return current * scaleFactor
+            barWidth = current * scaleFactor
         }
         else
          {
@@ -189,7 +177,7 @@ Item {
             else
                 barColor = "green"
             discharging = true
-            return -current * scaleFactor
+            barWidth = -current * scaleFactor
         }
     }
     
@@ -212,5 +200,6 @@ Item {
         scaleFactor = root.width / (maxChargeDisplayed + maxDischargeDisplayed)
         zeroOffset = maxDischargeDisplayed * scaleFactor
         okToDisplay = true
+        calculateBarWidth ()
     }
 }
