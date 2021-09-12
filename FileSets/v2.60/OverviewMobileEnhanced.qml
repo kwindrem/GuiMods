@@ -525,7 +525,7 @@ OverviewPage {
 		Keys.onSpacePressed: showErrorToast(event)
 
 		function editIsAllowed() {
-			if (isMulti) {
+			if (isMulti && numberOfMultis > 1) {
 				toast.createToast(qsTr("It is not possible to change this setting when there are more than one inverter connected."), 5000)
 				return false
 			}
@@ -571,7 +571,7 @@ OverviewPage {
         readOnly:
         {
             if (isMulti)
-                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1
+                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1 || numberOfMultis > 1
             else if (isInverter)
                 return false
             else
@@ -588,7 +588,7 @@ OverviewPage {
                 {
                     if (isMulti)
                     {
-                        if (modeIsAdjustable.valid)
+                        if (modeIsAdjustable.valid && numberOfMultis === 1)
                             return qsTr("%1").arg(acModeButton.texts[acModeButton.shownValue])
                         else
                             return qsTr("NOT AVAILABLE")
@@ -612,7 +612,7 @@ OverviewPage {
 			if (!mode.valid)
 				return
 
-			if (isMulti) {
+			if (isMulti && numberOfMultis > 1) {
 				toast.createToast(qsTr("It is not possible to change this setting when there are more than one inverter connected."), 5000)
 				return
 			}
