@@ -72,8 +72,8 @@ OverviewPage {
 //////// add for VE.Direct inverters
     property int numberOfInverters: 0
     property string inverterService: ""
-    property bool isMulti: numberOfMultis > 0
-    property bool isInverter: !isMulti && numberOfInverters > 0
+    property bool isMulti: numberOfMultis === 1
+    property bool isInverter: numberOfMultis === 0 && numberOfInverters === 1
     
     // Keeps track of which button on the bottom row is active
     property int buttonIndex: 0
@@ -520,7 +520,7 @@ OverviewPage {
 		width: show ? root.infoWidth2Column : 0
 		fontPixelSize: 14
 		unit: "A"
-		readOnly: numberOfMultis != 1 || currentLimitIsAdjustable.value !== 1
+        readOnly: !isMulti || currentLimitIsAdjustable.value !== 1
 		buttonColor: "#979797"
 
 		VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
@@ -528,7 +528,7 @@ OverviewPage {
 		Keys.onSpacePressed: showErrorToast(event)
 
 		function editIsAllowed() {
-			if (isMulti && numberOfMultis > 1) {
+            if (!isMulti) {
 				toast.createToast(qsTr("It is not possible to change this setting when there are more than one inverter connected."), 5000)
 				return false
 			}
@@ -574,7 +574,7 @@ OverviewPage {
 		readOnly:
         {
             if (isMulti)
-                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1 || numberOfMultis > 1
+                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1
             else if (isInverter)
                 return false
             else
@@ -615,7 +615,7 @@ OverviewPage {
 			if (!mode.valid)
 				return
 
-			if (isMulti && numberOfMultis > 1) {
+            if (!isMulti) {
 				toast.createToast(qsTr("It is not possible to change this setting when there are more than one inverter connected."), 5000)
 				return
 			}

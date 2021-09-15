@@ -62,8 +62,8 @@ OverviewPage {
 //////// add for VE.Direct inverters
     property int numberOfInverters: 0
     property string inverterService: ""
-    property bool isMulti: numberOfMultis > 0
-    property bool isInverter: !isMulti && numberOfInverters > 0
+    property bool isMulti: numberOfMultis === 1
+    property bool isInverter: numberOfMultis === 0 && numberOfInverters === 1
 
 //////// added for control show/hide gauges, tanks and temps from menus
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
@@ -829,5 +829,7 @@ OverviewPage {
         color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
         bind: Utils.path(inverterService, "/Mode")
         VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
+        inverterService: root.inverterService
+        isInverter: root.isInverter
     }
 }
