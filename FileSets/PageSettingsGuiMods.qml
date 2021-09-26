@@ -33,6 +33,12 @@ MbPage {
             writeAccessLevel: User.AccessUser
         }
 
+        MbSwitch {
+            id: relayOverview
+            bind: Utils.path (bindPrefixGuiMods, "/ShowRelayOverview")
+            name: qsTr ("Show Relay overview")
+            writeAccessLevel: User.AccessUser
+        }
         // duplicate mobile overview on/off here for convenience
         MbSwitch {
             id: mobileOverview
