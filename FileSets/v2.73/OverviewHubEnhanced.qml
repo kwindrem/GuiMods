@@ -92,14 +92,17 @@ OverviewPage {
     VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
     VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+    VBusItem { id: pvPower1; bind: Utils.path(pvChargerPrefix1, "/Yield/Power") }
 
     VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
     VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
     VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
+    VBusItem { id: pvPower2; bind: Utils.path(pvChargerPrefix2, "/Yield/Power") }
 
     VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
     VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix3, "/Pv/V") }
     VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
+    VBusItem { id: pvPower3; bind: Utils.path(pvChargerPrefix3, "/Yield/Power") }
 
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
@@ -356,36 +359,93 @@ OverviewPage {
             },
             TileText {
                 y: 29
-                text: numberOfPvChargers > 0 && pvName1.valid ? pvName1.text : ""
-                visible: numberOfPvChargers > 0 && pvVoltage1.valid
+                text: numberOfPvChargers >= 1 && pvName1.valid ? pvName1.text : " "
+                visible: numberOfPvChargers >= 1 && pvName1.valid
             },
             TileText {
                 y: 45
-                text: numberOfPvChargers > 0 ? pvVoltage1.text + " " + pvCurrent1.text : ""
+                text:
+                {
+                    var voltageText, currentText
+                    if (root.numberOfPvChargers < 1)
+                        return " "
+                    else
+                    {
+                        if (pvVoltage1.valid)
+                            voltageText = pvVoltage1.text
+                        else
+                            voltageText = "??V"
+                        if (pvCurrent1.valid)
+                            currentText = pvCurrent1.text
+                        else if (pvPower1.valid)
+                            currentText =  (pvPower1.value / pvVoltage1.value).toFixed (1) + "A"
+                        else
+                            currentText = "??A"
+                        return voltageText + " " + currentText
+                    }
+                }
                 font.pixelSize: 15
-                visible: numberOfPvChargers > 0 && pvVoltage1.valid && pvCurrent1.valid
+                visible: numberOfPvChargers > 0
             },
             TileText {
                 y: 61
-                text: numberOfPvChargers > 1 && pvName2.valid ? pvName2.text : ""
-                visible: numberOfPvChargers > 1 && pvVoltage2.valid
+                text: numberOfPvChargers >= 2 && pvName2.valid ? pvName2.text : " "
+                visible: numberOfPvChargers >= 2 && pvName2.valid
             },
             TileText {
                 y: 75
-                text: numberOfPvChargers > 1 ? pvVoltage2.text + " " + pvCurrent2.text : ""
+                text:
+                {
+                    var voltageText, currentText
+                    if (numberOfPvChargers < 2)
+                        return ""
+                    else
+                    {
+                        if (pvVoltage2.valid)
+                            voltageText = pvVoltage1.text
+                        else
+                            voltageText = "??V"
+                        if (pvCurrent2.valid)
+                            currentText = pvCurrent1.text
+                        else if (pvPower2.valid)
+                            currentText =  (pvPower2.value / pvVoltage2.value).toFixed (1) + "A"
+                        else
+                            currentText = "??A"
+                        return voltageText + " " + currentText
+                    }
+                }
                 font.pixelSize: 15
-                visible: numberOfPvChargers > 1 && pvVoltage2.valid && pvCurrent2.valid
+                visible: numberOfPvChargers >= 2
             },
             TileText {
                 y: 91
-                text: numberOfPvChargers > 2 && pvName3.valid ? pvName3.text : ""
-                visible: numberOfPvChargers > 2 && pvVoltage3.valid && ! showTanksTemps
+                text: numberOfPvChargers >= 3 && pvName3.valid ? pvName3.text : " "
+                visible: numberOfPvChargers >= 3 && pvName3.valid && ! showTanksTemps
             },
             TileText {
                 y: 105
-                text: numberOfPvChargers > 2 ? pvVoltage3.text + " " + pvCurrent3.text : ""
+                text:
+                {
+                    var voltageText, currentText
+                    if (numberOfPvChargers < 3)
+                        return ""
+                    else
+                    {
+                        if (pvVoltage3.valid)
+                            voltageText = pvVoltage1.text
+                        else
+                            voltageText = "??V"
+                        if (pvCurrent3.valid)
+                            currentText = pvCurrent3.text
+                        else if (pvPower3.valid)
+                            currentText =  (pvPower3.value / pvVoltage3.value).toFixed (1) + "A"
+                        else
+                            currentText = "??A"
+                        return voltageText + " " + currentText
+                    }
+                }
                 font.pixelSize: 15
-                visible: numberOfPvChargers > 2 && ! showTanksTemps && pvVoltage3.valid && pvCurrent3.valid
+                visible: numberOfPvChargers >= 3 && ! showTanksTemps
             }
         ]
 ////// add power bar graph
