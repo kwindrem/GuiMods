@@ -56,6 +56,23 @@ This package provides the following modificaitons to the VenusOS GUI:
         enabling this option will shorten the tank name to the first two words
             (first word for compact tank tiles)
             and repalce "Waste" with "Gray" to be consistent with "Black" label for sewage tank
+
+    Adds a Relay Overview page that allows controlling all relays.
+        Previously, relay control is several menu levels deep so this is much faster
+        Status for all relays is also shown along with the function (manual, generator, pump, alarm)
+        Buttons presented for pump and generator affect the actual parameters for those devices,
+             not just the relay state.
+        A relay name has also been added. This name is shown on the Relay Overview.
+            The name scrolls if it won't fit in the avaiable space.
+        All relay configurations are in Device List / Settings / Relay.
+            That menu has been expanded to set names and control whether the relay is shown on the
+                Relay Overview.
+        Note that for the Alarm function, there are no controls, yet the current alarm state is show.
+        Pump control has three modes: On, Off and Auto which is controlled by the associated tank level.
+        Geherator control has buttons for Manual Start and Manual Stop as well as
+            AutoEnable which toggles the enables the condition-based run control
+        Note that if condition-based run is enabled, Manual Stop may not stop the generator.
+            But turning off Auto Enable would cause the generator to stop.
     
 each of these modifications can be selected individually any time (while system is runing)
 via the Settings Display GuiMods menu

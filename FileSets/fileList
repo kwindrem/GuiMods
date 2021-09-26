@@ -11,3 +11,4 @@
 /opt/victronenergy/gui/qml/HubData.qml
 /opt/victronenergy/gui/qml/PageSettingsDisplay.qml
 /opt/victronenergy/gui/qml/Tile.qml
+/opt/victronenergy/gui/qml/PageSettingsRelay.qml

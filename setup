@@ -32,6 +32,9 @@ tileTempFile="$qmlDir/TileTemp.qml"
 hubDataFile="$qmlDir/HubData.qml"
 marqueeFile="$qmlDir/Marquee.qml"
 tileFile="$qmlDir/Tile.qml"
+relaySettingsFile="/opt/victronenergy/gui/qml/PageSettingsRelay.qml"
+relayOverviewFile="/opt/victronenergy/gui/qml/OverviewRelays.qml"
+relayTileFile="/opt/victronenergy/gui/qml/TileRelay.qml"
 
 settingsDisplayFile="$qmlDir/PageSettingsDisplay.qml"
 guiModsFile="$qmlDir/PageSettingsGuiMods.qml"
@@ -64,7 +67,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/TimeFormat\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowRelayOverview\
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -80,15 +83,28 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/GuiMods/AcCurrentLimit/Preset3", "default":30},\
             {"path":"/GuiMods/AcCurrentLimit/Preset4", "default":50},\
             {"path":"/GuiMods/TemperatureScale", "default":1},\
-            {"path":"/GuiMods/ShortenTankNames", "default":1},\
-            {"path":"/GuiMods/UseEnhancedMobileOverview", "default":1},\
-            {"path":"/GuiMods/UseEnhancedFlowOverview", "default":1},\
-            {"path":"/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1},\
-            {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1},\
-            {"path":"/GuiMods/ShowGauges", "default":1},\
-            {"path":"/GuiMods/ShowTileOverview", "default":1},\
-            {"path":"/GuiMods/MoveSettings", "default":1},\
-            {"path":"/GuiMods/TimeFormat", "default":1} ]' > /dev/null
+            {"path":"/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/UseEnhancedMobileOverview", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/UseEnhancedFlowOverview", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowGauges", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowTileOverview", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/MoveSettings", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/TimeFormat", "default":1}, \
+            {"path": "/Relay/0/CustomName", "default":""},\
+            {"path": "/Relay/0/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/1/CustomName", "default":""},\
+            {"path": "/Relay/1/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/2/CustomName", "default":""},\
+            {"path": "/Relay/2/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/3/CustomName", "default":""},\
+            {"path": "/Relay/3/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/4/CustomName", "default":""},\
+            {"path": "/Relay/4/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/5/CustomName", "default":""},\
+            {"path": "/Relay/5/Show", "default":1, "min":0, "max":1}, \
+            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1} ]' > /dev/null
     fi
 
     # move setup options to Settings
@@ -160,7 +176,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
 
         fi
     fi
-        
+
     logMessage "installing GuiMods files"
     updateActiveFile "$deviceListFile"
     updateActiveFile "$mainPagesFile"
@@ -184,6 +200,11 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$versionsFile"
     updateActiveFile "$marqueeFile"
     updateActiveFile "$tileFile"
+    updateActiveFile "$relaySettingsFile"
+    updateActiveFile "$relayOverviewFile"
+    updateActiveFile "$relayTileFile"
+
+
     # clean up from previous versions
     restoreActiveFile "$overviewHub"
     
@@ -216,6 +237,9 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$versionsFile"
     restoreActiveFile "$marqueeFile"
     restoreActiveFile "$tileFile"
+    restoreActiveFile "$relaySettingsFile"
+    restoreActiveFile "$relayOverviewFile"
+    restoreActiveFile "$relayTileFile"
 
     restoreActiveFile "$overviewHub"
 

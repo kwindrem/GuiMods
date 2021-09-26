@@ -140,6 +140,13 @@ PageStackWindow {
         onValueChanged: extraOverview ("OverviewTiles.qml", value === 1)
     }
 
+//////// show/hide the OverviewRelays page
+    VBusItem {
+        id: showOverviewRelays
+        bind: "com.victronenergy.settings/Settings/GuiMods/ShowRelayOverview"
+        onValueChanged: extraOverview ("OverviewRelays.qml", value === 1)
+    }
+
 	VBusItem {
 		id: startWithMenu
 		bind: "com.victronenergy.settings/Settings/Gui/StartWithMenuView"

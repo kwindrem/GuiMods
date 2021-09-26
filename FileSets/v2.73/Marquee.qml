@@ -1,6 +1,4 @@
-////// use v2.71 version which includes textHorizontalAlignment
 ////// add bold
-////// change to left justified if text exceeds space
 import QtQuick 1.1
 
 Rectangle {
@@ -31,7 +29,7 @@ Rectangle {
 		color: "#fff"
 		width: parent.width
 		anchors.verticalCenter: parent.verticalCenter
-		horizontalAlignment: longName || scroll ? Text.AlignLeft : Text.AlignHCenter
+        horizontalAlignment: longName || scroll ? Text.AlignLeft : Text.AlignHCenter
 	}
 
 	Timer {
