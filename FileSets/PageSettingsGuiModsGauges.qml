@@ -47,7 +47,7 @@ MbPage {
         }
         MbEditBox
         {
-            description: qsTr ("Inverter max continuous power (greed-yellow)")
+            description: qsTr ("Inverter max continuous power (green-yellow)")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/ContiuousPower")
             matchString: "0123456789"

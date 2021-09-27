@@ -736,7 +736,7 @@ OverviewPage {
 
         visible: showTemps
         width: compact ? root.width : root.width * tempCount / tankTempCount
-        property int tileWidth: width / Math.min (count, 4.2)
+        property int tileWidth: width / Math.min (count, 5.2)
         height: root.tanksHeight
         anchors
         {
