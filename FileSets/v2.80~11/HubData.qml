@@ -83,6 +83,7 @@ Item {
 		id: _genset
         splitPhaseL2PassthruDisabled: _splitPhaseL2Passthru.value === 0
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Genset")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
@@ -111,6 +112,7 @@ Item {
 		id: _grid
         splitPhaseL2PassthruDisabled: _splitPhaseL2Passthru.value === 0
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Grid")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
@@ -120,6 +122,7 @@ Item {
         splitPhaseL2PassthruDisabled: _splitPhaseL2Passthru.value === 0
         isAcOutput: true
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Consumption")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/Out"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
@@ -134,6 +137,7 @@ Item {
     ObjectAcConnection {
         id: _activein
         bindPrefix: Utils.path(systemPrefix, "/Ac/ActiveIn")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
     }

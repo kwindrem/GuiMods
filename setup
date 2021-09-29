@@ -17,20 +17,20 @@ deviceListFile="$qmlDir/PageMain.qml"
 mainPagesFile="$qmlDir/main.qml"
 overviewMobileEnhancedFile="$qmlDir/OverviewMobileEnhanced.qml"
 reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
-overviewAcValues="$qmlDir/OverviewAcValues.qml"
+overviewAcValues="$qmlDir/OverviewAcValuesEnhanced.qml"
 objectAcConnection="$qmlDir/ObjectAcConnection.qml"
-overviewHub="$qmlDir/OverviewHub.qml"
+overviewHub="$qmlDir/OverviewHubEnhanced.qml"
 overviewHubEnhanced="$qmlDir/OverviewHubEnhanced.qml"
-overviewSolarCharger="$qmlDir/OverviewSolarCharger.qml"
-tileTankFile="$qmlDir/TileTank.qml"
+overviewSolarChargerFile="$qmlDir/OverviewSolarChargerEnhanced.qml"
+tileTankFile="$qmlDir/TileTankEnhanced.qml"
 powerGaugeFile="$qmlDir/PowerGauge.qml"
 powerGaugeBatteryFile="$qmlDir/PowerGaugeBattery.qml"
-multiFile="$qmlDir/Multi.qml"
+multiFile="$qmlDir/MultiEnhanced.qml"
 inverterPopupFile="$qmlDir/InverterModePopUp.qml"
 acCurrentLimitPopUpFile="$qmlDir/AcCurrentLimitPopUp.qml"
 tileTempFile="$qmlDir/TileTemp.qml"
 hubDataFile="$qmlDir/HubData.qml"
-marqueeFile="$qmlDir/Marquee.qml"
+marqueeFile="$qmlDir/MarqueeEnhanced.qml"
 tileFile="$qmlDir/Tile.qml"
 relaySettingsFile="/opt/victronenergy/gui/qml/PageSettingsRelay.qml"
 relayOverviewFile="/opt/victronenergy/gui/qml/OverviewRelays.qml"
@@ -177,6 +177,14 @@ if [ $scriptAction == 'INSTALL' ] ; then
         fi
     fi
 
+    # clean up from previous versions
+    restoreActiveFile "$qmlDir/OverviewHub"
+    restoreActiveFile "$qmlDir/OverviewAcValues.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarCharger.qml"
+    restoreActiveFile "$qmlDir/TileTank.qml"
+    restoreActiveFile "$qmlDir/Multi.qml"
+    restoreActiveFile "$qmlDir/Marquee.qml"
+    
     logMessage "installing GuiMods files"
     updateActiveFile "$deviceListFile"
     updateActiveFile "$mainPagesFile"
@@ -186,7 +194,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$objectAcConnection"
     updateActiveFile "$overviewHubEnhanced"
     updateActiveFile "$hubDataFile"
-    updateActiveFile "$overviewSolarCharger"
+    updateActiveFile "$overviewSolarChargerFile"
     updateActiveFile "$powerGaugeFile"
     updateActiveFile "$powerGaugeBatteryFile"
     updateActiveFile "$multiFile"
@@ -205,8 +213,6 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$relayTileFile"
 
 
-    # clean up from previous versions
-    restoreActiveFile "$overviewHub"
     
     logMessage "++ Package installed"
 fi
@@ -223,7 +229,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$objectAcConnection"
     restoreActiveFile "$overviewHubEnhanced"
     restoreActiveFile "$hubDataFile"
-    restoreActiveFile "$overviewSolarCharger"
+    restoreActiveFile "$overviewSolarChargerFile"
     restoreActiveFile "$tileTankFile"
     restoreActiveFile "$tileTempFile"
     restoreActiveFile "$powerGaugeFile"
@@ -241,7 +247,13 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$relayOverviewFile"
     restoreActiveFile "$relayTileFile"
 
-    restoreActiveFile "$overviewHub"
+    # clean up from previous versions
+    restoreActiveFile "$qmlDir/OverviewHub"
+    restoreActiveFile "$qmlDir/OverviewAcValues.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarCharger.qml"
+    restoreActiveFile "$qmlDir/TileTank.qml"
+    restoreActiveFile "$qmlDir/Multi.qml"
+    restoreActiveFile "$qmlDir/Marquee.qml"
 
     logMessage "++ Package uninstalled"
 fi

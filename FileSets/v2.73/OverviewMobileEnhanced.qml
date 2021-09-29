@@ -181,7 +181,7 @@ OverviewPage {
                 },
 
 //////// combine SystemReason with notifications
-                Marquee {
+                MarqueeEnhanced {
                     text:
                     {
                         if (activeNotifications.length === 0)
@@ -390,7 +390,7 @@ OverviewPage {
         interactive: root.tankTileHeight * count > (tanksColum.height + 1) ? true : false
 
         model: TankModel { id: tankModel }
-        delegate: TileTank {
+        delegate: TileTankEnhanced {
             // Without an intermediate assignment this will trigger a binding loop warning.
             property variant theService: DBusServices.get(buddy.id)
             service: theService

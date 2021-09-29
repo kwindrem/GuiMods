@@ -113,7 +113,7 @@ Tile {
                 horizontalAlignment: Text.AlignHCenter
                 text: "Relay " + (relayNumber + 1)
             }
-            Marquee
+            MarqueeEnhanced
             {
                 id: relayName
                 width: parent.width - 4

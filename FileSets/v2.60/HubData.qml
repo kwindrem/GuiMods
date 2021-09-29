@@ -84,6 +84,7 @@ Item {
 	ObjectAcConnection {
 		id: _genset
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Genset")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
@@ -96,6 +97,7 @@ Item {
 	ObjectAcConnection {
 		id: _grid
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Grid")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}
@@ -103,6 +105,7 @@ Item {
 	ObjectAcConnection {
 		id: _acLoad
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Consumption")
+//////// modified for VE.Direct inverter support
         inverterSource: "/Ac/Out"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
 	}

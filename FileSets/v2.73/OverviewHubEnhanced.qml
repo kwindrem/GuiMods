@@ -131,7 +131,7 @@ OverviewPage {
 			left: parent.left; leftMargin: 10
 		}
 
-		values:	OverviewAcValues {
+		values:	OverviewAcValuesEnhanced {
 			connection: sys.acInput
 		}
 
@@ -160,7 +160,7 @@ OverviewPage {
 	}
 
 
-	Multi {
+	MultiEnhanced {
 		id: multi
 		anchors {
 			horizontalCenter: parent.horizontalCenter
@@ -220,7 +220,7 @@ OverviewPage {
 			top: multi.top
 		}
 
-		values: OverviewAcValues {
+		values: OverviewAcValuesEnhanced {
 			connection: sys.acLoad
 		}
 ////// add power bar graph
@@ -333,7 +333,7 @@ OverviewPage {
             return "--"
     }
 
-	OverviewSolarCharger {
+	OverviewSolarChargerEnhanced {
 		id: blueSolarCharger
 
 ////// MODIFIED to show tanks & provide extra space if not
@@ -478,7 +478,7 @@ OverviewPage {
             bottom: root.bottom; bottomMargin: hasDcAndAcSolar ? 75 : 5
         }
 
-        OverviewAcValues {
+        OverviewAcValuesEnhanced {
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
             visible: !coupledPvAc.visible
         }
@@ -705,7 +705,7 @@ OverviewPage {
         orientation: ListView.Horizontal
 
         model: TankModel { id: tankModel }
-        delegate: TileTank {
+        delegate: TileTankEnhanced {
             // Without an intermediate assignment this will trigger a binding loop warning.
             property variant theService: DBusServices.get(buddy.id)
             service: theService

@@ -169,7 +169,7 @@ OverviewPage {
                 },
 
 //////// combine SystemReason with notifications
-                Marquee {
+                MarqueeEnhanced {
                     text:
                     {
                         if (activeNotifications.length === 0)
@@ -378,7 +378,7 @@ OverviewPage {
         interactive: root.tankTileHeight * count > (tanksColum.height + 1) ? true : false
 
         model: tanksModel
-        delegate: TileTank {
+        delegate: TileTankEnhanced {
             width: tanksColum.width
             height: root.tankTileHeight
             pumpBindPrefix: root.pumpBindPreffix

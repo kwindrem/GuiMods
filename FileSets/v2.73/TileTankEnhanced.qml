@@ -87,7 +87,7 @@ Tile {
 //// modified to squeeze bar height if space is tight
         height: compact ? root.height : squeeze ? 17 : 21
 
-		Marquee {
+		MarqueeEnhanced {
 			id: tankText
 //// modified to give bar more horizontal space
             width: Math.max (Math.floor (parent.width * 0.3 ), 44)
