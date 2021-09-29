@@ -68,11 +68,28 @@ Item {
     property color bar1color: "black"
     property color bar2color: "black"
     property color bar3color: "black"
+
+    // some parameters are not valid when onCompleted occurs
+    // this timer refreshes related values until parameters become valid
+    Timer
+    {
+        id: refreshTimer
+        running: false
+        repeat: barMax === 0 || phaseCount === 0
+        interval: 3000
+        triggeredOnStart: true
+        onTriggered:
+        {
+            setPhaseCount ()
+            setLimits ()
+        }
+    }
     
     Component.onCompleted:
     {
         setPhaseCount ()
         setLimits ()
+        refreshTimer.running = true
     } 
 
     // OK range (0 to caution)
