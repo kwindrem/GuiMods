@@ -9,39 +9,12 @@ Item {
 	width: parent.width
 
     property variant connection
-    onConnectionChanged:
-    {
-        setPhaseCount ()
-        setLimits ()
-    }
-    property int connectionPhaseCount: connection != undefined && connection.phaseCount.valid ? connection.phaseCount.value : 0
-    onConnectionPhaseCountChanged:
-    {
-        setPhaseCount ()
-        setLimits ()
-    }
 
     // if connection is undefined, then this instance is for the inverter, so use it's phase count
     property string inverterService: ""
     property bool useInverterInfo: false
+    property VBusItem inverterPhaseCount: VBusItem { bind: Utils.path(inverterService, "/Ac/NumberOfPhases" ) }
     property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
-
-    VBusItem
-    {
-        id: inverterPhaseCountItem
-        bind: Utils.path(inverterService, "/Ac/NumberOfPhases" )
-        onValueChanged:
-        {
-            setPhaseCount ()
-            setLimits ()
-        }
-    }
-    property int inverterPhaseCount : inverterPhaseCountItem.valid ? inverterPhaseCountItem.value : 0
-    onInverterPhaseCountChanged:
-    {
-        setPhaseCount ()
-        setLimits ()
-    }
 
     property int phaseCount: 0
 
@@ -95,13 +68,28 @@ Item {
     property color bar1color: "black"
     property color bar2color: "black"
     property color bar3color: "black"
-    
-    property bool showGauge: false
+
+    // some parameters are not valid when onCompleted occurs
+    // this timer refreshes related values until parameters become valid
+    Timer
+    {
+        id: refreshTimer
+        running: false
+        repeat: barMax === 0 || phaseCount === 0
+        interval: 3000
+        triggeredOnStart: true
+        onTriggered:
+        {
+            setPhaseCount ()
+            setLimits ()
+        }
+    }
     
     Component.onCompleted:
     {
         setPhaseCount ()
         setLimits ()
+        refreshTimer.running = true
     } 
 
     // OK range (0 to caution)
@@ -112,7 +100,7 @@ Item {
         height: root.height
         clip: true
         color: "#99ff99"
-        visible: showGauge
+        visible: phaseCount > 0 && barMax != 0
         anchors
         {
             top: root.top
@@ -127,7 +115,7 @@ Item {
         height: root.height
         clip: true
         color: "#bbbb00"
-        visible: showGauge
+        visible: phaseCount > 0 && barMax != 0
         anchors
         {
             top: root.top
@@ -142,7 +130,7 @@ Item {
         height: root.height
         clip: true
         color: "#ffb3b3"
-        visible: showGauge
+        visible: phaseCount > 0 && barMax != 0
         anchors
         {
             top: root.top
@@ -162,7 +150,7 @@ Item {
             top: root.top; topMargin: firstBarVertPos
             left: root.left
         }
-        visible: showGauge
+        visible: phaseCount >= 1 && barMax != 0
     }
     Rectangle
     {
@@ -176,7 +164,7 @@ Item {
             top: root.top; topMargin: firstBarVertPos + barHeight
             left: root.left
         }
-        visible: showGauge
+        visible: phaseCount >= 1 && barMax != 0
     }
     Rectangle
     {
@@ -190,9 +178,104 @@ Item {
             top: root.top; topMargin: firstBarVertPos + barHeight * 2
             left: root.left
         }
-        visible: showGauge
+        visible: phaseCount >= 1 && barMax != 0
     }
 
+    function setLimits ()
+    {
+        var inverterContinuousPower = inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
+        var inverterPeakPower = inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
+        var inverterCautionPower = inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
+        var outPowerLimit = outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
+        var pvChargerMaxPower = pvChargerMaxPowerItem.valid ? pvChargerMaxPowerItem.value : 0
+        var inverterMode = inverterModeItem.valid ? inverterModeItem.value : 0
+
+        // guages disabled if inverterPeakPower is 0
+        if (inverterPeakPower === 0 || sys === undefined)
+        {
+            barMax = 0
+            overload = 0
+            caution = 0
+            return
+        }
+        if (root.connection === sys.acInput)
+        {
+            barMax = inPowerLimit * 1.2
+            overload = inPowerLimit
+            caution = overload // no caution - overload range
+        }
+        // acLoad power limits
+        else if (root.connection === sys.acLoad)
+        {
+            // Inverter Only - only multi contribution
+            if (inverterMode === 2 || systemState === 9)
+            {
+                barMax = inverterPeakPower
+                overload = inverterCautionPower
+                caution = inverterContinuousPower
+            }
+            // Charger Only - only AC input contribution
+            else if (inverterMode === 1)
+            {
+                barMax = inPowerLimit * 1.2
+                overload = inPowerLimit
+                caution = inPowerLimit
+            }
+            // On - AC input + multi contribution
+            else if (inverterMode === 3 && systemState >= 3)
+            {
+                barMax = inPowerLimit + inverterPeakPower
+                overload = inPowerLimit + inverterCautionPower
+                caution = inPowerLimit + inverterContinuousPower
+            }
+            // inverter is off or undefined - no AC output
+            else
+            {
+                barMax = 0
+                overload = 0
+                caution = 0
+            }
+            // apply system output limit
+            if (outPowerLimit != 0 && overload > outPowerLimit)
+            {
+                overload = outPowerLimit
+                barMax = outPowerLimit * 1.2                
+            }
+        }
+        else if (root.connection === sys.pvCharger || root.connection === sys.pvOnAcOut
+                || root.connection === sys.pvOnAcIn1 || root.connection === sys.pvOnAcIn2)
+        {
+            overload = pvChargerMaxPower
+            barMax = overload * 1.2
+            caution = overload // no caution - overload range
+        }
+        // inverter power limits
+        else 
+        {
+            // inverter not producing output - hide the guage
+            // Mode:  undefined, Charger Only, Off
+            // SystemState: Off, Fault
+            if (inverterMode <= 1 || inverterMode === 4 || systemState === 0 || systemState === 2)
+            {
+                barMax = 0
+                overload = 0
+                caution = 0
+            }
+            else
+            {
+                barMax = inverterPeakPower
+                overload = inverterCautionPower
+                caution = inverterContinuousPower
+            }
+        }
+        
+        // make sure regions are in expected order
+        if (overload > barMax)
+            overload = barMax
+        if (caution > overload)
+            caution = overload
+    }
+    
     function barWidthL1 ()
     {
         var currentValue
@@ -279,128 +362,37 @@ Item {
         return Math.max (root.width * currentValue / barMax, 0)
     }
 
-    function setLimits ()
-    {
-        var inverterContinuousPower = inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
-        var inverterPeakPower = inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
-        var inverterCautionPower = inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
-        var outPowerLimit = outputPowerLimitItem.valid ? outputPowerLimitItem.value : 0
-        var pvChargerMaxPower = pvChargerMaxPowerItem.valid ? pvChargerMaxPowerItem.value : 0
-        var inverterMode = inverterModeItem.valid ? inverterModeItem.value : 0
-
-        // gauges disabled if not receiving valid phase count
-        if (phaseCount === 0)
-            showGauge = false
-        // guages disabled if inverterPeakPower is 0
-        else if (inverterPeakPower === 0)
-            showGauge = false
-        // inverter power limits
-        else if (useInverterInfo) 
-        {
-            // inverter not producing output - hide the guage
-            // Mode:  undefined, Charger Only, Off
-            // SystemState: Off, Fault
-            if (inverterMode <= 1 || inverterMode === 4 || systemState === 0 || systemState === 2)
-                showGauge = false
-            else
-            {
-                barMax = inverterPeakPower
-                overload = inverterCautionPower
-                caution = inverterContinuousPower
-                showGauge = true
-            }
-        }
-        else if (sys === undefined)
-            showGauge = false
-        else if (root.connection === sys.acInput)
-        {
-            barMax = inPowerLimit * 1.2
-            overload = inPowerLimit
-            caution = overload // no caution - overload range
-            showGauge = true
-        }
-        // acLoad power limits
-        else if (root.connection === sys.acLoad)
-        {
-            // Inverter Only - only multi contribution
-            if (inverterMode === 2 || systemState === 9)
-            {
-                barMax = inverterPeakPower
-                overload = inverterCautionPower
-                caution = inverterContinuousPower
-                showGauge = true
-            }
-            // Charger Only - only AC input contribution
-            else if (inverterMode === 1)
-            {
-                barMax = inPowerLimit * 1.2
-                overload = inPowerLimit
-                caution = inPowerLimit
-                showGauge = true
-            }
-            // On - AC input + multi contribution
-            else if (inverterMode === 3 && systemState >= 3)
-            {
-                barMax = inPowerLimit + inverterPeakPower
-                overload = inPowerLimit + inverterCautionPower
-                caution = inPowerLimit + inverterContinuousPower
-                showGauge = true
-            }
-            // inverter is off or undefined - no AC output
-            else
-                showGauge = false
-            // apply system output limit
-            if (outPowerLimit != 0 && overload > outPowerLimit)
-            {
-                overload = outPowerLimit
-                barMax = outPowerLimit * 1.2                
-            }
-        }
-        else if (root.connection === sys.pvCharger || root.connection === sys.pvOnAcOut
-                || root.connection === sys.pvOnAcIn1 || root.connection === sys.pvOnAcIn2)
-        {
-            overload = pvChargerMaxPower
-            barMax = overload * 1.2
-            caution = overload // no caution - overload range
-            showGauge = true
-        }
-        // not a valid connection
-        else
-            showGauge = false
-        // make sure regions are in expected order
-        if (showGauge)
-        {
-            if (overload > barMax)
-                overload = barMax
-            if (caution > overload)
-                caution = overload
-        }
-    }
-    
-    // for the inverter/multi, phase count comes from the inverter
-    // for other connections, phaseCount comes from the connection (if defined)
+    // phaseCount comes from the connection (if defined)
     // phaseCount is always 1 for the PV charger connection
+    // for the inverter/multi, connection will not be defined
     function setPhaseCount ()
     {
-
+        // connection passed from parent
+        if (root.connection !== undefined)
+        {
+            if (root.connection === sys.pvCharger)
+                phaseCount = 1
+            else if (root.connection.phaseCount.valid)
+            {
+                if (root.connection.l1AndL2OutShorted)
+                    phaseCount = 1
+                else
+                    phaseCount = root.connection.phaseCount.value
+            }
+            else
+                phaseCount = 0
+        }
         // Multi or inverter can't define a connection
         // so service name is passed from parent
         // VE.Direct inverters don't set the phase count - only single phase
-        if (useInverterInfo)
+        else if (useInverterInfo)
         {
-            phaseCount =  inverterPhaseCount
+            if (inverterPhaseCount.valid)
+                phaseCount =  inverterPhaseCount.value
+            else
+                phaseCount = 1
         }
-        // connection passed from parent
-        else if (root.connection === undefined)
-            phaseCount = 0
-        else if (root.connection === sys.pvCharger)
-            phaseCount = 1
-        else if (root.connection.l1AndL2OutShorted)
-            phaseCount = 1
         else
-            phaseCount = root.connectionPhaseCount
-
-        if (phaseCount === 1)
-            showGauge = false
+            phaseCount = 0
     }
 }
