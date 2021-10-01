@@ -53,7 +53,7 @@ Tile {
 		width: root.width - 10
         height: compact ? root.height : squeeze ? 17 : 21
 
-		Marquee
+		MarqueeEnhanced
         {
 			id: tempText
             width: Math.max (Math.floor (parent.width * 0.5 ), 44)
