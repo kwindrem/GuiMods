@@ -28,7 +28,6 @@ Tile {
     property real temperature: rawValueItem.valid ? ((rawValueItem.value * 100.0) - 273.15) * scale + offset : temperatureItem.valid ? temperatureItem.value : -99
 	property VBusItem temperatureTypeItem: VBusItem { id: temperatureTypeItem; bind: Utils.path(bindPrefix, "/TemperatureType") }
     property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
-    property VBusItem statusItem: VBusItem { id: statusItem; bind: Utils.path(bindPrefix, "/Status") }
 	property bool compact: false
 
     property variant tempNames: [qsTr("Battery"), qsTr("Fridge"), qsTr("Generic")]
@@ -80,8 +79,8 @@ Tile {
             horizontalAlignment: compact ? Text.AlignRight : Text.AlignHCenter
             text:
             {   
-                if (statusItem.value !== 0)
-                    return "???"
+                if (root.temperature == -99)
+                    return "--"
                 else if (tempScale == 1)
                     return root.temperature.toFixed (1) + "°C"
                 else if (tempScale == 2)
