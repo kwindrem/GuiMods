@@ -28,7 +28,7 @@ Item {
     VBusItem
     {
         id: maxCharge
-        bind: Utils.path("com.victronenergy.settings", "/Settings/SystemSetup/MaxChargeCurrent")
+        bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent")
         onValueChanged: setLimits ()
     }
     VBusItem

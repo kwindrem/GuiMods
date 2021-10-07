@@ -67,7 +67,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowRelayOverview\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent\
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -104,7 +104,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path": "/Relay/4/Show", "default":1, "min":0, "max":1},\
             {"path": "/Relay/5/CustomName", "default":""},\
             {"path": "/Relay/5/Show", "default":1, "min":0, "max":1}, \
-            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1} ]' > /dev/null
+            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}, \
+            {"path":"/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0} ]' > /dev/null
     fi
 
     # move setup options to Settings
@@ -145,6 +146,16 @@ if [ $scriptAction == 'INSTALL' ] ; then
                     moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset3
                     moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset4
                 fi
+
+                # copy DVCC max battery charge current to gauge Settings if gauge setting is 0
+                maxCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent\
+                    com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+                dvccCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/SystemSetup/MaxChargeCurrent\
+                    com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+                if [ ! -z $maxCharge ] && [ $maxCharge == 0 ] && [ ! -z $dvccCharge ]; then
+                        dbus -y com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent SetValue $dvccCharge > /dev/null
+                fi
+            
             else
                 dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 0 > /dev/null
             fi

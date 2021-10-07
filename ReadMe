@@ -218,9 +218,14 @@ Configuration
     Max PV power is the maximum power expected by all PV chargers in the system.
     
     Max battery discharge current is used for the battery gauge and is the maximum sustained battery draw.
-        The maximum battery charge current is set in the DVCC menu.
-        If you don't use DVCC, turn it on, set the max charge current, then turn DVCC off.
 
+    Max battery charge current is used for the battery gauge and is the maximum sustained battery charging current.
+        Prevous versions of GuiMods used the DVCC max charge current but it's difficult to set
+        if DVCC isn't used, plus it's not in the same menu.
+        So this new parameter, used only for the battery gauge has been added.
+        It should be set the same as the DVCC max charge current if DVCC is used.
+        If this the gauge max charge current is 0, the setup script will copy the DVCC max charge current here.
+        
 
 Installation:
 

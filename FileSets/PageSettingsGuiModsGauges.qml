@@ -97,5 +97,18 @@ MbPage {
             show: showGauges.checked
             writeAccessLevel: User.AccessInstaller
         }
+        MbEditBox
+        {
+            description: qsTr ("Max battery charge current")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/BatteryMaxChargeCurrent")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "A"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
     }
 }
