@@ -402,11 +402,11 @@ OverviewPage {
                     else
                     {
                         if (pvVoltage2.valid)
-                            voltageText = pvVoltage1.text
+                            voltageText = pvVoltage2.text
                         else
                             voltageText = "??V"
                         if (pvCurrent2.valid)
-                            currentText = pvCurrent1.text
+                            currentText = pvCurrent2.text
                         else if (pvPower2.valid)
                             currentText =  (pvPower2.value / pvVoltage2.value).toFixed (1) + "A"
                         else
@@ -432,7 +432,7 @@ OverviewPage {
                     else
                     {
                         if (pvVoltage3.valid)
-                            voltageText = pvVoltage1.text
+                            voltageText = pvVoltage3.text
                         else
                             voltageText = "??V"
                         if (pvCurrent3.valid)
