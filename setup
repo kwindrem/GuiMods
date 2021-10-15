@@ -19,7 +19,6 @@ overviewMobileEnhancedFile="$qmlDir/OverviewMobileEnhanced.qml"
 reasonMessageFile="$qmlDir/SystemReasonMessage.qml"
 overviewAcValues="$qmlDir/OverviewAcValuesEnhanced.qml"
 objectAcConnection="$qmlDir/ObjectAcConnection.qml"
-overviewHub="$qmlDir/OverviewHubEnhanced.qml"
 overviewHubEnhanced="$qmlDir/OverviewHubEnhanced.qml"
 overviewSolarChargerFile="$qmlDir/OverviewSolarChargerEnhanced.qml"
 tileTankFile="$qmlDir/TileTankEnhanced.qml"
@@ -196,7 +195,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     restoreActiveFile "$qmlDir/Multi.qml"
     restoreActiveFile "$qmlDir/Marquee.qml"
     
-    logMessage "installing GuiMods files"
+    logMessage "installing $packageName files"
     updateActiveFile "$deviceListFile"
     updateActiveFile "$mainPagesFile"
     updateActiveFile "$overviewMobileEnhancedFile"
@@ -223,9 +222,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$relayOverviewFile"
     updateActiveFile "$relayTileFile"
 
-
-    
-    logMessage "++ Package installed"
+    logMessage "++ $packageName installed"
 fi
 
 
@@ -266,7 +263,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/Multi.qml"
     restoreActiveFile "$qmlDir/Marquee.qml"
 
-    logMessage "++ Package uninstalled"
+    logMessage "++ $packageName uninstalled"
 fi
 
 if $filesUpdated ; then
