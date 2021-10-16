@@ -37,23 +37,15 @@ Item {
 		}
 	}
 
-	Image {
-		anchors {
-			bottom: blueSolarChargerBox.bottom; bottomMargin: 3
-			right: blueSolarChargerBox.right; rightMargin: 3
-		}
-		source: "image://theme/overview-sun"
-////// MODIFIED to hide Blue Solar icon
-		visible: true
-	}
+////// moved sun icon to flow overview so it can be put below text, etc
 
-	Image {
-		anchors {
-			bottom: blueSolarChargerBox.bottom; bottomMargin: 3
-			left: parent.left; leftMargin: 2
-		}
-		source: "image://theme/overview-victron-logo-small"
+    Image {
+        anchors {
+            bottom: blueSolarChargerBox.bottom; bottomMargin: 3
+            left: parent.left; leftMargin: 2
+        }
+        source: "image://theme/overview-victron-logo-small"
 ////// MODIFIED to hide Blue Solar icon
-		visible: false
-	}
+        visible: false
+    }
 }

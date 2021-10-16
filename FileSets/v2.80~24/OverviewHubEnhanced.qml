@@ -343,6 +343,15 @@ OverviewPage {
 			right: root.right; rightMargin: 10
             bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
+////// moved sun icon here from OverviewSolarChager so it can be put below text, etc
+        MbIcon {
+            iconId: "overview-sun"
+            anchors {
+                bottom: parent.bottom
+                right: parent.right; rightMargin: 2
+            }
+            opacity: 0.5
+        }
 
 //////// add voltage and current
 		values: 
@@ -653,7 +662,7 @@ OverviewPage {
 		id: batteryToDcSystem
 		ballCount: 2
 		path: straight
-		active: root.active && hasDcSys.value > 0
+        active: root.active && sys.dcSystem.power.valid
 		value: flow(sys.dcSystem.power)
 
 		anchors {

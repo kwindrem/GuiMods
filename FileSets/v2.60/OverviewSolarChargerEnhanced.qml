@@ -41,16 +41,8 @@ Item {
 		}
 		iconId: "overview-sun"
 ////// MODIFIED to hide Blue Solar icon
-		display: true
-	}
-
-	MbIcon {
-		anchors {
-			bottom: blueSolarChargerBox.bottom; bottomMargin: 3
-			left: parent.left; leftMargin: 2
-		}
-		iconId: "overview-victron-logo-small"
-////// MODIFIED to hide Blue Solar icon
 		display: false
 	}
+
+////// moved sun icon to flow overview so it can be put below text, etc
 }
