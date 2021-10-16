@@ -297,7 +297,7 @@ OverviewPage {
 ////// wider to make room for current
 		width: multi.width + 20
 		height: 45
-        active: root.active && sys.dcSystem.power.valid
+        visible: sys.dcSystem.power.valid
 		title: qsTr("DC Loads")
 
 		anchors {
