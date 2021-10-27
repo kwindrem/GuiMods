@@ -1,3 +1,7 @@
+This package has been replaced with GuiMods2. 
+GuiMods will be maintained to support new Venus OS versions for "a while"
+    but there will be no future enhancements.
+
 The latest version of this package moves all setup configuraiton items to
 run-time Settings. There are no longer any setup options.
 Changes can be made without running the setup script again.
