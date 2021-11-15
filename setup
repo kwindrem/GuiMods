@@ -38,7 +38,6 @@ relayTileFile="/opt/victronenergy/gui/qml/TileRelay.qml"
 settingsDisplayFile="$qmlDir/PageSettingsDisplay.qml"
 guiModsFile="$qmlDir/PageSettingsGuiMods.qml"
 gaugesFile="$qmlDir/PageSettingsGuiModsGauges.qml"
-versionsFile="$qmlDir/PageSettingsGuiModsVersions.qml"
 
 #### following lines incorporate SetupHelper utilities into this script
 # Refer to the SetupHelper ReadMe file for details.
@@ -71,12 +70,12 @@ if [ $scriptAction == 'INSTALL' ] ; then
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
         dbus -y com.victronenergy.settings /Settings AddSettings\
-            '%[{"path": "/GuiMods/GaugeLimits/PeakPower", "default":3000.0},\
-            {"path":"/GuiMods/GaugeLimits/CautionPower", "default":2000.0},\
-            {"path":"/GuiMods/GaugeLimits/ContiuousPower", "default":1000.0},\
+            '%[{"path": "/GuiMods/GaugeLimits/PeakPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/CautionPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/ContiuousPower", "default":0.0},\
             {"path":"/GuiMods/GaugeLimits/AcOutputMaxPower", "default":0.0},\
             {"path":"/GuiMods/GaugeLimits/PvChargerMaxPower", "default":0.0},\
-            {"path":"/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":100.0},\
+            {"path":"/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":0.0},\
             {"path":"/GuiMods/AcCurrentLimit/Preset1", "default":10},\
             {"path":"/GuiMods/AcCurrentLimit/Preset2", "default":20},\
             {"path":"/GuiMods/AcCurrentLimit/Preset3", "default":30},\
@@ -215,12 +214,14 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$settingsDisplayFile"
     updateActiveFile "$guiModsFile"
     updateActiveFile "$gaugesFile"
-    updateActiveFile "$versionsFile"
     updateActiveFile "$marqueeFile"
     updateActiveFile "$tileFile"
     updateActiveFile "$relaySettingsFile"
     updateActiveFile "$relayOverviewFile"
     updateActiveFile "$relayTileFile"
+
+    # clean up from previous versions
+    restoreActiveFile "$versionsFile"
 
     logMessage "++ $packageName installed"
 fi
@@ -248,7 +249,6 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$settingsDisplayFile"
     restoreActiveFile "$guiModsFile"
     restoreActiveFile "$gaugesFile"
-    restoreActiveFile "$versionsFile"
     restoreActiveFile "$marqueeFile"
     restoreActiveFile "$tileFile"
     restoreActiveFile "$relaySettingsFile"
@@ -262,6 +262,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/TileTank.qml"
     restoreActiveFile "$qmlDir/Multi.qml"
     restoreActiveFile "$qmlDir/Marquee.qml"
+    restoreActiveFile "$versionsFile"
 
     logMessage "++ $packageName uninstalled"
 fi

@@ -12,10 +12,11 @@ MbPage {
 
 	model: VisualItemModel
     {
-        MbSubMenu
+        MbItemText
         {
-            description: qsTr("Package Versions and updates")
-            subpage: Component { PageSettingsGuiModsVersions {} }
+            text: qsTr ("Package versions moved to end of Settings menus")
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
         }
         MbSwitch
         {
@@ -87,6 +88,22 @@ MbPage {
             name: qsTr ("Show temperatures on Flow Overview")
             show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
+       }
+        MbSwitch
+        {
+            id: combineLoads
+            bind: Utils.path (bindPrefixGuiMods, "/EnhancedFlowCombineLoads")
+            name: qsTr ("Combine AC input/ouput loads")
+            show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessInstaller
+       }
+        MbSwitch
+        {
+            id: showLoadsOnInput
+            bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowLoadsOnInput")
+            name: qsTr ("Show Loads On Input")
+            show: useEnhFlowOverview.checked && ! combineLoads.checked
+            writeAccessLevel: User.AccessInstaller
        }
         MbSwitch
         {
@@ -171,6 +188,20 @@ MbPage {
                 MbOption { description: "24 hour"; value: 1 },
                 MbOption { description: "12 hour AM/PM"; value: 2 },
                 MbOption { description: "don't show time"; value: 0 }
+            ]
+            writeAccessLevel: User.AccessUser
+        }
+        MbItemOptions
+        {
+            id: inactiveFlowTiles
+            description: qsTr ("Inactive Tiles on Flow Overview")
+            bind: Utils.path (bindPrefixGuiMods, "/ShowInactiveFlowTiles")
+            show: useEnhFlowOverview.checked
+            possibleValues:
+            [
+                MbOption { description: "Show Dimmed"; value: 1 },
+                MbOption { description: "Show Full"; value: 2 },
+                MbOption { description: "Hide"; value: 0 }
             ]
             writeAccessLevel: User.AccessUser
         }
