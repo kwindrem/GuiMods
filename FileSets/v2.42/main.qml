@@ -1,6 +1,6 @@
 //////// Modified to hide the OverviewTiles page
 //////// Modified to substitute OverviewMobileEnhanced page
-//////// Modified to substitute OverviewHubEnhanced page
+//////// Modified to substitute OverviewGridParallelEnhanced page
 
 import QtQuick 1.1
 
@@ -17,64 +17,78 @@ PageStackWindow {
 	property bool completed: false
 	property bool showAlert: NotificationCenter.alert
 	property bool alarm: NotificationCenter.alarm
-//////// added for OverviewHubEnhanced page
-    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid
+//////// added for OverviewGridParallelEnhanced page
+    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid && hubOverviewGpEnhanced.valid
 	property string bindPrefix: "com.victronenergy.settings"
 
 	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
 	property bool isOverviewPage: pageStack.currentPage && pageStack.currentPage.model === overviewModel;
 	property bool isOfflineFwUpdatePage: pageStack.currentPage && pageStack.currentPage.objectName === "offlineFwUpdatePage";
 
-//////// modified for OverviewHubEnhanced page
+//////// modified for OverviewGridParallelEnhanced page
     property string hubOverviewType: theSystem.systemType.valid ?
                         withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : "unknown"
-
-//////// added for OverviewHubEnhanced page
     property string currentHubOverview: "OverviewHub.qml"
-//////// added for OverviewMobileEnhanced page
     property string currentMobileOverview: ""
+
 
 	// Keep track of the current view (menu/overview) to show as default next time the
 	// CCGX is restarted
 	onIsOverviewPageChanged: startWithMenu.setValue(isOverviewPage ? 0 : 1)
 
-	// Add the correct OverviewHub page
+    // Add the correct OverviewGridParallelEnhanced page
 //////// modified for OverviewHubEnhanced page
     onHubOverviewTypeChanged: selectHubOverview ()
 
-    VBusItem {
+    VBusItem
+    {
         id: hubOverviewEnhanced
         bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedFlowOverview"
+        onValueChanged: selectHubOverview ()
+    }
+    VBusItem
+    {
+        id: hubOverviewGpEnhanced
+        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGridParallelFlowOverview"
         onValueChanged: selectHubOverview ()
     }
 
     // base a new hub selection on the hub type and the enhanced flow overview flag
     function selectHubOverview ()
     {
-        var newHubOverview
-        switch(hubOverviewType){
-        case "Hub":
-        case "Hub-1":
-        case "Hub-2":
-        case "Hub-3":
-        case "unknown":
-            if (hubOverviewEnhanced.value === 1)
-                newHubOverview = "OverviewHubEnhanced.qml"
+//////// used same enhanced overview for all systems 
+        var newHubOverview = currentHubOverview
+        if (hubOverviewEnhanced.value === 1)
+        {
+            if (hubOverviewGpEnhanced.value === 1)
+                newHubOverview = "OverviewGridParallelEnhanced.qml"
             else
-                newHubOverview = "OverviewHub.qml"
-
-            replaceOverview(currentHubOverview, newHubOverview);
-            currentHubOverview = newHubOverview
-            break;
-        case "Hub-4":
-        case "ESS":
-            newHubOverview = "OverviewGridParallel.qml"
-            replaceOverview(currentHubOverview, newHubOverview);
-            currentHubOverview = newHubOverview
-            break;
-        default:
-            break;
+                newHubOverview = "OverviewHubEnhanced.qml"
         }
+        else
+        {
+            switch(hubOverviewType){
+            case "Hub":
+            case "Hub-1":
+            case "Hub-2":
+            case "Hub-3":
+            case "unknown":
+                newHubOverview = "OverviewHub.qml"
+                break;
+            case "Hub-4":
+            case "ESS":
+                newHubOverview = "OverviewGridParallel.qml"
+                break;
+            default:
+                break;
+            }
+        }
+        if (newHubOverview != currentHubOverview)
+        {
+            replaceOverview(currentHubOverview, newHubOverview);
+            currentHubOverview = newHubOverview
+        }
+
         // Workaround the QTBUG-17012 (only the first sentence in each case of Switch Statement can be executed)
         // by adding a return statement
         return
@@ -292,8 +306,6 @@ PageStackWindow {
 	}
 
     Component.onCompleted: {
-//////// modified for OverviewHubEnhanced page
-        selectHubOverview ()
         completed = true
     }
 
@@ -324,7 +336,12 @@ PageStackWindow {
 	Timer {
 		interval: 2000
 		running: completed && overviewsLoaded && startWithMenu.valid
-		onTriggered: if (startWithMenu.value === 0) showOverview()
+        onTriggered:
+        {
+//////// modified for OverviewGridParallelEnhanced page
+            selectHubOverview ()
+            if (startWithMenu.value === 0) showOverview()
+        }
 	}
 
 	function getDefaultOverviewIndex()

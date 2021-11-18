@@ -75,6 +75,15 @@ MbPage {
 
         MbSwitch
         {
+            id: useEnhGpOverview
+            bind: Utils.path (bindPrefixGuiMods, "/UseEnhancedGridParallelFlowOverview")
+            name: qsTr ("Use Enhanced Grid Parallel Flow Overview")
+            show: useEnhFlowOverview.checked
+            writeAccessLevel: User.AccessUser
+        }
+
+        MbSwitch
+        {
             id: showTanks
             bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowOverviewTanks")
             name: qsTr ("Show tanks on Flow Overview")

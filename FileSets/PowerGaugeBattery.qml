@@ -19,9 +19,9 @@ Item {
     property real maxDischargeDisplayed
     property real scaleFactor
     property real zeroOffset
-    property bool okToDisplay:false
-    property bool discharging:false
+    property bool okToDisplay: false
     property real barWidth
+    property real barOffset
     
     Component.onCompleted: setLimits ()
 
@@ -30,18 +30,21 @@ Item {
         id: maxCharge
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent")
         onValueChanged: setLimits ()
+        onValidChanged: setLimits ()
     }
     VBusItem
     {
         id: maxDischarge
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent")
         onValueChanged: setLimits ()
+        onValidChanged: setLimits ()
     }
     VBusItem
     {
         id: batteryCurrent
         bind: Utils.path("com.victronenergy.system", "/Dc/Battery/Current")
         onValueChanged: calculateBarWidth ()
+        onValidChanged: setLimits ()
     }
 
     // discharge overload range (beginning of bar dischargeOverload)
@@ -119,22 +122,6 @@ Item {
             left: chargeCautionRange.right
         }
     }
-    // zero line
-    Rectangle
-    {
-        id: zeroLine
-        width: 1
-        height: root.height
-        clip: true
-        color: "black"
-        visible: okToDisplay
-        anchors
-        {
-            top: root.top
-            left: root.left
-            leftMargin: maxDischargeDisplayed * scaleFactor
-        }
-    }
 
     // charging/discharging bar
     Rectangle
@@ -147,15 +134,33 @@ Item {
         anchors
         {
             verticalCenter: root.verticalCenter
-            left: zeroLine.horizontalCenter
-            leftMargin: root.discharging ? - width : 0
+            left: root.left; leftMargin: barOffset
         }
         visible: okToDisplay
+    }
+
+    // zero line - draw last so it's on top
+    Rectangle
+    {
+        id: zeroLine
+        width: 1
+        height: root.height
+        clip: true
+        color: "black"
+        visible: okToDisplay
+        anchors
+        {
+            top: root.top
+            left: root.left
+            leftMargin: zeroOffset
+        }
     }
     
     function calculateBarWidth ()
     {
         var current = batteryCurrent.valid ? batteryCurrent.value : 0
+    
+        current = Math.min ( Math.max (current, -maxDischargeDisplayed), maxChargeDisplayed)
     
         if (current >= 0)
         {
@@ -165,7 +170,7 @@ Item {
                 barColor = "yellow"
             else
                 barColor = "green"
-            discharging = false
+            barOffset = zeroOffset
             barWidth = current * scaleFactor
         }
         else
@@ -176,8 +181,8 @@ Item {
                 barColor = "yellow"
             else
                 barColor = "green"
-            discharging = true
             barWidth = -current * scaleFactor
+            barOffset = zeroOffset - barWidth
         }
     }
     
@@ -190,12 +195,12 @@ Item {
             return
         }
         chargeOverload = maxCharge.value
-        chargeCaution = chargeOverload * 0.8
-        maxChargeDisplayed = chargeOverload * 1.2
+        chargeCaution = chargeOverload
+        maxChargeDisplayed = chargeOverload * 1.1
 
         dischargeOverload = maxDischarge.value
-        dischargeCaution = dischargeOverload * 0.8
-        maxDischargeDisplayed = dischargeOverload * 1.2
+        dischargeCaution = dischargeOverload
+        maxDischargeDisplayed = dischargeOverload * 1.1
 
         scaleFactor = root.width / (maxChargeDisplayed + maxDischargeDisplayed)
         zeroOffset = maxDischargeDisplayed * scaleFactor

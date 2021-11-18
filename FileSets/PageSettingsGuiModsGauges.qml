@@ -60,7 +60,7 @@ MbPage {
         }
         MbEditBox
         {
-            description: qsTr ("Max system AC output power")
+            description: qsTr ("Max power Loads on Output / Combined Loads")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/AcOutputMaxPower")
             matchString: "0123456789"
@@ -73,9 +73,74 @@ MbPage {
         }
         MbEditBox
         {
-            description: qsTr ("Max PV power")
+            description: qsTr ("Max power Loads on Input")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/AcOutputNonCriticalMaxPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max power Grid feed-in")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxFeedInPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max power Multi/Quatro Charger")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxChargerPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max power PV Charger")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/PvChargerMaxPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max power PV inverter on AC Input")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/PvOnGridMaxPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max power PV inverter on AC Output")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/PvOnOutputMaxPower")
             matchString: "0123456789"
             numericOnlyLayout: true
             overwriteMode: false
@@ -106,6 +171,32 @@ MbPage {
             numericOnlyLayout: true
             overwriteMode: false
             unit: "A"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max DC load power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/DcSystemMaxLoad")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max DC charger power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/DcSystemMaxCharge")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
             enableSpaceBar: true
             show: showGauges.checked
             writeAccessLevel: User.AccessInstaller

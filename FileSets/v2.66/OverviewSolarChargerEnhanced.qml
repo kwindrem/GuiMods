@@ -2,47 +2,47 @@
 import QtQuick 1.1
 
 Item {
-	id: root
+    id: root
 
-	default property alias values: blueSolarChargerBox.values
-	property alias title: blueSolarChargerBox.title
-	property bool showChargerIcon: true
+    default property alias values: blueSolarChargerBox.values
+    property alias title: blueSolarChargerBox.title
+    property bool showChargerIcon: true
 
-	width: 155
-	height: 115
+    width: 155
+    height: 115
 
-	MbIcon {
-		id: blueSolarChargerIcon
+    MbIcon {
+        id: blueSolarChargerIcon
 
-		iconId: "overview-bluesolar-charger"
-		anchors.bottom: root.bottom
-		visible: showChargerIcon
-	}
+        iconId: "overview-bluesolar-charger"
+        anchors.bottom: root.bottom
+        visible: showChargerIcon
+    }
 
-	OverviewBox {
-		id: blueSolarChargerBox
+    OverviewBox {
+        id: blueSolarChargerBox
 
-		height: root.height
-		title: qsTr("PV Power")
-		titleColor: "#F4B350"
-		color: "#F39C12"
+        height: root.height
+        title: qsTr("PV Power")
+        titleColor: "#F4B350"
+        color: "#F39C12"
 
-		anchors {
-			bottom: root.bottom
-			left: blueSolarChargerIcon.left; leftMargin: showChargerIcon ? 43 : 0
-			right: parent.right
-		}
-	}
-
-	MbIcon {
-		anchors {
-			bottom: blueSolarChargerBox.bottom; bottomMargin: 3
-			right: blueSolarChargerBox.right; rightMargin: 3
-		}
-		iconId: "overview-sun"
-////// MODIFIED to hide Blue Solar icon
-		display: false
-	}
+        anchors {
+            bottom: root.bottom
+            left: blueSolarChargerIcon.left; leftMargin: showChargerIcon ? 43 : 0
+            right: parent.right
+        }
+    }
 
 ////// moved sun icon to flow overview so it can be put below text, etc
+
+    MbIcon {
+        anchors {
+            bottom: blueSolarChargerBox.bottom; bottomMargin: 3
+            left: parent.left; leftMargin: 2
+        }
+        iconId: "overview-victron-logo-small"
+////// MODIFIED to hide Blue Solar icon
+        visible: false
+    }
 }

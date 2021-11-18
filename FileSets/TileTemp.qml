@@ -1,10 +1,6 @@
 // New for GuiMods to display temperature sensors
 //  based on TileTank.qml
 //  same tile sizes and look
-//  no blink or color change for limits
-//  displays temperature rather that tank level
-//  bar grows from 0 C not from left end
-//  bar has blueish tint if temp < 0 or greenish tint if >= 0
 
 import QtQuick 1.1
 import "utils.js" as Utils

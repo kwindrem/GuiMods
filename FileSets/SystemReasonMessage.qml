@@ -12,7 +12,7 @@ Item {
 	// Flags to monitor
 	property list<VBusItem> flagItems: [
 		VBusItem { bind: Utils.path(systemPrefix, "/SystemState/LowSoc") },
-//		VBusItem { bind: Utils.path(systemPrefix, "/SystemState/BatteryLife") },
+		VBusItem { bind: Utils.path(systemPrefix, "/SystemState/BatteryLife") },
 		VBusItem { bind: Utils.path(systemPrefix, "/SystemState/ChargeDisabled") },
 		VBusItem { bind: Utils.path(systemPrefix, "/SystemState/DischargeDisabled") },
 		VBusItem { bind: Utils.path(systemPrefix, "/SystemState/SlowCharge") },
@@ -29,7 +29,7 @@ Item {
 		var reasonMessage =
 		[
 			"Low SOC",
-//			"Battery Life",
+			"Battery Life",
 			"Charge Off",
 			"Disch Off",
 			"Slow Charge",
@@ -37,7 +37,7 @@ Item {
 			"Disch Limited"
 		]
 		for (var i=0; i<flagItems.length; i++) {
-			if (flagItems[i].value) r.push(reasonMessage[i]);
+            if (flagItems[i].value) r.push(reasonMessage[i]);
 		}
 		return r;
 	}

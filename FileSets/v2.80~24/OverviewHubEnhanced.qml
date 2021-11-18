@@ -7,7 +7,7 @@
 //////  current in DC Loads
 //////  remaining time in Battery tile
 //////  bar graphs on AC in/out and Multi
-//////  popups for AC input current limit and inverter mode
+//////  detail pages for all tiles
 //////  bar gauge on PV Charger tile
 //////  add support for VE.Direct inverters
 
@@ -21,7 +21,15 @@ import com.victron.velib 1.0
 OverviewPage {
 	id: root
 
-	property variant sys: theSystem
+    property color detailColor: "#b3b3b3"
+    property real touchTargetOpacity: 0.3
+    property int touchArea: 40
+    property bool showTargets: helpTimer.running
+    property variant sys: theSystem
+    property bool isMulti: numberOfMultis === 1
+    property bool hasInverter: isMulti || numberOfInverters === 1
+    property bool hasAcInput: isMulti
+    property bool hasAcOutSystem: _hasAcOutSystem.value === 1
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -62,8 +70,6 @@ OverviewPage {
 //////// add for VE.Direct inverters
     property int numberOfInverters: 0
     property string inverterService: ""
-    property bool isMulti: numberOfMultis === 1
-    property bool isInverter: numberOfMultis === 0 && numberOfInverters === 1
 
 //////// added for control show/hide gauges, tanks and temps from menus
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
@@ -114,13 +120,15 @@ OverviewPage {
     VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Ac/Power") }
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
-    Component.onCompleted: discoverServices()
+    VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
+
+    Component.onCompleted: { discoverServices(); helpTimer.running = true }
 
 	title: qsTr("Overview")
 
 	OverviewBox {
 		id: acInBox
-        visible: !isInverter
+        visible: hasAcInput
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title: getAcSourceName(sys.acSource)
@@ -155,7 +163,9 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acInput
-            show: showGauges
+            maxForwardPowerParameter: "" // handled internally - uses input current limit and AC input voltage
+            maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
+            show: showGauges && hasAcInput
         }
 	}
 
@@ -168,7 +178,7 @@ OverviewPage {
 		}
         inverterService: root.inverterService
 ////// add power bar graph
-        PowerGauge
+        PowerGaugeMulti
         {
             id: multiBar
             width: multi.width
@@ -178,9 +188,7 @@ OverviewPage {
                 top: parent.top; topMargin: 23
                 horizontalCenter: parent.horizontalCenter
             }
-            connection: undefined
             inverterService: root.inverterService
-            useInverterInfo: true
             show: showGauges
         }
 	}
@@ -209,6 +217,7 @@ OverviewPage {
 
 	OverviewBox {
 		id: acLoadBox
+        visible: hasAcOutSystem
 		title: qsTr("AC Loads")
 		color: "#27AE60"
 		titleColor: "#2ECC71"
@@ -235,8 +244,8 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acLoad
-            inverterService: root.inverterService
-            show: showGauges
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
+            show: showGauges && hasAcOutSystem
         }
 	}
 
@@ -337,7 +346,7 @@ OverviewPage {
 		title: qsTr("PV Charger")
 ////// MODIFIED - always hide icon peaking out from under PV tile
 		showChargerIcon: false
-		visible: hasDcSolar || hasDcAndAcSolar
+		visible: hasDcSolar
 
 		anchors {
 			right: root.right; rightMargin: 10
@@ -464,7 +473,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.pvCharger
-            show: showGauges
+            show: showGauges && hasDcSolar
         }
 	}
 
@@ -547,13 +556,15 @@ OverviewPage {
                 top: parent.top; topMargin: -2
                 horizontalCenter: parent.horizontalCenter
             }
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
+            show: showGauges && hasAcSolar && !hasDcAndAcSolar
         }
     }
 
 	OverviewConnection {
 		id: acInToMulti
-        visible: !isInverter
+        visible: hasAcInput
 		ballCount: 2
 		path: straight
 		active: root.active
@@ -569,7 +580,7 @@ OverviewPage {
 		id: multiToAcLoads
 		ballCount: 2
 		path: straight
-		active: root.active
+        active: root.active && hasAcOutSystem
 		value: flow(sys.acLoad.power)
 
 		anchors {
@@ -676,9 +687,10 @@ OverviewPage {
 ////// moved to under Multi
     OverviewEssReason {
         anchors {
-            bottom: parent.bottom; bottomMargin: dcSystemBox.visible ? battery.height + 15 : 5
+            top: multi.bottom; topMargin: 7
             horizontalCenter: parent.horizontalCenter
         }
+        visible: !showTargets
     }
 
 ////// ADDED to show tanks & temps
@@ -854,64 +866,139 @@ OverviewPage {
         }
     }
 
-////// handle clicks outside popup areas
-    MouseArea {
-        anchors.fill: parent
-        enabled: parent.active
-        onPressed: mouse.accepted = acCurrentLimitPopUp.expanded || inverterModePopUp.expanded
-        onClicked: { acCurrentLimitPopUp.cancel(); inverterModePopUp.cancel() }
-    }
-////// popup current limit box over the AC Input tile
-    AcCurrentLimitPopUp
+// Details targets
+    MouseArea
     {
-        title: qsTr("AC Current Limit")
-        id: acCurrentLimitPopUp
-        // hide button until it is expanded
-        // 0 opacity blocks clicks so use a small value instead (0.001 appears to be smallest that works)
-        opacity: expanded ? 1 : 0.001
-        anchors.top: parent.top; anchors.topMargin: expanded ? 0 : acInBox.height * 2 /3
-        anchors.left: acInBox.left
-        width: show ? acInBox.width : 0
-
-        color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
-        fontPixelSize: 14
-        readOnly: ! isMulti || currentLimitIsAdjustable.value !== 1
-        // disable mouse area if can't make the adjustment
-        visible: !readOnly
-        buttonColor: "#979797"
-
-        bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimit")
-        VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
-    }
-    
-////// popup inverter mode selector over the Mulit tile
-    InverterModePopUp
-    {
-        title: qsTr("Inverter Mode")
-        id: inverterModePopUp
-        // hide button until it is expanded
-        // 0 opacity blocks clicks so use a small value instead (0.001 appears to be smallest that works)
-        opacity: expanded ? 1 : 0.001
-        anchors.top: parent.top; anchors.topMargin: expanded ? 0 : multi.height / 3
-        anchors.left: multi.left
-        width: show ? multi.width : 0
-//////// incorporate VE.Direct inverter
-        readOnly:
+        id: multiTarget
+        anchors.centerIn: multi
+        enabled: parent.active && hasInverter
+        height: touchArea * 1.5; width: touchArea * 1.5
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailInverter.qml", {backgroundColor: detailColor} ) }
+        Rectangle
         {
-            if (isMulti)
-                return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1
-            else if (isInverter)
-                return false
-            else
-                return true
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets && hasInverter
         }
-        // disable mouse area if can't make the adjustment
-        visible: !readOnly
-        buttonColor: "#979797"
-        color: containsMouse && !editMode ? "#d3d3d3" : "#A8A8A8"
-        bind: Utils.path(inverterService, "/Mode")
-        VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
-        inverterService: root.inverterService
-        isInverter: root.isInverter
+    }
+    MouseArea
+    {
+        id: acInputTarget
+        anchors.centerIn: acInBox
+        enabled: parent.active && hasAcInput
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailAcInput.qml",
+                        {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets && hasAcInput
+        }
+    }
+    MouseArea
+    {
+        id: acLoadsOnOutputTarget
+        anchors.centerIn: acLoadBox
+        enabled: parent.active && hasAcOutSystem
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailLoadsOnOutput.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets && hasAcOutSystem
+        }
+    }
+    MouseArea
+    {
+        id: pvInverterTarget
+        anchors.centerIn: pvInverter
+        enabled: parent.active && hasAcSolar
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailPvInverter.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets && hasAcSolar
+        }
+    }
+   MouseArea
+    {
+        id: pvChargerTarget
+        anchors.centerIn: blueSolarCharger
+        enabled: parent.active && hasDcSolar
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailPvCharger.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets && hasDcSolar
+        }
+    }
+    MouseArea
+    {
+        id: batteryTarget
+        anchors.centerIn: battery
+        enabled: parent.active
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailBattery.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets
+        }
+    }
+////// display detail targets and help message when first displayed.
+    Timer {
+        id: helpTimer
+        running: false
+        repeat: false
+        interval: 5000
+        triggeredOnStart: true
+    }
+
+    // help message shown when menu is first drawn
+    Rectangle
+    {
+        id: helpBox
+        color: "white"
+        width: multi.width
+        height: 32
+        opacity: 0.7
+        anchors
+        {
+            top: multi.bottom; topMargin: 1
+            horizontalCenter: root.horizontalCenter
+        }
+        visible: showTargets
+    }
+    TileText
+    {
+        text: qsTr ( "Tap tile center for detail at any time" )
+        color: "black"
+        anchors.fill: helpBox
+        wrapMode: Text.WordWrap
+        font.pixelSize: 12
+        show: showTargets
     }
 }
