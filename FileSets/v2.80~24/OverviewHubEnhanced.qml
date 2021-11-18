@@ -30,6 +30,7 @@ OverviewPage {
     property bool hasInverter: isMulti || numberOfInverters === 1
     property bool hasAcInput: isMulti
     property bool hasAcOutSystem: _hasAcOutSystem.value === 1
+    property bool hasDcSystem: hasDcSys.value > 0
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -121,6 +122,7 @@ OverviewPage {
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
     VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
+    VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
     Component.onCompleted: { discoverServices(); helpTimer.running = true }
 
@@ -306,7 +308,7 @@ OverviewPage {
 ////// wider to make room for current
 		width: multi.width + 20
 		height: 45
-        visible: sys.dcSystem.power.valid
+        visible: hasDcSystem
 		title: qsTr("DC Loads")
 
 		anchors {
@@ -325,7 +327,7 @@ OverviewPage {
 
     function dcSystemText ()
     {
-        if (sys.dcSystem.power.valid)
+        if (hasDcSystem)
         {
             var current = sys.dcSystem.power.value / sys.battery.voltage.value
             if (Math.abs (current) <= 100)
@@ -673,7 +675,7 @@ OverviewPage {
 		id: batteryToDcSystem
 		ballCount: 2
 		path: straight
-        active: root.active && sys.dcSystem.power.valid
+        active: root.active && hasDcSystem
 		value: flow(sys.dcSystem.power)
 
 		anchors {
@@ -690,7 +692,6 @@ OverviewPage {
             top: multi.bottom; topMargin: 7
             horizontalCenter: parent.horizontalCenter
         }
-        visible: !showTargets
     }
 
 ////// ADDED to show tanks & temps

@@ -21,6 +21,7 @@ import com.victron.velib 1.0
 OverviewPage {
 	id: root
 
+    property color detailColor: "#b3b3b3"
     property real touchTargetOpacity: 0.3
     property int touchArea: 40
     property bool showTargets: helpTimer.running
@@ -28,7 +29,8 @@ OverviewPage {
     property bool isMulti: numberOfMultis === 1
     property bool hasInverter: isMulti || numberOfInverters === 1
     property bool hasAcInput: isMulti
-    property bool hasLoadsOnOutput: hasInverter
+    property bool hasAcOutSystem: _hasAcOutSystem.value === 1
+    property bool hasDcSystem: hasDcSys.value > 0
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -118,6 +120,9 @@ OverviewPage {
     VBusItem { id: pvInverterName2; bind: Utils.path(pvInverterPrefix2, "/CustomName") }
     VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Ac/Power") }
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
+
+    VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
+    VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
     Component.onCompleted: { discoverServices(); helpTimer.running = true }
 
@@ -214,7 +219,7 @@ OverviewPage {
 
 	 {
 		id: acLoadBox
-        visible: hasLoadsOnOutput
+        visible: hasAcOutSystem
 		title: qsTr("AC Loads")
 		color: "#27AE60"
 		titleColor: "#2ECC71"
@@ -241,9 +246,8 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acLoad
-            inverterService: root.inverterService
-            show: showGauges
-            show: showGauges && hasLoadsOnOutput
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
+            show: showGauges && hasAcOutSystem
         }
 	}
 
@@ -299,17 +303,12 @@ OverviewPage {
         }
 	}
 
-	VBusItem {
-		id: hasDcSys
-		bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem"
-	}
-
 	OverviewBox {
 		id: dcSystemBox
 ////// wider to make room for current
 		width: multi.width + 20
 		height: 45
-		visible: hasDcSys.value > 0
+		visible: hasDcSystem
 		title: qsTr("DC Loads")
 
 		anchors {
@@ -328,7 +327,7 @@ OverviewPage {
 
     function dcSystemText ()
     {
-        if (sys.dcSystem.power.valid)
+        if (hasDcSystem)
         {
             var current = sys.dcSystem.power.value / sys.battery.voltage.value
             if (Math.abs (current) <= 100)
@@ -584,7 +583,7 @@ OverviewPage {
 		id: multiToAcLoads
 		ballCount: 2
 		path: straight
-		active: root.active && hasInverter
+		active: root.active && hasAcOutSystem
 		value: flow(sys.acLoad.power)
 
 		anchors {
@@ -677,7 +676,7 @@ OverviewPage {
 		id: batteryToDcSystem
 		ballCount: 2
 		path: straight
-		active: root.active && hasDcSys.value > 0
+		active: root.active && hasDcSystem
 		value: flow(sys.dcSystem.power)
 
 		anchors {
@@ -691,7 +690,7 @@ OverviewPage {
 ////// moved to under Multi
     OverviewEssReason {
         anchors {
-            bottom: parent.bottom; bottomMargin: dcSystemBox.visible ? battery.height + 15 : 5
+            top: multi.bottom; topMargin: 7
             horizontalCenter: parent.horizontalCenter
         }
     }
@@ -907,7 +906,7 @@ OverviewPage {
     {
         id: acLoadsOnOutputTarget
         anchors.centerIn: acLoadBox
-        enabled: parent.active && hasLoadsOnOutput
+        enabled: parent.active && hasAcOutSystem
         height: touchArea; width: touchArea
         onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailLoadsOnOutput.qml",
                     {backgroundColor: detailColor} ) }
@@ -917,7 +916,7 @@ OverviewPage {
             anchors.fill: parent
             radius: width * 0.2
             opacity: touchTargetOpacity
-            visible: showTargets && hasLoadsOnOutput
+            visible: showTargets && hasAcOutSystem
         }
     }
     MouseArea
@@ -979,18 +978,28 @@ OverviewPage {
         interval: 5000
         triggeredOnStart: true
     }
+    // help message shown when menu is first drawn
+    Rectangle
+    {
+        id: helpBox
+        color: "white"
+        width: multi.width
+        height: 32
+        opacity: 0.7
+        anchors
+        {
+            top: multi.bottom; topMargin: 1
+            horizontalCenter: root.horizontalCenter
+        }
+        visible: showTargets
+    }
     TileText
     {
         text: qsTr ( "Tap tile center for detail at any time" )
         color: "black"
-        width: multi.width + 15
+        anchors.fill: helpBox
         wrapMode: Text.WordWrap
-        font.pixelSize: showTargets ? 12 : 18
-        anchors
-        {
-            bottom: root.bottom; bottomMargin: bottomOffset -1
-            horizontalCenter: root.horizontalCenter
-        }
+        font.pixelSize: 12
         show: showTargets
     }
 }
