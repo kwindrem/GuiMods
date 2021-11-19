@@ -81,6 +81,22 @@ MbPage {
             show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
         }
+        MbSwitch
+        {
+            id: combineLoads
+            bind: Utils.path (bindPrefixGuiMods, "/EnhancedFlowCombineLoads")
+            name: qsTr ("Combine AC input/ouput loads")
+            show: useEnhFlowOverview.checked && useEnhGpOverview.checked
+            writeAccessLevel: User.AccessInstaller
+       }
+        MbSwitch
+        {
+            id: showLoadsOnInput
+            bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowLoadsOnInput")
+            name: qsTr ("Show Loads On Input")
+            show: useEnhFlowOverview.checked && useEnhGpOverview.checked && ! combineLoads.checked
+            writeAccessLevel: User.AccessInstaller
+       }
 
         MbSwitch
         {
@@ -97,22 +113,6 @@ MbPage {
             name: qsTr ("Show temperatures on Flow Overview")
             show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
-       }
-        MbSwitch
-        {
-            id: combineLoads
-            bind: Utils.path (bindPrefixGuiMods, "/EnhancedFlowCombineLoads")
-            name: qsTr ("Combine AC input/ouput loads")
-            show: useEnhFlowOverview.checked
-            writeAccessLevel: User.AccessInstaller
-       }
-        MbSwitch
-        {
-            id: showLoadsOnInput
-            bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowLoadsOnInput")
-            name: qsTr ("Show Loads On Input")
-            show: useEnhFlowOverview.checked && ! combineLoads.checked
-            writeAccessLevel: User.AccessInstaller
        }
         MbSwitch
         {

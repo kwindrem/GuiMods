@@ -299,13 +299,39 @@ OverviewPage {
         }
 	}
 
+     VBusItem {
+        id: maxDcLoad
+        bind: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
+    }
+     VBusItem {
+        id: maxDcCharge
+        bind: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
+    }
+
 	OverviewBox {
 		id: dcSystemBox
 ////// wider to make room for current
 		width: multi.width + 20
 		height: 45
 		visible: hasDcSystem
-		title: qsTr("DC Loads")
+        title:
+        {
+            var dcLoad, dcCharge
+            if (maxDcLoad.valid && maxDcLoad.value != 0)
+                dcLoad = true
+            else
+                dcLoad = false
+            if (maxDcCharge.valid && maxDcCharge.value != 0)
+                dcCharge = true
+            else
+                dcCharge = false
+            if (dcLoad && ! dcCharge)
+                qsTr ("DC Loads")
+            else if ( ! dcLoad && dcCharge)
+                qsTr ("DC Charge")
+            else
+                qsTr ("DC System")
+        }
 
 		anchors {
 			horizontalCenter: multi.horizontalCenter
