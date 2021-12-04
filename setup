@@ -195,7 +195,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     
     # remove GuiMods2 from packageList - if it's reistalled, it will ba added back
     # but we want to skip any checks for GuiMods including from packageInstaller
-    if [ $(grep -c "GuiMods2" "$packageListFile") != 0 ]; then
+    if [ -f "$packageListFile" ] && [ $(grep -c "GuiMods2" "$packageListFile") != 0 ]; then
         logMessage "removing GuiMods2 from packageList"
         sed -i -e /GuiMods2/d "$packageListFile"
     fi

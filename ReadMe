@@ -361,7 +361,7 @@ When Venus boots, it will unarchive the file to /data/GuiMods-current
 
 Move the directory into it's active locaiton:
 rm -rf /data/GuiMods
-mv /data/GuiMods2-current /data/GuiMods
+mv /data/GuiMods-current /data/GuiMods
 
 Repeat the above for SetupHelper if you haven't done so for another package.
 
@@ -375,4 +375,4 @@ Setting up an ssh authorization key (see documentation referenced above) will by
 and avoid having to reset the root password after each update.
 
 Note that installing GuiMods will uninstall GuiMods2.
-Installing GuiMods2 after installing GuiMods1 will uninstall GuiMods.
+Installing GuiMods2 after installing GuiMods will uninstall GuiMods.

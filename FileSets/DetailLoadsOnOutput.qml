@@ -73,6 +73,22 @@ MbPage {
             Row
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                        text: "" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L1" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L2" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L3"; visible: phaseCount >= 3 }
+                visible: phaseCount >= 2
+            }
+            Row
+            {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                     text: "Total Power" }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"

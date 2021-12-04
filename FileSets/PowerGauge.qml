@@ -206,11 +206,10 @@ Item {
             bar1offset = zeroOffset + barWidth
             return -barWidth
         }
-        return bar1width
     }
     function calculateBar2width ()
     {
-        var currentValue
+        var currentValue, barWidth
         if (phaseCount < 2)
             return 0
         currentValue = root.connection.powerL2.valid ? root.connection.powerL2.value : 0
@@ -225,13 +224,13 @@ Item {
         // RIGHT of bar is at 0 point
         else
         {
-            bar1offset = zeroOffset + barWidth
+            bar2offset = zeroOffset + barWidth
             return -barWidth
         }
     }
     function calculateBar3width ()
     {
-        var currentValue
+        var currentValue, barWidth
         if (phaseCount < 3)
             return 0
         currentValue = root.connection.powerL3.valid ? root.connection.powerL3.value : 0
