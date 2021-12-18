@@ -1,0 +1,298 @@
+#!/bin/bash
+
+# this script provides the following modificaitons:
+#   move Settings and Notifications to the top of the list man page
+#   hides the Tiles Overview
+#   replaces the Mobile Overview with an enhanced version
+#
+# each of these modifications is optional and can be selected
+#   at install time
+#
+# Note: both Enhanced Mobile Overview and hiding the Tile Overview modify main.qml
+# so order of operations is important.
+# The code also relies on a second request to backup an active file will not touch an existing backup
+
+qmlDir=/opt/victronenergy/gui/qml
+
+#### following lines incorporate SetupHelper utilities into this script
+# Refer to the SetupHelper ReadMe file for details.
+    
+source "/data/SetupHelper/CommonResources"
+
+#### end of lines to include SetupHelper
+
+#### running manually and OK to proceed - prompt for input
+if [ $scriptAction == 'NONE' ] ; then
+    # display innitial message
+    echo
+    echo "This package modifies the GUI in several areas"
+    echo "Refer to the ReadMe for an explaination of each modification"
+    echo "Installation enables all modificaions by default"
+    echo "  however each modificaiton can be enabled/disabled in the Settings Display menus"
+
+    standardActionPrompt
+fi
+
+#### installing
+if [ $scriptAction == 'INSTALL' ] ; then
+
+    # insure the  GuiMods2 is uninstalled since they can't coexist
+    if [ -f "$installedFlagPrefix""GuiMods2" ]; then
+        logMessage "uninstalling the original GuiMods2 - can't coexist with GuiMods"
+        "/data/GuiMods2/setup" "uninstall" "deferReboot"
+        if (( $? == $exitReboot )); then
+            rebootNeeded=true
+        fi
+        activateGridParallelOverview=true
+    else
+        activateGridParallelOverview=false
+    fi
+
+    # cleanup from previous verisons
+    restoreActiveFile "$qmlDir/DetailCriticalOutput.qml"
+    restoreActiveFile "$qmlDir/DetailNoncriticalOutput.qml"
+
+    # create dbus Settings if they haven't been set previously
+    # if one setting exists, assume they are all there
+    # NOTE: if new settings are added in the future, change test for that one
+    # to avoid creating that new parameter !!!!
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/UseEnhancedGridParallelFlowOverview\
+                com.victronenergy.BusItem.GetValue &> /dev/null
+    if (( $? != 0 )); then
+        logMessage "creating GuiMods Settings"
+        dbus -y com.victronenergy.settings /Settings AddSettings\
+            '%[{"path": "/GuiMods/GaugeLimits/PeakPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/CautionPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/ContiuousPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/AcOutputMaxPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/PvChargerMaxPower", "default":0.0},\
+            {"path":"/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":0.0},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset1", "default":10},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset2", "default":20},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset3", "default":30},\
+            {"path":"/GuiMods/AcCurrentLimit/Preset4", "default":50},\
+            {"path":"/GuiMods/TemperatureScale", "default":1},\
+            {"path":"/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/UseEnhancedMobileOverview", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/UseEnhancedFlowOverview", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowEnhancedFlowLoadsOnInput", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/EnhancedFlowCombineLoads", "default":0, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowGauges", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowTileOverview", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/MoveSettings", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/TimeFormat", "default":1}, \
+            {"path": "/Relay/0/CustomName", "default":""},\
+            {"path": "/Relay/0/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/1/CustomName", "default":""},\
+            {"path": "/Relay/1/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/2/CustomName", "default":""},\
+            {"path": "/Relay/2/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/3/CustomName", "default":""},\
+            {"path": "/Relay/3/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/4/CustomName", "default":""},\
+            {"path": "/Relay/4/Show", "default":1, "min":0, "max":1},\
+            {"path": "/Relay/5/CustomName", "default":""},\
+            {"path": "/Relay/5/Show", "default":1, "min":0, "max":1}, \
+            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}, \
+            {"path":"/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0}, \
+            {"path":"/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower", "default":0.0}, \
+            {"path":"/GuiMods/GaugeLimits/PvOnGridMaxPower", "default":0.0}, \
+            {"path":"/GuiMods/GaugeLimits/PvOnOutputMaxPower", "default":0.0}, \
+            {"path":"/GuiMods/GaugeLimits/MaxChargerPower", "default":0.0}, \
+            {"path":"/GuiMods/GaugeLimits/MaxFeedInPower", "default":0.0}, \
+            {"path":"/GuiMods/ShowInactiveFlowTiles", "default":1, "min":0, "max":2}, \
+            {"path":"/GuiMods/GaugeLimits/DcSystemMaxLoad", "default":0.0}, \
+            {"path":"/GuiMods/GaugeLimits/DcSystemMaxCharge", "default":0.0}, \
+            {"path":"/GuiMods/UseEnhancedGridParallelFlowOverview", "default":0, "min":0, "max":1} ]' > /dev/null
+    fi
+
+    # move setup options to Settings
+    if [ -f "$setupOptionsDir/optionsSet" ]; then
+        if [ -f "$setupOptionsDir/useEnhancedOverview" ] \
+                || [ -f "$setupOptionsDir/moveSettings" ] \
+                || [ -f "$setupOptionsDir/hideTileOverview" ] \
+                || [ -f "$setupOptionsDir/enhancedFlow" ]; then
+            logMessage "moving setup options to GuiMods2 Settings"
+            
+            if [ -f "$setupOptionsDir/useEnhancedOverview" ]; then
+                setSetting 1 /Settings/GuiMods/UseEnhancedMobileOverview
+            else
+                setSetting 0 /Settings/GuiMods/UseEnhancedMobileOverview
+            fi
+            if [ -f "$setupOptionsDir/hideTileOverview" ]; then
+                setSetting 1 /Settings/GuiMods/ShowTileOverview
+            else
+                setSetting 0 /Settings/GuiMods/ShowTileOverview
+            fi
+            if [ -f "$setupOptionsDir/enhancedFlow" ]; then
+                dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 1 &> /dev/null
+                moveSetting "$setupOptionsDir/inverterPeakPower" /Settings/InverterLimits/PeakPower /Settings/GuiMods/GaugeLimits/PeakPower
+                moveSetting "$setupOptionsDir/inverterCautionPower" /Settings/InverterLimits/PeakCautionPowerPower /Settings/GuiMods/GaugeLimits/CautionPower
+                moveSetting "$setupOptionsDir/inverterContiuousPower" /Settings/InverterLimits/ContiuousPower /Settings/GuiMods/GaugeLimits/ContiuousPower
+                moveSetting "$setupOptionsDir/systemPowerLimit" /Settings/InverterLimits/OutputPowerLimit /Settings/GuiMods/GaugeLimits/AcOutputMaxPower
+                moveSetting "$setupOptionsDir/maxDischargeCurrent" /Settings/SystemSetup/MaxDischargeCurrent /Settings/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent
+                moveSetting "$setupOptionsDir/pvChargerMaxPower" /Settings/PvCharger/MaxPower /Settings/GuiMods/GaugeLimits/PvChargerMaxPower
+                if [ -f "$setupOptionsDir/acCurrentLimitPresets" ]; then
+                    read acCurrentLimitPreset1 acCurrentLimitPreset2 acCurrentLimitPreset3 acCurrentLimitPreset4 <<< $(cat "$setupOptionsDir/acCurrentLimitPresets")
+                    setSetting acCurrentLimitPreset1 /Settings/GuiMods/AcCurrentLimit/Preset1
+                    setSetting acCurrentLimitPreset2 /Settings/GuiMods/AcCurrentLimit/Preset2
+                    setSetting acCurrentLimitPreset3 /Settings/GuiMods/AcCurrentLimit/Preset3
+                    setSetting acCurrentLimitPreset4 /Settings/GuiMods/AcCurrentLimit/Preset4
+                else 
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset1
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset2
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset3
+                    moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset4
+                fi
+
+                # copy DVCC max battery charge current to gauge Settings if gauge setting is 0
+                maxCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent\
+                    com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+                dvccCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/SystemSetup/MaxChargeCurrent\
+                    com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+                if [ ! -z $maxCharge ] && [ $maxCharge == 0 ] && [ ! -z $dvccCharge ]; then
+                        dbus -y com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent SetValue $dvccCharge > /dev/null
+                fi
+            
+            else
+                dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 0 > /dev/null
+            fi
+ 
+             # remove unused setup options (now in Settings)
+            rm -f "$setupOptionsDir/useEnhancedOverview"
+            rm -f "$setupOptionsDir/enhancedFlow"
+            rm -f "$setupOptionsDir/hideTileOverview"
+            rm -f "$setupOptionsDir/moveSettings"
+            rm -f "$setupOptionsDir/acCurrentLimitPresets"
+            rm -f "$setupOptionsDir/inverterCautionPower"
+            rm -f "$setupOptionsDir/inverterContiuousPower"
+            rm -f "$setupOptionsDir/inverterPeakPower"
+            rm -f "$setupOptionsDir/maxDischargeCurrent"
+            rm -f "$setupOptionsDir/pvChargerMaxPower"
+            rm -f "$setupOptionsDir/shortenTankNames"
+            rm -f "$setupOptionsDir/systemPowerLimit"
+            rm -f "$setupOptionsDir/temperatureScale"
+            rm -f "$setupOptionsDir/acCurrentLimitPresets"
+
+             # remove old Settings
+            removeDbusSettings  "InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
+                                "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
+                                "SystemSetup/MaxDischargeCurrent",\
+                                "InverterLimits/AcCurrentLimit/Preset1", "InverterLimits/AcCurrentLimit/Preset2",\
+                                "InverterLimits/AcCurrentLimit/Preset3", "InverterLimits/AcCurrentLimit/Preset4",\
+                                "PvCharger/MaxPower"
+
+        fi
+    fi
+    
+    # GuiMods2 was just uninstalled, so switch to the grid parallel overview so user sees same screen as with GuiMods2
+    if $activateGridParallelOverview ; then
+        logMessage "GuiMods is replacing GuiMods2 - enable grid paraellel overview in GuiMods"
+        setSetting 1 "/Settings/GuiMods/UseEnhancedGridParallelFlowOverview"
+    fi
+    
+    # remove GuiMods2 from packageList - if it's reistalled, it will ba added back
+    # but we want to skip any checks for GuiMods including from packageInstaller
+    if [ -f "$packageListFile" ] && [ $(grep -c "GuiMods2" "$packageListFile") != 0 ]; then
+        logMessage "removing GuiMods2 from packageList"
+        sed -i -e /GuiMods2/d "$packageListFile"
+    fi
+
+    logMessage "installing $packageName files"
+    updateActiveFile "$qmlDir/PageMain.qml"
+    updateActiveFile "$qmlDir/main.qml"
+    updateActiveFile "$qmlDir/OverviewMobileEnhanced.qml"
+    updateActiveFile "$qmlDir/SystemReasonMessage.qml"
+    updateActiveFile "$qmlDir/OverviewAcValuesEnhanced.qml"
+    updateActiveFile "$qmlDir/OverviewAcValuesEnhancedGP.qml"
+    updateActiveFile "$qmlDir/ObjectAcConnection.qml"
+    updateActiveFile "$qmlDir/OverviewHubEnhanced.qml"
+    updateActiveFile "$qmlDir/OverviewGridParallelEnhanced.qml"
+    updateActiveFile "$qmlDir/HubData.qml"
+    updateActiveFile "$qmlDir/OverviewSolarChargerEnhanced.qml"
+    updateActiveFile "$qmlDir/OverviewSolarInverter.qml"
+    updateActiveFile "$qmlDir/PowerGauge.qml"
+    updateActiveFile "$qmlDir/PowerGaugeMulti.qml"
+    updateActiveFile "$qmlDir/PowerGaugeBattery.qml"
+    updateActiveFile "$qmlDir/MultiEnhanced.qml"
+    updateActiveFile "$qmlDir/MultiEnhancedGP.qml"
+    updateActiveFile "$qmlDir/TileTankEnhanced.qml"
+    updateActiveFile "$qmlDir/TileTemp.qml"
+    updateActiveFile "$qmlDir/PageSettingsDisplay.qml"
+    updateActiveFile "$qmlDir/PageSettingsGuiMods.qml"
+    updateActiveFile "$qmlDir/PageSettingsGuiModsGauges.qml"
+    updateActiveFile "$qmlDir/MarqueeEnhanced.qml"
+    updateActiveFile "$qmlDir/Tile.qml"
+    updateActiveFile "$qmlDir/PageSettingsRelay.qml"
+    updateActiveFile "$qmlDir/OverviewRelays.qml"
+    updateActiveFile "$qmlDir/TileRelay.qml"
+    updateActiveFile "$qmlDir/DetailInverter.qml"
+    updateActiveFile "$qmlDir/DetailAcInput.qml"
+    updateActiveFile "$qmlDir/DetailBattery.qml"
+    updateActiveFile "$qmlDir/DetailLoadsOnOutput.qml"
+    updateActiveFile "$qmlDir/DetailLoadsOnInput.qml"
+    updateActiveFile "$qmlDir/DetailPvCharger.qml"
+    updateActiveFile "$qmlDir/PvChargerRow.qml"
+    updateActiveFile "$qmlDir/DetailPvInverter.qml"
+    updateActiveFile "$qmlDir/PvInverterRow.qml"
+    
+    # cleanup from older versions
+    restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
+
+    logMessage "++ $packageName installed"
+fi
+
+
+# uninstalling - check scriptAction again
+# if an install step failed package needs to be removed
+if [ $scriptAction == 'UNINSTALL' ] ; then
+    restoreActiveFile "$qmlDir/PageMain.qml"
+    restoreActiveFile "$qmlDir/main.qml"
+    restoreActiveFile "$qmlDir/OverviewMobileEnhanced.qml"
+    restoreActiveFile "$qmlDir/SystemReasonMessage.qml"
+    restoreActiveFile "$qmlDir/OverviewAcValuesEnhanced.qml"
+    restoreActiveFile "$qmlDir/OverviewAcValuesEnhancedGP.qml"
+    restoreActiveFile "$qmlDir/ObjectAcConnection.qml"
+    restoreActiveFile "$qmlDir/OverviewGridParallelEnhanced.qml"
+    restoreActiveFile "$qmlDir/HubData.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarChargerEnhanced.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarInverter.qml"
+    restoreActiveFile "$qmlDir/TileTankEnhanced.qml"
+    restoreActiveFile "$qmlDir/TileTemp.qml"
+    restoreActiveFile "$qmlDir/PageSettingsDisplay.qml"
+    restoreActiveFile "$qmlDir/PowerGauge.qml"
+    restoreActiveFile "$qmlDir/PowerGaugeMulti.qml"
+    restoreActiveFile "$qmlDir/PowerGaugeBattery.qml"
+    restoreActiveFile "$qmlDir/MultiEnhanced.qml"
+    restoreActiveFile "$qmlDir/MultiEnhancedGP.qml"
+    restoreActiveFile "$qmlDir/PageSettingsGuiMods.qml"
+    restoreActiveFile "$qmlDir/PageSettingsGuiModsGauges.qml"
+    restoreActiveFile "$qmlDir/MarqueeEnhanced.qml"
+    restoreActiveFile "$qmlDir/Tile.qml"
+    restoreActiveFile "$qmlDir/PageSettingsRelay.qml"
+    restoreActiveFile "$qmlDir/OverviewRelays.qml"
+    restoreActiveFile "$qmlDir/TileRelay.qml"
+    restoreActiveFile "$qmlDir/DetailInverter.qml"
+    restoreActiveFile "$qmlDir/DetailAcInput.qml"
+    restoreActiveFile "$qmlDir/DetailBattery.qml"
+    restoreActiveFile "$qmlDir/DetailLoadsOnOutput.qml"
+    restoreActiveFile "$qmlDir/DetailLoadsOnInput.qml"
+    restoreActiveFile "$qmlDir/DetailPvCharger.qml"
+    restoreActiveFile "$qmlDir/PvChargerRow.qml"
+    restoreActiveFile "$qmlDir/DetailPvInverter.qml"
+    restoreActiveFile "$qmlDir/PvInverterRow.qml"
+
+    # cleanup from older versions
+    restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
+
+    logMessage "++ $packageName uninstalled"
+fi
+
+if $filesUpdated ; then
+    restartGui=true
+fi
+
+# thats all folks - SCRIPT EXITS INSIDE THE FUNCTION
+endScript
