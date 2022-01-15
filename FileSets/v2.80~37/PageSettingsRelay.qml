@@ -138,14 +138,16 @@ MbPage {
             bind: "com.victronenergy.system/Relay/5/State"
             show: hasRelay5
         }
+
 		MbSubMenu {
 			id: conditions
-			description: qsTr("Temperature sensors")
-			item: VBusItem { value: relayPage.summary }
+			description: qsTr("Temperature control rules")
 			show: relayFunction.value === 4 || relay1Function.value === 4
-			subpage: PageSettingsRelayTempSensors {
-				id: relayPage
-				title: qsTr("Temperature sensors")
+			subpage: Component {
+				PageSettingsRelayTempSensors {
+					id: relayPage
+					title: qsTr("Temperature control rules")
+				}
 			}
 		}
 

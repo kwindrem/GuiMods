@@ -1,3 +1,6 @@
+v5.6:
+	added support for Venus OS v2.80~37
+
 v5.5:
 	added support for Venus OS v2.80~33
 	added Temperature sensor relay mode
