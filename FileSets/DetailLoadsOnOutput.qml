@@ -8,7 +8,7 @@ import com.victron.velib 1.0
 MbPage {
 	id: root
  
-    title: combineAcLoads ? qsTr ("AC Loads detail") : qsTr ("Loads on AC Ooutput detail")
+    title: combineAcLoads ? qsTr ("AC Loads detail") : qsTr ("Loads on AC Output detail")
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"

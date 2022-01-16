@@ -1,3 +1,5 @@
+v5.8:
+	fix typo in Loads on Output detail title
 v5.7:
 	wrapped all text with qsTr ()
 	added charnging mode to solar charger detail
