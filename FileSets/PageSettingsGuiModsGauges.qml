@@ -6,7 +6,7 @@ import com.victron.velib 1.0
 
 MbPage {
 	id: root
-	title: qsTr("Gui Mods Power Gauges")
+	title: qsTr("Gui Mods power gauges")
     property string bindPrefixGuiMods: "com.victronenergy.settings/Settings/GuiMods"
 
 	model: VisualItemModel

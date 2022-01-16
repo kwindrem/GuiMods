@@ -71,7 +71,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: "Total Power" }
+                    text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                     text: formatValue (sys.acInLoad.power, " W" ) }
@@ -97,7 +97,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Power" }
+                        text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (sys.acInLoad.powerL1, " W") }
@@ -112,7 +112,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Voltage" }
+                        text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (voltageL1, " V") }
@@ -127,7 +127,7 @@ MbPage {
             {
                 Text { id: currentTitle; font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Current" }
+                        text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: calculateCurrent (sys.acInLoad.powerL1, voltageL1, " A") }
@@ -142,7 +142,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Frequency" }
+                        text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (frequencyL1, " Hz") }
@@ -157,7 +157,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L2 Output values included in L1"
+                        text: qsTr("L2 Output values included in L1")
                         visible: l1AndL2OutShorted }
             }
         }

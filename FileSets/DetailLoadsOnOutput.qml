@@ -8,7 +8,7 @@ import com.victron.velib 1.0
 MbPage {
 	id: root
  
-    title: combineAcLoads ? qsTr ("AC Loads Detail") : qsTr ("Loads on AC Output Detail")
+    title: combineAcLoads ? qsTr ("AC Loads detail") : qsTr ("Loads on AC Ooutput detail")
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"
@@ -90,7 +90,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: "Total Power" }
+                    text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                     text:
@@ -107,7 +107,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Power" }
+                        text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (outputLoad.powerL1, " W") }
@@ -122,7 +122,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Voltage" }
+                        text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (voltageL1, " V") }
@@ -137,7 +137,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Current" }
+                        text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: calculateCurrent (outputLoad.powerL1, voltageL1, " A") }
@@ -152,7 +152,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Frequency" }
+                        text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (frequencyL1, " Hz") }

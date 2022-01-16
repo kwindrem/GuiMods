@@ -15,6 +15,12 @@ Row {
     VBusItem { id: pvVoltage;  bind: Utils.path(serviceName, "/Pv/V") }
     VBusItem { id: pvPower; bind: Utils.path(serviceName, "/Yield/Power") }
 
+	SystemState {
+		id: state
+		bind: Utils.path (serviceName, "/State")
+	}
+
+
     function doScroll()
     {
         pvText.doScroll()
@@ -45,6 +51,9 @@ Row {
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: calculateCurrent (pvPower, pvVoltage, " A") }
+    Text { font.pixelSize: 12; font.bold: true; color: "black"
+            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text: state.text }
 
     function formatValue (item, unit)
     {

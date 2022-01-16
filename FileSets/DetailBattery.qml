@@ -9,7 +9,7 @@ MbPage
 {
 	id: root
  
-    title: "Battery Detail"
+    title: "Battery detail"
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"

@@ -221,9 +221,9 @@ Tile {
             {
             // Alarm - no buttons
             case 0:
-                functionText = "Alarm"
-                activeText = "Alarm"
-                inactiveText = "No Alarm"
+                functionText = qsTr("Alarm")
+                activeText = qsTr("Alarm")
+                inactiveText = qsTr("No Alarm")
                 offButtonText = "--" // empty string causes interactions between instances
                 onButtonText = "--" // empty string causes interactions between instances
                 autoButtonText = "--" // empty string causes interactions between instances
@@ -233,33 +233,33 @@ Tile {
                 break;;
             // Generator
             case 1:
-                functionText = "Generator"
-                activeText = "Running"
-                inactiveText = "Stopped"
-                onButtonText = "Manual\nStart"
-                offButtonText = "Manual\nStop"
-                autoButtonText = "Auto\nEnable"
+                functionText = qsTr("Generator")
+                activeText = qsTr("Running")
+                inactiveText = qsTr("Stopped")
+                onButtonText = qsTr("Manual\nStart")
+                offButtonText = qsTr("Manual\nStop")
+                autoButtonText = qsTr("Auto\nEnable")
                 onButton.show = true 
                 offButton.show = true 
                 autoButton.show = true
                 break;;
             // pump
             case 3:
-                functionText = "Pump"
-                activeText = "On"
-                inactiveText = "Off"
-                onButtonText = "On"
-                offButtonText = "Off"
-                autoButtonText = "Auto"
+                functionText = qsTr("Pump")
+                activeText = qsTr("On")
+                inactiveText = qsTr("Off")
+                onButtonText = qsTr("On")
+                offButtonText = qsTr("Off")
+                autoButtonText = qsTr("Auto")
                 onButton.show = true 
                 offButton.show = true 
                 autoButton.show = true
                 break;;
             // temperature
             case 4:
-                functionText = "Temp"
-                activeText = "Alarm"
-                inactiveText = "No Alarm"
+                functionText = qsTr("Temp")
+                activeText = qsTr("Alarm")
+                inactiveText = qsTr("No Alarm")
                 onButtonText = "--"
                 offButtonText = "--"
                 autoButtonText = "--"
@@ -269,11 +269,11 @@ Tile {
                 break;;
             // manual (2) and undefined
             default:
-                functionText = "Manual"
-                activeText = "On"
-                inactiveText = "Off"
-                onButtonText = "On"
-                offButtonText = "Off"
+                functionText = qsTr("Manual")
+                activeText = qsTr("On")
+                inactiveText = qsTr("Off")
+                onButtonText = qsTr("On")
+                offButtonText = qsTr("Off")
                 autoButtonText = "--" // empty string causes interactions between instances
                 onButton.show = true 
                 offButton.show = true 
@@ -285,11 +285,11 @@ Tile {
         else
         {
             relayFunction = 2
-            functionText = "Manual"
-            activeText = "On"
-            inactiveText = "Off"    
-            onButtonText = "On"
-            offButtonText = "Off"
+            functionText = qsTr("Manual")
+            activeText = qsTr("On")
+            inactiveText = qsTr("Off")
+            onButtonText = qsTr("On")
+            offButtonText = qsTr("Off")
             autoButtonText = "--" // empty string causes interactions
             autoButton.show =false 
         }

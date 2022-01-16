@@ -100,7 +100,7 @@ OverviewPage
         running: root.active
    }
 
-	title: qsTr("Relay Overview")
+	title: qsTr("Relay overview")
 	clip: true
 
     Component.onCompleted: updateRelays ()
@@ -129,7 +129,7 @@ OverviewPage
             horizontalCenter: parent.horizontalCenter
         }
         horizontalAlignment: Text.AlignHCenter
-        text: "Relay Overview"
+        text: qsTr("Relay overview")
     }
 
 	ListView

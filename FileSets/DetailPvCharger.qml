@@ -9,7 +9,7 @@ MbPage
 {
 	id: root
  
-    title: "PV Charger Detail"
+    title: "PV Charger detail"
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"
@@ -45,7 +45,7 @@ MbPage
                 PowerGauge
                 {
                     id: gauge
-                    width: rowTitleWidth + tableColumnWidth * 3
+                    width: rowTitleWidth + tableColumnWidth * 4
                     height: 15
                     connection: sys.pvCharger
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
@@ -55,7 +55,7 @@ MbPage
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Total power" }
+                        text: qsTr("Total power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth * 3; horizontalAlignment: Text.AlignHCenter
                     text: formatValue (sys.pvCharger.power, " W") }                        
@@ -65,16 +65,19 @@ MbPage
                 id: tableHeaderRow
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Device Name" }
+                        text: qsTr("Device Name") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Power" }
+                        text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "PV Voltage" }
+                        text: qsTr("PV Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "PV Current" }
+                        text: qsTr("PV Current") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Mode") }
             }
 
         }

@@ -9,7 +9,7 @@ import com.victron.velib 1.0
 MbPage {
 	id: root
  
-    title: "Inverter Detail"
+    title: "Inverter detail"
     
     property string systemPrefix: "com.victronenergy.system"
 
@@ -21,7 +21,7 @@ MbPage {
     property int inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
     property bool editable: inverterService != "" && inverterModeItem.valid
     property int buttonHeight: 40
-    property int tableColumnWidth: 60
+    property int tableColumnWidth: 80
     property int rowTitleWidth: 130
     property int dataColumns: 3
     property int totalDataWidth: tableColumnWidth * dataColumns
@@ -45,7 +45,7 @@ MbPage {
     SystemState
     {
         id: vebusState
-        bind: systemState.valid?Utils.path(systemPrefix, "/SystemState/State"):Utils.path(inverterService, "/State")
+        bind: systemState.valid ? Utils.path(systemPrefix, "/SystemState/State") : Utils.path(inverterService, "/State")
     }
     VBusItem { id: pInL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/P") }
     VBusItem { id: pInL2; bind: Utils.path(inverterService, "/Ac/ActiveIn/L2/P") }
@@ -67,6 +67,8 @@ MbPage {
     VBusItem { id: iOutL3; bind: Utils.path(inverterService, "/Ac/Out/L3/I") }
     VBusItem { id: fInL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/F") }
     VBusItem { id: fOutL1; bind: Utils.path(inverterService, "/Ac/Out/L1/F") }
+    VBusItem { id: dcPower; bind: Utils.path(inverterService, "/Dc/0/Power") }
+    VBusItem { id: dcCurrent; bind: Utils.path(inverterService, "/Dc/0/Current") }
     VBusItem { id: splitPhaseL2Passthru; bind: Utils.path(inverterService, "/Ac/State/SplitPhaseL2Passthru") }
     VBusItem { id: phaseCountItem; bind: Utils.path(inverterService, "/Ac/NumberOfPhases") }
 
@@ -105,7 +107,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Total Power" }
+                        text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text:
@@ -139,7 +141,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "State" }
+                        text: qsTr("State") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: vebusState.text }
@@ -164,7 +166,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Power" }
+                        text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValueDiff (pOutL1, pInL1, " W") }
@@ -179,7 +181,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Input Voltage" }
+                        text: qsTr("Input Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (vInL1, " V") }
@@ -194,7 +196,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Output Voltage" }
+                        text: qsTr("Output Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (vOutL1, " V") }
@@ -209,7 +211,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Input Current" }
+                        text: qsTr("Input Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (iInL1, " A") }
@@ -224,7 +226,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Output Current" }
+                        text: qsTr("Output Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (iOutL1, " A") }
@@ -239,26 +241,47 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Input Frequency" }
+                        text: qsTr("Frequency In / Out") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
+                        width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (fInL1, " Hz") }
-            }
-            Row
-            {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Output Frequency" }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
+                        width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (fOutL1, " Hz") }
             }
             Row
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                        text: qsTr("DC Power / Current") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: totalDataWidth / 3; horizontalAlignment: Text.AlignHCenter
+                        text: formatValue (dcPower, " W") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: totalDataWidth / 3; horizontalAlignment: Text.AlignHCenter
+                        text: formatValue (dcCurrent, " A") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: totalDataWidth / 3; horizontalAlignment: Text.AlignHCenter
+                        text:
+						{
+							if (! dcPower.valid)
+								return ""
+							else if (dcPower.value > 0)
+								return qsTr ("supplying")
+							else if (dcPower.value < 0)
+								return qsTr ("consuming")
+							else
+								return ""
+						}
+				}
+            }
+            Row
+            {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L2 Output values included in L1"
-                        visible: l1AndL2OutShorted }
+                        text: qsTr ("L2 Output values included in L1")
+                        visible: l1AndL2OutShorted
+					}
             }
         }
         Column

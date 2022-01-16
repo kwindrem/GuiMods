@@ -134,7 +134,7 @@ Item {
         switch (root.connection)
         {
             case sys.acInput:
-                return spacer + "Limit: " + root.connection.inCurrentLimit.format(1);
+                return spacer + qsTr("Limit: ") + root.connection.inCurrentLimit.format(1);
             default:
                 return "";
         }

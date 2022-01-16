@@ -9,7 +9,7 @@ MbPage
 {
 	id: root
  
-    title: "PV Inverter Detail"
+    title: "PV Inverter detail"
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"
@@ -42,10 +42,10 @@ MbPage
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignLeft
-                        text: "Total PV power" }
+                        text: qsTr("Total PV power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Grid" }
+                        text: qsTr("Grid") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (sys.pvOnGrid.power, " W") }
@@ -62,10 +62,10 @@ MbPage
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignLeft
-                        text: "Total PV power" }
+                        text: qsTr("Total PV power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Output" }
+                        text: qsTr("Output") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (sys.pvOnAcOut.power, " W") }
@@ -83,10 +83,10 @@ MbPage
                 id: tableHeaderRow
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Device Name" }
+                        text: qsTr("Device Name") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Total" }
+                        text: qsTr("Total") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L1" }
@@ -98,7 +98,7 @@ MbPage
                         text: "L3" }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
-                        text: "Connection" }
+                        text: qsTr("Connection") }
             }
 
         }

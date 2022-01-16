@@ -9,7 +9,7 @@ import com.victron.velib 1.0
 MbPage {
 	id: root
  
-    title: "AC Input Detail"
+    title: "AC Input detail"
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"
@@ -102,7 +102,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: "Total Power" }
+                    text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                     text:
@@ -119,7 +119,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Source" }
+                        text: qsTr("Source") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: getAcSource (sys.acSource) }
@@ -144,7 +144,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Power" }
+                        text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (sys.acInput.powerL1, " W") }
@@ -159,7 +159,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Voltage" }
+                        text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (voltageL1, " V") }
@@ -174,7 +174,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Current" }
+                        text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: calculateCurrent (sys.acInput.powerL1, voltageL1, " A") }
@@ -189,7 +189,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "Frequency" }
+                        text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValue (frequencyL1, " Hz") }
@@ -198,14 +198,14 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "CurrentLimit" }
+                        text: qsTr("CurrentLimit") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text:
                         {
                             var newText
                             if (newCurrentLimit != actualCurrentLimit)
-                                newText = "  New " + newCurrentLimit.toFixed (1) + " A"
+                                newText = qsTr("  New ") + newCurrentLimit.toFixed (1) + " A"
                             else
                                 newText = ""
                             return currentLimitItem.valid ? currentLimitItem.value.toFixed (1) + " A" + newText: "--" }
@@ -215,7 +215,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Current values are estimated" }
+                        text: qsTr("Current values are estimated") }
             }
         }
         Column
@@ -224,7 +224,7 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "Current Limit" }
+                        text: qsTr("Current Limit") }
             }
             width: 140
             spacing: 4

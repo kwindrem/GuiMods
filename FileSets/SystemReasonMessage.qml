@@ -28,13 +28,13 @@ Item {
 		var r = [];
 		var reasonMessage =
 		[
-			"Low SOC",
-			"Battery Life",
-			"Charge Off",
-			"Disch Off",
-			"Slow Charge",
-			"Charge Limited",
-			"Disch Limited"
+			qsTr("Low SOC"),
+			qsTr("Battery Life"),
+			qsTr("Charge Off"),
+			qsTr("Disch Off"),
+			qsTr("Slow Charge"),
+			qsTr("Charge Limited"),
+			qsTr("Disch Limited")
 		]
 		for (var i=0; i<flagItems.length; i++) {
             if (flagItems[i].value) r.push(reasonMessage[i]);
