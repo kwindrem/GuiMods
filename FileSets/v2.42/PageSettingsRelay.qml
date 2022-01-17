@@ -86,7 +86,7 @@ MbPage {
                     prefix = ""
                     suffix = ""
                 }
-                return prefix + (hasRelay1 ? qsTr("Relay 1") : qsTr("Relay")) + suffix + qsTr (" On")
+                return prefix + (hasRelay1 ? qsTr("Relay 1") : qsTr("Relay")) + suffix + " " + qsTr ("On")
             }
           
 			bind: "com.victronenergy.system/Relay/0/State"
@@ -107,7 +107,7 @@ MbPage {
                     prefix = ""
                     suffix = ""
                 }
-                return prefix + qsTr("Relay 2") + suffix + qsTr (" On")
+                return prefix + qsTr("Relay 2") + suffix + " " + qsTr ("On")
             }
 
             bind: "com.victronenergy.system/Relay/1/State"
@@ -128,7 +128,7 @@ MbPage {
                     prefix = ""
                     suffix = ""
                 }
-                return prefix + qsTr("Relay 3") + suffix + qsTr (" On")
+                return prefix + qsTr("Relay 3") + suffix + " " + qsTr ("On")
             }
             bind: "com.victronenergy.system/Relay/2/State"
             show: hasRelay2
@@ -148,7 +148,7 @@ MbPage {
                     prefix = ""
                     suffix = ""
                 }
-                return prefix + qsTr("Relay 4") + suffix + qsTr (" On")
+                return prefix + qsTr("Relay 4") + suffix + " " + qsTr ("On")
             }
             bind: "com.victronenergy.system/Relay/3/State"
             show: hasRelay3
@@ -168,7 +168,7 @@ MbPage {
                     prefix = ""
                     suffix = ""
                 }
-                return prefix + qsTr("Relay 5") + suffix + qsTr (" On")
+                return prefix + qsTr("Relay 5") + suffix + " " + qsTr ("On")
             }
             bind: "com.victronenergy.system/Relay/4/State"
             show: hasRelay4
@@ -188,7 +188,7 @@ MbPage {
                     prefix = ""
                     suffix = ""
                 }
-                return prefix + qsTr("Relay 6") + suffix + qsTr (" On")
+                return prefix + qsTr("Relay 6") + suffix + " " + qsTr ("On")
             }
             bind: "com.victronenergy.system/Relay/5/State"
             show: hasRelay5

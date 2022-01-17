@@ -1,3 +1,6 @@
+v5.9:
+	added more qsTr() wrappers
+
 v5.8:
 	fix typo in Loads on Output detail title
 v5.7:
