@@ -44,9 +44,9 @@ MbPage {
 			suffix = ""
 		}
 		if (relayNumber == 1)
-			return prefix + (hasRelay1 ? qsTr("Relay 1") : qsTr("Relay")) + suffix + qsTr (" On")
+			return prefix + (hasRelay1 ? qsTr("Relay 1") : qsTr("Relay")) + suffix + " " + qsTr("On")
 		else
-			return prefix + qsTr("Relay ") + relayNumber + suffix + qsTr (" On")
+			return prefix + qsTr("Relay") + " " + relayNumber + suffix + " " + qsTr("On")
 	}
 
 	model: VisualItemModel {
