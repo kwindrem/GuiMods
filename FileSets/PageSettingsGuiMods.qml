@@ -181,7 +181,7 @@ MbPage {
             [
                 MbOption { description: "°C"; value: 1 },
                 MbOption { description: "°F"; value: 2 },
-                MbOption { description: "both °C & °F"; value: 0 }
+                MbOption { description: qsTr("both °C & °F"); value: 0 }
             ]
             writeAccessLevel: User.AccessUser
         }
@@ -194,9 +194,9 @@ MbPage {
             show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
             possibleValues:
             [
-                MbOption { description: "24 hour"; value: 1 },
-                MbOption { description: "12 hour AM/PM"; value: 2 },
-                MbOption { description: "don't show time"; value: 0 }
+                MbOption { description: qsTr("24 hour"); value: 1 },
+                MbOption { description: qsTr("12 hour AM/PM"); value: 2 },
+                MbOption { description: qsTr("don't show time"); value: 0 }
             ]
             writeAccessLevel: User.AccessUser
         }
@@ -208,9 +208,9 @@ MbPage {
             show: useEnhFlowOverview.checked
             possibleValues:
             [
-                MbOption { description: "Show Dimmed"; value: 1 },
-                MbOption { description: "Show Full"; value: 2 },
-                MbOption { description: "Hide"; value: 0 }
+                MbOption { description: qsTr("Show Dimmed"); value: 1 },
+                MbOption { description: qsTr("Show Full"); value: 2 },
+                MbOption { description: qsTr("Hide"); value: 0 }
             ]
             writeAccessLevel: User.AccessUser
         }
