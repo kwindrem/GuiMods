@@ -1,11 +1,11 @@
-GuiMods has ben revived with combined functionality of the original GuiMods and GuiMods2
+GuiMods has been revived with combined functionality of the original GuiMods and GuiMods2
 
-GuiMods2 has been decomissioned
+GuiMods2 has been decommissioned
 
-The user may not select between enhanced versions of the
+The user may now select between enhanced versions of the
 	simpler flow (aka Hub) and Grid Parallel overviews
 
-The enhnaced Hub overview includes voltage, current, frequency and input current limit values.
+The enhanced Hub overview includes voltage, current, frequency and input current limit values.
 
 The enhanced Grid Parallel flow overview which presents most components in the system
 	but lacks room for any detail. 
@@ -17,7 +17,7 @@ The following components have NOT been tested:
 Configuration settings can be found in:
     Device List / Settings / Display & language/ GuiMods
 
-This package provides the following modificaitons to the VenusOS GUI:
+This package provides the following modifications to the VenusOS GUI:
     Grid Parallel Flow overview:
         Tiles have been reduced in size to make room for all components.
         Except for the battery, only a gauge and a total power number are displayed
@@ -57,10 +57,10 @@ This package provides the following modificaitons to the VenusOS GUI:
         hides Pump switch if not enabled to make more space for tanks
             (this became standard in v2.70~9)
         tanks column scrolls if there are more tanks than space allows
-        add temeratore sensors to tanks column
-            The tanks column is split into separte columns for tanks and temerature sensors
-            A common tile height is set for both columns, then each column is filled in separtly
-            Any tank that apepars as a dBus temperature sensor should appear
+        add temperature sensors to tanks column
+            The tanks column is split into separate columns for tanks and temperature sensors
+            A common tile height is set for both columns, then each column is filled in separately
+            Any tank that appears as a dBus temperature sensor should appear
         Adds VE.Direct inverter status and control
 
     Enhances the Tank Tile
@@ -72,11 +72,11 @@ This package provides the following modificaitons to the VenusOS GUI:
 
     Adds VE.Direct inverter status and control
 
-    Eses custom tank name if it exists and optionally shorten tank names
+    Uses custom tank name if it exists and optionally shorten tank names
         beginning with Venus v2.70~16, NEMA2000 tank names can be too long to fit in available space
         enabling this option will shorten the tank name to the first two words
             (first word for compact tank tiles)
-            and repalce "Waste" with "Gray" to be consistent with "Black" label for sewage tank
+            and replace "Waste" with "Gray" to be consistent with "Black" label for sewage tank
 
     Adds a Relay Overview page that allows controlling all relays.
         Previously, relay control is several menu levels deep so this is much faster
@@ -84,23 +84,23 @@ This package provides the following modificaitons to the VenusOS GUI:
         Buttons presented for pump and generator affect the actual parameters for those devices,
              not just the relay state.
         A relay name has also been added. This name is shown on the Relay Overview.
-            The name scrolls if it won't fit in the avaiable space.
+            The name scrolls if it won't fit in the available space.
         All relay configurations are in Device List / Settings / Relay.
             That menu has been expanded to set names and control whether the relay is shown on the
                 Relay Overview.
         Note that for the Alarm function, there are no controls, yet the current alarm state is show.
         Pump control has three modes: On, Off and Auto which is controlled by the associated tank level.
-        Geherator control has buttons for Manual Start and Manual Stop as well as
+        Generator control has buttons for Manual Start and Manual Stop as well as
             AutoEnable which toggles the enables the condition-based run control
         Note that if condition-based run is enabled, Manual Stop may not stop the generator.
             But turning off Auto Enable would cause the generator to stop.
     
-each of these enhancements/modificatinos can be selected individually any time
-    (while system is runing) via the Settings Display GuiMods menu
+each of these enhancements/modifications can be selected individually any time
+    (while system is running) via the Settings Display GuiMods menu
 
 Power Gauges
 
-The power gauges provide an indicaton of the inverter's and battery's ability to satisfy the
+The power gauges provide an indication of the inverter's and battery's ability to satisfy the
     AC and DC loads and help the user to manage system loads.
 Power gauges for inputs and outputs provide an indication of current power levels
     relative to user-defined limits. Again, providing some help in system management.
@@ -120,16 +120,16 @@ Power gauges display power for each leg of the system as separate horizontal bar
 The AC input has a finite power limit based on the input wiring and breaker.
 An adjustable input current limit further restricts available AC input power.
 The gauge in this tile reflects the AC input current limit setting so the power at the system input
-is shown reliative to this input.
+is shown relative to this input.
 
 The AC output power is a combination of AC input power and that provided by the inverter.
 The AC output power gauge ranges are set by a user-defined limits
-The AC output distribution may have it's own limit (e.g., the panel's master breaker).
+The AC output distribution may have its own limit (e.g., the panel's master breaker).
 The gauge is set to this limit so the user can identify a potential breaker trip.
 
 The battery too represents an area of concern. If it is overloaded, the system will shut down.
 Many systems include DC loads which draw power from the battery, so it is important to provide
-an indication of how much DC power is being extracted from the battery realtive to it's maximum
+an indication of how much DC power is being extracted from the battery relative to it's maximum
 discharge current. The system also charges the battery so power flow may also be into the battery.
 Therefore, the battery gauge must indicate a charging or discharging current.
 The zero point is therefore in the middle of the gauge with discharging to the left and charging to the right.
@@ -150,7 +150,7 @@ The PV charger detail provides a system total as a gauge and power number,
 The PV inverter detail provides system totals for grid and output connections
     then lists name, total power, power for each leg and where the inverter is connected (input or output) 
 
-The system does not provide current values for the AC input and ouput of the system.
+The system does not provide current values for the AC input and output of the system.
     AC input and output details pages show current values that are calculated based on the power and voltage.
     With a low power factor, actual current values could be significantly higher those shown.
 
@@ -177,7 +177,7 @@ Configuration
     Use Enhanced Flow Overview
         Replaces the standard flow overviews with the enhanced version described above
 
-    Use Grid Parallel Enhaned Flow Overview
+    Use Grid Parallel Enhanced Flow Overview
         Selects between the simpler Hub and more complete Grid Parallel overviews.
         Use Enhanced Flow Overview must be on to see and change this option
     
@@ -188,7 +188,7 @@ Configuration
     
     Combine AC input/output loads
         The enhanced flow overview displays two load tiles: Loads on Input and Loads on Output.
-        Confusion is likley especially when a system only connects to one load output.
+        Confusion is likely especially when a system only connects to one load output.
         This option combines the information into a common tile in the upper right of the overview
         and changes the title to AC Loads.
     
@@ -227,7 +227,7 @@ Configuration
             after all packages have been checked once, Normal mode is automatically selected
             This mode is handy for making a quick check to insure all packages are up to date,
             then allowing the system to check again at the slower rate
-        Check packages once - makes one pass through all installe packages at the fast rate
+        Check packages once - makes one pass through all installed packages at the fast rate
             then disables automatic updates
         Disabled - prevents the system from checking GitHub for updates
         Access level must be set to Installer or above to change this setting.
@@ -255,11 +255,11 @@ Configuration
     
     Inverter caution power is the maximum power the inverter can produce under the best conditions
         (low temperature, etc.). This is the transition between yellow and red regions on the gauges.
-        The inverter spec sheet will list this as the maximum continuous power at low temerature.
+        The inverter spec sheet will list this as the maximum continuous power at low temperature.
     
-    Inverter max continuous power is the power the inverter can produce indefinately.
+    Inverter max continuous power is the power the inverter can produce indefinitely.
         This is the transition between the green and yellow regions on the gauges.
-        The inverter spec sheet will list this as the maximum continuous power at the highest operating temerature.
+        The inverter spec sheet will list this as the maximum continuous power at the highest operating temperature.
             
     Max power Loads on Output is the maximum power accepted by devices
         that will be powered by the inverter.
@@ -277,7 +277,7 @@ Configuration
     
     Max power Multi/Quatro charger is the maximum power the charger portion of the inverter will DRAW
         from the AC input. This is generally close to the Continuous Power above but may need some
-            experimentaion to display properly without showing an overload.
+            experimentation to display properly without showing an overload.
         Note that the gauge will show power to the left of the zero line when it is charging the battery
             or when it is supplying the DC system loads.
     
@@ -301,8 +301,8 @@ Configuration
         So a 60 amp main breaker on a 12 volt system would be 720 watts.
         If there are no DC loads, set this value to 0.
 
-    Max DC Charger power is the maximum lf all DC charging sources such as a DC-DC converter from the starter battery
-        or a wind generator. Set this parameter to the expecte maximum for all charging sources.
+    Max DC Charger power is the maximum of all DC charging sources such as a DC-DC converter from the starter battery
+        or a wind generator. Set this parameter to the expected maximum for all charging sources.
 
     The last two parameters also affect the naming of the DC System tile.
         If the DC Charger power is set to zero but the DC load power is not zero, tile will read DC Loads
@@ -311,68 +311,21 @@ Configuration
 
 Installation:
 
-This script should be run manually initally.
-It will then called from reinstallMods to reinstall functionality after a Venus update
+GuiMods requires that SetupHelper is installed first.
 
-The easiest way to install GuiMods is to use do "blind install" which installs
-    from an SD card or USB stick without any terminal interaction:
-    
-    1) Download venus-data.tgz from the GitHub repo.
-    2) copy it to the root of a freshly formatted SD card or USB memory stick
-    3) place the media in the GX device (Cerbo, CCGX, etc)
-    4) reboot the GX device TWICE
-        after the second reboot, you should see the GUI restart and display
-        the enhanced flow overview from GuiMods2
-        If GuiMods2 was previously installed, the Grid Parallel overview
-            is automatically selected
-    5) remove the media from the GX device to prevent the next reboot from
-        starting the process all over again
+The easiest way to install GuiMods is to do a "blind install" of SetupHelper and then add the GuiMods package
+via the PackageManager menus.
 
-    CAUTION: This mechanism overwrites /data/rcS.local !!!!
-        If you are using rcS.local to perform boot-time activities,
-        /data/rcS.local must be recreated following this "blind" install
-        Note that SetupHelper and GuiMods2 also use /data/rcS.local for
-        reinstallation following a firmware update so use caution in
-        recreating rcS.local.
+Refer to SetupHelper here:
 
-    venus-data.tgz is available here:
-        https://github.com/kwindrem/SetupHelper/raw/main/venus-data.tgz
-    and here:
-        https://github.com/kwindrem/GuiMods/raw/main/venus-data.tgz
-    One may be newer than the other. In any case, automatic updates
-        will update any package that is out of date following the blind install
+https://github.com/kwindrem/SetupHelper
 
+Once SetupHelper is installed, you can add GuiMods by placing the archive from its GitHub repo on a USB stick or SD card and inserting it in the GX device (CCGX, Cerbo, etc.). PackageManager will detect the archive and transfer the package to local storage. It will then appear in the Active packages list.
 
-There are two other methods to fetch a package archive:
+The GuiMods compressed archive can be downloaded here:
 
-If the Venus device has internet access is to run the following command:
+https://github.com/kwindrem/GuiMods/archive/refs/tags/latest.tar.gz
 
-wget -qO - https://github.com/kwindrem/GuiMods/archive/current.tar.gz | tar -xzf - -C /data
-
-If the Venus device does not have internet access, you will need to fetch the archive using a computer that does have internet access:
-
-click on this link in a web browser:
-https://github.com/kwindrem/GuiMods/archive/current.tar.gz
-
-rename the resulting .tar.gz file to venus-data.tar.gz
-copy the venus-data.tar.gz to a USB stick,
-put the stick in the Venus device and reboot.
-When Venus boots, it will unarchive the file to /data/GuiMods-current
-
-Move the directory into it's active locaiton:
-rm -rf /data/GuiMods
-mv /data/GuiMods-current /data/GuiMods
-
-Repeat the above for SetupHelper if you haven't done so for another package.
-
-Finally, run the setup script to complete the installation
-/data/GuiMods/setup
-
-You will need root access to the Venus device. Instructions can be found here:
-https://www.victronenergy.com/live/ccgx:root_access
-The root password needs to be reentered following a Venus update.
-Setting up an ssh authorization key (see documentation referenced above) will bypass the password request at login
-and avoid having to reset the root password after each update.
 
 Note that installing GuiMods will uninstall GuiMods2.
 Installing GuiMods2 after installing GuiMods will uninstall GuiMods.

@@ -121,6 +121,9 @@ OverviewPage {
     VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Ac/Power") }
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
+//////// add to display AC input ignored
+    VBusItem { id: ignoreAcInput; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+
     VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
     VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
@@ -133,7 +136,13 @@ OverviewPage {
         visible: hasAcInput
 		width: 148
 		height: showStatusBar ? 100 : 120
-		title: getAcSourceName(sys.acSource)
+		title:
+		{
+			if (ignoreAcInput.valid && ignoreAcInput.value == 1)
+				return qsTr ("AC In Ignored")
+			else
+				return getAcSourceName(sys.acSource)
+		}
 		titleColor: "#E74c3c"
 		color: "#C0392B"
 		anchors {

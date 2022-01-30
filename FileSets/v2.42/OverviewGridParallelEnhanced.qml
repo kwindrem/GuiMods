@@ -60,6 +60,9 @@ OverviewPage {
     property bool compact: showTanks && showTemps && tankTempCount > 4
     property int tanksHeight: compact ? 22 : 45
 
+//////// add to display AC input ignored
+    VBusItem { id: ignoreAcInput; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
     property bool showGauges: showGaugesItem.valid ? showGaugesItem.value === 1 ? true : false : false
@@ -101,7 +104,13 @@ OverviewPage {
         opacity: hasAcInput ? 1 : disabledTileOpacity
 		width: inOutTileWidth
 		height: inOutTileHeight
-		title: getAcSourceName(sys.acSource)
+		title:
+		{
+			if (ignoreAcInput.valid && ignoreAcInput.value == 1)
+				return qsTr ("AC In Ignored")
+			else
+				return getAcSourceName(sys.acSource)
+		}
 		titleColor: "#E74c3c"
 		color: "#C0392B"
 		anchors {

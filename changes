@@ -1,3 +1,5 @@
+v5.10:
+	added indication that AC input is ignored
 v5.9:
 	added more qsTr() wrappers
 
