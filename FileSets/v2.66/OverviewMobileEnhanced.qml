@@ -304,11 +304,16 @@ OverviewPage {
         ]
 	} // end Tile PV CHARGER
 
+//////// add to display AC input ignored
+    VBusItem { id: ignoreAcInput; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+
 //////// add AC INPUT tile
         Tile {
             title: {
                 if (isInverter)
                     return qsTr ("No AC Input")
+				else if (ignoreAcInput.valid && ignoreAcInput.value == 1)
+					return qsTr ("AC In Ignored")
                 else
                 {
                     switch(sys.acSource) {
