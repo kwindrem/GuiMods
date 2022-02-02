@@ -1,3 +1,10 @@
+v5.13:
+	fixed: PV Charger power gauge not showing
+	modified PV Charger tile to show only power
+	and list up to 7 individual chargers
+	custom name scrolls if it does not fit
+	greater than 2 or 3 chargers puts name and power on a single line
+
 v5.12:
 	added v2.80 - no functional changes
 v5.11:

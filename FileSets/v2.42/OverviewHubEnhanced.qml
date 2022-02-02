@@ -60,7 +60,13 @@ OverviewPage {
     property string pvChargerPrefix1: ""
     property string pvChargerPrefix2: ""
     property string pvChargerPrefix3: ""
+    property string pvChargerPrefix4: ""
+    property string pvChargerPrefix5: ""
+    property string pvChargerPrefix6: ""
+    property string pvChargerPrefix7: ""
     property int numberOfPvChargers: 0
+    property int pvChargerRows: showTanksTemps ? 4 : 7
+    property bool pvChargerCompact: numberOfPvChargers > (pvChargerRows / 2)
 //////// add for PV INVERTER power
     property string pvInverterPrefix1: ""
     property string pvInverterPrefix2: ""
@@ -95,15 +101,22 @@ OverviewPage {
             return "hh:mm"
     }
 
-//////// add to display PV charger voltage and current
-    VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
-    VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
+//////// add to display individual PV charger power
     VBusItem { id: pvName1;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
-    VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
-    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix1, "/CustomName") }
-    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
-    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix32, "/Pv/V") }
+    VBusItem { id: pvPower1; bind: Utils.path(pvChargerPrefix1, "/Yield/Power") }
+    VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
+    VBusItem { id: pvPower2; bind: Utils.path(pvChargerPrefix2, "/Yield/Power") }
     VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
+    VBusItem { id: pvPower3; bind: Utils.path(pvChargerPrefix3, "/Yield/Power") }
+    VBusItem { id: pvName4;  bind: Utils.path(pvChargerPrefix4, "/CustomName") }
+    VBusItem { id: pvPower4; bind: Utils.path(pvChargerPrefix4, "/Yield/Power") }
+    VBusItem { id: pvName5;  bind: Utils.path(pvChargerPrefix5, "/CustomName") }
+    VBusItem { id: pvPower5; bind: Utils.path(pvChargerPrefix5, "/Yield/Power") }
+    VBusItem { id: pvName6;  bind: Utils.path(pvChargerPrefix6, "/CustomName") }
+    VBusItem { id: pvPower6; bind: Utils.path(pvChargerPrefix6, "/Yield/Power") }
+    VBusItem { id: pvName7;  bind: Utils.path(pvChargerPrefix7, "/CustomName") }
+    VBusItem { id: pvPower7; bind: Utils.path(pvChargerPrefix7, "/Yield/Power") }
+
     VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
 //////// add to display PV Inverter power
@@ -396,105 +409,193 @@ OverviewPage {
             opacity: 0.5
         }
 
-//////// add voltage and current
-        values: 
+//////// add power for individual PV chargers
+		values: 
         [
             TileText {
                 y: 8
                 text: sys.pvCharger.power.format(0)
                 font.pixelSize: 19
             },
+			MarqueeEnhanced
+			{
+                y: 27
+				id: pv1Name
+				// ofset left margin for this row if showing tanks/temps
+				width:
+				{
+					if (pvChargerCompact)
+					{
+						if (showTanksTemps)
+							return ((parent.width / 2) - 15)
+						else
+							return ((parent.width / 2) - 5)
+					}
+					else
+						return (parent.width - 10)
+				}
+				anchors.left: parent.left; anchors.leftMargin: (showTanksTemps && pvChargerCompact) ? 15 : 5
+				height: 15
+				text: pvName1.valid ? pvName1.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv1Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 2
+			},
             TileText {
-                y: 29
-                text: numberOfPvChargers >= 1 && pvName1.valid ? pvName1.text : " "
-                visible: numberOfPvChargers >= 1 && pvName1.valid
-            },
-            TileText {
-                y: 45
-                text:
-                {
-                    var voltageText, currentText
-                    if (root.numberOfPvChargers < 1)
-                        return " "
-                    else
-                    {
-                        if (pvVoltage1.valid)
-                            voltageText = pvVoltage1.text
-                        else
-                            voltageText = "??V"
-                        if (pvCurrent1.valid)
-                            currentText = pvCurrent1.text
-                        else if (pvPower1.valid)
-                            currentText =  (pvPower1.value / pvVoltage1.value).toFixed (1) + "A"
-                        else
-                            currentText = "??A"
-                        return voltageText + " " + currentText
-                    }
-                }
-                font.pixelSize: 15
-                visible: numberOfPvChargers > 0
-            },
-            TileText {
-                y: 61
-                text: numberOfPvChargers >= 2 && pvName2.valid ? pvName2.text : " "
-                visible: numberOfPvChargers >= 2 && pvName2.valid
-            },
-            TileText {
-                y: 75
-                text:
-                {
-                    var voltageText, currentText
-                    if (numberOfPvChargers < 2)
-                        return ""
-                    else
-                    {
-                        if (pvVoltage2.valid)
-                            voltageText = pvVoltage2.text
-                        else
-                            voltageText = "??V"
-                        if (pvCurrent2.valid)
-                            currentText = pvCurrent2.text
-                        else if (pvPower2.valid)
-                            currentText =  (pvPower2.value / pvVoltage2.value).toFixed (1) + "A"
-                        else
-                            currentText = "??A"
-                        return voltageText + " " + currentText
-                    }
-                }
+                y: pvChargerCompact ? 27 : 43
+                text: pvPower1.text
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
+				anchors.right: parent.right; anchors.rightMargin: 5
                 font.pixelSize: 15
                 visible: numberOfPvChargers >= 2
             },
+			MarqueeEnhanced
+			{
+                y: pvChargerCompact ? 43 : 59
+				id: pv2Name
+				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
+				anchors.left: parent.left; anchors.leftMargin: 5
+				height: 15
+				text: pvName2.valid ? pvName2.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv2Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 2
+			},
+            TileText {
+                y: pvChargerCompact ? 43 : 75
+                text: pvPower2.text
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
+				anchors.right: parent.right; anchors.rightMargin: 5
+				font.pixelSize: 15
+                visible: numberOfPvChargers >= 2
+            },
+			MarqueeEnhanced
+			{
+                y: pvChargerCompact ? 59 : 91
+				id: pv3Name
+				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
+				anchors.left: parent.left; anchors.leftMargin: 5
+				height: 15
+				text: pvName3.valid ? pvName3.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv3Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 3
+			},
+            TileText {
+                y: pvChargerCompact ? 59 : 107
+                text: pvPower3.text
+				anchors.right: parent.right; anchors.rightMargin: 5
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
+                font.pixelSize: 15
+                visible: numberOfPvChargers >= 3
+            },
+			MarqueeEnhanced
+			{
+                y: 75
+				id: pv4Name
+				// ofset left margin for this row if NOT showing tanks/temps
+				width:
+				{
+					if (pvChargerCompact)
+					{
+						if (! showTanksTemps)
+							return ((parent.width / 2) - 15)
+						else
+							return ((parent.width / 2) - 5)
+					}
+					else
+						return (parent.width - 10)
+				}
+				anchors.left: parent.left; anchors.leftMargin: ( ! showTanksTemps && pvChargerCompact) ? 15 : 5
+				height: 15
+				text: pvName4.valid ? pvName4.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 4
+			},
+            TileText {
+                y: 75
+                text: pvPower4.text
+				anchors.right: parent.right; anchors.rightMargin: 5
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
+                font.pixelSize: 15
+				visible: numberOfPvChargers >= 4
+            },
+			MarqueeEnhanced
+			{
+                y: 91
+				id: pv5Name
+				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
+				anchors.left: parent.left; anchors.leftMargin: 5
+				height: 15
+				text: pvName5.valid ? pvName5.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv5Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5
+			},
             TileText {
                 y: 91
-                text: numberOfPvChargers >= 3 && pvName3.valid ? pvName3.text : " "
-                visible: numberOfPvChargers >= 3 && pvName3.valid && ! showTanksTemps
-            },
-            TileText {
-                y: 105
-                text:
-                {
-                    var voltageText, currentText
-                    if (numberOfPvChargers < 3)
-                        return ""
-                    else
-                    {
-                        if (pvVoltage3.valid)
-                            voltageText = pvVoltage3.text
-                        else
-                            voltageText = "??V"
-                        if (pvCurrent3.valid)
-                            currentText = pvCurrent3.text
-                        else if (pvPower3.valid)
-                            currentText =  (pvPower3.value / pvVoltage3.value).toFixed (1) + "A"
-                        else
-                            currentText = "??A"
-                        return voltageText + " " + currentText
-                    }
-                }
+                text: pvPower5.text
+				anchors.right: parent.right; anchors.rightMargin: 5
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-                visible: numberOfPvChargers >= 3 && ! showTanksTemps
+				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5
+            },
+			MarqueeEnhanced
+			{
+                y: 107
+				id: pv6Name
+				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
+				anchors.left: parent.left; anchors.leftMargin: 5
+				height: 15
+				text: pvName6.valid ? pvName6.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6
+			},
+            TileText {
+                y: 107
+                text: pvPower6.text
+				anchors.right: parent.right; anchors.rightMargin: 5
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
+                font.pixelSize: 15
+				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6
+            },
+  			MarqueeEnhanced
+			{
+                y: 123
+				id: pv7Name
+				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
+				anchors.left: parent.left; anchors.leftMargin: 5
+				height: 15
+				text: pvName7.valid ? pvName7.text : " "
+				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
+				fontSize: 15
+				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
+				scroll: false
+				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7
+			},
+            TileText {
+                y: 123
+                text: pvPower7.text
+				anchors.right: parent.right; anchors.rightMargin: 5
+				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
+                font.pixelSize: 15
+				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7
             }
-        ]
+      ]
 ////// add power bar graph
         PowerGauge
         {
@@ -507,6 +608,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.pvCharger
+			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
             show: showGauges && hasDcSolar
         }
 	}
@@ -727,7 +829,7 @@ OverviewPage {
     }
 
 ////// ADDED to show tanks & temps
-    // Synchronise tank name text scroll start
+    // Synchronise tank name text scroll start and PV Charger name scroll
     Timer
     {
         id: scrollTimer
@@ -861,8 +963,15 @@ OverviewPage {
                 pvChargerPrefix2 = service.name;
             else if (numberOfPvChargers === 3)
                 pvChargerPrefix3 = service.name;
+            else if (numberOfPvChargers === 4)
+                pvChargerPrefix4 = service.name;
+            else if (numberOfPvChargers === 5)
+                pvChargerPrefix5 = service.name;
+            else if (numberOfPvChargers === 6)
+                pvChargerPrefix6 = service.name;
+            else if (numberOfPvChargers === 7)
+                pvChargerPrefix7 = service.name;
             break;;
-        }
     }
 
     // Detect available services of interest
@@ -878,6 +987,10 @@ OverviewPage {
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
         pvChargerPrefix3 = ""
+        pvChargerPrefix4 = ""
+        pvChargerPrefix5 = ""
+        pvChargerPrefix6 = ""
+        pvChargerPrefix7 = ""
         pvInverterPrefix1 = ""
         pvInverterPrefix2 = ""
         pvInverterPrefix3 = ""
