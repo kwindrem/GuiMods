@@ -1,3 +1,6 @@
+v5.14:
+	fixed: overlap between PV Charger and PV Inverter tiles on hub overview
+
 v5.13:
 	fixed: PV Charger power gauge not showing
 	modified PV Charger tile to show only power

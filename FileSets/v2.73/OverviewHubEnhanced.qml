@@ -438,7 +438,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv1Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 2
+				visible: numberOfPvChargers >= 2 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: pvChargerCompact ? 27 : 43
@@ -446,7 +446,7 @@ OverviewPage {
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				anchors.right: parent.right; anchors.rightMargin: 5
                 font.pixelSize: 15
-                visible: numberOfPvChargers >= 2
+                visible: numberOfPvChargers >= 2 && ! hasDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -460,7 +460,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv2Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 2
+				visible: numberOfPvChargers >= 2 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: pvChargerCompact ? 43 : 75
@@ -468,7 +468,7 @@ OverviewPage {
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				anchors.right: parent.right; anchors.rightMargin: 5
 				font.pixelSize: 15
-                visible: numberOfPvChargers >= 2
+                visible: numberOfPvChargers >= 2 && ! hasDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -482,7 +482,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv3Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 3
+				visible: numberOfPvChargers >= 3 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: pvChargerCompact ? 59 : 107
@@ -490,7 +490,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-                visible: numberOfPvChargers >= 3
+                visible: numberOfPvChargers >= 3 && ! hasDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -516,7 +516,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 4
+				visible: numberOfPvChargers >= 4 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: 75
@@ -524,7 +524,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 4
+				visible: numberOfPvChargers >= 4 && ! hasDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -538,7 +538,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv5Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5
+				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: 91
@@ -546,7 +546,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5
+				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! hasDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -560,7 +560,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6
+				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: 107
@@ -568,7 +568,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6
+				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! hasDcAndAcSolar
             },
   			MarqueeEnhanced
 			{
@@ -582,7 +582,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7
+				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! hasDcAndAcSolar
 			},
             TileText {
                 y: 123
@@ -590,7 +590,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7
+				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! hasDcAndAcSolar
             }
       ]
 ////// add power bar graph
