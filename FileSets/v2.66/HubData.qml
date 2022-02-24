@@ -1,4 +1,6 @@
 //////// modified for VE.Direct inverter support
+//////// modified for grid/genset meter
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -13,6 +15,9 @@ Item {
 
 //////// add to support VE.Direct inverters
     property string inverterService: ""
+//////// add for grid/genset meters
+	property string gridMeterService: ""
+	property string gensetService: ""
 
 	property variant battery: _battery
 	property alias dcSystem: _dcSystem
@@ -87,6 +92,8 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
+//////// add for genset meter
+		meterService: root.gensetService
 	}
 
 	VBusItem {
@@ -100,6 +107,8 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
+//////// add for grid meter
+		meterService: root.gridMeterService
 	}
 
 	ObjectAcConnection {

@@ -1,4 +1,6 @@
 //////// modified for VE.Direct inverter support
+//////// modified for grid/genset meter
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -13,6 +15,9 @@ Item {
 
 //////// add to support VE.Direct inverters
     property string inverterService: ""
+//////// add for grid/genset meters
+	property string gridMeterService: ""
+	property string gensetService: ""
 
 	property variant battery: _battery
 	property alias dcSystem: _dcSystem
@@ -86,6 +91,8 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
+//////// add for genset meter
+		meterService: root.gensetService
 	}
 
 	VBusItem {
@@ -115,6 +122,8 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
+//////// add for grid meter
+		meterService: root.gridMeterService
 	}
 
 	ObjectAcConnection {
@@ -140,6 +149,8 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
+//////// add for grid/genset meter
+		meterService: _acSource.valid && _acSource.value === acSourceGenset ? root.gensetService : root.gridMeterService
     }
 
 	ObjectAcConnection {
@@ -185,6 +196,7 @@ Item {
 	}
 
 //////// add to support VE.Direct inverters
+//////// and grid/genset meters
     Component.onCompleted: discoverServices()
 
     // When new service is found check if is a tank sensor
@@ -201,12 +213,23 @@ Item {
             if (inverterService === "")
                 inverterService = service.name;
             break;;
+		case DBusService.DBUS_SERVICE_GRIDMETER:
+            if (gridMeterService === "")
+				gridMeterService = service.name;
+            break;;
+		case DBusService.DBUS_SERVICE_GENSET:
+            if (gensetService === "")
+				gensetService = service.name;
+            break;;
         }
     }
 
     // Check available services inverter services
     function discoverServices()
     {
+		inverterService = ""
+		gridMeterService = ""
+		gensetService = ""
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
     }

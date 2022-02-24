@@ -3,6 +3,7 @@
 // because other connections don't have related parameters
 // may not support paralleled Multis/Quatros
 ////// modified to show power bar graphs
+////// add support for grid meter
 
 
 import QtQuick 1.1

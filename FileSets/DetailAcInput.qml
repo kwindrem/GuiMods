@@ -21,8 +21,8 @@ MbPage {
     property color backgroundColor: "#b3b3b3"
 
     property int buttonHeight: 40
-    property int tableColumnWidth: 60
-    property int rowTitleWidth: 130
+    property int tableColumnWidth: 80
+    property int rowTitleWidth: 100
     property int dataColumns: 3
     property int totalDataWidth: tableColumnWidth * dataColumns
     property int legColumnWidth: phaseCount <= 1 ? totalDataWidth : totalDataWidth / phaseCount
@@ -33,6 +33,16 @@ MbPage {
     property bool isMulti: numberOfMultis === 1
     property bool isInverter: numberOfMultis === 0 && numberOfInverters === 1
     property int phaseCount: sys.acInput.phaseCount.valid ? sys.acInput.phaseCount.value : 0
+
+	property string gridMeterService: ""
+	property string gensetService: ""
+    property string meterService: activeSource.valid && activeSource.value === 2 ? gensetService : gridMeterService
+    property bool useMeter: meterService != ""
+    property string pathPrefix: useMeter ? Utils.path ( meterService, "/Ac/") : Utils.path (inverterService, "/Ac/ActiveIn/")
+    property string voltageSuffix: useMeter ? "/Voltage" : "/V"
+    property string currentSuffix: useMeter ? "/Current" : "/I"
+
+    
 
     property real actualCurrentLimit: 0
     property real newCurrentLimit: 0
@@ -63,9 +73,14 @@ MbPage {
         onValidChanged: getActualCurrent ()
     }
 
-    VBusItem { id: voltageL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/V") }
-    VBusItem { id: voltageL2; bind: Utils.path(inverterService, "/Ac/ActiveIn/L2/V") }
-    VBusItem { id: voltageL3; bind: Utils.path(inverterService, "/Ac/ActiveIn/L3/V") }
+    VBusItem { id: voltageL1; bind: Utils.path(pathPrefix, "L1", voltageSuffix) }
+    VBusItem { id: voltageL2; bind: Utils.path(pathPrefix, "L2", voltageSuffix) }
+    VBusItem { id: voltageL3; bind: Utils.path(pathPrefix, "L3", voltageSuffix) }
+
+    VBusItem { id: currentL1; bind: Utils.path (pathPrefix, "L1", currentSuffix) }
+    VBusItem { id: currentL2; bind: Utils.path (pathPrefix, "L2", currentSuffix) }
+    VBusItem { id: currentL3; bind: Utils.path (pathPrefix, "L3", currentSuffix) }
+
     VBusItem { id: frequencyL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/F") }
     VBusItem { id: activeSource; bind: Utils.path(systemPrefix, "/Ac/ActiveIn/Source") }
     VBusItem { id: activeInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
@@ -96,6 +111,8 @@ MbPage {
                     width: rowTitleWidth + totalDataWidth
                     height: 15
                     connection: sys.acInput
+					maxForwardPowerParameter: "" // handled internally - uses input current limit and AC input voltage
+					maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
                 }
             }
             Row
@@ -177,13 +194,15 @@ MbPage {
                         text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: calculateCurrent (sys.acInput.powerL1, voltageL1, " A") }
+                        text: useMeter ? formatValue (currentL1, " A") : calculateCurrent (sys.acInput.powerL1, voltageL1, " A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: calculateCurrent (sys.acInput.powerL2, voltageL2, " A"); visible: phaseCount >= 2 }
+                        text: useMeter ? formatValue (currentL2, " A") : calculateCurrent (sys.acInput.powerL2, voltageL2, " A");
+								visible: phaseCount >= 2 }
                Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                         text: calculateCurrent (sys.acInput.powerL3, voltageL3, " A"); visible: phaseCount >= 3 }
+						text: useMeter ? formatValue (currentL3, " A") : calculateCurrent (sys.acInput.powerL3, voltageL3, " A");
+								visible: phaseCount >= 3 }
             }
             Row
             {
@@ -215,7 +234,8 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Current values are estimated") }
+                        text: qsTr("Current values are estimated")
+                        visible: ! useMeter }
             }
         }
         Column
@@ -421,6 +441,14 @@ MbPage {
             if (numberOfInverters === 1 && inverterService == "")
                 inverterService = service.name;
             break;;
+		case DBusService.DBUS_SERVICE_GRIDMETER:
+            if (gridMeterService === "")
+				gridMeterService = service.name;
+            break;;
+		case DBusService.DBUS_SERVICE_GENSET:
+            if (gensetService === "")
+				gensetService = service.name;
+            break;;
         }
     }
 
@@ -430,6 +458,8 @@ MbPage {
         numberOfMultis = 0
         numberOfInverters = 0
         inverterService = ""
+		gridMeterService = ""
+		gensetService = ""
         for (var i = 0; i < DBusServices.count; i++)
         {
             addService(DBusServices.at(i))

@@ -384,7 +384,7 @@ OverviewPage {
 		id: blueSolarCharger
 
 ////// MODIFIED to show tanks & provide extra space if not
-        height: hasDcAndAcSolar ? 65 : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
+        height: hasDcAndAcSolar ? 55 : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
         width: 148
 		title: qsTr("PV Charger")
 ////// MODIFIED - always hide icon peaking out from under PV tile
@@ -404,6 +404,7 @@ OverviewPage {
                 right: parent.right; rightMargin: 2
             }
             opacity: 0.5
+            visible: ! hasDcAndAcSolar
         }
 
 //////// add power for individual PV chargers
@@ -613,7 +614,7 @@ OverviewPage {
     OverviewSolarInverter {
         id: pvInverter
 ////// MODIFIED to show tanks & provide extra space if not
-        height: hasDcAndAcSolar ? 65 : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
+        height: hasDcAndAcSolar ? blueSolarCharger.height : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
         width: 148
         title: qsTr("PV Inverter")
         showInverterIcon: !hasDcAndAcSolar
@@ -621,7 +622,7 @@ OverviewPage {
 
         anchors {
             right: root.right; rightMargin: 10;
-            bottom: root.bottom; bottomMargin: hasDcAndAcSolar ? 75 : 5
+            bottom: hasDcAndAcSolar ? blueSolarCharger.top : root.bottom; bottomMargin: 5
         }
 
         OverviewAcValuesEnhanced {
