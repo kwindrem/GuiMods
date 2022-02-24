@@ -1,3 +1,6 @@
+v5.16:
+	added voltage & current to PV Charger tile if space permits
+
 v5.15:
 	add support for grid (and genset) AC input meter
 	more fixes for PV Charger / Inverter tile overlaps
