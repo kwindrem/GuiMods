@@ -111,12 +111,12 @@ OverviewPage {
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
     VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
     VBusItem { id: pvPower2; bind: Utils.path(pvChargerPrefix2, "/Yield/Power") }
-    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
-    VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
+    VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
     VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
     VBusItem { id: pvPower3; bind: Utils.path(pvChargerPrefix3, "/Yield/Power") }
-    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
-    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix3, "/Pv/V") }
+    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
     VBusItem { id: pvName4;  bind: Utils.path(pvChargerPrefix4, "/CustomName") }
     VBusItem { id: pvPower4; bind: Utils.path(pvChargerPrefix4, "/Yield/Power") }
     VBusItem { id: pvName5;  bind: Utils.path(pvChargerPrefix5, "/CustomName") }

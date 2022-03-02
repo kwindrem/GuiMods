@@ -1,3 +1,7 @@
+v5.17:
+	fixed: PV charger voltage and current for 2nd and 3rd unit are wrong
+
+
 v5.16:
 	added voltage & current to PV Charger tile if space permits
 
