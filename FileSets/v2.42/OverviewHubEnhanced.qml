@@ -136,6 +136,10 @@ OverviewPage {
     VBusItem { id: pvInverterPower3; bind: Utils.path(pvInverterPrefix3, "/Ac/Power") }
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
+//////// added to show/dim AC Input tile
+    VBusItem { id: showInactiveTiles; bind: Utils.path(guiModsPrefix, "/ShowInactiveFlowTiles") }
+    property real disabledTileOpacity: ! showInactiveTiles.valid || showInactiveTiles.value === 1 ? 0.3 : showInactiveTiles.value === 2 ? 1.0 : 0.0
+
 //////// add to display AC input ignored
     VBusItem { id: ignoreAcInput; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
 
@@ -148,7 +152,7 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
-        visible: hasAcInput
+        opacity: hasAcInput ? 1 : disabledTileOpacity
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title:

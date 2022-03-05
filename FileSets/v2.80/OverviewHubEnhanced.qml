@@ -90,6 +90,10 @@ OverviewPage {
     VBusItem { id: showTempsItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTemps") }
     property bool showTempsEnable: showTempsItem.valid ? showTempsItem.value === 1 ? true : false : false
 
+//////// added to show/dim AC Input tile
+    VBusItem { id: showInactiveTiles; bind: Utils.path(guiModsPrefix, "/ShowInactiveFlowTiles") }
+    property real disabledTileOpacity: ! showInactiveTiles.valid || showInactiveTiles.value === 1 ? 0.3 : showInactiveTiles.value === 2 ? 1.0 : 0.0
+
 //////// added to control time display
     VBusItem { id: timeFormatItem; bind: Utils.path(guiModsPrefix, "/TimeFormat") }
     property string timeFormat: getTimeFormat ()
@@ -148,7 +152,7 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
-        visible: hasAcInput
+        opacity: hasAcInput ? 1 : disabledTileOpacity
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title:
