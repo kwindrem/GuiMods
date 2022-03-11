@@ -74,7 +74,7 @@ MbPage
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr ("Remainig time") }
+                    text: qsTr ("Remaining time") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: timeToGo.valid ? Utils.secondsToString(timeToGo.value) : "" }

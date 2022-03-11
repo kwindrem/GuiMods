@@ -252,13 +252,18 @@ OverviewPage {
 
 	Tile {  // DC SYSTEM
 ////// use title to reflect load or source from DC system
-	    title: qsTr(sys.dcSystem.power.valid ? "NO DC SYSTEM": 
+	    title: qsTr( hasDcSys.value != 1 ? "NO DC SYSTEM": 
                 !sys.dcSystem.power.valid ? "NO DC POWER" : sys.dcSystem.power.value >= 0 ? "DC LOADS" : "DC CHARGER")
 	    id: dcSystem
 	    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
 	    width: root.infoWidth3Column
 	    height: root.infoTileHeight
 	    color: "#16a085"
+
+	    VBusItem {
+		id: hasDcSys
+		bind: Utils.path(settingsBindPreffix, "/Settings/SystemSetup/HasDcSystem")
+	    }
 
 	    values: [
 		TileText {

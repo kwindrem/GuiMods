@@ -1,5 +1,8 @@
+v5.19:
+	fixed: mobile overview DC tile reads NO DC SYSTEM when it does exist
+
 v5.18:
-	included AC Input tile in show/hide/dim inactive tiles
+	included AC Input tile in standard flow overview in show/hide/dim inactive tiles
 
 v5.17:
 	fixed: PV charger voltage and current for 2nd and 3rd unit are wrong
