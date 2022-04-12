@@ -4,6 +4,7 @@
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "timeToGo.js" as TTG
 
 MbPage
 {
@@ -77,7 +78,7 @@ MbPage
                     text: qsTr ("Remaining time") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: timeToGo.valid ? Utils.secondsToString(timeToGo.value) : "" }
+                    text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : "" }
              Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
         }

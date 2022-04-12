@@ -34,6 +34,8 @@
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
+import "timeToGo.js"
+import "timeToGo.js" as TTG
 
 OverviewPage {
     title: qsTr("Mobile")
@@ -236,7 +238,7 @@ OverviewPage {
                     TileText {
                         text: {
                             if (timeToGo.valid)
-                                return Utils.secondsToString(timeToGo.value)
+								return TTG.formatTimeToGo (timeToGo)
                             else
                                 return "∞"
                         }

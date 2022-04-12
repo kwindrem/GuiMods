@@ -31,10 +31,6 @@ Tile {
     property variant tempColors: ["#4aa3df", "#1abc9c", "#F39C12"]
     property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : "#7f8c8d"
 
-    property real minTemp: -30
-    property real maxTemp: 60
-    property real tempSpan: (maxTemp - minTemp)
-
     title: compact ? "" : tempName
 	color: tempColor
 

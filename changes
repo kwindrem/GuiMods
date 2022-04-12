@@ -1,3 +1,6 @@
+v5,20:
+	fixed: battery remaining time incorrect for > 1 day
+
 v5.19:
 	fixed: mobile overview DC tile reads NO DC SYSTEM when it does exist
 

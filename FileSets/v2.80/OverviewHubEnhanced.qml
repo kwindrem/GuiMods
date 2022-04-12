@@ -15,6 +15,7 @@ import QtQuick 1.1
 import "utils.js" as Utils
 ////// ADDED to show tanks
 import com.victron.velib 1.0
+import "timeToGo.js" as TTG
 
 
 
@@ -321,12 +322,7 @@ OverviewPage {
 				text: sys.battery.voltage.format(1) + "   " + sys.battery.current.format(1)
 			}
             TileText {
-                text: {
-                    if (timeToGo.valid)
-                        return "Remain: " + Utils.secondsToString(timeToGo.value)
-                    else
-                        return "Remain: ∞"
-                }
+                text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr ("Remain: ∞")
             }
         }
 	}

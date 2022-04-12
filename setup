@@ -237,6 +237,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/PvChargerRow.qml"
     updateActiveFile "$qmlDir/DetailPvInverter.qml"
     updateActiveFile "$qmlDir/PvInverterRow.qml"
+    updateActiveFile "$qmlDir/timeToGo.js"
     
     # cleanup from older versions
     restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
@@ -283,6 +284,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/PvChargerRow.qml"
     restoreActiveFile "$qmlDir/DetailPvInverter.qml"
     restoreActiveFile "$qmlDir/PvInverterRow.qml"
+	restoreActiveFile "$qmlDir/timeToGo.js"
 
     # cleanup from older versions
     restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"

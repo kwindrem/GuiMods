@@ -34,6 +34,7 @@
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
+import "timeToGo.js" as TTG
 
 OverviewPage {
     title: qsTr("Mobile")
@@ -236,12 +237,7 @@ OverviewPage {
                         text: qsTr("Remaining:")
                     },
                     TileText {
-                        text: {
-                            if (timeToGo.valid)
-                                return Utils.secondsToString(timeToGo.value)
-                            else
-                                return "∞"
-                        }
+                        text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : "∞"
                         
                         VBusItem {
                             id: timeToGo
