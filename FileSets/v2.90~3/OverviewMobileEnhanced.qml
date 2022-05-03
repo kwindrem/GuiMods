@@ -44,24 +44,23 @@ OverviewPage {
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
     property variant activeNotifications: NotificationCenter.notifications.filter(
-											  function isActive(obj) { return obj.active} )
+                                              function isActive(obj) { return obj.active} )
     property string noAdjustableByDmc: qsTr("This setting is disabled when a Digital Multi Control " +
-											"is connected. If it was recently disconnected execute " +
-											"\"Redetect system\" that is avalible on the inverter menu page.")
+                                            "is connected. If it was recently disconnected execute " +
+                                            "\"Redetect system\" that is available on the inverter menu page.")
     property string noAdjustableByBms: qsTr("This setting is disabled when a VE.Bus BMS " +
-											"is connected. If it was recently disconnected execute " +
-											"\"Redetect system\" that is avalible on the inverter menu page.")
+                                            "is connected. If it was recently disconnected execute " +
+                                            "\"Redetect system\" that is available on the inverter menu page.")
     property string noAdjustableTextByConfig: qsTr("This setting is disabled. " +
-										   "Possible reasons are \"Overruled by remote\" is not enabled or " +
-										   "an assistant is preventing the adjustment. Please, check " +
-										   "the inverter configuration with VEConfigure.")
+                                           "Possible reasons are \"Overruled by remote\" is not enabled or " +
+                                           "an assistant is preventing the adjustment. Please, check " +
+                                           "the inverter configuration with VEConfigure.")
 
 //////// added to keep track of tanks and temps
-    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: numberOfTanks + numberOfTemps
+    property int tankTempCount: tankModel.rowCount + numberOfTemps
     property real tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? buttonRowHeight : 0)
-    property real tanksHeight: numberOfTanks > 0 ? tanksTempsHeight * numberOfTanks / tankTempCount : 0
+    property real tanksHeight: tankModel.rowCount > 0 ? tanksTempsHeight * tankModel.rowCount / tankTempCount : 0
     property real tempsHeight: tanksTempsHeight - tanksHeight
     property real minimumTankHeight: 21
     property real maxTankHeight: 80
@@ -119,7 +118,7 @@ OverviewPage {
             return "hh:mm"
     }
 
-	Component.onCompleted: discoverTanks()
+	Component.onCompleted: discoverMulti()
 
     ListView {
         id: infoArea
@@ -146,13 +145,13 @@ OverviewPage {
                 bind: Utils.path(settingsBindPreffix, "/Settings/SystemSetup/SystemName")
             }
 
+//////// change time to selectable 12/24 hour format
             Timer {
                 id: wallClock
                 running: timeFormat != ""
                 repeat: true
                 interval: 1000
                 triggeredOnStart: true
-//////// change time to 12 hour format
                 onTriggered: time = Qt.formatDateTime(new Date(), timeFormat)
                 property string time
             }
@@ -249,7 +248,7 @@ OverviewPage {
 
 	Tile {  // DC SYSTEM
 ////// use title to reflect load or source from DC system
-	    title: qsTr(hasDcSys.value != 1 ? "NO DC SYSTEM": 
+	    title: qsTr( hasDcSys.value != 1 ? "NO DC SYSTEM": 
                 !sys.dcSystem.power.valid ? "NO DC POWER" : sys.dcSystem.power.value >= 0 ? "DC LOADS" : "DC CHARGER")
 	    id: dcSystem
 	    anchors { right: parent.right; verticalCenter: parent.verticalCenter }
@@ -266,13 +265,13 @@ OverviewPage {
 		TileText {
 		    font.pixelSize: 22
             text: sys.dcSystem.power.format(0)
-            visible: hasDcSys.value === 1
+            visible: sys.dcSystem.power.valid
 		},
 		TileText {
                     text: !sys.dcSystem.power.valid ? "---" :
 ////// replace to/from battery with current
                          (sys.dcSystem.power.value / sys.battery.voltage.value).toFixed(1) + "A"
-                    visible: hasDcSys.value === 1
+                    visible: sys.dcSystem.power.valid
                 }
             ]
 	} // end Tile DC SYSTEM
@@ -290,7 +289,7 @@ OverviewPage {
 	    values: [
             TileText {
                 font.pixelSize: 22
-                text: sys.pvCharger.power.valid ? sys.pvCharger.power.uiText : "none"
+                text: sys.pvCharger.power.valid ? sys.pvCharger.power.text : "none"
             },
     //////// add voltage and current
             TileText {
@@ -332,8 +331,9 @@ OverviewPage {
             values: [
                 TileText {
                     visible: isMulti
-                    text: sys.acInput.power.uiText
+                    text: sys.acInput.power.text
                     font.pixelSize: 22
+                    
                 },
 //////// add voltage and current
                 TileText {
@@ -357,13 +357,13 @@ OverviewPage {
 
             values: [
                 TileText {
-                    text: sys.acLoad.power.uiText
+                    text: sys.acLoad.power.text
                     font.pixelSize: 22
                 },
 //////// add voltage and current - no frequency for VE.Direct inverter
                 TileText {
                     text: isMulti ? outVoltage.text + "  " + outCurrent.text + "  " + outFrequency.text
-                            : isInverter > 0 ? outVoltage.text + "  " + outCurrent.text : ""
+                            : isInverter ? outVoltage.text + "  " + outCurrent.text : ""
                 }
             ]
         }
@@ -390,8 +390,11 @@ OverviewPage {
 //////// make list flickable if more tiles than will fit completely
         interactive: root.tankTileHeight * count > (tanksColum.height + 1) ? true : false
 
-        model: tanksModel
+        model: TankModel { id: tankModel }
         delegate: TileTankEnhanced {
+            // Without an intermediate assignment this will trigger a binding loop warning.
+            property variant theService: DBusServices.get(buddy.id)
+            service: theService
             width: tanksColum.width
             height: root.tankTileHeight
             pumpBindPrefix: root.pumpBindPreffix
@@ -413,7 +416,6 @@ OverviewPage {
             z: -1
         }
     }
-    ListModel { id: tanksModel }
 
 //////// added temperature ListView and Model
     ListView {
@@ -433,6 +435,7 @@ OverviewPage {
         {
             width: tempsColumn.width
             height: root.tankTileHeight
+//////// modified to control compact differently
             compact: root.compact
             Connections
             {
@@ -518,7 +521,7 @@ OverviewPage {
 		width: show ? root.infoWidth2Column : 0
 		fontPixelSize: 14
 		unit: "A"
-		readOnly: !isMulti || currentLimitIsAdjustable.value !== 1
+        readOnly: !isMulti || currentLimitIsAdjustable.value !== 1
 		buttonColor: "#979797"
 
 		VBusItem { id: currentLimitIsAdjustable; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable") }
@@ -526,7 +529,7 @@ OverviewPage {
 		Keys.onSpacePressed: showErrorToast(event)
 
 		function editIsAllowed() {
-			if (!isMulti) {
+            if (!isMulti) {
 				toast.createToast(qsTr("It is not possible to change this setting when there are more than one inverter connected."), 5000)
 				return false
 			}
@@ -569,7 +572,7 @@ OverviewPage {
 		focus: root.active && isCurrentItem
 
 		editable: true
-        readOnly:
+		readOnly:
         {
             if (isMulti)
                 return !modeIsAdjustable.valid || modeIsAdjustable.value !== 1
@@ -583,8 +586,8 @@ OverviewPage {
 		color: acModeButtonMouseArea.containsPressed ? "#d3d3d3" : "#A8A8A8"
 		title: qsTr("AC MODE")
 
-		values: [
-			TileText {
+        values: [
+            TileText {
                 text:
                 {
                     if (isMulti)
@@ -596,13 +599,13 @@ OverviewPage {
                     }
                     else if (isInverter)
                     {
-                            return qsTr("%1").arg(acModeButton.inverterTexts[acModeButton.shownValue])
+                        return qsTr("%1").arg(acModeButton.inverterTexts[acModeButton.shownValue])
                     }
                     else
                         return qsTr("NOT AVAILABLE")
                 }
             }
-		]
+        ]
 
 		VBusItem { id: mode; bind: Utils.path(inverterService, "/Mode") }
 		VBusItem { id: modeIsAdjustable; bind: Utils.path(inverterService,"/ModeIsAdjustable") }
@@ -613,7 +616,7 @@ OverviewPage {
 			if (!mode.valid)
 				return
 
-			if (!isMulti) {
+            if (!isMulti) {
 				toast.createToast(qsTr("It is not possible to change this setting when there are more than one inverter connected."), 5000)
 				return
 			}
@@ -838,7 +841,7 @@ OverviewPage {
 		}
 	}
 
-	// When new service is found check if is a tank sensor
+	// When new service is found add resources as appropriate
 	Connections {
 		target: DBusServices
 		onDbusServiceFound: addService(service)
@@ -849,14 +852,6 @@ OverviewPage {
     {
         switch (service.type)
         {
-        case DBusService.DBUS_SERVICE_TANK:
-            // hide incoming N2K tank dBus object if TankRepeater is running
-            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
-            {
-                numberOfTanks++
-                tanksModel.append({serviceName: service.name})
-            }
-            break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
@@ -885,14 +880,13 @@ OverviewPage {
 
     // Check available services to find tank sesnsors
 //////// rewrite to always call addService, removing redundant service type checks
-    function discoverTanks()
+    function discoverMulti()
     {
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfMultis = 0
         numberOfInverters = 0
         inverterService = ""
-        tanksModel.clear()
         tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))

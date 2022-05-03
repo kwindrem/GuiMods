@@ -1,4 +1,10 @@
 // Display individual PV charger / inverter devices in Details page
+// tracker is passed from DetailPvCharger.qml
+//	-1 indicates a single tracker MPPT
+//	0 indicates the overview for a multiple tracker MPPT
+//		this will display the MPPT name, total PV yield and charging mode
+// 1 - n indicates specific tracker informaiton
+//		this will display tracker power, voltage and current only
 
 import QtQuick 1.1
 import "utils.js" as Utils
@@ -8,12 +14,17 @@ Row {
     // uses the same sizes as DetailsPvCharger page
     property int tableColumnWidth: 0
     property int rowTitleWidth: 0
+    property int index: tracker - 1
+    property bool singleTracker: tracker == -1
+    property bool multiTrackerHeader: tracker == 0
+    property bool useTrackerInfo: tracker > 0
+    property bool showNameAndTotal: singleTracker || multiTrackerHeader
 
     VBusItem { id: customNameItem; bind: Utils.path(serviceName, "/CustomName") }
 
-    property string pvName: customNameItem.valid ? customNameItem.value : "--"
-    VBusItem { id: pvVoltage;  bind: Utils.path(serviceName, "/Pv/V") }
-    VBusItem { id: pvPower; bind: Utils.path(serviceName, "/Yield/Power") }
+    property string pvName: showNameAndTotal ? customNameItem.valid ? customNameItem.value : "--" : "    tracker " + tracker.toString()
+    VBusItem { id: pvVoltage;  bind: Utils.path(serviceName, singleTracker ? "/Pv/V" : useTrackerInfo ? "/Pv/" + index.toString() + "/V" : "") }
+    VBusItem { id: pvPower; bind: Utils.path(serviceName, showNameAndTotal ? "/Yield/Power" : "/Pv/" + index.toString() + "/P") }
 
 	SystemState {
 		id: state
@@ -44,16 +55,16 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvPower, " W") }
+            text: pvPowerPath }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvVoltage, " V") }
+            text: multiTrackerHeader ? " " : formatValue (pvVoltage, " V") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: calculateCurrent (pvPower, pvVoltage, " A") }
+            text: multiTrackerHeader ? " " : calculateCurrent (pvPower, pvVoltage, " A") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: state.text }
+            text: showNameAndTotal ? state.text : " " }
 
     function formatValue (item, unit)
     {

@@ -335,7 +335,7 @@ OverviewPage {
                 }
             }
             TileText {
-                text: sys.battery.voltage.format(1) + "  " + sys.battery.current.format(1)
+                text: sys.battery.voltage.format(2) + "  " + sys.battery.current.format(1)
             }
             TileText {
                 text: sys.battery.power.format(0)
@@ -479,31 +479,14 @@ OverviewPage {
         id: dcSystemBox
         width: inOutTileWidth
         height: inOutTileHeight
-        opacity: hasDcSystem ? 1 : 0
-        title:
-        {
-            var dcLoad, dcCharge
-            if (maxDcLoad.valid && maxDcLoad.value != 0)
-                dcLoad = true
-            else
-                dcLoad = false
-            if (maxDcCharge.valid && maxDcCharge.value != 0)
-                dcCharge = true
-            else
-                dcCharge = false
-            if (dcLoad && ! dcCharge)
-                qsTr ("DC Loads")
-            else if ( ! dcLoad && dcCharge)
-                qsTr ("DC Charge")
-            else
-                qsTr ("DC System")
-        }
+        visible: hasDcSystem
+        title: qsTr ("DC System")
          anchors {
             right: root.right; rightMargin: 5
 ////// MODIFIED to show tanks
             bottom: parent.bottom; bottomMargin: bottomOffset
         }
-         values: TileText {
+		values: TileText {
             text: sys.dcSystem.power.text
             font.pixelSize: 17
             visible: hasDcSystem

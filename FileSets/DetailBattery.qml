@@ -126,7 +126,7 @@ MbPage
                     text: qsTr ("Voltage") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: sys.battery.voltage.format(1) }
+                    text: sys.battery.voltage.format(2) }
              Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
         }

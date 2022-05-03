@@ -230,7 +230,7 @@ OverviewPage {
                         text: sys.battery.power.text
                     },
                     TileText {
-                        text: sys.battery.voltage.format(1) + "   " + sys.battery.current.format(1)
+                        text: sys.battery.voltage.format(2) + "   " + sys.battery.current.format(1)
                     },
                     TileText {
                         text: qsTr("Remaining:")

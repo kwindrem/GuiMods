@@ -110,14 +110,17 @@ OverviewPage {
     VBusItem { id: pvPower1; bind: Utils.path(pvChargerPrefix1, "/Yield/Power") }
     VBusItem { id: pvVoltage1;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
     VBusItem { id: pvCurrent1; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+    VBusItem { id: pv1NrTrackers; bind: Utils.path(pvChargerPrefix1, "/NrOfTrackers") }
     VBusItem { id: pvName2;  bind: Utils.path(pvChargerPrefix2, "/CustomName") }
     VBusItem { id: pvPower2; bind: Utils.path(pvChargerPrefix2, "/Yield/Power") }
-    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
-    VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+    VBusItem { id: pvVoltage2;  bind: Utils.path(pvChargerPrefix2, "/Pv/V") }
+    VBusItem { id: pvCurrent2; bind: Utils.path(pvChargerPrefix2, "/Pv/I") }
+    VBusItem { id: pv2NrTrackers; bind: Utils.path(pvChargerPrefix2, "/NrOfTrackers") }
     VBusItem { id: pvName3;  bind: Utils.path(pvChargerPrefix3, "/CustomName") }
     VBusItem { id: pvPower3; bind: Utils.path(pvChargerPrefix3, "/Yield/Power") }
-    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix1, "/Pv/V") }
-    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix1, "/Pv/I") }
+    VBusItem { id: pvVoltage3;  bind: Utils.path(pvChargerPrefix3, "/Pv/V") }
+    VBusItem { id: pvCurrent3; bind: Utils.path(pvChargerPrefix3, "/Pv/I") }
+    VBusItem { id: pv3NrTrackers; bind: Utils.path(pvChargerPrefix3, "/NrOfTrackers") }
     VBusItem { id: pvName4;  bind: Utils.path(pvChargerPrefix4, "/CustomName") }
     VBusItem { id: pvPower4; bind: Utils.path(pvChargerPrefix4, "/Yield/Power") }
     VBusItem { id: pvName5;  bind: Utils.path(pvChargerPrefix5, "/CustomName") }
@@ -303,7 +306,7 @@ OverviewPage {
 ////// MODIFIED to show tanks
         height: batteryHeight + 5
 		anchors {
-			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5;
+			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : hasDcAndAcSolar ? 15 : 5;
 			left: parent.left; leftMargin: 10
 		}
 		values: Column {
@@ -321,7 +324,7 @@ OverviewPage {
                 font.pixelSize: 6
             }
 			TileText {
-				text: sys.battery.voltage.format(1) + "   " + sys.battery.current.format(1)
+				text: sys.battery.voltage.format(2) + "   " + sys.battery.current.format(1)
 			}
             TileText {
                 text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr ("Remain: ∞")
@@ -344,24 +347,7 @@ OverviewPage {
 		width: multi.width + 20
 		height: 45
 		visible: hasDcSystem
-        title:
-        {
-            var dcLoad, dcCharge
-            if (maxDcLoad.valid && maxDcLoad.value != 0)
-                dcLoad = true
-            else
-                dcLoad = false
-            if (maxDcCharge.valid && maxDcCharge.value != 0)
-                dcCharge = true
-            else
-                dcCharge = false
-            if (dcLoad && ! dcCharge)
-                qsTr ("DC Loads")
-            else if ( ! dcLoad && dcCharge)
-                qsTr ("DC Charge")
-            else
-                qsTr ("DC System")
-        }
+        title: qsTr ("DC System")
 
 		anchors {
 			horizontalCenter: multi.horizontalCenter
@@ -379,7 +365,7 @@ OverviewPage {
 
     function dcSystemText ()
     {
-        if (sys.dcSystem.power.valid)
+        if (hasDcSystem && sys.dcSystem.power.valid)
         {
             var current = sys.dcSystem.power.value / sys.battery.voltage.value
             if (Math.abs (current) <= 100)
@@ -478,7 +464,9 @@ OverviewPage {
                         return " "
                     else
                     {
-                        if (pvVoltage1.valid)
+						if (pv1NrTrackers.valid && pv1NrTrackers.value > 1)
+							return qsTr ("multiple trackers")
+                        else if (pvVoltage1.valid)
                             voltageText = pvVoltage1.text
                         else
                             voltageText = "??V"
@@ -525,7 +513,9 @@ OverviewPage {
                         return " "
                     else
                     {
-                        if (pvVoltage2.valid)
+						if (pv2NrTrackers.valid && pv2NrTrackers.value > 1)
+							return qsTr ("multiple trackers")
+                        else if (pvVoltage2.valid)
                             voltageText = pvVoltage2.text
                         else
                             voltageText = "??V"
@@ -572,7 +562,9 @@ OverviewPage {
                         return " "
                     else
                     {
-                        if (pvVoltage3.valid)
+						if (pv3NrTrackers.valid && pv3NrTrackers.value > 1)
+							return qsTr ("multiple trackers")
+                        else if (pvVoltage3.valid)
                             voltageText = pvVoltage3.text
                         else
                             voltageText = "??V"
@@ -708,8 +700,8 @@ OverviewPage {
 
     OverviewSolarInverter {
         id: pvInverter
-////// MODIFIED to show tanks & provide extra space if not
-        height: hasDcAndAcSolar ? blueSolarCharger.height : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
+////// MODIFIED to show tanks/temps of provide extra space if no tanks/temps
+        height: hasDcSolar ? blueSolarCharger.height : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
         width: 148
         title: qsTr("PV Inverter")
         showInverterIcon: !hasDcAndAcSolar
@@ -717,7 +709,7 @@ OverviewPage {
 
         anchors {
             right: root.right; rightMargin: 10;
-            bottom: hasDcAndAcSolar ? blueSolarCharger.top : root.bottom; bottomMargin: 5
+            bottom: blueSolarCharger.top; bottomMargin: 5
         }
 
         OverviewAcValuesEnhanced {
@@ -731,6 +723,7 @@ OverviewPage {
             TileText {
                 id: coupledPvAc
 
+				// total poer is sum of PV power on AC ins and AC out
                 property double pvInverterOnAcOut: sys.pvOnAcOut.power.valid ? sys.pvOnAcOut.power.value : 0
                 property double pvInverterOnAcIn1: sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
                 property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
@@ -787,7 +780,7 @@ OverviewPage {
             }
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
             connection: sys.pvInverter
-            show: showGauges && hasAcSolar && !hasDcAndAcSolar
+            show: showGauges && hasAcSolar
         }
     }
 

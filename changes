@@ -1,4 +1,14 @@
-v5,20:
+v5.22:
+	added support for Venus OS v2.90~3 firmware
+
+v5.21:
+	added display of multiple trackers in RS MPPT in the PV Charger detail page
+	fixed: voltage and current on flow overview displayed as ??V NaNA
+	increased battery voltage resolution to 1/100th of a volt
+	fixed: DC System power/voltage in flow overview displayed as --/NaNA
+		if DC power not valid
+
+v5.20:
 	fixed: battery remaining time incorrect for > 1 day
 
 v5.19:

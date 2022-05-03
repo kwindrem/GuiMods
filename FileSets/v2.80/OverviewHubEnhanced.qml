@@ -319,7 +319,7 @@ OverviewPage {
                 font.pixelSize: 6
             }
 			TileText {
-				text: sys.battery.voltage.format(1) + "   " + sys.battery.current.format(1)
+				text: sys.battery.voltage.format(2) + "   " + sys.battery.current.format(1)
 			}
             TileText {
                 text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr ("Remain: ∞")
@@ -342,24 +342,7 @@ OverviewPage {
 		width: multi.width + 20
 		height: 45
         visible: hasDcSystem
-        title:
-        {
-            var dcLoad, dcCharge
-            if (maxDcLoad.valid && maxDcLoad.value != 0)
-                dcLoad = true
-            else
-                dcLoad = false
-            if (maxDcCharge.valid && maxDcCharge.value != 0)
-                dcCharge = true
-            else
-                dcCharge = false
-            if (dcLoad && ! dcCharge)
-                qsTr ("DC Loads")
-            else if ( ! dcLoad && dcCharge)
-                qsTr ("DC Charge")
-            else
-                qsTr ("DC System")
-        }
+        title: qsTr ("DC System")
 
 		anchors {
 			horizontalCenter: multi.horizontalCenter
@@ -377,7 +360,7 @@ OverviewPage {
 
     function dcSystemText ()
     {
-        if (hasDcSystem)
+        if (hasDcSystem && sys.dcSystem.power.valid)
         {
             var current = sys.dcSystem.power.value / sys.battery.voltage.value
             if (Math.abs (current) <= 100)
