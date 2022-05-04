@@ -1,3 +1,6 @@
+v5.23:
+	fixed install crash
+
 v5.22:
 	added support for Venus OS v2.90~3 firmware
 

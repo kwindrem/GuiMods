@@ -16,3 +16,4 @@
 /opt/victronenergy/gui/qml/PageSettingsDisplay.qml
 /opt/victronenergy/gui/qml/Tile.qml
 /opt/victronenergy/gui/qml/PageSettingsRelay.qml
+/opt/victronenergy/gui/qml/PageSettingsGuiMods.qml
