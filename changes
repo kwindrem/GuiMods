@@ -1,3 +1,6 @@
+v2.25:
+	use system temperature scale if present (v2.90 and beyond)
+
 v5.24:
 	fixed: PV Charger detail table is blank
 

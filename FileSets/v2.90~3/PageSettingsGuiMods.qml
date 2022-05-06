@@ -9,6 +9,7 @@ MbPage {
 	title: qsTr("Gui Mods")
     property string bindPrefixGuiMods: "com.victronenergy.settings/Settings/GuiMods"
     property string bindPrefix: "com.victronenergy.settings/Settings/Gui"
+    property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
 
 	model: VisualItemModel
     {
@@ -188,7 +189,7 @@ MbPage {
             id: tempScale
             description: qsTr ("Temperature scale")
             bind: Utils.path (bindPrefixGuiMods, "/TemperatureScale")
-            show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
+            show: ! systemScaleItem.valid && (useEnhFlowOverview.checked || useEnhMobileOverview.checked)
             possibleValues:
             [
                 MbOption { description: "°C"; value: 1 },
