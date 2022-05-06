@@ -124,17 +124,19 @@ MbPage
         running: root.active
     }
 
-	VBusItem { id: numberOfTrackers;  bind: Utils.path(service.name,"/NrOfTrackers") }
+	VBusItem { id: numberOfTrackers;  bind: Utils.path(serviceName,"/NrOfTrackers") }
+	property string serviceName: ""
 
     function addService(service)
     {
         switch (service.type)
         {
         case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
+			serviceName = service.name
 			// for single tracker create a single charger row with tracker instance -1
-            if ( ! numberTrackers.valid )
+            if ( ! numberOfTrackers.valid || numberOfTrackers.value == 1)
 				pvChargerModel.append ( {serviceName: service.name, tracker: -1} )
-			// for multiple trackers create a separate charger row
+			// create a separate charger row for each tracker
 			else
 			{
 				var tracker

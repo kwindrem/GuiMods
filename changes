@@ -1,3 +1,6 @@
+v5.24:
+	fixed: PV Charger detail table is blank
+
 v5.23:
 	fixed install crash
 

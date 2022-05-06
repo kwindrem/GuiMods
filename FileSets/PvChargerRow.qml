@@ -55,7 +55,7 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: pvPowerPath }
+            text: formatValue (pvPower, " W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: multiTrackerHeader ? " " : formatValue (pvVoltage, " V") }
