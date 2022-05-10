@@ -1,3 +1,6 @@
+v2.26:
+	fixed: PV charger voltage/current not shown starting with v2.80
+
 v2.25:
 	use system temperature scale if present (v2.90 and beyond)
 

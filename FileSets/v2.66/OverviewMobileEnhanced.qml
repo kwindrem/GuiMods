@@ -104,11 +104,18 @@ OverviewPage {
     property int infoWidth3Column: infoWidth / 3
     property int infoWidth2Column: infoWidth / 2
 
+//////// add for PV Charger voltage and current
+	VBusItem { id: pvNrTrackers; bind: Utils.path(pvChargerPrefix, "/NrOfTrackers") }
+	property bool singleTracker: ! pvNrTrackers.valid || pvNrTrackers.value == 1
+	property bool showPvVI: numberOfPvChargers == 1 && singleTracker
+	VBusItem { id: pvPower; bind: Utils.path(pvChargerPrefix, "/Yield/Power") }
+	VBusItem { id: pvVoltage;  bind: Utils.path(pvChargerPrefix, singleTracker ? "/Pv/V" : "/Pv/0/V") }
+
 //////// added to control time display
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: timeFormatItem; bind: Utils.path(guiModsPrefix, "/TimeFormat") }
     property string timeFormat: getTimeFormat ()
-    
+
     function getTimeFormat ()
     {
         if (!timeFormatItem.valid || timeFormatItem.value === 0)
@@ -284,9 +291,6 @@ OverviewPage {
 	    width: root.infoWidth3Column
 	    height: root.infoTileHeight
 	    color: "#2cc36b"
-//////// add voltage and current
-	    VBusItem { id: pvCurrent; bind: Utils.path(pvChargerPrefix, "/Pv/I") }
-	    VBusItem { id: pvVoltage;  bind: Utils.path(pvChargerPrefix, "/Pv/V") }
 	    values: [
             TileText {
                 font.pixelSize: 22
@@ -294,8 +298,9 @@ OverviewPage {
             },
     //////// add voltage and current
             TileText {
-                text: numberOfPvChargers > 0 ? pvVoltage.text + " " + pvCurrent.text : ""
-                visible: numberOfPvChargers > 0 && pvVoltage.valid && pvCurrent.valid
+                text: showPvVI ? pvVoltage.value.toFixed(1) + "V" + " "
+						+ (pvPower.value / pvVoltage.value).toFixed(1) + "A" : ""
+                visible: showPvVI
             }
         ]
 	} // end Tile PV CHARGER
