@@ -201,7 +201,6 @@ OverviewPage {
 			MarqueeEnhanced {
 				text:
 				{
-					return "reason placeholder" ////////////////////
 					if (activeNotifications.length === 0)
 						return systemReasonMessage.text
 					else

@@ -1,7 +1,10 @@
+v5.31:
+	removed debug message ("reason placeholder")
+
 v5.30:
 	fixed: generator control from relay overview not working
 
-v5.29~1:
+v5.29:
 	added humidity to temps tiles
 	added DC System detail
 	added details and gauges to Mobile Overview
