@@ -18,6 +18,8 @@ Tile {
 
 	property string bindPrefix: serviceName
     property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, "/Temperature") }
+    property VBusItem humidityItem: VBusItem { id: humidityItem; bind: Utils.path(bindPrefix, "/Humidity") }
+    property string humidityText: humidityItem.valid ? (" " + humidityItem.value.toFixed (0) + "%") : ""
     property VBusItem rawValueItem: VBusItem { id: rawValueItem; bind: Utils.path(bindPrefix, "/RawValue") }
     property VBusItem scaleItem: VBusItem { id: scaleItem; bind: Utils.path(bindPrefix, "/Scale") }
     property VBusItem offsetItem: VBusItem { id: offsetItem; bind: Utils.path(bindPrefix, "/Offset") }
@@ -38,7 +40,8 @@ Tile {
 
 	function doScroll()
 	{
-		tempText.doScroll()
+		nameText.doScroll()
+		valueText.doScroll()
 	}
 
 	values: Item
@@ -48,7 +51,7 @@ Tile {
 
 		MarqueeEnhanced
         {
-			id: tempText
+			id: nameText
             width: Math.max (Math.floor (parent.width * 0.5 ), 44)
 			height: compact ? 13 : parent.height
 			text: compact ? tempName : ""
@@ -60,26 +63,27 @@ Tile {
                 verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
 			}
 		}
-
-        Text {
-            font.pixelSize: 12
-            font.bold: true
-            color: "white"
-            width: root.width - 10 - (compact ? tempText.width + 3 : 0)
-            anchors {
-                verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
-                right: parent.right
-            }
-            horizontalAlignment: compact ? Text.AlignRight : Text.AlignHCenter
+		MarqueeEnhanced
+        {
+			id: valueText
+            width: root.width - 10 - (compact ? nameText.width : 0)
+			height: compact ? 13 : parent.height
             text:
             {   
                 if (root.temperature == -99)
                     return "--"
                 else if (tempScale == 2)
-                    return ((root.temperature * 9 / 5) + 32).toFixed (1) + "°F"
+                    return ((root.temperature * 9 / 5) + 32).toFixed (1) + "°F" + humidityText
                 else
-                    return root.temperature.toFixed (1) + "°C"
+                    return root.temperature.toFixed (1) + "°C" + humidityText
             }
-        }
+			textHorizontalAlignment: compact ? Text.AlignLeft : Text.AlignHCenter
+			scroll: false
+			anchors
+            {
+                verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
+                right: parent.right
+			}
+		}
 	}
 }

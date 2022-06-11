@@ -99,7 +99,7 @@ MbPage {
         }
         MbEditBox
         {
-            description: qsTr ("Max power Multi/Quatro Charger")
+            description: qsTr ("Max power Multi/Quattro Charger")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxChargerPower")
             matchString: "0123456789"

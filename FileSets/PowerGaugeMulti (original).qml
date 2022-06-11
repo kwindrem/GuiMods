@@ -7,7 +7,6 @@ import com.victron.velib 1.0
 
 Item {
 	id: root
-	width: parent.width
 
     property string inverterService: ""
     property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }

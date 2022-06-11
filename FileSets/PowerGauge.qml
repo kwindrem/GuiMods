@@ -7,54 +7,31 @@ import com.victron.velib 1.0
 
 Item {
 	id: root
-	width: parent.width
 
     property variant connection
-    onConnectionChanged:
-    {
-        setPhaseCount ()
-        setLimits ()
-    }
-    property int connectionPhaseCount: connection.phaseCount != undefined && connection.phaseCount.valid ? connection.phaseCount.value : 0
-    onConnectionPhaseCountChanged:
-    {
-        setPhaseCount ()
-        setLimits ()
-    }
 
-    property int phaseCount: 0
+    property int connectionPhaseCount: connection.phaseCount != undefined && connection.phaseCount.valid ? connection.phaseCount.value : 0
+    property int phaseCount: root.connection == undefined ? 0 : (root.connection === sys.pvCharger || root.connection === sys.dcSystem || root.connection.l1AndL2OutShorted) ? 1 : connectionPhaseCount
+
 
     property string maxForwardPowerParameter: ""
-    VBusItem
-    {
-        id: maxForwardLimitItem
-        bind: root.maxForwardPowerParameter
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
-    }
+    VBusItem { id: maxForwardLimitItem; bind: root.maxForwardPowerParameter }
 
     property string maxReversePowerParameter: ""
-    VBusItem
-    {
-        id: maxReverseLimitItem
-        bind: root.maxReversePowerParameter
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
-    }
+    VBusItem { id: maxReverseLimitItem; bind: root.maxReversePowerParameter }
 
     property real inPowerLimit: sys.acInput.inCurrentLimit.value * sys.acInput.voltageL1.value
-    onInPowerLimitChanged:
-    {
-        if (connection === sys.acInput)
-            setLimits ()
-    }
 
-    property real maxForwardLimit: 0
-    property real maxDisplayed: 0
-    property real maxReverseLimit: 0
-    property real maxLoadDisplayed: 0
-    property real scaleFactor
-    property real zeroOffset
+    property real maxForwardLimit: root.connection === sys.acInput ? inPowerLimit : maxForwardLimitItem.valid ? maxForwardLimitItem.value : 0
+    property real maxReverseLimit: maxReverseLimitItem.valid ? maxReverseLimitItem.value : 0
+	// overload range is 10% of forward to reverse limits
+	property real overload: (maxForwardLimit + maxReverseLimit) * 0.1
+	property real maxForwardDisplayed: maxForwardLimit > 0 ? maxForwardLimit + overload : 0
+	property real maxReverseDisplayed: maxReverseLimit > 0 ? maxReverseDisplayed = maxReverseLimit + overload : 0
+	property real totalPowerDisplayed: maxForwardDisplayed + maxReverseDisplayed
+	property bool showGauge: root.connection != undefined && totalPowerDisplayed > 0 && phaseCount > 0
+	property real scaleFactor: showGauge ? root.width / totalPowerDisplayed : 0
+	property real zeroOffset: showGauge ? maxReverseDisplayed * scaleFactor : 0
 
     property int barSpacing: phaseCount > 0 ? Math.max (height / (phaseCount + 1), 2) : 0
     property int barHeight: barSpacing < 3 ? barSpacing : barSpacing - 1
@@ -66,20 +43,12 @@ Item {
     property color bar1color: "black"
     property color bar2color: "black"
     property color bar3color: "black"
-    
-    property bool showGauge: false
-    
-    Component.onCompleted:
-    {
-        setPhaseCount ()
-        setLimits ()
-    } 
 
     // overload range Left
     Rectangle
     {
         id: overloadLeft
-        width: showGauge ? scaleFactor * (maxLoadDisplayed - maxReverseLimit) : 0
+        width: showGauge ? scaleFactor * (maxReverseDisplayed - maxReverseLimit) : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
@@ -109,7 +78,7 @@ Item {
     Rectangle
     {
         id: overloadRight
-        width: showGauge ? scaleFactor * (maxDisplayed - maxForwardLimit) : 0
+        width: showGauge ? scaleFactor * (maxForwardDisplayed - maxForwardLimit) : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
@@ -125,7 +94,7 @@ Item {
     Rectangle
     {
         id: bar1
-        width: visible ? calculateBar1width () : 0
+        width: phaseCount >= 1 ? calculateBar1width () : 0
         height: barHeight
         clip: true
         color: bar1color
@@ -135,12 +104,12 @@ Item {
             left: root.left; leftMargin: bar1offset
 
         }
-        visible: showGauge
+        visible: showGauge && phaseCount >= 1
     }
     Rectangle
     {
         id: bar2
-        width: visible ? calculateBar2width () : 0
+        width: phaseCount >= 2 ? calculateBar2width () : 0
         height: barHeight
         clip: true
         color: bar2color
@@ -149,12 +118,12 @@ Item {
             top: root.top; topMargin: firstBarVertPos + barSpacing
             left: root.left; leftMargin: bar2offset
         }
-        visible: showGauge
+        visible: showGauge && phaseCount >= 2
     }
     Rectangle
     {
         id: bar3
-        width: visible ? calculateBar3width () : 0
+        width: phaseCount >= 3 ? calculateBar3width () : 0
         height: barHeight
         clip: true
         color: bar3color
@@ -163,7 +132,7 @@ Item {
             top: root.top; topMargin: firstBarVertPos + barSpacing * 2
             left: root.left; leftMargin: bar3offset
         }
-        visible: showGauge
+        visible: showGauge && phaseCount >= 3
     }
 
     // zero line - draw last so it's on top
@@ -186,14 +155,12 @@ Item {
     function calculateBar1width ()
     {
         var currentValue, barWidth
-        if (phaseCount < 1)
-            return 0
         if (root.connection === sys.pvCharger || root.connection === sys.dcSystem)
             currentValue = root.connection.power.valid ? root.connection.power.value : 0
         else
             currentValue = root.connection.powerL1.valid ? root.connection.powerL1.value : 0
         bar1color = getBarColor (currentValue)
-        barWidth = Math.min ( Math.max (currentValue, -maxLoadDisplayed), maxDisplayed) * scaleFactor
+        barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
         // left of bar is at 0 point
         if (barWidth >= 0)
         {
@@ -210,11 +177,9 @@ Item {
     function calculateBar2width ()
     {
         var currentValue, barWidth
-        if (phaseCount < 2)
-            return 0
         currentValue = root.connection.powerL2.valid ? root.connection.powerL2.value : 0
         bar2color = getBarColor (currentValue)
-        barWidth = Math.min ( Math.max (currentValue, -maxLoadDisplayed), maxDisplayed) * scaleFactor
+        barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
         // left of bar is at 0 point
         if (barWidth >= 0)
         {
@@ -231,11 +196,9 @@ Item {
     function calculateBar3width ()
     {
         var currentValue, barWidth
-        if (phaseCount < 3)
-            return 0
         currentValue = root.connection.powerL3.valid ? root.connection.powerL3.value : 0
         bar3color = getBarColor (currentValue)
-        barWidth = Math.min ( Math.max (currentValue, -maxLoadDisplayed), maxDisplayed) * scaleFactor
+        barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
         // left of bar is at 0 point
         if (barWidth >= 0)
         {
@@ -248,58 +211,6 @@ Item {
             bar3offset = zeroOffset + barWidth
             return -barWidth
         }
-    }
-
-    function setLimits ()
-    {
-        // gauges disabled if not receiving valid phase count
-        //   or connection not defined
-        if (phaseCount === 0 || sys === undefined)
-        {
-            showGauge = false
-            return
-        }
-        
-        if (root.connection === sys.acInput)
-            maxForwardLimit = inPowerLimit
-        else
-            maxForwardLimit = maxForwardLimitItem.valid ? maxForwardLimitItem.value : 0
-        // gauges disabled if maxForwardLimit is 0
-        if (maxForwardLimit === 0)
-        {
-            showGauge = false
-            return
-        }
-        maxReverseLimit = maxReverseLimitItem.valid ? maxReverseLimitItem.value : 0
-                
-        // overload range is 10%
-        // at left end also if showing load values to left of zero
-        var overload = (maxForwardLimit + maxReverseLimit) * 0.1
-        maxDisplayed = maxForwardLimit + overload
-        if (maxReverseLimit > 0)
-            maxLoadDisplayed = maxReverseLimit + overload
-        else
-            maxLoadDisplayed = 0
-
-        scaleFactor = root.width / (maxDisplayed + maxLoadDisplayed)
-        zeroOffset = maxLoadDisplayed * scaleFactor
-
-        showGauge = true
-
-    }
-    
-    // for connections, phaseCount comes from the connection (if defined)
-    // phaseCount is always 1 for the PV charger connection
-    function setPhaseCount ()
-    {
-        if (root.connection === undefined)
-            phaseCount = 0
-        else if (root.connection === sys.pvCharger || root.connection === sys.dcSystem)
-            phaseCount = 1
-        else if (root.connection.l1AndL2OutShorted)
-            phaseCount = 1
-        else
-            phaseCount = root.connectionPhaseCount
     }
 
     function getBarColor (currentValue)

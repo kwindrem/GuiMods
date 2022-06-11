@@ -77,7 +77,7 @@ MbPage
                         text: qsTr("PV Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Mode") }
+                        text: qsTr("State") }
             }
 
         }

@@ -7,7 +7,6 @@ import com.victron.velib 1.0
 
 Item {
 	id: root
-	width: parent.width
 
     property string inverterService: ""
     property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
@@ -15,97 +14,106 @@ Item {
     {
         id: systemStateItem
         bind: Utils.path("com.victronenergy.system", "/SystemState/State")
-        onValueChanged: setLimits ()
     }
 
     VBusItem
     { 
         id: pInL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/P")
-        onValidChanged: calculateBar1width ()
-        onValueChanged: calculateBar1width ()
+        onValidChanged: calculateBar1 ()
+        onValueChanged: calculateBar1 ()
     }
     VBusItem
     { 
         id: pInL2; bind: Utils.path(inverterService, "/Ac/ActiveIn/L2/P")
-        onValidChanged: calculateBar2width ()
-        onValueChanged: calculateBar2width ()
+        onValidChanged: calculateBar2 ()
+        onValueChanged: calculateBar2 ()
     }
     VBusItem
     { 
         id: pInL3; bind: Utils.path(inverterService, "/Ac/ActiveIn/L3/P")
-        onValidChanged: calculateBar3width ()
-        onValueChanged: calculateBar3width ()
+        onValidChanged: calculateBar3 ()
+        onValueChanged: calculateBar3 ()
     }
     VBusItem
     { 
         id: pOutL1; bind: Utils.path(inverterService, "/Ac/Out/L1/P")
-        onValidChanged: calculateBar1width ()
-        onValueChanged: calculateBar1width ()
+        onValidChanged: calculateBar1 ()
+        onValueChanged: calculateBar1 ()
     }
     VBusItem
     { 
         id: pOutL2; bind: Utils.path(inverterService, "/Ac/Out/L2/P")
-        onValidChanged: calculateBar2width ()
-        onValueChanged: calculateBar2width ()
+        onValidChanged: calculateBar2 ()
+        onValueChanged: calculateBar2 ()
     }
     VBusItem
     { 
         id: pOutL3; bind: Utils.path(inverterService, "/Ac/Out/L3/P")
-        onValidChanged: calculateBar3width ()
-        onValueChanged: calculateBar3width ()
+        onValidChanged: calculateBar3 ()
+        onValueChanged: calculateBar3 ()
     }
 
     VBusItem
     {
         id: phaseCountItem
         bind: Utils.path(inverterService, "/Ac/NumberOfPhases" )
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
     }
     property int phaseCount : phaseCountItem.valid ? phaseCountItem.value : 0
-    onPhaseCountChanged: setLimits ()
 
     VBusItem
     {
         id: inverterContinuousPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/ContiuousPower")
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
+        onValueChanged: calculateAllBars ()
+        onValidChanged: calculateAllBars ()
     }
     VBusItem
     {
         id: inverterPeakPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/PeakPower")
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
+        onValueChanged: calculateAllBars ()
+        onValidChanged: calculateAllBars ()
     }
     VBusItem
     {
         id: inverterCautionPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/CautionPower")
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
+        onValueChanged: calculateAllBars ()
+        onValidChanged: calculateAllBars ()
     }
     VBusItem
     {
         id: chargerMaxPowerItem
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/MaxChargerPower")
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
+        onValueChanged: calculateAllBars ()
+        onValidChanged: calculateAllBars ()
     }
-    property real maxInverterDisplayed: 0
-    property real inverterOverload: 0
-    property real inverterCaution: 0
-    property real maxChargerDisplayed: 0
-    property real chargerMaxPower: 0
+	property real inverterMode: inverterModeItem.valid ? inverterModeItem.value : 0
+	property real systemState: systemStateItem.valid ? systemStateItem.value : 0
+	// inverter not producing output and charger not running - hide the guage
+	// Mode:  undefined, Off
+	// SystemState: Off, Fault
+    property bool showGauge: ! (inverterMode <= 0 || inverterMode === 4 || systemState === 0 || systemState === 2 || totalDisplayedPower == 0)
+
+	property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
+    property real inverterContinuousPower: inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
+	property real inverterPeakPower: inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
+
+    property real maxInverterDisplayed: inverterPeakPower
+    property real inverterOverload: Math.min (inverterCautionPower, maxInverterDisplayed)
+	property real inverterCaution: Math.min (inverterCautionPower, inverterOverload)
+
+    property real chargerMaxPower: chargerMaxPowerItem.valid ? chargerMaxPowerItem.value : 0
+    property real maxChargerDisplayed: chargerMaxPower * 1.1
+    property real totalDisplayedPower: maxInverterDisplayed + maxChargerDisplayed
+    property real scaleFactor: showGauge ? root.width / (maxInverterDisplayed + maxChargerDisplayed) : 0
+    property real zeroOffset: showGauge ? maxChargerDisplayed * scaleFactor : 0
 
     property int barSpacing: phaseCount > 0 ? Math.max (height / (phaseCount + 1), 2) : 0
     property int barHeight: barSpacing < 3 ? barSpacing : barSpacing - 1
     property int firstBarVertPos: (height - barSpacing * phaseCount) / 2
-    property real scaleFactor
-    property real zeroOffset
-    
-    property real bar1offset
+
+	property real bar1offset
     property real bar2offset
     property real bar3offset
     property real bar1width
@@ -115,13 +123,8 @@ Item {
     property color bar1color: "black"
     property color bar2color: "black"
     property color bar3color: "black"
-    
-    property bool showGauge: false
-    
-    Component.onCompleted:
-    {
-        setLimits ()
-    } 
+
+	Component.onCompleted: calculateAllBars ()
 
     // chaerger overload range (maxChargerDisplayed to chargerMaxPower)
     Rectangle
@@ -243,7 +246,7 @@ Item {
         }
     }
 
-    function calculateBar1width ()
+    function calculateBar1 ()
     {
         var currentValue, barWidth
         if (phaseCount < 1)
@@ -267,7 +270,7 @@ Item {
             bar1offset = zeroOffset + barWidth
         }
     }
-    function calculateBar2width ()
+    function calculateBar2 ()
     {
         var currentValue, barWidth
         if (phaseCount < 2)
@@ -291,7 +294,7 @@ Item {
             bar2offset = zeroOffset + barWidth
         }
     }
-    function calculateBar3width ()
+    function calculateBar3 ()
     {
         var currentValue, barWidth
         if (phaseCount < 3)
@@ -316,46 +319,6 @@ Item {
         }
     }
 
-    function setLimits ()
-    {
-        var inverterContinuousPower = inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
-        var inverterCautionPower = inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
-        var inverterPeakPower = inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
-        var inverterMode = inverterModeItem.valid ? inverterModeItem.value : 0
-        var systemState = systemStateItem.valid ? systemStateItem.value : 0
-
-        // gauges disabled if not receiving valid phase count
-        //   or if inverterPeakPower is 0
-        if (phaseCount === 0 || inverterPeakPower === 0)
-        {
-            showGauge = false
-            scaleFactor = 0
-            zeroOffset = 0
-            return
-        }
-
-        // inverter not producing output and charger not running - hide the guage
-        // Mode:  undefined, Off
-        // SystemState: Off, Fault
-        if (inverterMode <= 0 || inverterMode === 4 || systemState === 0 || systemState === 2)
-            showGauge = false
-        else
-        {
-            maxInverterDisplayed = inverterPeakPower
-            inverterOverload = inverterCautionPower
-            inverterCaution = inverterContinuousPower
-            chargerMaxPower = chargerMaxPowerItem.valid ? chargerMaxPowerItem.value : 0
-            maxChargerDisplayed = chargerMaxPower * 1.1
-            // make sure regions are in expected order
-            if (inverterOverload > maxInverterDisplayed)
-                inverterOverload = maxInverterDisplayed
-            if (inverterCaution > inverterOverload)
-                inverterCaution = inverterOverload
-            scaleFactor = root.width / (maxInverterDisplayed + maxChargerDisplayed)
-            zeroOffset = maxChargerDisplayed * scaleFactor
-            showGauge = true
-        }
-    }
     function getBarColor (currentValue)
     {
         if (currentValue > inverterOverload || currentValue < -chargerMaxPower)
@@ -365,4 +328,11 @@ Item {
         else
             return "green"
     }
+
+	function calculateAllBars ()
+	{
+		    calculateBar1 ()
+		    calculateBar2 ()
+		    calculateBar3 ()
+	}
 }

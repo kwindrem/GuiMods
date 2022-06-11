@@ -6,56 +6,55 @@ import com.victron.velib 1.0
 
 Item {
 	id: root
-	width: parent.width
 
     property int barHeight: Math.max (height / 2, 2)    
     property color barColor: "black"
     
-    property real chargeOverload
-    property real chargeCaution
-    property real maxChargeDisplayed
-    property real dischargeOverload
-    property real dischargeCaution
-    property real maxDischargeDisplayed
-    property real scaleFactor
-    property real zeroOffset
-    property bool okToDisplay: false
+    property real chargeOverload: maxCharge.valid ? maxCharge.value : 0
+    property real chargeCaution: chargeOverload
+    property real maxChargeDisplayed: chargeOverload * 1.1
+    property real dischargeOverload: maxDischarge.valid ? maxDischarge.value : 0
+    property real dischargeCaution: dischargeOverload
+    property real maxDischargeDisplayed: dischargeOverload * 1.1
+	property real totalPowerDisplayed: maxChargeDisplayed + maxDischargeDisplayed
+    property bool showGauge: totalPowerDisplayed > 0
+    property real scaleFactor: showGauge ? (root.width / totalPowerDisplayed) : 0
+    property real zeroOffset: showGauge ? (maxDischargeDisplayed * scaleFactor) : 0
     property real barWidth
     property real barOffset
     
-    Component.onCompleted: setLimits ()
+	Component.onCompleted: calculateBarWidth ()
 
     VBusItem
     {
         id: maxCharge
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent")
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
+        onValueChanged: calculateBarWidth ()
+        onValidChanged: calculateBarWidth ()
     }
     VBusItem
     {
         id: maxDischarge
         bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent")
-        onValueChanged: setLimits ()
-        onValidChanged: setLimits ()
+        onValueChanged: calculateBarWidth ()
+        onValidChanged: calculateBarWidth ()
     }
     VBusItem
     {
         id: batteryCurrent
         bind: Utils.path("com.victronenergy.system", "/Dc/Battery/Current")
         onValueChanged: calculateBarWidth ()
-        onValidChanged: setLimits ()
     }
 
     // discharge overload range (beginning of bar dischargeOverload)
     Rectangle
     {
         id: dischargeOverloadRange
-        width: okToDisplay ? scaleFactor * (maxDischargeDisplayed - dischargeOverload) : 0
+        width: showGauge ? scaleFactor * (maxDischargeDisplayed - dischargeOverload) : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
-        visible: okToDisplay
+        visible: showGauge
         anchors
         {
             top: root.top
@@ -66,11 +65,11 @@ Item {
     Rectangle
     {
         id: dischargeCautionRange
-        width: okToDisplay ? scaleFactor * (dischargeOverload - dischargeCaution) : 0
+        width: showGauge ? scaleFactor * (dischargeOverload - dischargeCaution) : 0
         height: root.height
         clip: true
         color: "#bbbb00"
-        visible: okToDisplay
+        visible: showGauge
         anchors
         {
             top: root.top
@@ -81,11 +80,11 @@ Item {
     Rectangle
     {
         id: okRange
-        width: okToDisplay ? scaleFactor * (dischargeCaution + chargeCaution) : 0
+        width: showGauge ? scaleFactor * (dischargeCaution + chargeCaution) : 0
         height: root.height
         clip: true
         color: "#99ff99"
-        visible: okToDisplay
+        visible: showGauge
         anchors
         {
             top: root.top
@@ -96,11 +95,11 @@ Item {
     Rectangle
     {
         id: chargeCautionRange
-        width: okToDisplay ? scaleFactor * (chargeOverload - chargeCaution) : 0
+        width: showGauge ? scaleFactor * (chargeOverload - chargeCaution) : 0
         height: root.height
         clip: true
         color: "#bbbb00"
-        visible: okToDisplay
+        visible: showGauge
         anchors
         {
             top: root.top
@@ -111,11 +110,11 @@ Item {
     Rectangle
     {
         id: chargeOverloadRange
-        width: okToDisplay ? scaleFactor * (maxChargeDisplayed - chargeOverload) : 0
+        width: showGauge ? scaleFactor * (maxChargeDisplayed - chargeOverload) : 0
         height: root.height
         clip: true
         color: "#ffb3b3"
-        visible: okToDisplay
+        visible: showGauge
         anchors
         {
             top: root.top
@@ -127,7 +126,7 @@ Item {
     Rectangle
     {
         id: chargingBar
-        width: okToDisplay ? barWidth : 0
+        width: showGauge ? barWidth : 0 ////////////////////////////////
         height: barHeight
         clip: true
         color: barColor
@@ -136,7 +135,7 @@ Item {
             verticalCenter: root.verticalCenter
             left: root.left; leftMargin: barOffset
         }
-        visible: okToDisplay
+        visible: showGauge
     }
 
     // zero line - draw last so it's on top
@@ -147,7 +146,7 @@ Item {
         height: root.height
         clip: true
         color: "black"
-        visible: okToDisplay
+        visible: showGauge
         anchors
         {
             top: root.top
@@ -184,27 +183,5 @@ Item {
             barWidth = -current * scaleFactor
             barOffset = zeroOffset - barWidth
         }
-    }
-    
-    function setLimits ()
-    {
-        // guages disabled if maxDischarge is 0
-        if (! maxDischarge.valid || maxDischarge.value === 0)
-        {
-            okToDisplay = false
-            return
-        }
-        chargeOverload = maxCharge.value
-        chargeCaution = chargeOverload
-        maxChargeDisplayed = chargeOverload * 1.1
-
-        dischargeOverload = maxDischarge.value
-        dischargeCaution = dischargeOverload
-        maxDischargeDisplayed = dischargeOverload * 1.1
-
-        scaleFactor = root.width / (maxChargeDisplayed + maxDischargeDisplayed)
-        zeroOffset = maxDischargeDisplayed * scaleFactor
-        okToDisplay = true
-        calculateBarWidth ()
     }
 }

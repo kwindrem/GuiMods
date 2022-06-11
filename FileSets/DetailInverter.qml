@@ -400,6 +400,7 @@ MbPage {
          switch (service.type)
         {
         case DBusService.DBUS_SERVICE_MULTI:
+        case DBusService.DBUS_SERVICE_MULTI_RS:
             numberOfMultis++
             if (numberOfMultis === 1)
                 inverterService = service.name;

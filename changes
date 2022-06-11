@@ -1,3 +1,20 @@
+
+v5.29~1:
+	added humidity to temps tiles
+	added DC System detail
+	added details and gauges to Mobile Overview
+	
+alternator, etc (DC sources) development on hold
+v5.28~6:
+	switched from /Mode to /State for battery State in DC System detail page
+v5.28~5:
+	translate states locally in DC System detail page
+
+v5.28~3:
+	add alternator, fuel cell tiles to Grid Parallel overview (wind TBD)
+
+v5.28~1:
+
 v5.27:
 	added v2.90~8
 

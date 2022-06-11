@@ -1197,6 +1197,23 @@ OverviewPage {
             visible: showTargets
         }
     }
+    MouseArea
+    {
+        id: dcTarget
+        anchors.centerIn: dcSystemBox
+        enabled: parent.active
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailDcSystem.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets
+        }
+    }
 ////// display detail targets and help message when first displayed.
     Timer {
         id: helpTimer
