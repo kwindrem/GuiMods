@@ -306,7 +306,7 @@ OverviewPage {
 ////// MODIFIED to show tanks
         height: batteryHeight + 5
 		anchors {
-			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : hasDcAndAcSolar ? 15 : 5;
+			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5;
 			left: parent.left; leftMargin: 10
 		}
 		values: Column {
@@ -411,7 +411,8 @@ OverviewPage {
                 right: parent.right; rightMargin: 2
             }
             opacity: 0.5
-        }
+			visible: ! hasDcAndAcSolar
+      }
 
 //////// add power for individual PV chargers
 		values: 
@@ -779,8 +780,8 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
-            connection: sys.pvInverter
-            show: showGauges && hasAcSolar
+            connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
+            show: showGauges && hasAcSolar && !hasDcAndAcSolar
         }
     }
 
@@ -921,7 +922,7 @@ OverviewPage {
         id: scrollTimer
         interval: 15000
         repeat: true
-        running: root.active && root.compact
+        running: root.active
     }
     ListView
     {
@@ -1003,7 +1004,7 @@ OverviewPage {
     }
     ListModel { id: tempsModel }
 
-    // When new service is found check if is a tank sensor
+    // When new service is found add resources as appropriate
     Connections
     {
         target: DBusServices
@@ -1058,7 +1059,19 @@ OverviewPage {
             else if (numberOfPvChargers === 7)
                 pvChargerPrefix7 = service.name;
             break;;
-    }
+
+ //////// add for PV INVERTER power display
+        case DBusService.DBUS_SERVICE_PV_INVERTER:
+            numberOfPvInverters++
+            if (numberOfPvInverters === 1)
+                pvInverterPrefix1 = service.name;
+            else if (numberOfPvInverters === 2)
+                pvInverterPrefix2 = service.name;
+            else if (numberOfPvInverters === 3)
+                pvInverterPrefix3 = service.name;
+            break;;
+        }
+   }
 
     // Detect available services of interest
     function discoverServices()
@@ -1181,6 +1194,23 @@ OverviewPage {
         enabled: parent.active
         height: touchArea; width: touchArea
         onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailBattery.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets
+        }
+    }
+    MouseArea
+    {
+        id: dcTarget
+        anchors.centerIn: dcSystemBox
+        enabled: parent.active
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailDcSystem.qml",
                     {backgroundColor: detailColor} ) }
         Rectangle
         {

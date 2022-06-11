@@ -77,7 +77,6 @@ OverviewPage {
     property int numberOfPvInverters: 0
 
     property int numberOfMultis: 0
-    property string multiPrefix: ""
 //////// add for VE.Direct inverters
     property int numberOfInverters: 0
     property string inverterService: ""

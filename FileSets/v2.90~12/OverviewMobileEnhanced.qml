@@ -64,7 +64,7 @@ OverviewPage {
 //////// added to keep track of tanks and temps
     property int numberOfTemps: 0
     property int tankTempCount: tankModel.rowCount + numberOfTemps
-    property real tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? pumpButton : 0)
+    property real tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? pumpButton.height : 0)
     property real tanksHeight: tankModel.rowCount > 0 ? tanksTempsHeight * tankModel.rowCount / tankTempCount : 0
     property real tempsHeight: tanksTempsHeight - tanksHeight
     property real minimumTankHeight: 21

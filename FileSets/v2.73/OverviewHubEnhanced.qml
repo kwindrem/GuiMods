@@ -77,7 +77,6 @@ OverviewPage {
     property int numberOfPvInverters: 0
 
     property int numberOfMultis: 0
-    property string multiPrefix: ""
 //////// add for VE.Direct inverters
     property int numberOfInverters: 0
     property string inverterService: ""
@@ -397,7 +396,7 @@ OverviewPage {
 
 		anchors {
 			right: root.right; rightMargin: 10
-            bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : hasDcAndAcSolar ? 15 : 5
+            bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
 
 ////// moved sun icon here from OverviewSolarChager so it can be put below text, etc
@@ -411,7 +410,7 @@ OverviewPage {
             visible: ! hasDcAndAcSolar
         }
 
-//////// add power for individual PV chargers
+//////// modified to add power for individual PV charger info
 		values: 
         [
             TileText {
@@ -464,7 +463,7 @@ OverviewPage {
                     {
 						if (pv1NrTrackers.valid && pv1NrTrackers.value > 1)
 							return qsTr ("multiple trackers")
-                        else iif (pvVoltage1.valid)
+                        else if (pvVoltage1.valid)
                             voltageText = pvVoltage1.text
                         else
                             voltageText = "??V"
@@ -699,7 +698,7 @@ OverviewPage {
     OverviewSolarInverter {
         id: pvInverter
 ////// MODIFIED to show tanks & provide extra space if not
-        height: hasDcSolar ? blueSolarCharger.height : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
+        height: hasDcAndAcSolar ? blueSolarCharger.height : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
         width: 148
         title: qsTr("PV Inverter")
         showInverterIcon: !hasDcAndAcSolar
@@ -707,7 +706,7 @@ OverviewPage {
 
         anchors {
             right: root.right; rightMargin: 10;
-            bottom: blueSolarCharger.top; bottomMargin: 5
+            bottom: hasDcAndAcSolar ? blueSolarCharger.top : root.bottom; bottomMargin: 5
         }
 
         OverviewAcValuesEnhanced {
@@ -778,7 +777,7 @@ OverviewPage {
             }
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-            show: showGauges && hasAcSolar
+            show: showGauges && hasAcSolar && !hasDcAndAcSolar
         }
     }
 
@@ -913,13 +912,13 @@ OverviewPage {
     }
 
 ////// ADDED to show tanks & temps
-    // Synchronise tank name text scroll start
+    // Synchronise tank name text scroll start and PV Charger name scroll
     Timer
     {
         id: scrollTimer
         interval: 15000
         repeat: true
-        running: root.active && root.compact
+        running: root.active
     }
     ListView
     {
@@ -1083,13 +1082,13 @@ OverviewPage {
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
         pvChargerPrefix3 = ""
+        pvChargerPrefix5 = ""
+        pvChargerPrefix6 = ""
+        pvChargerPrefix7 = ""
         pvInverterPrefix1 = ""
         pvInverterPrefix2 = ""
         pvInverterPrefix3 = ""
         pvChargerPrefix4 = ""
-        pvChargerPrefix5 = ""
-        pvChargerPrefix6 = ""
-        pvChargerPrefix7 = ""
         tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
         {
@@ -1189,6 +1188,23 @@ OverviewPage {
         enabled: parent.active
         height: touchArea; width: touchArea
         onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailBattery.qml",
+                    {backgroundColor: detailColor} ) }
+        Rectangle
+        {
+            color: "black"
+            anchors.fill: parent
+            radius: width * 0.2
+            opacity: touchTargetOpacity
+            visible: showTargets
+        }
+    }
+    MouseArea
+    {
+        id: dcTarget
+        anchors.centerIn: dcSystemBox
+        enabled: parent.active
+        height: touchArea; width: touchArea
+        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailDcSystem.qml",
                     {backgroundColor: detailColor} ) }
         Rectangle
         {

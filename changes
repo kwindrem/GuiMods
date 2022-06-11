@@ -1,3 +1,7 @@
+
+v5.32:
+	merged changes from v2.90 to previous versions
+
 v5.31:
 	removed debug message ("reason placeholder")
 
