@@ -1,3 +1,5 @@
+v5.30:
+	fixed: generator control from relay overview not working
 
 v5.29~1:
 	added humidity to temps tiles
