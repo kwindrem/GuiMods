@@ -62,10 +62,11 @@ OverviewPage {
                                            "the inverter configuration with VEConfigure.")
 
 //////// added to keep track of tanks and temps
+    property int numberOfTanks: 0
     property int numberOfTemps: 0
-    property int tankTempCount: tankModel.rowCount + numberOfTemps
+    property int tankTempCount: numberOfTanks + numberOfTemps
     property real tanksTempsHeight: root.height - (pumpButton.pumpEnabled ? pumpButton.height : 0)
-    property real tanksHeight: tankModel.rowCount > 0 ? tanksTempsHeight * tankModel.rowCount / tankTempCount : 0
+    property real tanksHeight: numberOfTanks > 0 ? tanksTempsHeight * numberOfTanks / tankTempCount : 0
     property real tempsHeight: tanksTempsHeight - tanksHeight
     property real minimumTankHeight: 21
     property real maxTankHeight: 80
@@ -711,6 +712,14 @@ Tile {
     {
         switch (service.type)
         {
+        case DBusService.DBUS_SERVICE_TANK:
+            // hide incoming N2K tank dBus object if TankRepeater is running
+            if ( ! incomingTankName.valid || incomingTankName.value !== service.name)
+            {
+                numberOfTanks++
+                tanksModel.append({serviceName: service.name})
+            }
+            break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
@@ -741,11 +750,13 @@ Tile {
 //////// rewrite to always call addService, removing redundant service type checks
     function discoverServices()
     {
+		numberOfTanks = 0
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfMultis = 0
         numberOfInverters = 0
         inverterService = ""
+		tanksModel.clear()
         tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
@@ -891,7 +902,7 @@ Tile {
         triggeredOnStart: true
     }
 
-    // help message shown when menu is first drawn //////////////////////////
+    // help message shown when menu is first drawn
     Rectangle
     {
         id: helpBox

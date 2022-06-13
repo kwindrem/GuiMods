@@ -40,6 +40,12 @@ MbPage {
             name: qsTr ("Show Relay overview")
             writeAccessLevel: User.AccessUser
         }
+        MbSwitch {
+            id: tanksTempsOverview
+            bind: Utils.path (bindPrefixGuiMods, "/ShowTanksTempsDigIn")
+            name: qsTr ("Show Tanks, Temps, Digital Input overview")
+            writeAccessLevel: User.AccessUser
+        }
         // duplicate mobile overview on/off here for convenience
         MbSwitch {
             id: mobileOverview

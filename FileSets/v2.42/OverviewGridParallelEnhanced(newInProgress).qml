@@ -80,7 +80,7 @@ OverviewPage {
     property bool showTargets: helpTimer.running
 
     property int bottomOffset: 45 ////////////showTanksTemps ? 45 : 5
-    property int topOffset: showTanksTemps ? 1 : 5
+    property int topOffset: 1 ////////////////showTanksTemps ? 1 : 5
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
     property int numberOfTemps: 0

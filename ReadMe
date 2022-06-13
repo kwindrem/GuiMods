@@ -43,6 +43,8 @@ This package provides the following modifications to the VenusOS GUI:
             A combination of up to 4 tanks and temps fit across the bottom
             For more, the bottom row splits into separate rows for temps and tanks
             Each row scrolls horizontally if more than 4 items exist in the row
+            The temp tile alternates between its normal color and red if an alarm condition exists
+				note that the alarm condition must be assigned to a relay for the display to show the alarm
     
     Move Settings and Notifications to the top of the Device List page
 
@@ -94,7 +96,12 @@ This package provides the following modifications to the VenusOS GUI:
             AutoEnable which toggles the enables the condition-based run control
         Note that if condition-based run is enabled, Manual Stop may not stop the generator.
             But turning off Auto Enable would cause the generator to stop.
-    
+
+    Adds a an Overview page that shows tanks, temperature sensors and digital inputs.
+		This provides a larger view than is available elsewhere
+		and uses separate columns for tanks, temps and digital inputs
+
+
 each of these enhancements/modifications can be selected individually any time
     (while system is running) via the Settings Display GuiMods menu
 

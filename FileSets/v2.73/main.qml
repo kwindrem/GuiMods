@@ -163,6 +163,13 @@ PageStackWindow {
         onValueChanged: extraOverview ("OverviewRelays.qml", value === 1)
     }
 
+//////// show/hide the Overview Tanks/Temps/Digital Inputs page
+    VBusItem {
+        id: showOverviewTanksTemps
+        bind: "com.victronenergy.settings/Settings/GuiMods/ShowTanksTempsDigIn"
+        onValueChanged: extraOverview ("OverviewTanksTempsDigInputs.qml", value === 1)
+    }
+
     VBusItem {
         id: tanksOverview
         bind: "com.victronenergy.settings/Settings/Gui/TanksOverview"

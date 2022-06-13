@@ -56,7 +56,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/UseEnhancedGridParallelFlowOverview\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowTanksTempsDigIn\
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -105,7 +105,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/GuiMods/ShowInactiveFlowTiles", "default":1, "min":0, "max":2}, \
             {"path":"/GuiMods/GaugeLimits/DcSystemMaxLoad", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/DcSystemMaxCharge", "default":0.0}, \
-            {"path":"/GuiMods/UseEnhancedGridParallelFlowOverview", "default":0, "min":0, "max":1} ]' > /dev/null
+            {"path":"/GuiMods/UseEnhancedGridParallelFlowOverview", "default":0, "min":0, "max":1}, \
+            {"path":"/GuiMods/ShowTanksTempsDigIn", "default":0, "min":0, "max":1}, ]' > /dev/null
     fi
 
     # move setup options to Settings
@@ -240,6 +241,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/timeToGo.js"
     updateActiveFile "$qmlDir/DetailDcSystem.qml"
     updateActiveFile "$qmlDir/DcSystemRow.qml"
+    updateActiveFile "$qmlDir/OverviewTanksTempsDigInputs.qml"
+    updateActiveFile "$qmlDir/TileDigIn.qml"
     
     # cleanup from older versions
     restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
@@ -289,6 +292,8 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
 	restoreActiveFile "$qmlDir/timeToGo.js"
 	restoreActiveFile "$qmlDir/DetailDcSystem.qml"
 	restoreActiveFile "$qmlDir/DcSystemRow.qml"
+	restoreActiveFile "$qmlDir/OverviewTanksTempsDigInputs.qml"
+	restoreActiveFile "$qmlDir/TileDigIn.qml"
 
     # cleanup from older versions
     restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"

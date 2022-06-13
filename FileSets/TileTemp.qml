@@ -9,6 +9,17 @@ import "tanksensor.js" as TankSensor
 Tile {
 	id: root
 
+	property string bindPrefix: serviceName
+	property string alarmBase: Utils.path ("com.victronenergy.temprelay/Sensor/", serviceName.split(".")[3])
+	property VBusItem alarmEnabledItem: VBusItem { bind: Utils.path ( alarmBase, "/Enabled" ) }
+	property VBusItem condition1StateItem: VBusItem { bind: Utils.path ( alarmBase, "/0/State" ) }
+	property VBusItem condition2StateItem: VBusItem { bind: Utils.path ( alarmBase, "/1/State" ) }
+	property bool alarmEnabled: alarmEnabledItem.valid && alarmEnabledItem.value == 1
+	property bool condition1Active: condition1StateItem.valid && condition1StateItem.value == 1
+	property bool condition2Active: condition1StateItem.valid && condition2StateItem.value == 1
+	property bool alarmActive: alarmEnabled & ( condition1Active || condition2Active )
+	property bool alarmState: false
+
     property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
     property VBusItem tempScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/TemperatureScale" }
 	// use system temperature scale if it exists (v2.90 onward) - otherwise use the GuiMods version
@@ -16,7 +27,6 @@ Tile {
     // small tile height threshold
     property bool squeeze: height < 50
 
-	property string bindPrefix: serviceName
     property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, "/Temperature") }
     property VBusItem humidityItem: VBusItem { id: humidityItem; bind: Utils.path(bindPrefix, "/Humidity") }
     property string humidityText: humidityItem.valid ? (" " + humidityItem.value.toFixed (0) + "%") : ""
@@ -36,7 +46,7 @@ Tile {
     property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : "#7f8c8d"
 
     title: compact ? "" : tempName
-	color: tempColor
+	color: alarmActive && alarmState ? "red":  tempColor
 
 	function doScroll()
 	{
@@ -85,5 +95,14 @@ Tile {
                 right: parent.right
 			}
 		}
+	}
+
+	Timer
+	{
+        id: scrollTimer
+        interval: 1000
+        repeat: true
+        running: root.alarmActive
+        onTriggered: root.alarmState = ! root.alarmState
 	}
 }

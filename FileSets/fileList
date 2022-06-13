@@ -18,3 +18,4 @@
 /opt/victronenergy/gui/qml/PageSettingsRelay.qml
 /opt/victronenergy/gui/qml/PageSettingsGuiMods.qml
 /opt/victronenergy/gui/qml/TileRelay.qml
+/opt/victronenergy/gui/qml/OverviewTanksTempsDigInputs.qml
