@@ -1,6 +1,5 @@
 //////// Modified to hide the OverviewTiles page
-//////// Modified to substitute OverviewMobileEnhanced page
-//////// Modified to substitute OverviewGridParallelEnhanced page
+//////// Modified to substitute flow overview pages
 
 import QtQuick 1.1
 
@@ -20,19 +19,20 @@ PageStackWindow {
 	property bool completed: false
 	property bool showAlert: NotificationCenter.alert
 	property bool alarm: NotificationCenter.alarm
-//////// added for OverviewGridParallelEnhanced page
-    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid && hubOverviewGpEnhanced.valid
+//////// added for GuiMods flow pages
+    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && guiModsFlowOverview.valid && generatorOverviewEnhanced.valid
 	property string bindPrefix: "com.victronenergy.settings"
 
 	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
 	property bool isOverviewPage: pageStack.currentPage && pageStack.currentPage.model === overviewModel;
 	property bool isOfflineFwUpdatePage: pageStack.currentPage && pageStack.currentPage.objectName === "offlineFwUpdatePage";
 
-//////// modified for OverviewGridParallelEnhanced page
+//////// modified for GuiMods pages
 	property string hubOverviewType: theSystem.systemType.valid ?
 						withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : "unknown"
     property string currentHubOverview: "OverviewHub.qml"
     property string currentMobileOverview: ""
+    property string currentGeneratorOverview: ""
 
 	// Keep track of the current view (menu/overview) to show as default next time the
 	// CCGX is restarted
@@ -44,30 +44,17 @@ PageStackWindow {
 
     VBusItem
     {
-        id: hubOverviewEnhanced
-        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedFlowOverview"
-        onValueChanged: selectHubOverview ()
-    }
-    VBusItem
-    {
-        id: hubOverviewGpEnhanced
-        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGridParallelFlowOverview"
+        id: guiModsFlowOverview
+        bind: "com.victronenergy.settings/Settings/GuiMods/FlowOverview"
         onValueChanged: selectHubOverview ()
     }
 
     // base a new hub selection on the hub type and the enhanced flow overview flag
     function selectHubOverview ()
     {
-//////// used same enhanced overview for all systems 
         var newHubOverview = currentHubOverview
-        if (hubOverviewEnhanced.value === 1)
-        {
-            if (hubOverviewGpEnhanced.value === 1)
-                newHubOverview = "OverviewGridParallelEnhanced.qml"
-            else
-                newHubOverview = "OverviewHubEnhanced.qml"
-        }
-        else
+		// Victron stock overviews with automatic selection
+        if (guiModsFlowOverview.value == 0)
         {
             switch(hubOverviewType){
             case "Hub":
@@ -85,6 +72,17 @@ PageStackWindow {
                 break;
             }
         }
+		// Gui Mods simple flow
+		else if (guiModsFlowOverview.value === 1)
+        {
+			newHubOverview = "OverviewHubEnhanced.qml"
+		}
+		// Gui Mods complex flow (AC coupled or DC coupled)
+		else
+		{
+			newHubOverview = "OverviewFlowComplex.qml"
+        }
+
         if (newHubOverview != currentHubOverview)
         {
             replaceOverview(currentHubOverview, newHubOverview);
@@ -99,13 +97,46 @@ PageStackWindow {
 	VBusItem {
 		id: generatorOverview
 		bind: "com.victronenergy.settings/Settings/Relay/Function"
-		onValueChanged: extraOverview("OverviewGeneratorRelay.qml", value === 1)
+		onValueChanged: selectGeneratorOverview ()
 	}
+
+    VBusItem
+    {
+        id: generatorOverviewEnhanced
+        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGeneratorOverview"
+        onValueChanged: selectGeneratorOverview ()
+    }
 
 	VBusItem {
 		id: fischerPandaGenOverview
 		bind: "com.victronenergy.settings/Settings/Services/FischerPandaAutoStartStop"
 		onValueChanged: extraOverview("OverviewGeneratorFp.qml", value === 1)
+	}
+
+	function selectGeneratorOverview ()
+	{
+        var newGeneratorOverview
+        if (generatorOverview.value === 1)
+        {
+            if (generatorOverviewEnhanced.value === 1)
+				newGeneratorOverview = "OverviewGeneratorRelayEnhanced.qml"
+            else
+				newGeneratorOverview = "OverviewGeneratorRelay.qml"
+            if (currentGeneratorOverview === "")
+                extraOverview (newGeneratorOverview, true)
+            else
+                replaceOverview (currentGeneratorOverview, newGeneratorOverview)
+			currentGeneratorOverview = newGeneratorOverview
+        }
+        else
+        {
+            // hide existing generator overview if any
+            if (currentGeneratorOverview != "")
+            {
+                extraOverview (currentGeneratorOverview, false)
+				currentGeneratorOverview  = ""
+            }
+        }
 	}
 
 //////// handle OverviewMobileEnhanced page
@@ -121,6 +152,7 @@ PageStackWindow {
         bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedMobileOverview"
         onValueChanged: selectMobileOverview ()
     }
+
     // base a new mobile overview selection on the the mobile overview and enhanced mobile overview flags
     function selectMobileOverview ()
     {
@@ -135,7 +167,7 @@ PageStackWindow {
                 extraOverview (newMobileOverview, true)
             else
                 replaceOverview (currentMobileOverview, newMobileOverview)
-                currentMobileOverview = newMobileOverview
+			currentMobileOverview = newMobileOverview
         }
         else
         {

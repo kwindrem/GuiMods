@@ -4,6 +4,7 @@
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 MbPage
 {
@@ -48,7 +49,7 @@ MbPage
                         text: qsTr("Grid") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (sys.pvOnGrid.power, " W") }
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.power) }
                 PowerGauge
                 {
                     id: pvGridGauge
@@ -68,7 +69,7 @@ MbPage
                         text: qsTr("Output") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (sys.pvOnAcOut.power, " W") }
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.power) }
                 PowerGauge
                 {
                     id: pvAcOutGauge
@@ -164,21 +165,6 @@ MbPage
         {
             addService(DBusServices.at(i))
         }
-    }
-
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return ""
     }
 }
 

@@ -8,6 +8,7 @@
 
 import QtQuick 1.1
 import "utils.js" as Utils
+import "enhancedFormat.js" as EnhFmt
 
 Row {
 	id: root
@@ -46,7 +47,7 @@ Row {
         fontSize: 12
         textColor: "black"
         bold: true
-        textHorizontalAlignment: Text.AlignLeft
+        textHorizontalAlignment: Text.AlignHCenter
         scroll: false
         anchors
         {
@@ -55,10 +56,10 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvPower, " W") }
+            text: EnhFmt.formatVBusItem (pvPower, " W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: multiTrackerHeader ? " " : formatValue (pvVoltage, " V") }
+            text: multiTrackerHeader ? " " : EnhFmt.formatVBusItem (pvVoltage, " V") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: multiTrackerHeader ? " " : calculateCurrent (pvPower, pvVoltage, " A") }
@@ -66,32 +67,11 @@ Row {
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: showNameAndTotal ? state.text : " " }
 
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return ""
-    }
     
     function calculateCurrent (powerItem, voltageItem, unit)
     {
-        var current
         if (powerItem.valid && voltageItem.valid && voltageItem.value != 0)
-        {
-            current = powerItem.value / voltageItem.value
-            if (current < 100)
-                return current.toFixed (1) + unit
-            else
-                return current.toFixed (0) + unit
-        }
+			return EnhFmt.formatValue (powerItem.value / voltageItem.value, "A")
         else
             return ""
     }

@@ -7,6 +7,9 @@ import com.victron.velib 1.0
 Item {
 	id: root
 
+    property variant endLabelFontSize: 16
+    property color endLabelBackgroundColor: "transparent"
+
     property int barHeight: Math.max (height / 2, 2)    
     property color barColor: "black"
     
@@ -18,10 +21,12 @@ Item {
     property real maxDischargeDisplayed: dischargeOverload * 1.1
 	property real totalPowerDisplayed: maxChargeDisplayed + maxDischargeDisplayed
     property bool showGauge: totalPowerDisplayed > 0
-    property real scaleFactor: showGauge ? (root.width / totalPowerDisplayed) : 0
-    property real zeroOffset: showGauge ? (maxDischargeDisplayed * scaleFactor) : 0
+    property real labelOffset: showGauge &&  maxDischargeDisplayed != 0 && maxChargeDisplayed != 0 ? 15 : 0
+    property real scaleFactor: showGauge ? ((root.width - labelOffset * 2) / totalPowerDisplayed) : 0
+    property real zeroOffset: showGauge ? ((maxDischargeDisplayed * scaleFactor) + labelOffset) : 0
     property real barWidth
     property real barOffset
+    property color endLabelColor: "white"
     
 	Component.onCompleted: calculateBarWidth ()
 
@@ -46,6 +51,49 @@ Item {
         onValueChanged: calculateBarWidth ()
     }
 
+    // discharge end label
+	Rectangle
+	{
+		anchors.fill: dischargeText
+		color: endLabelBackgroundColor
+        show: labelOffset > 0
+	}
+    TileText
+    {
+		id: dischargeText
+        text: "D"
+        color: endLabelColor
+        font.pixelSize: endLabelFontSize
+        width: labelOffset
+        anchors
+        {
+			verticalCenter: root.verticalCenter
+			verticalCenterOffset: 1
+            left: root.left
+        }
+        show: showGauge
+    }
+    // charge end label
+ 	Rectangle
+	{
+		anchors.fill: chargeText
+		color: endLabelBackgroundColor
+        show: labelOffset > 0
+	}
+    TileText
+    {
+		id: chargeText
+        text: "C"
+        color: endLabelColor
+        font.pixelSize: endLabelFontSize
+        width: labelOffset
+        anchors
+        {
+			verticalCenter: dischargeText.verticalCenter
+            right: root.right
+        }
+        show: showGauge
+    }
     // discharge overload range (beginning of bar dischargeOverload)
     Rectangle
     {
@@ -58,7 +106,7 @@ Item {
         anchors
         {
             top: root.top
-            left: root.left
+            left: root.left; leftMargin: labelOffset
         }
     }
     // discharge caution range (overload to caution)

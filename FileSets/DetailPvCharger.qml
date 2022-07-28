@@ -4,6 +4,7 @@
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 MbPage
 {
@@ -17,8 +18,6 @@ MbPage
 
     property int tableColumnWidth: 80
     property int rowTitleWidth: 130
-
-    VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
 
     Component.onCompleted: discoverServices()
 
@@ -42,27 +41,28 @@ MbPage
             spacing: 2
             Row
             {
+				anchors.horizontalCenter: parent.horizontalCenter
+				Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
+                        horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Total power") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text: EnhFmt.formatVBusItem (sys.pvCharger.power) }                        
                 PowerGauge
                 {
                     id: gauge
-                    width: rowTitleWidth + tableColumnWidth * 4
+                    width: (root.width * 0.8) - totalLabel.paintedWidth - tableColumnWidth
                     height: 15
                     connection: sys.pvCharger
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
                 }
             }
-            Row
-            {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: qsTr("Total power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth * 3; horizontalAlignment: Text.AlignHCenter
-                    text: formatValue (sys.pvCharger.power, " W") }                        
-            }
+            // vertical spacer
+            Row { Text { font.pixelSize: 12; width: rowTitleWidth; text: "" } }
             Row
             {
                 id: tableHeaderRow
+				anchors.horizontalCenter: parent.horizontalCenter
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Device Name") }
@@ -119,7 +119,7 @@ MbPage
     Timer
     {
         id: scrollTimer
-        interval: 15000
+        interval: 5000
         repeat: true
         running: root.active
     }
@@ -156,21 +156,6 @@ MbPage
         {
             addService(DBusServices.at(i))
         }
-    }
-
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return ""
     }
 }
 

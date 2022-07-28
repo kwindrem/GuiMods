@@ -1,6 +1,5 @@
 //////// Modified to hide the OverviewTiles page
-//////// Modified to substitute OverviewMobileEnhanced page
-//////// Modified to substitute OverviewGridParallelEnhanced page
+//////// Modified to substitute flow overview pages
 
 import QtQuick 1.1
 
@@ -20,8 +19,8 @@ PageStackWindow {
 	property bool completed: false
 	property bool showAlert: NotificationCenter.alert
 	property bool alarm: NotificationCenter.alarm
-//////// added for OverviewGridParallelEnhanced page
-    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && hubOverviewEnhanced.valid && hubOverviewGpEnhanced.valid
+//////// added for GuiMods flow pages
+    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && guiModsFlowOverview.valid
 	property string bindPrefix: "com.victronenergy.settings"
 
 	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
@@ -29,7 +28,7 @@ PageStackWindow {
 	property bool isOfflineFwUpdatePage: pageStack.currentPage && pageStack.currentPage.objectName === "offlineFwUpdatePage";
 
 
-//////// modified for OverviewGridParallelEnhanced page
+//////// modified for GuiMods pages
     property string hubOverviewType: theSystem.systemType.valid ?
                         withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : "unknown"
     property string currentHubOverview: "OverviewHub.qml"
@@ -46,30 +45,17 @@ PageStackWindow {
 
     VBusItem
     {
-        id: hubOverviewEnhanced
-        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedFlowOverview"
-        onValueChanged: selectHubOverview ()
-    }
-    VBusItem
-    {
-        id: hubOverviewGpEnhanced
-        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGridParallelFlowOverview"
+        id: guiModsFlowOverview
+        bind: "com.victronenergy.settings/Settings/GuiMods/FlowOverview"
         onValueChanged: selectHubOverview ()
     }
 
     // base a new hub selection on the hub type and the enhanced flow overview flag
     function selectHubOverview ()
     {
-//////// used same enhanced overview for all systems 
         var newHubOverview = currentHubOverview
-        if (hubOverviewEnhanced.value === 1)
-        {
-            if (hubOverviewGpEnhanced.value === 1)
-                newHubOverview = "OverviewGridParallelEnhanced.qml"
-            else
-                newHubOverview = "OverviewHubEnhanced.qml"
-        }
-        else
+		// Victron stock overviews with automatic selection
+        if (guiModsFlowOverview.value == 0)
         {
             switch(hubOverviewType){
             case "Hub":
@@ -87,6 +73,17 @@ PageStackWindow {
                 break;
             }
         }
+		// Gui Mods simple flow
+		else if (guiModsFlowOverview.value === 1)
+        {
+			newHubOverview = "OverviewHubEnhanced.qml"
+		}
+		// Gui Mods complex flow (AC coupled or DC coupled)
+		else
+		{
+			newHubOverview = "OverviewFlowComplex.qml"
+        }
+
         if (newHubOverview != currentHubOverview)
         {
             replaceOverview(currentHubOverview, newHubOverview);

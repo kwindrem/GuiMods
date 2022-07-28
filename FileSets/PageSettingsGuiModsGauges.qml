@@ -201,5 +201,44 @@ MbPage {
             show: showGauges.checked
             writeAccessLevel: User.AccessInstaller
         }
+        MbEditBox
+        {
+            description: qsTr ("Max Alternator power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxAlternatorPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max Wind Generator power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxWindGenPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max Fuel Cell power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxFuelCellPower")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
     }
 }

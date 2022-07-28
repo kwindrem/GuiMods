@@ -2,7 +2,6 @@
 
 import QtQuick 1.1
 import "utils.js" as Utils
-import "tanksensor.js" as TankSensor
 
 Tile {
 	id: root

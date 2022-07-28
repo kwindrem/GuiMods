@@ -1,5 +1,27 @@
+v6.0:
+	revise Generator overview & add auto run enable/disable
+	add generator service interval and countdown on generator overview
+	incorporate GeneratorConnector code in GuiMods - GeneratorConnector now obsolete
+	revised "simple" flow overview
+	revised "grid parallel" flow overview, now called "AC Coupled"
+	added DC Coupled flow overview
+	add alternator, AC charger and wind generator DC sources
+	added gauges to mobile overview and generator overview
+	add details page access from mobile overview
+		current limit and inverter mode buttons removed/replaced with details pages
+	DC system detail added: shows DC system devices
+		as well as other devices not shown on the flow overview
+	added detail acces via the CCGX hard buttons
+	dropped support for Venus OS v2.4x and 2.5x
+	fixed: Generator buttons don't work on Relay Overview page for some Venus OS versions
+	fixed: PV Inverter tile on GuiMods Simple overview formatting errors
+	added more detail to the Relay overview generator status
+
 v5.35:
 	fixed file set issues
+
+v5.34:
+	added alternator to Grid Parallel Flow overview
 
 v5.33:
 	added tanks, temps, digital inputs overview page

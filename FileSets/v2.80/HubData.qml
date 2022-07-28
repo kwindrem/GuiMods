@@ -1,5 +1,6 @@
 //////// modified for VE.Direct inverter support
 //////// modified for grid/genset meter
+//////// added alternator, AC charger, wind generator
 
 import QtQuick 1.1
 import com.victron.velib 1.0
@@ -21,6 +22,10 @@ Item {
 
 	property variant battery: _battery
 	property alias dcSystem: _dcSystem
+	property alias alternator: _alternator
+	property alias windGenerator: _windGenerator
+	property alias fuelCell: _fuelCell
+	property alias acCharger: _acCharger
 	property alias pvCharger: _pvCharger
 	property alias pvOnAcIn1: _pvOnAcIn1
 	property alias pvOnAcIn2: _pvOnAcIn2
@@ -67,6 +72,30 @@ Item {
 	QtObject {
 		id: _pvCharger
 		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/Pv/Power"); unit: "W"}
+	}
+
+//////// added alternator
+	QtObject {
+		id: _alternator
+		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/Alternator/Power"); unit: "W"}
+	}
+
+//////// added AC charger
+	QtObject {
+		id: _acCharger
+		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/AcCharger/Power"); unit: "W"}
+	}
+
+//////// added wind generator
+	QtObject {
+		id: _windGenerator
+		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/WindGenerator/Power"); unit: "W"}
+	}
+
+//////// added fuel cell
+	QtObject {
+		id: _fuelCell
+		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/FuelCell/Power"); unit: "W"}
 	}
 
 	ObjectAcConnection {

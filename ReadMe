@@ -2,108 +2,155 @@ GuiMods has been revived with combined functionality of the original GuiMods and
 
 GuiMods2 has been decommissioned
 
-The user may now select between enhanced versions of the
-	simpler flow (aka Hub) and Grid Parallel overviews
+Recent changes:
+	separate simple, DC coupled and AC coupled flow overviews can now be selected
+	Alternator, Wind Generator, Fuel Cell and AC Charger DC sources have been added
+	DC details page has been added
+	Mobile Overview now has access to details pages
+	Gauges and details pages have been added to Mobile Overview
+	Hard buttons (CCGX) can now be used to access to details pages
+		and to make selections on the AC input and Inverter details
+	Generator Overview has been enhanced
+		new layout
+		add auto run enable/disable
+		add service interval
+	GeneratorConnector functionality has been incorporated into GuiMods
+		making GeneratorConnector obsolete
 
-The enhanced Hub overview includes voltage, current, frequency and input current limit values.
-
-The enhanced Grid Parallel flow overview which presents most components in the system
-	but lacks room for any detail. 
-    Only total power plus a gauge indicating power on each leg/phase is shown on the overview.
-    
 The following components have NOT been tested:
     Multi-phase(leg) systems
 
-Configuration settings can be found in:
-    Device List / Settings / Display & language/ GuiMods
-
 This package provides the following modifications to the VenusOS GUI:
-    Grid Parallel Flow overview:
-        Tiles have been reduced in size to make room for all components.
-        Except for the battery, only a gauge and a total power number are displayed
-        Additional details are displayed on full screens devoted to that part of the system.
-        Tapping the center of the tile on the overview screen brings up the details.
-        When entering the enhanced flow overview page, target areas are displayed for a few seconds
-            with a message instructing "tap for details"
+	A simple "flow" overview:
+		This overview provides the tiles for AC in and out, inverter, battery, Solar (PV) charger
+			and in some cases PV inverters.
 
-    Hub Flow overview:
-        This overview provides the tiles for AC in and out, inverter, battery, Solar (PV) charger
-            and in some cases PV inverters.
-            The Grid Parallel overview is a better choice if this overview hides components
-                due to limited real estate.
+	A flow overview that displays more AC system components:
+		This overview is useful when ac-coupled PV inverters are present in the system.
+		Tiles have been reduced in size to make room for the additional components.
+		Except for the battery, only a gauge and a total power number are displayed
 
-        In the stock code, different flow overviews were used depending on the system type
-            (e.g, ESS active).
-        In this version, the user may choose between the enhanced Grid Parallel and simpler enhanced Hub overviews.
+	A flow overview that displays more DC system components:
+		This overview is useful when an alternator or other DC components are present in the system.
+		Tiles have been reduced in size to make room for the additional components.
+		Except for the battery, only a gauge and a total power number are displayed
 
-        Add tank information (both overviews)
-            4 tanks fit along the bottom of the page
-            for more than 4 tanks, the list scrolls
-        Add temps information (both overviews)
-            A combination of up to 4 tanks and temps fit across the bottom
-            For more, the bottom row splits into separate rows for temps and tanks
-            Each row scrolls horizontally if more than 4 items exist in the row
-            The temp tile alternates between its normal color and red if an alarm condition exists
-				note that the alarm condition must be assigned to a relay for the display to show the alarm
-    
-    Move Settings and Notifications to the top of the Device List page
+	For all three overviews, additional details are displayed on full screens devoted to that part of the system.
+		Tapping the center of the tile brings up the details.
+		When entering the enhanced flow overview page, target areas are displayed for a few seconds
+			with a message instructing "tap for details"
 
-    Optionally hides the Tiles Overview
+	In the Victron stock code, different flow overviews were used depending on the system type
+		(e.g, ESS active).
+	In this version, the user may choose between the three flow overview versions.
 
-    Enhances the Mobile Overview
-        all new layout and tile organization
-        add Inverter Only mode
-        shows voltages current and frequency for AC in and out
-        shows current for DC loads
-        shows solar voltage and current
-        hides Pump switch if not enabled to make more space for tanks
-            (this became standard in v2.70~9)
-        tanks column scrolls if there are more tanks than space allows
-        add temperature sensors to tanks column
-            The tanks column is split into separate columns for tanks and temperature sensors
-            A common tile height is set for both columns, then each column is filled in separately
-            Any tank that appears as a dBus temperature sensor should appear
-        Adds VE.Direct inverter status and control
+	Add tank information (both overviews)
+		4 tanks fit along the bottom of the page
+		for more than 4 tanks, the list scrolls
+	Add temps information (both overviews)
+		A combination of up to 4 tanks and temps fit across the bottom
+		For more, the bottom row splits into separate rows for temps and tanks
+		Each row scrolls horizontally if more than 4 items exist in the row
+		Alarm indicaiton: The temp tile alternates between its normal color and red if an alarm condition exists
+			Note that the alarm condition must be assigned to a relay for the display to show the alarm
 
-    Enhances the Tank Tile
-        red indicates low/high fluid levels
-        indicates NO RESPONSE if no signal received from tank
-        tile shrinks if needed to show more tanks, then list scrolls
-        display custom tank names (stock in v2.70~9)
-        displays absolute fluid quantity (e.g., gallons) in addition to percentage
+	Move Settings and Notifications
+		Moves thise items to the top of the Device List page
+			Normally, they are displayed at the bottom
 
-    Adds VE.Direct inverter status and control
+	Optionally hides the Tiles Overview
 
-    Uses custom tank name if it exists and optionally shorten tank names
-        beginning with Venus v2.70~16, NEMA2000 tank names can be too long to fit in available space
-        enabling this option will shorten the tank name to the first two words
-            (first word for compact tank tiles)
-            and replace "Waste" with "Gray" to be consistent with "Black" label for sewage tank
+	Enhances the Mobile Overview
+		all new layout and tile organization
+		add Inverter Only mode
+		shows voltages current and frequency for AC in and out
+		shows current for DC loads
+		shows solar voltage and current
+		hides Pump switch if not enabled to make more space for tanks
+			(this became standard in v2.70~9)
+		tanks column scrolls if there are more tanks than space allows
+		add temperature sensors to tanks column
+			The tanks column is split into separate columns for tanks and temperature sensors
+			A common tile height is set for both columns, then each column is filled in separately
+			Any tank that appears as a dBus temperature sensor should appear
+		Adds VE.Direct inverter status and control
 
-    Adds a Relay Overview page that allows controlling all relays.
-        Previously, relay control is several menu levels deep so this is much faster
-        Status for all relays is also shown along with the function (manual, generator, pump, alarm)
-        Buttons presented for pump and generator affect the actual parameters for those devices,
-             not just the relay state.
-        A relay name has also been added. This name is shown on the Relay Overview.
-            The name scrolls if it won't fit in the available space.
-        All relay configurations are in Device List / Settings / Relay.
-            That menu has been expanded to set names and control whether the relay is shown on the
-                Relay Overview.
-        Note that for the Alarm function, there are no controls, yet the current alarm state is show.
-        Pump control has three modes: On, Off and Auto which is controlled by the associated tank level.
-        Generator control has buttons for Manual Start and Manual Stop as well as
-            AutoEnable which toggles the enables the condition-based run control
-        Note that if condition-based run is enabled, Manual Stop may not stop the generator.
-            But turning off Auto Enable would cause the generator to stop.
+	Enhances the Tank Tile
+		red indicates low/high fluid levels
+		indicates NO RESPONSE if no signal received from tank
+		tile shrinks if needed to show more tanks, then list scrolls
+		display custom tank names (stock in v2.70~9)
+		displays absolute fluid quantity (e.g., gallons) in addition to percentage
 
-    Adds a an Overview page that shows tanks, temperature sensors and digital inputs.
+	Adds VE.Direct inverter status and control
+
+	Uses custom tank name if it exists and optionally shorten tank names
+		beginning with Venus v2.70~16, NEMA2000 tank names can be too long to fit in available space
+		enabling this option will shorten the tank name to the first two words
+			(first word for compact tank tiles)
+			and replace "Waste" with "Gray" to be consistent with "Black" label for sewage tank
+
+	Adds a Relay Overview page that allows controlling all relays.
+		Previously, relay control is several menu levels deep so this is much faster
+		Status for all relays is also shown along with the function (manual, generator, pump, alarm)
+		Buttons presented for pump and generator affect the actual parameters for those devices,
+			 not just the relay state.
+		A relay name has also been added. This name is shown on the Relay Overview.
+			The name scrolls if it won't fit in the available space.
+		All relay configurations are in Device List / Settings / Relay.
+			That menu has been expanded to set names and control whether the relay is shown on the
+				Relay Overview.
+		Note that for the Alarm function, there are no controls, yet the current alarm state is show.
+		Pump control has three modes: On, Off and Auto which is controlled by the associated tank level.
+		Generator control has buttons for Manual Start and Manual Stop as well as
+			AutoEnable which toggles the enables the condition-based run control
+		Note that if condition-based run is enabled, Manual Stop may not stop the generator.
+			But turning off Auto Enable would cause the generator to stop.
+
+	Adds a an Overview page that shows tanks, temperature sensors and digital inputs.
 		This provides a larger view than is available elsewhere
 		and uses separate columns for tanks, temps and digital inputs
 
+	Generator overview:
+		now includes a button that enables and disables auto run functionality.
+			It functions exactly like the manual start/stop button.
+			Because two buttons share the hard buttons, up and down buttons are used to select
+				which function will be controlled by the center button.
+
+		Status and test run tiles have been combined and now includes current run time as well as
+			time until a timed manual run expires.
+		A new Run Times tile has been included which shows times for Today, total accuulated time and
+			a count-down to the next required servive
+			The service interval is set in the generator settings menu
+			as well as a button to reset the count-down timer to the service interval.
+			If the service interval is 0 the service number will not be shonw in the Generator overview
+		Run times previously used days/hours, hours/minutes, or minutes/seconds formatting. This has been changed
+			to show minutes (if less than 1 hour) or hours to be more consistent with generator total run time and service intervals.
+		Note: a button in the generator settings menu already exists to set the total accumulate time
+			to match the run time meter on the generator itself.
+		
+		A digital input configured for generator run/stop integrates with the generator manual start/stop logic.
+
+		When the digial input changes to the running state,
+		Venus Manual Start is changed to true if there are no automatic run conditions
+
+		When the digital input changes to the not running,
+			Venus Manual Start is changed to false
+
+		The Generator overview includes "Running" or "Stopped" in the generator icon if a digital input
+			has been configured for generator run status input.
+			
 
 each of these enhancements/modifications can be selected individually any time
     (while system is running) via the Settings Display GuiMods menu
+
+The hard buttons available on the CCGX or other UIs without touch capability can now access the details pages
+	UP and DOWN buttons cycle through the available selection.
+	The active selection is indicated either by showing the touch target area
+	In the details pages, selected button is indicated by a black border
+	Pressing the "space" button while the selection is active simulates touching the region
+	The active selection times out after 5 seconds.
+
 
 Power Gauges
 
@@ -181,13 +228,17 @@ Configuration
         When on, the standard mobile overview is replaced with the enhanced version provided
         with this package. Details are explained above
     
-    Use Enhanced Flow Overview
-        Replaces the standard flow overviews with the enhanced version described above
+    Flow Overview selection - refer to the discriptioun above for what is shown in each flow version
+		Victron stock
+			This disables the GuiMods flow overviews so the ones supplied in by Victron are displayed
+		GuiMods simple
+		GuiMods DC Coupled
+		GuiMods AC Coupled
 
-    Use Grid Parallel Enhanced Flow Overview
-        Selects between the simpler Hub and more complete Grid Parallel overviews.
+	Show more devices on flow overview
+        Selects between a simpler and more complete overviews (described above).
         Use Enhanced Flow Overview must be on to see and change this option
-    
+
     Show tanks on Flow Overview
     Show temperatures on Flow Overview
         Fluid levels and temperatures are displayed at the bottom of the Flow Overview when
@@ -199,6 +250,11 @@ Configuration
         This option combines the information into a common tile in the upper right of the overview
         and changes the title to AC Loads.
     
+	DC System tile name
+		Renames the DC System tile. This may be useful if for example the system only has DC loads.
+		In that case, the tile can be renamed to something like "DC Loads".
+		If this paremeter is blank, "DC System" is used for that tile's name
+
     Show Loads On Input
         Not all systems have loads connected to the input side of the inverter/charger.
         This would include loads connected to the AC 2 output.
@@ -308,13 +364,14 @@ Configuration
         So a 60 amp main breaker on a 12 volt system would be 720 watts.
         If there are no DC loads, set this value to 0.
 
-    Max DC Charger power is the maximum of all DC charging sources such as a DC-DC converter from the starter battery
+    Max DC charger power is the maximum of all DC charging sources such as a DC-DC converter from the starter battery
         or a wind generator. Set this parameter to the expected maximum for all charging sources.
 
-    The last two parameters also affect the naming of the DC System tile.
-        If the DC Charger power is set to zero but the DC load power is not zero, tile will read DC Loads
-        If the DC charger power is not zero but the DC load power is zero, the title will read DC Chargers
-        Otherwise, the tile will have a name of DC System indicating there are both loads and charging source.
+	Max Alternator power is the maximum power expected from all alternators in the system
+
+	Max Wind Generator power is the maximum power expected from all wind generators in the system
+
+	Max Fuel Cell power is the maximum power expected from all fuel cells in the system
 
 Installation:
 
@@ -336,3 +393,4 @@ https://github.com/kwindrem/GuiMods/archive/refs/tags/latest.tar.gz
 
 Note that installing GuiMods will uninstall GuiMods2.
 Installing GuiMods2 after installing GuiMods will uninstall GuiMods.
+You should not use GuiMods2 !!!

@@ -66,7 +66,8 @@ OverviewPage {
             height: root.tankTileHeight
             pumpBindPrefix: root.pumpBindPreffix
             compact: root.tanksCompact
-            Connections {
+            Connections
+            {
                 target: scrollTimer
                 onTriggered: doScroll()
             }
@@ -140,11 +141,6 @@ OverviewPage {
         {
             width: digInputsColumn.width
             height: root.digInTileHeight
-            Connections
-            {
-                target: scrollTimer
-                onTriggered: doScroll()
-            }
         }
         Tile
         {

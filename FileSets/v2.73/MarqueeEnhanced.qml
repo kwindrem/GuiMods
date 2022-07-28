@@ -12,7 +12,7 @@ Rectangle {
 	property alias interval: marqueeTimer.interval
 	property alias fontSize: _text.font.pixelSize
 	property alias textColor: _text.color
-	property alias textHorizontalAlignment: _text.horizontalAlignment
+	property variant textHorizontalAlignment: Text.AlignHCenter
     property alias bold: _text.font.bold
 	property bool scroll: true
     property bool longName: _text.paintedWidth > marquee.width
@@ -29,7 +29,8 @@ Rectangle {
 		color: "#fff"
 		width: parent.width
 		anchors.verticalCenter: parent.verticalCenter
-        horizontalAlignment: longName || scroll ? Text.AlignLeft : Text.AlignHCenter
+		// use spcified alignment unless name won't fit or are scrolling, then align left
+        horizontalAlignment: longName && scroll ? Text.AlignLeft : textHorizontalAlignment
 	}
 
 	Timer {

@@ -2,7 +2,6 @@
 
 import QtQuick 1.1
 import "utils.js" as Utils
-import "tanksensor.js" as TankSensor
 
 Tile {
 	id: root
@@ -52,30 +51,32 @@ Tile {
     {
         id: generatorManualStartItem
         bind: Utils.path("com.victronenergy.generator.startstop0" , "/ManualStart")
+        onValidChanged: updateButtons ()
         onValueChanged: updateButtons ()
     }
     VBusItem
     {
         id: generatorAutoRunItem
         bind: Utils.path(settingsPrefix, "/Settings/Generator0/AutoStartEnabled")
+        onValidChanged: updateButtons ()
         onValueChanged: updateButtons ()
+    }
+    VBusItem
+    {
+        id: generatorConditionItem
+        bind: Utils.path("com.victronenergy.generator.startstop0" , "/RunningByConditionCode")
+    }
+    VBusItem
+    {
+        id: generatorExternalOverrideItem
+        bind: Utils.path("com.victronenergy.generator.startstop0" , "/ExternalOverride")
     }
     VBusItem
     {
         id: pumpModeItem
         bind: Utils.path(settingsPrefix, "/Settings/Pump0/Mode")
+        onValidChanged: updateButtons ()
         onValueChanged: updateButtons ()
-    }
-
-    // relay function changes may instantiate new dBus services which takes time
-    // this timer triggers button refreshe after a suitable delay (2 S)
-    Timer
-    {
-        id: functionDelayTimer
-        interval: 2000
-        repeat: false
-        running: false
-        onTriggered: updateButtons ()
     }
 
     Component.onCompleted: updateFunction ()
@@ -84,7 +85,8 @@ Tile {
 
     function doScroll()
     {
-        relayName.doScroll()
+        relayName.doScroll ()
+        relayState.doScroll ()
     }
 
 	values: Item
@@ -133,25 +135,61 @@ Tile {
                 text: functionText
             }
 
-            Text
+            MarqueeEnhanced
             {
                 id: relayState
-                font.pixelSize: 12
-                font.bold: true
-                color: "black"
-                anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
+                width: parent.width - 4
+                fontSize: 12
+                bold: true
+                textColor: "black"
+                scroll: false
                 text:
                 {
-                    if (stateItem.valid)
+					// special handling for generator
+					if (relayFunction == 1)
+					{
+						if (generatorExternalOverrideItem.valid && generatorExternalOverrideItem.value == 1)
+							return qsTr ("External override - stopped")
+						else if (generatorConditionItem.valid)
+						{
+							switch (generatorConditionItem.value)
+							{
+								case 0:
+									return qsTr ("Stopped")
+								case 1:
+									return qsTr ("Man run")
+								case 2:
+									return qsTr ("Test run")
+								case 3:
+									return qsTr ("Loss of comms run")
+								case 4:
+									return qsTr ("SOC run")
+								case 5:
+									return qsTr ("Load run")
+								case 6:
+									return qsTr ("Battery current run")
+								case 7:
+									return qsTr ("Battery voltage run")
+								case 8:
+									return qsTr ("Inverter temperature run")
+								case 9:
+									return qsTr ("Inverter overload run")
+								default:
+									return "??"
+							}
+						}
+						else
+							return "??"
+					}
+                    else if (stateItem.valid)
                     {
-                         if (relayActive)
-                            text: activeText
+						if (relayActive)
+                            return activeText
                         else
-                            text: inactiveText
-                        }
+                            return inactiveText
+					}
                     else
-                        text: "??"
+                        return "??"
                 }
             }
             // spacer
@@ -224,9 +262,9 @@ Tile {
                 functionText = qsTr("Alarm")
                 activeText = qsTr("Alarm")
                 inactiveText = qsTr("No Alarm")
-                offButtonText = "--" // empty string causes interactions between instances
-                onButtonText = "--" // empty string causes interactions between instances
-                autoButtonText = "--" // empty string causes interactions between instances
+                offButtonText = ""
+                onButtonText = ""
+                autoButtonText = ""
                 onButton.show = false 
                 offButton.show = false 
                 autoButton.show = false 
@@ -234,8 +272,8 @@ Tile {
             // Generator
             case 1:
                 functionText = qsTr("Generator")
-                activeText = qsTr("Running")
-                inactiveText = qsTr("Stopped")
+                activeText = qsTr("")	// generator state text handled below
+                inactiveText = qsTr("")
                 onButtonText = qsTr("Manual\nStart")
                 offButtonText = qsTr("Manual\nStop")
                 autoButtonText = qsTr("Auto\nEnable")
@@ -274,7 +312,7 @@ Tile {
                 inactiveText = qsTr("Off")
                 onButtonText = qsTr("On")
                 offButtonText = qsTr("Off")
-                autoButtonText = "--" // empty string causes interactions between instances
+                autoButtonText = ""
                 onButton.show = true 
                 offButton.show = true 
                 autoButton.show = false 
@@ -294,8 +332,6 @@ Tile {
             autoButton.show =false 
         }
         updateButtons ()
-        // trigger delay to refresh buttons again after new dBus services can be established
-        functionDelayTimer.running = true
     }
     
     function updateButtons ()
@@ -311,14 +347,16 @@ Tile {
             {
                 onButtonActive = generatorManualStartItem.value === 1
                 offButtonActive = ! onButtonActive
-                autoButtonActive = generatorAutoRunItem.value
             }
             else
             {
                 offButtonActive = false
                 onButtonActive = false
-                autoButtonActive = false
             }
+            if (generatorAutoRunItem.valid)
+                autoButtonActive = generatorAutoRunItem.value
+			else
+                autoButtonActive = false
             break;;
         // pump
         case 3:

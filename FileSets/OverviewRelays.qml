@@ -95,7 +95,7 @@ OverviewPage
     Timer
     {
         id: marqueeTimer
-        interval: 15000
+        interval: 5000
         repeat: true
         running: root.active
    }

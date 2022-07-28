@@ -5,6 +5,7 @@ import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
 import "timeToGo.js" as TTG
+import "enhancedFormat.js" as EnhFmt
 
 MbPage
 {
@@ -58,6 +59,7 @@ MbPage
                 id: gauge
                 width: tableWidth
                 height: 15
+				endLabelColor: "black"
             }
         }
         Row
@@ -67,8 +69,8 @@ MbPage
                     text: qsTr ("State of charge") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: sys.battery.soc.valid ? sys.battery.soc.value.toFixed (1) + " %" : "--"}
-             Text { font.pixelSize: 12; font.bold: true; color: "black"
+					text: EnhFmt.formatVBusItem (sys.battery.soc) }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
         }
         Row
@@ -114,10 +116,10 @@ MbPage
                     text: qsTr ("Power") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: Math.abs (sys.battery.power.value.toFixed(1)) + " W" }
+                    text: EnhFmt.formatVBusItemAbs (sys.battery.power) }
             Text { id: chargingText; font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: sys.battery.power.value < 0 ? qsTr ("from battery") : sys.battery.power.value > 0 ? qsTr ("to battery") : "" }
+                    text: sys.battery.power.value < 0 ? qsTr ("supplying") : sys.battery.power.value > 0 ? qsTr ("consuming") : "" }
         }
         Row
         {
@@ -137,7 +139,7 @@ MbPage
                     text: qsTr ("Current") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: Math.abs (sys.battery.power.value / sys.battery.voltage.value).toFixed(1) + " A" }
+                    text: EnhFmt.formatValueAbs (sys.battery.power.value / sys.battery.voltage.value, " A") }
              Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: chargingText.text }
         }
@@ -148,7 +150,7 @@ MbPage
                     text: qsTr ("Consumed Amp-Hours") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: formatValue (consumedAh, " AH") }
+                    text: EnhFmt.formatVBusItemAbs (consumedAh, "AH") }
              Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
         }
@@ -190,19 +192,4 @@ MbPage
                     text: qsTr ("Discharge Limited") ; visible: showEssCodes; opacity: dischargeLimited.value === 1 ? 1 : essDimOpacity }
         }
     }
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return "--"
-    }
 }
-

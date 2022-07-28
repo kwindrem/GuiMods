@@ -20,10 +20,11 @@ Tile {
 	property bool alarmActive: alarmEnabled & ( condition1Active || condition2Active )
 	property bool alarmState: false
 
-    property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
-    property VBusItem tempScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/TemperatureScale" }
 	// use system temperature scale if it exists (v2.90 onward) - otherwise use the GuiMods version
-    property int tempScale: systemScaleItem.valid ? systemScaleItem.value == "fahrenheit" ? 2 : 1 : tempScaleItem.valid ? tempScaleItem.value : 0
+    property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
+    property VBusItem guiModsTempScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/TemperatureScale" }
+    property int tempScale: systemScaleItem.valid ? systemScaleItem.value == "fahrenheit" ? 2 : 1 : guiModsTempScaleItem.valid ? guiModsTempScaleItem.value : 1
+
     // small tile height threshold
     property bool squeeze: height < 50
 
@@ -99,7 +100,7 @@ Tile {
 
 	Timer
 	{
-        id: scrollTimer
+        id: alarmTimer
         interval: 1000
         repeat: true
         running: root.alarmActive

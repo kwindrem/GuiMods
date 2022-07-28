@@ -2,6 +2,7 @@
 
 import QtQuick 1.1
 import "utils.js" as Utils
+import "enhancedFormat.js" as EnhFmt
 
 Row {
 	id: root
@@ -30,7 +31,7 @@ Row {
         fontSize: 12
         textColor: "black"
         bold: true
-        textHorizontalAlignment: Text.AlignLeft
+        textHorizontalAlignment: Text.AlignHCenter
         scroll: false
         anchors
         {
@@ -39,16 +40,16 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvTotalPower, " W") }
+            text: EnhFmt.formatVBusItem (pvTotalPower, " W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvPowerL1, " W") }
+            text: EnhFmt.formatVBusItem (pvPowerL1, " W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvPowerL2, " W") }
+            text: EnhFmt.formatVBusItem (pvPowerL2, " W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatValue (pvPowerL3, " W") }
+            text: EnhFmt.formatVBusItem (pvPowerL3, " W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
             text: 
@@ -75,20 +76,5 @@ Row {
                 else
                     return "--"
             }
-    }
-
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return "--"
     }
 }

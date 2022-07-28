@@ -140,11 +140,6 @@ OverviewPage {
         {
             width: digInputsColumn.width
             height: root.digInTileHeight
-            Connections
-            {
-                target: scrollTimer
-                onTriggered: doScroll()
-            }
         }
         Tile
         {

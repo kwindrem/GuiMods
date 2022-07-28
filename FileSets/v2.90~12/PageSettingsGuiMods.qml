@@ -11,14 +11,12 @@ MbPage {
     property string bindPrefix: "com.victronenergy.settings/Settings/Gui"
     property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
 
+	property bool showFlowParams: flowOverview.item.valid && flowOverview.item.value >= 1
+	property bool showComplexParams: flowOverview.item.valid && flowOverview.item.value >= 2
+	property bool showAcCoupledParams: flowOverview.item.valid && flowOverview.item.value == 3
+
 	model: VisualItemModel
     {
-        MbItemText
-        {
-            text: qsTr ("Package versions moved to end of Settings menus")
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
-        }
         MbSwitch
         {
             id: showTileOverview
@@ -47,6 +45,15 @@ MbPage {
             name: qsTr ("Show Tanks, Temps, Digital Input overview")
             writeAccessLevel: User.AccessUser
         }
+
+        MbSwitch
+        {
+            id: useEnhGeneratorOverview
+            bind: Utils.path (bindPrefixGuiMods, "/UseEnhancedGeneratorOverview")
+            name: qsTr ("Use Enhanced Generator Overview")
+            writeAccessLevel: User.AccessUser
+        }
+
         // duplicate mobile overview on/off here for convenience
         MbSwitch {
             id: mobileOverview
@@ -71,37 +78,34 @@ MbPage {
             VBusItem { id: showMobileOverview; bind: Utils.path (bindPrefix, "/MobileOverview") }
             writeAccessLevel: User.AccessUser
         }
+		MbItemOptions
+		{
+            id: flowOverview
+			description: qsTr("Flow overview")
+            bind: Utils.path (bindPrefixGuiMods, "/FlowOverview")
+			possibleValues:
+			[
+				MbOption {description: qsTr("Victron stock"); value: 0},
+				MbOption {description: qsTr("GuiMods simple"); value: 1},
+				MbOption {description: qsTr("GuiMods DC Coupled"); value: 2},
+				MbOption {description: qsTr("GuiMods AC Coupled"); value: 3}
+			]
+		}
 
-        MbSwitch
-        {
-            id: useEnhFlowOverview
-            bind: Utils.path (bindPrefixGuiMods, "/UseEnhancedFlowOverview")
-            name: qsTr ("Use Enhanced Flow Overview")
-            writeAccessLevel: User.AccessUser
-        }
-
-        MbSwitch
-        {
-            id: useEnhGpOverview
-            bind: Utils.path (bindPrefixGuiMods, "/UseEnhancedGridParallelFlowOverview")
-            name: qsTr ("Use Enhanced Grid Parallel Flow Overview")
-            show: useEnhFlowOverview.checked
-            writeAccessLevel: User.AccessUser
-        }
-        MbSwitch
+		MbSwitch
         {
             id: combineLoads
             bind: Utils.path (bindPrefixGuiMods, "/EnhancedFlowCombineLoads")
             name: qsTr ("Combine AC input/ouput loads")
-            show: useEnhFlowOverview.checked && useEnhGpOverview.checked
+            show: root.showAcCoupledParams
             writeAccessLevel: User.AccessInstaller
-       }
-        MbSwitch
+		}
+		MbSwitch
         {
             id: showLoadsOnInput
             bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowLoadsOnInput")
             name: qsTr ("Show Loads On Input")
-            show: useEnhFlowOverview.checked && useEnhGpOverview.checked && ! combineLoads.checked
+			show: root.showAcCoupledParams && ! combineLoads.checked
             writeAccessLevel: User.AccessInstaller
        }
 
@@ -110,7 +114,7 @@ MbPage {
             id: showTanks
             bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowOverviewTanks")
             name: qsTr ("Show tanks on Flow Overview")
-            show: useEnhFlowOverview.checked
+			show: root.showFlowParams
             writeAccessLevel: User.AccessUser
         }
         MbSwitch
@@ -118,7 +122,7 @@ MbPage {
             id: showTemps
             bind: Utils.path (bindPrefixGuiMods, "/ShowEnhancedFlowOverviewTemps")
             name: qsTr ("Show temperatures on Flow Overview")
-            show: useEnhFlowOverview.checked
+            show: root.showFlowParams
             writeAccessLevel: User.AccessUser
        }
         MbSwitch
@@ -126,8 +130,14 @@ MbPage {
             id: shortenTankNames
             bind: Utils.path (bindPrefixGuiMods, "/ShortenTankNames")
             name: qsTr ("Shorten tank names")
-            show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
             writeAccessLevel: User.AccessUser
+        }
+        MbEditBox {
+            id: dcSystemName
+            description: qsTr("DC System tile name")
+            item.bind: "com.victronenergy.settings/GuiMods/CustomDcSystemName"
+            maximumLength: 32
+            enableSpaceBar: true
         }
 
         MbSpinBox {
@@ -141,7 +151,6 @@ MbPage {
 				min: 0
 				max: 999
 			}
-            show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
         }
 
@@ -156,7 +165,6 @@ MbPage {
 				min: 0
 				max: 999
             }
-            show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
         }
 
@@ -171,7 +179,6 @@ MbPage {
 				min: 0
 				max: 999
 			}
-            show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
         }
 
@@ -186,7 +193,6 @@ MbPage {
 				min: 0
 				max: 999
 			}
-            show: useEnhFlowOverview.checked
             writeAccessLevel: User.AccessUser
         }
 
@@ -195,7 +201,7 @@ MbPage {
             id: tempScale
             description: qsTr ("Temperature scale")
             bind: Utils.path (bindPrefixGuiMods, "/TemperatureScale")
-            show: ! systemScaleItem.valid && (useEnhFlowOverview.checked || useEnhMobileOverview.checked)
+            show: ! systemScaleItem.valid
             possibleValues:
             [
                 MbOption { description: "°C"; value: 1 },
@@ -210,7 +216,6 @@ MbPage {
             id: timeFormat
             description: qsTr ("Time format")
             bind: Utils.path (bindPrefixGuiMods, "/TimeFormat")
-            show: useEnhFlowOverview.checked || useEnhMobileOverview.checked
             possibleValues:
             [
                 MbOption { description: qsTr("24 hour"); value: 1 },
@@ -224,7 +229,7 @@ MbPage {
             id: inactiveFlowTiles
             description: qsTr ("Inactive Tiles on Flow Overview")
             bind: Utils.path (bindPrefixGuiMods, "/ShowInactiveFlowTiles")
-            show: useEnhFlowOverview.checked
+            show: root.showFlowParams
             possibleValues:
             [
                 MbOption { description: qsTr("Show Dimmed"); value: 1 },
@@ -237,7 +242,7 @@ MbPage {
         {
             description: qsTr("Power Gauges")
             subpage: Component { PageSettingsGuiModsGauges {} }
-            show: useEnhFlowOverview.checked
+            show: root.showFlowParams
         }
     }
 }

@@ -1,9 +1,11 @@
+
 ////// detail page for displaying DC System details
 ////// pushed from Flow overview
 
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 MbPage
 {
@@ -18,12 +20,42 @@ MbPage
     property int tableColumnWidth: 80
     property int rowTitleWidth: 130
 
+
+	property int systemRows: Math.min (systemModel.count, 1)
+	property int otherRows: otherModel.count
+	property int totalTableRows: systemRows + otherRows
+
 	property bool pvChargers: false
 
-    VBusItem { id: hasDcSysItem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
-    property bool hasDcSystem: hasDcSysItem.value > 0
+    VBusItem { id: dcSystemMeasurementItem; bind: "com.victronenergy.system/Dc/System/MeasurementType" }
+	property bool dcSystemIsEstimated: ! dcSystemMeasurementItem.valid || dcSystemMeasurementItem.value != 1
+	VBusItem { id: systemBatteryItem; bind: "com.victronenergy.system/Dc/Battery/BatteryService" }
+	VBusItem { id: systemMultiItem; bind: "com.victronenergy.system/Ac/In/0/ServiceName" }
+	VBusItem { id: flowOverviewItem; bind: "com.victronenergy.settings/Settings/GuiMods/FlowOverview" }
+	property int flowOverview: flowOverviewItem.valid ? flowOverviewItem.value : 0
 
     Component.onCompleted: discoverServices()
+ 
+	function adjustSystemTableHeight ()
+	{
+		if (totalTableRows < 9 || systemRows <= 3)
+			systemTable.height = systemRows * 15
+		else if (otherRows < 7)
+			systemTable.height = (9 - otherRows) * 15
+		else
+			systemTable.height =  35
+	}
+
+    // When new service is found add it
+    Connections
+    {
+        target: DBusServices
+        onDbusServiceFound:
+        {
+			addService(service)	
+			adjustSystemTableHeight ()
+		}
+    }
 
     // background
     Rectangle
@@ -35,209 +67,237 @@ MbPage
         color: root.backgroundColor
     }
 
-    Row
-    {
-        spacing: 5
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top; anchors.topMargin: + 10
-        Column 
-        {
-            spacing: 2
-            Row
-            {
-                id: tableHeaderRow
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Name") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Device") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("State") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Direction") }
-            }
-        }
+	Column 
+	{
+		anchors
+		{
+			top: parent.top; topMargin: totalTableRows < 9 ? 10 : 5
+			bottom: parent.bottom; bottomMargin: 5
+		}
+		spacing: 2
+		Row
+		{
+			id: totalPowerRow
+			anchors.horizontalCenter: parent.horizontalCenter
+			Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
+					horizontalAlignment: Text.AlignHCenter
+					text: dcSystemIsEstimated ? qsTr("DC System power (est)") : qsTr("DC System power") }
+			Text { id: totalPower; font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+				text: EnhFmt.formatVBusItemAbs (sys.dcSystem.power) }
+			PowerGauge
+			{
+				id: gauge
+				width: (root.width * 0.9) - totalLabel.paintedWidth - totalPower.width
+				height: 15
+				showLabels: true
+				endLabelColor: "black"
+				connection: sys.dcSystem
+				maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
+				maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
+			}
+		}
+		Row
+		{
+			id: spacer1
+			anchors.horizontalCenter: parent.horizontalCenter
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					text: "" }
+			visible: totalTableRows < 8
+		}
+		Row
+		{
+			id: systemTableTitleRow
+			anchors.horizontalCenter: parent.horizontalCenter
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Name") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Direction") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Power") }
+		}
+		Row {
+			id: noSystemDevicesRow
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: root.width; horizontalAlignment: Text.AlignHCenter
+					text: qsTr ("no DC system devces")
+					visible: systemModel.count == 0 }
+		}
+		// table of system DC sources and loads
+		ListView
+		{
+			id: systemTable
+
+			anchors.horizontalCenter: systemTableTitleRow.horizontalCenter
+			width: systemTableTitleRow.width
+			height: 35 // adjusted later when rows are added to the two tables
+			interactive: true
+			clip: true
+			model: systemModel
+			delegate: DcSystemRow
+			{
+				tableColumnWidth: root.tableColumnWidth
+				rowTitleWidth: root.rowTitleWidth
+				width: systemTable.width
+				showDirection: true
+				Connections
+				{
+					target: scrollTimer
+					onTriggered: doScroll()
+				}
+			}
+		}
+		Row
+		{
+			id: spacer2
+			anchors.horizontalCenter: parent.horizontalCenter
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					text: "" }
+			visible: totalTableRows < 9
+		}
+		Rectangle
+		{
+			id: separatorLine
+			color: "black"
+			anchors.horizontalCenter: parent.horizontalCenter
+			width: otherTable.width
+			height: 2
+		}
+		Row {
+			id: otherDevicesTextRow
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: root.width; horizontalAlignment: Text.AlignHCenter
+					text: qsTr ("other DC devices not shown on overview page") }
+		}
+		Row
+		{
+			id: otherTableTitleRow
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Name") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Device") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Direction") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Power") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("State") }
+		}
+		// table of other DC sources and loads
+		ListView
+		{
+			id: otherTable
+
+			anchors.horizontalCenter: otherTableTitleRow.horizontalCenter
+			width: otherTableTitleRow.width
+			height: parent.height - y
+			interactive: true
+			clip: true
+			model: otherModel
+			delegate: DcSystemRow
+			{
+				tableColumnWidth: root.tableColumnWidth
+				rowTitleWidth: root.rowTitleWidth
+				width: otherTable.width
+				showDevice: true
+				showDirection: true
+				showState: true
+				Connections
+				{
+					target: scrollTimer
+					onTriggered: doScroll()
+				}
+			}
+		}
     }
 
-    // table of available DC sources and loads
-    ListView
-    {
-        id: dcTable
+    ListModel { id: systemModel }
 
-        anchors
-        {
-            top: root.top; topMargin: 30
-            horizontalCenter: root.horizontalCenter
-        }
-        width: tableHeaderRow.width
-        height: root.height - 60
-        interactive: true
+    ListModel { id: otherModel }
 
-        model: dcModel
-        delegate: DcSystemRow
-        {
-            tableColumnWidth: root.tableColumnWidth
-            rowTitleWidth: root.rowTitleWidth
-            width: dcTable.width
-            Connections
-            {
-                target: scrollTimer
-                onTriggered: doScroll()
-            }
-        }
-    }
-
-    ListModel { id: dcModel }
-
-    // Synchronise PV charger name text scroll start
+    // Synchronise name text scroll start
     Timer
     {
         id: scrollTimer
-        interval: 15000
+        interval: 5000
         repeat: true
         running: root.active
     }
 
-    function addService(service)
+	property int numberOfInverters: 0
+
+	// hack to get monitor mode from within a loop inside a function when service is changing
+	property string tempServiceName: ""
+	property VBusItem monitorModeItem: VBusItem { bind: Utils.path(tempServiceName, "/Settings/MonitorMode") }
+	property int monitorMode: monitorModeItem.valid ? monitorModeItem.value : 0
+
+    function addService (service)
     {
-		var monitorMode = ""
         switch (service.type)
         {
 		case DBusService.DBUS_SERVICE_BATTERY:
-			dcModel.append ( {serviceName: service.name, deviceType: "Battery"} )
+			// skip THE system battery
+			if (! systemBatteryItem.valid || service.name != systemBatteryItem.value)
+				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
             break;;
-        case DBusService.DBUS_SERVICE_DCSOURCE:
-			monitorMode = getMonitorMode (service.name)
-			if (monitorMode != "")
-				dcModel.append ( {serviceName: service.name, deviceType: monitorMode} )
-			else
-				dcModel.append ( {serviceName: service.name, deviceType: "Source"} )
-            break;;
-        case DBusService.DBUS_SERVICE_DCLOAD:
-			monitorMode = getMonitorMode (service.name)
-			if (monitorMode != "")
-				dcModel.append ( {serviceName: service.name, deviceType: monitorMode} )
-			else
-				dcModel.append ( {serviceName: service.name, deviceType: "Load"} )
-            break;;
-        case DBusService.DBUS_SERVICE_DCSYSTEM:
-			dcModel.append ( {serviceName: service.name, deviceType: "DC System"} )
-            break;;
-        case DBusService.DBUS_SERVICE_MULTI:
-			dcModel.append ( {serviceName: service.name, deviceType: "Multi"} )
-            break;;
-		case DBusService.DBUS_SERVICE_MULTI_RS:
-			pvChargers = true
-			dcModel.append ( {serviceName: service.name, deviceType: "Multi RS"} )
+
+		case DBusService.DBUS_SERVICE_MULTI:
+			// skip THE main Multi
+			if (! systemMultiItem.valid || service.name != systemMultiItem.value)
+				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
             break;;
 		case DBusService.DBUS_SERVICE_INVERTER:
-			dcModel.append ( {serviceName: service.name, deviceType: "Inverter"} )
+			// skip if this the FIRST one unless a main Multi exists
+			//	NOTE: the first one may not be THE system inverter but not sure how to figure that out exactly
+			if (numberOfInverters > 0 || systemMultiItem.valid)
+				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+			numberOfInverters++
             break;;
-        case DBusService.DBUS_SERVICE_ALTERNATOR:
-			dcModel.append ( {serviceName: service.name, deviceType: "Altenator"} )
-            break;;
-        case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
-			pvChargers = true
-            break;;
-        case DBusService.DBUS_SERVICE_FUELCELL:
-			dcModel.append ( {serviceName: service.name, deviceType: "Fuel Cell"} )
+
+		case DBusService.DBUS_SERVICE_ALTERNATOR:
 		case DBusService.DBUS_SERVICE_AC_CHARGER:
- 			dcModel.append ( {serviceName: service.name, deviceType: "AC Charger"} )
-           break;;
+        case DBusService.DBUS_SERVICE_FUELCELL:
+			// skip if tile present in flow (flow == DC Coupled)
+			if (flowOverview != 2)
+				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+			break;;
+
+        case DBusService.DBUS_SERVICE_DCSYSTEM:
+			systemModel.append ( {serviceName: service.name, serviceType: service.type } )
+            break;;
+
+        case DBusService.DBUS_SERVICE_DCSOURCE:
+			root.tempServiceName = service.name
+			// wind generator shown on DC and AC coupled overviews
+			if (monitorMode != -8 || flowOverview < 2 )
+				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+			break;
+        case DBusService.DBUS_SERVICE_DCLOAD:
+			otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+            break;;
         }
     }
 
     // Detect available services of interest
     function discoverServices()
     {
-        dcModel.clear()
+		systemModel.clear()
+		otherModel.clear()
+        numberOfInverters = 0
         pvChargers = false
         for (var i = 0; i < DBusServices.count; i++)
-        {
             addService(DBusServices.at(i))
-        }
-		if (pvChargers)
-			dcModel.append ( {serviceName: "", deviceType: "PV Chargers"} )
-		dcModel.append ( {serviceName: "", deviceType: "(unknown)"} )
+
+		adjustSystemTableHeight ()
     }
-
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return ""
-    }
-
-	property string serviceName: ""
-	property VBusItem monitorMode: VBusItem { bind: Utils.path(serviceName, "/Settings/MonitorMode") }
-	
-	function getMonitorMode (serviceName)
-	{
-		root.serviceName = serviceName
-		if (monitorMode.valid)
-		{
-			switch (monitorMode.value)
-			{
-				case -1:
-					return qsTr ("Source")
-					break;;
-				case -2:
-					return qsTr ("AC Charger")
-					break;;
-				case -3:
-					return qsTr ("DC-DC charger")
-					break;;
-				case -4:
-					return qsTr ("Water gen")
-					break;;
-				case -6:
-					return qsTr ("Alternator")
-					break;;
-				case -8:
-					return qsTr ("Wind gen")
-					break;;
-				case -7:
-					return qsTr ("Shaft gen")
-					break;;
-
-				case 1:
-					return qsTr ("Load")
-					break;;
-				case 3:
-					return qsTr ("Fridge")
-					break;;
-				case 4:
-					return qsTr ("Water pump")
-					break;;
-				case 5:
-					return qsTr ("Bilge pump")
-					break;;
-				case 7:
-					return qsTr ("Inverter")
-					break;;
-				case 8:
-					return qsTr ("Water heater")
-					break;;
-				default:
-					return ("")
-					break;;
-			}
-		}
-		else
-			return ""
-	}
 }

@@ -16,28 +16,25 @@ import "utils.js" as Utils
 ////// ADDED to show tanks
 import com.victron.velib 1.0
 import "timeToGo.js" as TTG
+import "enhancedFormat.js" as EnhFmt
 
 
 
 OverviewPage {
 	id: root
 
-    property color detailColor: "#b3b3b3"
-    property real touchTargetOpacity: 0.3
-    property int touchArea: 40
-    property bool showTargets: helpTimer.running
     property variant sys: theSystem
     property bool isMulti: numberOfMultis === 1
     property bool hasInverter: isMulti || numberOfInverters === 1
-    property bool hasAcInput: isMulti
+    property bool hasAcInput: isMulti || showAllTiles
     property bool hasAcOutSystem: _hasAcOutSystem.value === 1
-    property bool hasDcSystem: hasDcSys.value > 0
-	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
-	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
+    property bool hasDcSystem: hasDcSys.value > 0 || showAllTiles
+	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid || showAllTiles
+	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid || showAllTiles
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
-	property bool hasAcSolarOnOut: sys.pvOnAcOut.power.valid
+	property bool hasAcSolarOnOut: sys.pvOnAcOut.power.valid || showAllTiles
 	property bool hasAcSolar: hasAcSolarOnIn || hasAcSolarOnOut
-	property bool hasDcSolar: sys.pvCharger.power.valid
+	property bool hasDcSolar: sys.pvCharger.power.valid || showAllTiles
 	property bool hasDcAndAcSolar: hasAcSolar && hasDcSolar
 ////// ADDED to show tanks
     property int bottomOffset: 45
@@ -90,14 +87,18 @@ OverviewPage {
     VBusItem { id: showTempsItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTemps") }
     property bool showTempsEnable: showTempsItem.valid ? showTempsItem.value === 1 ? true : false : false
 
-//////// added to show/dim AC Input tile
-    VBusItem { id: showInactiveTiles; bind: Utils.path(guiModsPrefix, "/ShowInactiveFlowTiles") }
-    property real disabledTileOpacity: ! showInactiveTiles.valid || showInactiveTiles.value === 1 ? 0.3 : showInactiveTiles.value === 2 ? 1.0 : 0.0
+//////// added to show/dim tiles
+    VBusItem { id: showInactiveTilesItem; bind: Utils.path(guiModsPrefix, "/ShowInactiveFlowTiles") }
+    property real disabledTileOpacity: (showInactiveTiles && showInactiveTilesItem.value === 1) ? 0.3 : 1
+    property bool showInactiveTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value >= 1
+
+	// for debug, ignore validity checks so all tiles and their flow lines will show
+    property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
 //////// added to control time display
     VBusItem { id: timeFormatItem; bind: Utils.path(guiModsPrefix, "/TimeFormat") }
     property string timeFormat: getTimeFormat ()
-    
+
     function getTimeFormat ()
     {
         if (!timeFormatItem.valid || timeFormatItem.value === 0)
@@ -149,13 +150,16 @@ OverviewPage {
     VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
     VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
-    Component.onCompleted: { discoverServices(); helpTimer.running = true }
+    Component.onCompleted: { discoverServices(); showHelp () }
 
-	title: qsTr("Overview")
+	title: qsTr("Simple Overview")
 
 	OverviewBox {
 		id: acInBox
+		titleColor: "#E74c3c"
+		color: "#C0392B"
         opacity: hasAcInput ? 1 : disabledTileOpacity
+        visible: hasAcInput || showInactiveTiles
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title:
@@ -165,8 +169,6 @@ OverviewPage {
 			else
 				return getAcSourceName(sys.acSource)
 		}
-		titleColor: "#E74c3c"
-		color: "#C0392B"
 		anchors {
 			top: multi.top
 			left: parent.left; leftMargin: 10
@@ -196,10 +198,12 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.acInput
-            maxForwardPowerParameter: "" // handled internally - uses input current limit and AC input voltage
+			useInputCurrentLimit: true
+            maxForwardPowerParameter: ""
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
             show: showGauges && hasAcInput
         }
+		DetailTarget { id: acInputTarget; detailsPage: "DetailAcInput.qml" }
 	}
 
 
@@ -224,6 +228,7 @@ OverviewPage {
             inverterService: root.inverterService
             show: showGauges
         }
+		DetailTarget { id: multiTarget;  detailsPage: "DetailInverter.qml"; width: 60; height: 60 }
 	}
 
 ////// ADDED to show time inside inverter icon
@@ -250,7 +255,8 @@ OverviewPage {
 
 	OverviewBox {
 		id: acLoadBox
-        visible: hasAcOutSystem
+        visible: hasAcOutSystem || showInactiveTiles
+        opacity: hasAcOutSystem ? 1 : disabledTileOpacity
 		title: qsTr("AC Loads")
 		color: "#27AE60"
 		titleColor: "#2ECC71"
@@ -280,6 +286,7 @@ OverviewPage {
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
             show: showGauges && hasAcOutSystem
         }
+		DetailTarget { id: loadsOnOutputTarget;  detailsPage: "DetailLoadsOnOutput.qml" }
 	}
 
 	Battery {
@@ -327,24 +334,19 @@ OverviewPage {
                 text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr ("Remain: ∞")
             }
         }
+		DetailTarget { id: batteryTarget;  detailsPage: "DetailBattery.qml" }
 	}
 
-     VBusItem {
-        id: maxDcLoad
-        bind: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
-    }
-     VBusItem {
-        id: maxDcCharge
-        bind: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
-    }
+    VBusItem { id: dcSystemNameItem; bind: Utils.path(settingsBindPreffix, "/Settings/GuiMods/CustomDcSystemName") }
 
 	OverviewBox {
 		id: dcSystemBox
 ////// wider to make room for current
 		width: multi.width + 20
 		height: 45
-        visible: hasDcSystem
-        title: qsTr ("DC System")
+        opacity: hasDcSystem ? 1 : disabledTileOpacity
+        visible: hasDcSystem || sys.dcSystem.power.valid || showInactiveTiles
+        title: dcSystemNameItem.valid && dcSystemNameItem.value != "" ? dcSystemNameItem.value : qsTr ("DC System")
 
 		anchors {
 			horizontalCenter: multi.horizontalCenter
@@ -353,11 +355,39 @@ OverviewPage {
 			bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
 
-        values: TileText {
-            anchors.centerIn: parent
-////// modified to show current
-            text: dcSystemText ()
+        values:
+        [
+			TileText
+			{
+				width: parent.width
+				anchors
+				{
+					horizontalCenter: parent.horizontalCenter
+					bottom: parent.bottom; bottomMargin: 0
+				}
+	////// modified to show current
+				text: dcSystemText ()
+			}
+        ]
+        PowerGauge
+        {
+            id: dcSystemGauge
+            width: parent.width
+            height: 8
+            anchors
+            {
+                top: parent.top; topMargin: 19
+                left: parent.left; leftMargin: 15
+                right: parent.right
+            }
+            connection: sys.dcSystem
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
+            maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
+            showLabels: true
+            show: showGauges && hasDcSystem || sys.dcSystem.power.valid
+
         }
+		DetailTarget { id: dcSystemTarget;  detailsPage: "DetailDcSystem.qml" }
     }
 
     function dcSystemText ()
@@ -365,10 +395,7 @@ OverviewPage {
         if (hasDcSystem && sys.dcSystem.power.valid)
         {
             var current = sys.dcSystem.power.value / sys.battery.voltage.value
-            if (Math.abs (current) <= 100)
-                return sys.dcSystem.power.format(0) + " " + current.toFixed(1) + "A"
-            else
-                return sys.dcSystem.power.format(0) + " " + current.toFixed(0) + "A"
+			return EnhFmt.formatVBusItem (sys.dcSystem.power) + " " + EnhFmt.formatValue (current, "A")
         }
         else
             return "--"
@@ -383,21 +410,33 @@ OverviewPage {
 	property int pvOffset6: pvOffset5 + pvRowSpacing * pvRowsPerCharger
 	property int pvOffset7: pvOffset6 + pvRowSpacing * pvRowsPerCharger
 
-	OverviewSolarChargerEnhanced {
-		id: blueSolarCharger
+////// replaced OverviewSolarCharger with OverviewBox
+	OverviewBox {
+		id: pvChargerBox
+		title: qsTr("PV Charger")
+        titleColor: "#F4B350"
+        color: "#F39C12"
+		visible: hasDcSolar || showInactiveTiles
+        opacity: hasDcSolar ? 1 : disabledTileOpacity
 
 ////// MODIFIED to show tanks & provide extra space if not
-        height: hasDcAndAcSolar ? 55 : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
+        height:
+        {
+			var availableHeight = root.height - 3 - acLoadBox.height - 5 - (showTanksTemps ? bottomOffset + 3 : 5)
+			if (hasDcAndAcSolar)
+				return ((availableHeight - 5) / 2) + 4
+			else if (hasDcSolar)
+				return availableHeight
+			else
+				return 0
+		}
         width: 148
-		title: qsTr("PV Charger")
-////// MODIFIED - always hide icon peaking out from under PV tile
-		showChargerIcon: false
-		visible: hasDcSolar
 
 		anchors {
 			right: root.right; rightMargin: 10
             bottom: parent.bottom; bottomMargin: showTanksTemps ? bottomOffset + 3 : 5
 		}
+
 ////// moved sun icon here from OverviewSolarChager so it can be put below text, etc
         MbIcon {
             iconId: "overview-sun"
@@ -414,7 +453,7 @@ OverviewPage {
         [
             TileText {
                 y: 8
-                text: sys.pvCharger.power.format(0)
+                text: EnhFmt.formatVBusItem (sys.pvCharger.power)
                 font.pixelSize: 19
             },
 			MarqueeEnhanced
@@ -445,7 +484,7 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset1 + (pvChargerCompact ? 0 : pvRowSpacing)
-                text: pvPower1.text
+                text: EnhFmt.formatVBusItem (pvPower1, "W")
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				anchors.right: parent.right; anchors.rightMargin: 5
                 font.pixelSize: 15
@@ -463,13 +502,13 @@ OverviewPage {
 						if (pv1NrTrackers.valid && pv1NrTrackers.value > 1)
 							return qsTr ("multiple trackers")
                         else if (pvVoltage1.valid)
-                            voltageText = pvVoltage1.text
+                            voltageText = EnhFmt.formatVBusItem (pvVoltage1, "V")
                         else
                             voltageText = "??V"
                         if (pvCurrent1.valid)
-                            currentText = pvCurrent1.text
+                            currentText = EnhFmt.formatVBusItem (pvCurrent1, "A")
                         else if (pvPower1.valid)
-                            currentText =  (pvPower1.value / pvVoltage1.value).toFixed (1) + "A"
+                            currentText =  EnhFmt.formatValue ((pvPower1.value / pvVoltage1.value), "A")
                         else
                             currentText = "??A"
                         return voltageText + " " + currentText
@@ -494,7 +533,7 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset2 + (pvChargerCompact ? 0 : pvRowSpacing)
-                text: pvPower2.text
+                text: EnhFmt.formatVBusItem (pvPower2, "W")
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				anchors.right: parent.right; anchors.rightMargin: 5
 				font.pixelSize: 15
@@ -512,13 +551,13 @@ OverviewPage {
 						if (pv2NrTrackers.valid && pv2NrTrackers.value > 1)
 							return qsTr ("multiple trackers")
                         else if (pvVoltage2.valid)
-                            voltageText = pvVoltage2.text
+                            voltageText = EnhFmt.formatVBusItem (pvVoltage2,  "V")
                         else
                             voltageText = "??V"
                         if (pvCurrent2.valid)
-                            currentText = pvCurrent2.text
+                            currentText = EnhFmt.formatVBusItem (pvCurrent2, "A")
                         else if (pvPower2.valid)
-                            currentText =  (pvPower2.value / pvVoltage2.value).toFixed (1) + "A"
+                            currentText =  EnhFmt.formatValue ((pvPower2.value / pvVoltage2.value), "A")
                         else
                             currentText = "??A"
                         return voltageText + " " + currentText
@@ -543,7 +582,7 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset3 + (pvChargerCompact ? 0 : pvRowSpacing)
-                text: pvPower3.text
+                text: EnhFmt.formatVBusItem (pvPower3, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
@@ -561,13 +600,13 @@ OverviewPage {
 						if (pv3NrTrackers.valid && pv3NrTrackers.value > 1)
 							return qsTr ("multiple trackers")
                         else if (pvVoltage3.valid)
-                            voltageText = pvVoltage3.text
+                            voltageText = EnhFmt.formatVBusItem (pvVoltage3, "V")
                         else
                             voltageText = "??V"
                         if (pvCurrent3.valid)
-                            currentText = pvCurrent3.text
+                            currentText = EnhFmt.formatVBusItem (pvCurrent3, "A")
                         else if (pvPower3.valid)
-                            currentText =  (pvPower3.value / pvVoltage3.value).toFixed (1) + "A"
+                            currentText =  EnhFmt.formatValue ((pvPower3.value / pvVoltage3.value), "A")
                         else
                             currentText = "??A"
                         return voltageText + " " + currentText
@@ -604,7 +643,7 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset4 + (pvChargerCompact ? 0 : pvRowSpacing)
-                text: pvPower4.text
+                text: EnhFmt.formatVBusItem (pvPower4, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
@@ -626,7 +665,7 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset5 + pvChargerCompact ? 0 : pvRowSpacing
-                text: pvPower5.text
+                text: EnhFmt.formatVBusItem (pvPower5, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
@@ -648,7 +687,7 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset6 + (pvChargerCompact ? 0 : pvRowSpacing)
-                text: pvPower6.text
+                text: EnhFmt.formatVBusItem (pvPower6, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
@@ -670,52 +709,67 @@ OverviewPage {
 			},
             TileText {
                 y: pvOffset7 + (pvChargerCompact ? 0 : pvRowSpacing)
-                text: pvPower7.text
+                text: EnhFmt.formatVBusItem (pvPower7, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
 				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! hasDcAndAcSolar
-            }
-      ]
+			}
+		]
 ////// add power bar graph
-        PowerGauge
+		PowerGauge
         {
             id: pvChargerBar
-            width: parent.width
-            height: 12
+            width: parent.width - (hasDcAndAcSolar && ! showTanksTemps ? 20 : 0)
+            height: 10
             anchors
             {
-                top: parent.top; topMargin: -2
-                horizontalCenter: parent.horizontalCenter
+                top: parent.top; topMargin: 19
+                right: parent.right; rightMargin: 0.5
             }
             connection: sys.pvCharger
 			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
             show: showGauges && hasDcSolar
         }
+		DetailTarget { id: pvChargerTarget;  detailsPage: "DetailPvCharger.qml" }
 	}
 
-    OverviewSolarInverter {
+////// replaced OverviewSolarInverter with OverviewBox
+    OverviewBox {
         id: pvInverter
+		titleColor: "#F4B350"
+		color: "#F39C12"
+        visible: hasAcSolar || showInactiveTiles
+        opacity: hasAcSolar ? 1 : disabledTileOpacity
+
 ////// MODIFIED to show tanks & provide extra space if not
-        height: hasDcAndAcSolar ? blueSolarCharger.height : showTanksTemps ? batteryHeight + 20 : 114 + bottomOffset
+        height:
+        {
+			var availableHeight = root.height - 3 - acLoadBox.height -5
+			availableHeight -= (showTanksTemps ? bottomOffset + 3 : 5)
+			if (hasDcAndAcSolar)
+				availableHeight -= pvChargerBox.height + 5
+			if (hasAcSolar)
+				return availableHeight
+			else
+				return 0
+		}
         width: 148
         title: qsTr("PV Inverter")
-        showInverterIcon: !hasDcAndAcSolar
-        visible: hasAcSolar
 
         anchors {
             right: root.right; rightMargin: 10;
-            bottom: hasDcAndAcSolar ? blueSolarCharger.top : root.bottom; bottomMargin: 5
+            bottom: hasDcAndAcSolar ? pvChargerBox.top : root.bottom
+            bottomMargin: hasDcAndAcSolar ? 5 : showTanksTemps ? bottomOffset + 3 : 5
         }
 
-        OverviewAcValuesEnhanced {
-            connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-            visible: !coupledPvAc.visible
-        }
-
-//////// add individual PV inverter powers
         values:
         [
+			OverviewAcValuesEnhanced {
+                y: 8
+				connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
+				visible: !coupledPvAc.visible
+			},
             TileText {
                 id: coupledPvAc
 
@@ -725,9 +779,10 @@ OverviewPage {
 
                 y: 10
                 text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
-                font.pixelSize: hasDcAndAcSolar ? 20 : 25
+                font.pixelSize: 19
                 visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
             },
+//////// add individual PV inverter powers
             TileText {
                 y: 31
                 text: pvInverterName1.valid ? pvInverterName1.text : "-"
@@ -735,7 +790,7 @@ OverviewPage {
             },
             TileText {
                 y: 47
-                text: pvInverterPower1.valid ? pvInverterPower1.text : "--"
+                text: EnhFmt.formatVBusItem (pvInverterPower1, "W")
                 font.pixelSize: 15
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
@@ -746,7 +801,7 @@ OverviewPage {
             },
             TileText {
                 y: 77
-                text: pvInverterPower2.valid ? pvInverterPower2.text : "--"
+                text: EnhFmt.formatVBusItem (pvInverterPower2, "W")
                 font.pixelSize: 15
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 1
             },
@@ -757,7 +812,7 @@ OverviewPage {
             },
             TileText {
                 y: 107
-                text: pvInverterPower3.valid ? pvInverterPower3.text : "--"
+                text: EnhFmt.formatVBusItem (pvInverterPower3, "W")
                 font.pixelSize: 15
                 visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             }
@@ -770,13 +825,14 @@ OverviewPage {
             height: 12
             anchors
             {
-                top: parent.top; topMargin: -2
+                top: parent.top; topMargin: 19
                 horizontalCenter: parent.horizontalCenter
             }
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
             show: showGauges && hasAcSolar && !hasDcAndAcSolar
         }
+		DetailTarget { id: pvInverterTarget;  detailsPage: "DetailPvInverter.qml" }
     }
 
 	OverviewConnection {
@@ -797,7 +853,7 @@ OverviewPage {
 		id: multiToAcLoads
 		ballCount: 2
 		path: straight
-        active: root.active && hasAcOutSystem
+        active: root.active && ( hasAcOutSystem || showAllTiles )
 		value: flow(sys.acLoad.power)
 
 		anchors {
@@ -815,12 +871,12 @@ OverviewPage {
 
 		ballCount: 4
 		path: corner
-		active: root.active && hasAcSolar
+		active: root.active && (hasAcSolar || showAllTiles )
 		value: hasDcAndAcSolar ? hasDcAndAcFlow : flow(sys.pvOnAcOut.power)
 
 		anchors {
 			left: pvInverter.left; leftMargin: 8
-			top: pvInverter.verticalCenter; topMargin: hasDcAndAcSolar ? 1 : 0
+			top: pvInverter.verticalCenter; topMargin: hasDcAndAcSolar ? 10 : 0
 			right: multi.horizontalCenter; rightMargin: -20
 			bottom: multi.bottom; bottomMargin: 10
 		}
@@ -831,7 +887,7 @@ OverviewPage {
 		id: dcConnect
 		anchors {
 			left: multi.horizontalCenter; leftMargin: hasAcSolar ? -20  : 0
-			bottom: dcSystemBox.top; bottomMargin: 10
+			bottom: dcSystemBox.top; bottomMargin: hasDcAndAcSolar ? 7 : 10
 		}
 	}
 
@@ -853,10 +909,10 @@ OverviewPage {
 	}
 
 	OverviewConnection {
-		id: blueSolarChargerDcConnect
+		id: pvChargerBoxDcConnect
 		ballCount: 3
 		path: straight
-		active: root.active && hasDcSolar
+		active: root.active && (hasDcSolar || showAllTiles )
 		value: -flow(sys.pvCharger.power)
 		startPointVisible: false
 
@@ -864,7 +920,7 @@ OverviewPage {
 			left: dcConnect.left
 			top: dcConnect.top
 
-			right: blueSolarCharger.left; rightMargin: -8
+			right: pvChargerBox.left; rightMargin: -8
 			bottom: dcConnect.top;
 		}
 	}
@@ -890,7 +946,7 @@ OverviewPage {
 		id: batteryToDcSystem
 		ballCount: 2
 		path: straight
-        active: root.active && hasDcSystem
+        active: root.active && ( hasDcSystem|| showAllTiles )
 		value: flow(sys.dcSystem.power)
 
 		anchors {
@@ -1095,132 +1151,6 @@ OverviewPage {
     }
 
 // Details targets
-    MouseArea
-    {
-        id: multiTarget
-        anchors.centerIn: multi
-        enabled: parent.active && hasInverter
-        height: touchArea * 1.5; width: touchArea * 1.5
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailInverter.qml", {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets && hasInverter
-        }
-    }
-    MouseArea
-    {
-        id: acInputTarget
-        anchors.centerIn: acInBox
-        enabled: parent.active && hasAcInput
-        height: touchArea; width: touchArea
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailAcInput.qml",
-                        {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets && hasAcInput
-        }
-    }
-    MouseArea
-    {
-        id: acLoadsOnOutputTarget
-        anchors.centerIn: acLoadBox
-        enabled: parent.active && hasAcOutSystem
-        height: touchArea; width: touchArea
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailLoadsOnOutput.qml",
-                    {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets && hasAcOutSystem
-        }
-    }
-    MouseArea
-    {
-        id: pvInverterTarget
-        anchors.centerIn: pvInverter
-        enabled: parent.active && hasAcSolar
-        height: touchArea; width: touchArea
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailPvInverter.qml",
-                    {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets && hasAcSolar
-        }
-    }
-   MouseArea
-    {
-        id: pvChargerTarget
-        anchors.centerIn: blueSolarCharger
-        enabled: parent.active && hasDcSolar
-        height: touchArea; width: touchArea
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailPvCharger.qml",
-                    {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets && hasDcSolar
-        }
-    }
-    MouseArea
-    {
-        id: batteryTarget
-        anchors.centerIn: battery
-        enabled: parent.active
-        height: touchArea; width: touchArea
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailBattery.qml",
-                    {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets
-        }
-    }
-    MouseArea
-    {
-        id: dcTarget
-        anchors.centerIn: dcSystemBox
-        enabled: parent.active
-        height: touchArea; width: touchArea
-        onClicked: { rootWindow.pageStack.push ("/opt/victronenergy/gui/qml/DetailDcSystem.qml",
-                    {backgroundColor: detailColor} ) }
-        Rectangle
-        {
-            color: "black"
-            anchors.fill: parent
-            radius: width * 0.2
-            opacity: touchTargetOpacity
-            visible: showTargets
-        }
-    }
-////// display detail targets and help message when first displayed.
-    Timer {
-        id: helpTimer
-        running: false
-        repeat: false
-        interval: 5000
-        triggeredOnStart: true
-    }
 
     // help message shown when menu is first drawn
     Rectangle
@@ -1235,15 +1165,128 @@ OverviewPage {
             top: multi.bottom; topMargin: 1
             horizontalCenter: root.horizontalCenter
         }
-        visible: showTargets
+        visible: false
+		TileText
+		{
+			text: qsTr ( "Tap tile center for detail at any time" )
+			color: "black"
+			anchors.fill: helpBox
+			wrapMode: Text.WordWrap
+			font.pixelSize: 12
+			visible: parent.visible
+		}
     }
-    TileText
+
+	//// hard key handler
+	//		used to press buttons when touch isn't available
+	//		UP and DOWN buttons cycle through the list of touch areas
+	//		"space" button is used to simulate a touch on the area
+	//		target must be highlighted so that other uses of "space"
+	//		will still occur
+
+	// list of all details touchable areas
+	property variant targetList:
+	[
+		acInputTarget, batteryTarget,
+		multiTarget, dcSystemTarget,
+		loadsOnOutputTarget, pvInverterTarget, pvChargerTarget 
+	]
+
+	property int selectedTarget: 0
+
+    Timer
     {
-        text: qsTr ( "Tap tile center for detail at any time" )
-        color: "black"
-        anchors.fill: helpBox
-        wrapMode: Text.WordWrap
-        font.pixelSize: 12
-        show: showTargets
+        id: targetTimer
+        interval: 5000
+        repeat: false
+        running: false
+        onTriggered: { hideAllTargets () }
     }
+
+	Keys.forwardTo: [keyHandler]
+	Item
+	{
+		id: keyHandler
+		Keys.onUpPressed:
+		{
+			nextTarget (-1)
+			event.accepted = true
+		}
+
+		Keys.onDownPressed:
+		{
+			nextTarget (+1)
+			event.accepted = true
+		}
+		Keys.onSpacePressed:
+		{
+			if (targetTimer.running)
+			{
+				var foo // hack to make clicked() work
+				bar.clicked (foo)
+				event.accepted = true
+			}
+			else
+				event.accepted = false
+		}
+	}
+	// hack to make clicked() work
+	property variant bar: targetList[selectedTarget]
+
+	function nextTarget (increment)
+	{
+		// make one pass through all possible targets to find an enabled one
+		// if found, that's the new selectedTarget,
+		// if not selectedTarget does not change
+		var newIndex = selectedTarget
+		for (var i = 0; i < targetList.length; i++)
+		{
+			if (( ! targetTimer.running || helpBox.visible) && targetList[newIndex].enabled)
+			{
+				highlightSelectedTarget ()
+				return
+			}
+			newIndex += increment
+			if (newIndex >= targetList.length)
+				newIndex = 0
+			else if (newIndex < 0)
+				newIndex = targetList.length - 1
+			if (targetList[newIndex].enabled)
+			{
+				selectedTarget = newIndex
+				highlightSelectedTarget ()
+				break
+			}
+		}
+	}
+
+	function showHelp ()
+	{
+		for (var i = 0; i < targetList.length; i++)
+		{
+			targetList[i].targetVisible = true
+		}
+		helpBox.visible = true
+		targetTimer.restart ()
+	}
+	function hideAllTargets ()
+	{
+		for (var i = 0; i < targetList.length; i++)
+		{
+			targetList[i].targetVisible = false
+		}
+		helpBox.visible = false
+	}
+	function highlightSelectedTarget ()
+	{
+		for (var i = 0; i < targetList.length; i++)
+		{
+			if (targetList[i] == targetList[selectedTarget])
+				targetList[i].targetVisible = true
+			else
+				targetList[i].targetVisible = false
+		}
+		helpBox.visible = false
+		targetTimer.restart ()
+	}
 }

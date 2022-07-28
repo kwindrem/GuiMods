@@ -5,6 +5,7 @@
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 MbPage {
 	id: root
@@ -164,13 +165,13 @@ MbPage {
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (sys.acInput.powerL1, " W") }
+                        text: EnhFmt.formatVBusItem (sys.acInput.powerL1) }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (sys.acInput.powerL2, " W"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (sys.acInput.powerL2); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (sys.acInput.powerL3, " W"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acInput.powerL3); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -179,13 +180,13 @@ MbPage {
                         text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (voltageL1, " V") }
+                        text: EnhFmt.formatVBusItem (voltageL1, " V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (voltageL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (voltageL2, " V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (voltageL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (voltageL3, " V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -194,14 +195,14 @@ MbPage {
                         text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: useMeter ? formatValue (currentL1, " A") : calculateCurrent (sys.acInput.powerL1, voltageL1, " A") }
+                        text: useMeter ? EnhFmt.formatVBusItem (currentL1, " A") : calculateCurrent (sys.acInput.powerL1, voltageL1) }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: useMeter ? formatValue (currentL2, " A") : calculateCurrent (sys.acInput.powerL2, voltageL2, " A");
+                        text: useMeter ? EnhFmt.formatVBusItem (currentL2, " A") : calculateCurrent (sys.acInput.powerL2, voltageL2);
 								visible: phaseCount >= 2 }
                Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-						text: useMeter ? formatValue (currentL3, " A") : calculateCurrent (sys.acInput.powerL3, voltageL3, " A");
+						text: useMeter ? EnhFmt.formatVBusItem (currentL3, " A") : calculateCurrent (sys.acInput.powerL3, voltageL3);
 								visible: phaseCount >= 3 }
             }
             Row
@@ -211,7 +212,7 @@ MbPage {
                         text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (frequencyL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (frequencyL1, " Hz") }
             }
             Row
             {
@@ -253,7 +254,7 @@ MbPage {
             {
                 width: (parent.width / 2) - 4
                 spacing: 4
-                Button
+                DetailButton
                 {
                     id: preset1button
                     baseColor: newCurrentLimit === acLimitPreset1 ? "black" : root.buttonColor
@@ -269,7 +270,7 @@ MbPage {
                                 color: "white"
                             }
                 }
-                Button
+                DetailButton
                 {
                     id: preset2button
                     baseColor: newCurrentLimit === acLimitPreset2 ? "black" : root.buttonColor
@@ -290,7 +291,7 @@ MbPage {
             {
                 width: (parent.width / 2) - 4
                 spacing: 4
-                Button
+                DetailButton
                 {
                     id: preset3button
                     baseColor: newCurrentLimit === acLimitPreset3 ? "black" : root.buttonColor
@@ -306,7 +307,7 @@ MbPage {
                                 color: "white"
                             }
                 }
-                Button
+                DetailButton
                 {
                     id: preset4button
                     baseColor: newCurrentLimit === acLimitPreset4 ? "black" : root.buttonColor
@@ -327,7 +328,7 @@ MbPage {
             {
                 width: (parent.width / 2) - 4
                 spacing: 4
-                Button
+                DetailButton
                 {
                     id: trimMinus
                     baseColor: root.buttonColor
@@ -343,7 +344,7 @@ MbPage {
                                 color: "white"
                             }
                 }
-                Button
+                DetailButton
                 {
                     id: trimPlus
                     baseColor: root.buttonColor
@@ -363,7 +364,7 @@ MbPage {
             {
                 width: parent.width
                 spacing: 4
-                Button
+                DetailButton
                 {
                     id: acceptButton
                     baseColor: root.buttonColor
@@ -485,33 +486,119 @@ MbPage {
 
     // fake current value from power / voltage
     // does not consider power factor so this value for current is not really correct
-    function calculateCurrent (powerItem, voltageItem, unit)
+    function calculateCurrent (powerItem, voltageItem)
     {
-        var current
         if (powerItem.valid && voltageItem.valid && voltageItem.value != 0)
-        {
-            current = powerItem.value / voltageItem.value
-            if (current < 100)
-                return current.toFixed (1) + unit
-            else
-                return current.toFixed (0) + unit
-        }
+			return EnhFmt.formatValue (powerItem.value / voltageItem.value, "A")
         else
             return "--"
     }
 
-    function formatValue (item, unit)
+
+	//// hard key handler
+	//		used to press buttons when touch isn't available
+	//		UP and DOWN buttons cycle through the list of buttons
+	//		"space" button is used to simulate a button press
+	//		button must be highlighted so that other uses of "space"
+	//		will still occur
+
+	// list of buttons to be accessed via hard buttons
+	property variant buttonList:
+	[
+		preset1button, preset2button, preset3button, preset4button, trimMinus, trimPlus, acceptButton
+	]
+
+	property int buttonIndex: 0
+
+    Timer
     {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return "--"
+        id: targetTimer
+        interval: 5000
+        repeat: false
+        running: false
+        onTriggered: { clearHighlight () }
     }
+
+	Keys.forwardTo: [keyHandler]
+
+	Item
+	{
+		id: keyHandler
+		Keys.onDownPressed:
+		{
+			nextTarget (+1)
+			event.accepted = true
+		}
+
+		Keys.onUpPressed:
+		{
+			nextTarget (-1)
+			event.accepted = true
+		}
+	}
+
+	function nextTarget (increment)
+	{
+		// make one pass through all possible targets to find an enabled one
+		// if found, that's the new selectedTarget,
+		// if not selectedTarget does not change
+		var newIndex = buttonIndex
+		for (var i = 0; i < buttonList.length; i++)
+		{
+			// just restore highlight if not visible
+			if ( ! targetTimer.running && buttonList[newIndex].visible)
+			{
+				setActiveButton (buttonIndex)
+				return
+			}
+			newIndex += increment
+			if (newIndex >= buttonList.length)
+				newIndex = 0
+			else if (newIndex < 0)
+				newIndex = buttonList.length - 1
+			if (buttonList[newIndex].visible)
+			{
+				setActiveButton (newIndex)
+				break
+			}
+		}
+	}
+
+	// Keys.onSpacePressed doesn't work - stolen by pageHandler
+	// so build a custom page handler so "space" can be used to press a button
+	pageToolbarHandler: detailToolbarHandler
+	ToolbarHandlerPages
+	{
+		id: detailToolbarHandler
+		isDefault: true
+		function centerAction()
+		{
+			acceptSpaceButton ()
+		}
+	}
+    
+	function acceptSpaceButton ()
+	{
+		if (targetTimer.running)
+		{
+			buttonList[buttonIndex].clicked ()
+		}
+	}
+
+	function setActiveButton (newIndex)
+	{
+		buttonIndex = newIndex
+		for (var i = 0; i < buttonList.length; i++)
+		if (i == newIndex)
+			buttonList[i].highlight = true
+		else
+			buttonList[i].highlight = false
+		targetTimer.restart ()
+	}
+
+	function clearHighlight ()
+	{
+		for (var i = 0; i < buttonList.length; i++)
+			buttonList[i].highlight = false
+	}
 }

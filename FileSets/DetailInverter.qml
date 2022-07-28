@@ -5,12 +5,13 @@
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 MbPage {
 	id: root
- 
+
     title: "Inverter detail"
-    
+
     property string systemPrefix: "com.victronenergy.system"
 
 	property int fontPixelSize: 18
@@ -130,7 +131,7 @@ MbPage {
                                 totalValid = true
                             }
                             if (totalValid)
-                                return total.toFixed (0) + " W"
+                                return EnhFmt.formatValue (total, " W")
                             else
                                 return "--"
                         }                        
@@ -184,13 +185,13 @@ MbPage {
                         text: qsTr("Input Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (vInL1, " V") }
+                        text: EnhFmt.formatVBusItem (vInL1, " V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (vInL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (vInL2, " V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (vInL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (vInL3, " V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -199,13 +200,13 @@ MbPage {
                         text: qsTr("Output Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (vOutL1, " V") }
+                        text: EnhFmt.formatVBusItem (vOutL1, " V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (vOutL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (vOutL2, " V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (vOutL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (vOutL3, " V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -214,13 +215,13 @@ MbPage {
                         text: qsTr("Input Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (iInL1, " A") }
+                        text: EnhFmt.formatVBusItem (iInL1, " A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (iInL2, " A"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (iInL2, " A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (iInL3, " A"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (iInL3, " A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -229,13 +230,13 @@ MbPage {
                         text: qsTr("Output Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (iOutL1, " A") }
+                        text: EnhFmt.formatVBusItem (iOutL1, " A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" :formatValue (iOutL2, " A"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (iOutL2, " A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (iOutL3, " A"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (iOutL3, " A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -244,10 +245,10 @@ MbPage {
                         text: qsTr("Frequency In / Out") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (fInL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (fInL1, " Hz") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (fOutL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (fOutL1, " Hz") }
             }
             Row
             {
@@ -255,13 +256,7 @@ MbPage {
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                         text: qsTr("DC Power / Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth / 3; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (dcPower, " W") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth / 3; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (dcCurrent, " A") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth / 3; horizontalAlignment: Text.AlignHCenter
+                        width: totalDataWidth * 0.4; horizontalAlignment: Text.AlignHCenter
                         text:
 						{
 							if (! dcPower.valid)
@@ -274,6 +269,12 @@ MbPage {
 								return ""
 						}
 				}
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: totalDataWidth * 0.3; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (dcPower, " W") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: totalDataWidth * 0.3; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (dcCurrent, " A") }
             }
             Row
             {
@@ -289,7 +290,7 @@ MbPage {
             width: 80
             spacing: 4
 
-            Button
+            DetailButton
             {
                 id: onButton
                 baseColor: inverterMode === 3 ? "green" : "#e6ffe6"
@@ -304,7 +305,7 @@ MbPage {
                     color: inverterMode === 3 ? "white" : "black"
                 }
             }
-            Button
+			DetailButton
             {
                 id: offButton
                 baseColor: inverterMode === 4 ? "black" : "#e6e6e6"
@@ -318,7 +319,7 @@ MbPage {
                     color: inverterMode === 4 ? "white" : "black"
                 }
             }
-            Button
+			DetailButton
             {
                 id: invertOnlyButton
                 baseColor: inverterMode === 2 ? "blue" : "#ccccff"
@@ -332,7 +333,7 @@ MbPage {
                     color: inverterMode === 2 ? "white" : "black"
                 }
             }
-            Button 
+			DetailButton
             {
                 id: chargeOnlyButton
                 baseColor: inverterMode === 1 ? "orange" : "#ffedcc"
@@ -347,7 +348,7 @@ MbPage {
                     color: inverterMode === 1 ? "white" : "black"
                 }
             }
-            Button 
+			DetailButton
             {
                 id: ecoButton
                 baseColor: inverterMode === 5 ? "orange" : "#ffedcc"
@@ -425,33 +426,119 @@ MbPage {
         }
     }
 
-    function formatValue (item, unit)
+    function formatValueDiff (item1, item2, unit)
     {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
+        if (item1.valid && item2.valid)
+            return EnhFmt.formatValue (item2.value - item2.value, unit)
         else
             return "--"
     }
 
-    function formatValueDiff (item1, item2, unit)
+
+	//// hard key handler
+	//		used to press buttons when touch isn't available
+	//		UP and DOWN buttons cycle through the list of buttons
+	//		"space" button is used to simulate a button press
+	//		button must be highlighted so that other uses of "space"
+	//		will still occur
+
+	// list of buttons to be accessed via hard buttons
+	property variant buttonList:
+	[
+		onButton, offButton, invertOnlyButton, chargeOnlyButton, ecoButton
+	]
+
+	property int buttonIndex: 0
+
+    Timer
     {
-        var value
-        if (item1.valid && item2.valid)
-        {
-            value = item2.value - item2.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
-        }
-        else
-            return "--"
+        id: targetTimer
+        interval: 5000
+        repeat: false
+        running: false
+        onTriggered: { clearHighlight () }
     }
+
+	Keys.forwardTo: [keyHandler]
+
+	Item
+	{
+		id: keyHandler
+		Keys.onDownPressed:
+		{
+			nextTarget (+1)
+			event.accepted = true
+		}
+
+		Keys.onUpPressed:
+		{
+			nextTarget (-1)
+			event.accepted = true
+		}
+	}
+
+	function nextTarget (increment)
+	{
+		// make one pass through all possible targets to find an enabled one
+		// if found, that's the new selectedTarget,
+		// if not selectedTarget does not change
+		var newIndex = buttonIndex
+		for (var i = 0; i < buttonList.length; i++)
+		{
+			// just restore highlight if not visible
+			if ( ! targetTimer.running && buttonList[newIndex].visible)
+			{
+				setActiveButton (buttonIndex)
+				return
+			}
+			newIndex += increment
+			if (newIndex >= buttonList.length)
+				newIndex = 0
+			else if (newIndex < 0)
+				newIndex = buttonList.length - 1
+			if (buttonList[newIndex].visible)
+			{
+				setActiveButton (newIndex)
+				break
+			}
+		}
+	}
+
+	// Keys.onSpacePressed doesn't work - stolen by pageHandler
+	// so build a custom page handler so "space" can be used to press a button
+	pageToolbarHandler: detailToolbarHandler
+	ToolbarHandlerPages
+	{
+		id: detailToolbarHandler
+		isDefault: true
+		function centerAction()
+		{
+			acceptSpaceButton ()
+		}
+	}
+    
+	function acceptSpaceButton ()
+	{
+		if (targetTimer.running)
+		{
+			buttonList[buttonIndex].clicked ()
+		}
+	}
+
+	function setActiveButton (newIndex)
+	{
+		buttonIndex = newIndex
+		for (var i = 0; i < buttonList.length; i++)
+		if (i == newIndex)
+			buttonList[i].highlight = true
+		else
+			buttonList[i].highlight = false
+		targetTimer.restart ()
+	}
+
+	function clearHighlight ()
+	{
+		for (var i = 0; i < buttonList.length; i++)
+			buttonList[i].highlight = false
+	}
 }

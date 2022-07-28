@@ -21,6 +21,10 @@ source "/data/SetupHelper/CommonResources"
 
 #### end of lines to include SetupHelper
 
+
+restartSystemCalc=false
+restartGeneratorService=false
+
 #### running manually and OK to proceed - prompt for input
 if [ $scriptAction == 'NONE' ] ; then
     # display innitial message
@@ -31,6 +35,17 @@ if [ $scriptAction == 'NONE' ] ; then
     echo "  however each modificaiton can be enabled/disabled in the Settings Display menus"
 
     standardActionPrompt
+fi
+
+# cleanup from previous verisons
+if [ $scriptAction == 'INSTALL' ] || [ $scriptAction == 'UNINSTALL' ] ; then
+    restoreActiveFile "$qmlDir/DetailCriticalOutput.qml"
+    restoreActiveFile "$qmlDir/DetailNoncriticalOutput.qml"
+    restoreActiveFile "$qmlDir/OverviewGridParallelEnhanced.qml"
+    restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
+    restoreActiveFile "$qmlDir/OverviewAcValuesEnhancedGP.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarChargerEnhanced.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarInverter.qml"
 fi
 
 #### installing
@@ -48,15 +63,18 @@ if [ $scriptAction == 'INSTALL' ] ; then
         activateGridParallelOverview=false
     fi
 
-    # cleanup from previous verisons
-    restoreActiveFile "$qmlDir/DetailCriticalOutput.qml"
-    restoreActiveFile "$qmlDir/DetailNoncriticalOutput.qml"
+    # insure GeneratorConnector is uninstalled since its functionalty is now part of GuiMods
+    if [ -f "$installedFlagPrefix""GeneratorConnector" ]; then
+        logMessage "uninstalling the GeneratorConnector - GuiMods incorporates all it's features and more"
+        "/data/GeneratorConnector/setup" "uninstall" "deferReboot" "deferGuiReset"
+    fi
+
 
     # create dbus Settings if they haven't been set previously
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowTanksTempsDigIn\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/MaxFuelCellPower\
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -82,6 +100,11 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path":"/GuiMods/ShowGauges", "default":1, "min":0, "max":1},\
             {"path":"/GuiMods/ShowTileOverview", "default":1, "min":0, "max":1},\
             {"path":"/GuiMods/MoveSettings", "default":1, "min":0, "max":1},\
+            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}, \
+            {"path":"/GuiMods/ShowInactiveFlowTiles", "default":0}, \
+            {"path":"/GuiMods/ShowTanksTempsDigIn", "default":0, "min":0, "max":1}, \
+            {"path":"/GuiMods/FlowOverview", "default":1, "min":0, "max":3}, \
+			{"path":"/GuiMods/CustomDcSystemName", "default":""}, \
             {"path":"/GuiMods/TimeFormat", "default":1}, \
             {"path": "/Relay/0/CustomName", "default":""},\
             {"path": "/Relay/0/Show", "default":1, "min":0, "max":1},\
@@ -95,19 +118,32 @@ if [ $scriptAction == 'INSTALL' ] ; then
             {"path": "/Relay/4/Show", "default":1, "min":0, "max":1},\
             {"path": "/Relay/5/CustomName", "default":""},\
             {"path": "/Relay/5/Show", "default":1, "min":0, "max":1}, \
-            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}, \
             {"path":"/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/PvOnGridMaxPower", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/PvOnOutputMaxPower", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/MaxChargerPower", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/MaxFeedInPower", "default":0.0}, \
-            {"path":"/GuiMods/ShowInactiveFlowTiles", "default":1, "min":0, "max":2}, \
             {"path":"/GuiMods/GaugeLimits/DcSystemMaxLoad", "default":0.0}, \
             {"path":"/GuiMods/GaugeLimits/DcSystemMaxCharge", "default":0.0}, \
-            {"path":"/GuiMods/UseEnhancedGridParallelFlowOverview", "default":0, "min":0, "max":1}, \
-            {"path":"/GuiMods/ShowTanksTempsDigIn", "default":0, "min":0, "max":1}, ]' > /dev/null
+            {"path":"/GuiMods/GaugeLimits/MaxAlternatorPower", "default":0.0}, \
+			{"path":"/GuiMods/GaugeLimits/MaxWindGenPower", "default":0.0}, \
+			{"path":"/GuiMods/GaugeLimits/MaxAcChargerPower", "default":0.0}, \
+			{"path":"/GuiMods/UseEnhancedGeneratorOverview", "default":1.0}, \
+			{"path":"/GuiMods/GaugeLimits/MaxFuelCellPower", "default":0.0} ]' > /dev/null
     fi
+
+    temp=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowInactiveFlowTiles\
+                com.victronenergy.BusItem.GetMax)
+	temp=$(echo $temp| awk '{print $3}')
+	if (( $temp != 0)); then
+		removeDbusSettings "GuiMods/ShowInactiveFlowTiles"
+		logMessage "creating ShowInactiveFlowTiles without limits"
+        dbus -y com.victronenergy.settings /Settings AddSettings\
+            '%[{"path":"/GuiMods/ShowInactiveFlowTiles", "default":0}]' > /dev/null
+	fi
+
+
 
     # move setup options to Settings
     if [ -f "$setupOptionsDir/optionsSet" ]; then
@@ -207,13 +243,10 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/OverviewMobileEnhanced.qml"
     updateActiveFile "$qmlDir/SystemReasonMessage.qml"
     updateActiveFile "$qmlDir/OverviewAcValuesEnhanced.qml"
-    updateActiveFile "$qmlDir/OverviewAcValuesEnhancedGP.qml"
     updateActiveFile "$qmlDir/ObjectAcConnection.qml"
     updateActiveFile "$qmlDir/OverviewHubEnhanced.qml"
-    updateActiveFile "$qmlDir/OverviewGridParallelEnhanced.qml"
+    updateActiveFile "$qmlDir/OverviewFlowComplex.qml"
     updateActiveFile "$qmlDir/HubData.qml"
-    updateActiveFile "$qmlDir/OverviewSolarChargerEnhanced.qml"
-    updateActiveFile "$qmlDir/OverviewSolarInverter.qml"
     updateActiveFile "$qmlDir/PowerGauge.qml"
     updateActiveFile "$qmlDir/PowerGaugeMulti.qml"
     updateActiveFile "$qmlDir/PowerGaugeBattery.qml"
@@ -238,12 +271,41 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/PvChargerRow.qml"
     updateActiveFile "$qmlDir/DetailPvInverter.qml"
     updateActiveFile "$qmlDir/PvInverterRow.qml"
-    updateActiveFile "$qmlDir/timeToGo.js"
-    updateActiveFile "$qmlDir/DetailDcSystem.qml"
     updateActiveFile "$qmlDir/DcSystemRow.qml"
+    updateActiveFile "$qmlDir/DetailDcSystem.qml"
+    updateActiveFile "$qmlDir/DetailAlternator.qml"
+    updateActiveFile "$qmlDir/DetailAcCharger.qml"
+    updateActiveFile "$qmlDir/DetailWindGen.qml"
+    updateActiveFile "$qmlDir/timeToGo.js"
     updateActiveFile "$qmlDir/OverviewTanksTempsDigInputs.qml"
     updateActiveFile "$qmlDir/TileDigIn.qml"
-    
+    updateActiveFile "$qmlDir/SystemStateShort.qml"
+    updateActiveFile "/opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py"
+	updateActiveFile "$qmlDir/enhancedFormat.js"
+    if $thisFileUpdated; then
+		restartSystemCalc=true
+    fi
+    updateActiveFile "$qmlDir/DetailTarget.qml"
+    updateActiveFile "$qmlDir/DetailButton.qml"
+    updateActiveFile "/opt/victronenergy/gui/qml/TileManualStartEnhanced.qml"
+    updateActiveFile "/opt/victronenergy/gui/qml/TileAutoRunEnhanced.qml"
+    updateActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorEnhanced.qml"
+    updateActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml"
+    updateActiveFile "/opt/victronenergy/gui/qml/DetailFuelCell.qml"
+
+    updateActiveFile "/opt/victronenergy/gui/qml/OverviewGenerator.qml"
+    updateActiveFile "/opt/victronenergy/dbus-generator-starter/startstop.py"
+    if $thisFileUpdated; then
+		restartGeneratorService=true
+    fi
+    updateActiveFile "/opt/victronenergy/dbus-generator-starter/dbus_generator.py"
+    if $thisFileUpdated; then
+		restartGeneratorService=true
+    fi
+    updateActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
+    updateActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
+
+
     # cleanup from older versions
     restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
 
@@ -259,12 +321,9 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/OverviewMobileEnhanced.qml"
     restoreActiveFile "$qmlDir/SystemReasonMessage.qml"
     restoreActiveFile "$qmlDir/OverviewAcValuesEnhanced.qml"
-    restoreActiveFile "$qmlDir/OverviewAcValuesEnhancedGP.qml"
     restoreActiveFile "$qmlDir/ObjectAcConnection.qml"
-    restoreActiveFile "$qmlDir/OverviewGridParallelEnhanced.qml"
+    restoreActiveFile "$qmlDir/OverviewFlowComplex.qml"
     restoreActiveFile "$qmlDir/HubData.qml"
-    restoreActiveFile "$qmlDir/OverviewSolarChargerEnhanced.qml"
-    restoreActiveFile "$qmlDir/OverviewSolarInverter.qml"
     restoreActiveFile "$qmlDir/TileTankEnhanced.qml"
     restoreActiveFile "$qmlDir/TileTemp.qml"
     restoreActiveFile "$qmlDir/PageSettingsDisplay.qml"
@@ -287,6 +346,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/DetailLoadsOnInput.qml"
     restoreActiveFile "$qmlDir/DetailPvCharger.qml"
     restoreActiveFile "$qmlDir/PvChargerRow.qml"
+	restoreActiveFile "$qmlDir/DetailAcCharger.qml"
     restoreActiveFile "$qmlDir/DetailPvInverter.qml"
     restoreActiveFile "$qmlDir/PvInverterRow.qml"
 	restoreActiveFile "$qmlDir/timeToGo.js"
@@ -294,15 +354,50 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
 	restoreActiveFile "$qmlDir/DcSystemRow.qml"
 	restoreActiveFile "$qmlDir/OverviewTanksTempsDigInputs.qml"
 	restoreActiveFile "$qmlDir/TileDigIn.qml"
+	restoreActiveFile "$qmlDir/DetailAlternator.qml"
+	restoreActiveFile "$qmlDir/AlternatorRow.qml"
+	restoreActiveFile "$qmlDir/DetailWindGen.qml"
+	restoreActiveFile "$qmlDir/SystemStateShort.qml"
+    restoreActiveFile "/opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py"
+	restoreActiveFile "$qmlDir/enhancedFormat.js"
+    if $thisFileUpdated ; then
+		restartSystemCalc=true
+	fi
+	restoreActiveFile "$qmlDir/DetailTarget.qml"
+	restoreActiveFile "$qmlDir/DetailButton.qml"
+	restoreActiveFile "/opt/victronenergy/gui/qml/TileManualStartEnhanced.qml"
+	restoreActiveFile "/opt/victronenergy/gui/qml/TileAutoRunEnhanced.qml"
+	restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorEnhanced.qml"
+	restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml"
+	restoreActiveFile "/opt/victronenergy/gui/qml/DetailFuelCell.qml"
 
-    # cleanup from older versions
-    restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
+    restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGenerator.qml"
+    restoreActiveFile "/opt/victronenergy/dbus-generator-starter/startstop.py"
+    if $thisFileUpdated; then
+		restartGeneratorService=true
+    fi
+	restoreActiveFile "/opt/victronenergy/dbus-generator-starter/dbus_generator.py"
+    if $thisFileUpdated; then
+		restartGeneratorService=true
+    fi
+	restoreActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
+	restoreActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
+    logMessage "++ setup: Uninstalled GeneratorConnector"
 
     logMessage "++ $packageName uninstalled"
 fi
 
 if $filesUpdated ; then
     restartGui=true
+fi
+
+if $restartSystemCalc ; then
+	logMessage "restarting systemcalc"
+	svc -t /service/dbus-systemcalc-py
+fi
+if $restartGeneratorService ; then
+    logMessage "restarting dbus_generator"
+    svc -t /service/dbus-generator-starter
 fi
 
 # thats all folks - SCRIPT EXITS INSIDE THE FUNCTION
