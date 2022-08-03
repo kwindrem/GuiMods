@@ -164,6 +164,10 @@ OverviewPage {
 		onDbusServiceFound: addService(service)
 	}
 
+	// hack to get value(s) from within a loop inside a function when service is changing
+	property string tempServiceName: ""
+	property VBusItem temperatureItem: VBusItem { bind: Utils.path(tempServiceName, "/Dc/0/Temperature") }
+
     function addService(service)
     {
         switch (service.type)
@@ -176,6 +180,15 @@ OverviewPage {
 		case DBusService.DBUS_SERVICE_PULSE_COUNTER:
 			numberOfDigIn++
             digInModel.append({serviceName: service.name})
+            break;;
+        case DBusService.DBUS_SERVICE_BATTERY:
+        case DBusService.DBUS_SERVICE_MULTI:
+			root.tempServiceName = service.name
+			if (temperatureItem.valid)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
             break;;
        }
     }
@@ -190,10 +203,4 @@ OverviewPage {
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
     }
-/////////////////////////////////// remove this on newer versions
-	// TANK REPEATER - add to hide the service for the physical sensor
-    VBusItem { id: incomingTankName;
-        bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
-	// TANK REPEATER - end add
-
 }

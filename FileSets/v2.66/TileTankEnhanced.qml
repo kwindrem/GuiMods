@@ -63,7 +63,7 @@ Tile {
     }
 
     values: Item {
-        width: root.width - 10
+        width: root.width - 8
 //// modified to squeeze bar height if space is tight
         height: compact ? root.height : squeeze ? 17 : 21
 

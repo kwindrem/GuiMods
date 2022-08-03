@@ -17,7 +17,7 @@ Rectangle {
 	property variant textHorizontalAlignment: Text.AlignHCenter
     property alias bold: _text.font.bold
 	property bool scroll: true
-    property bool longName: _text.paintedWidth > marquee.width
+    property bool longName: text != "" && _text.paintedWidth > marquee.width
 
     function doScroll()
     {

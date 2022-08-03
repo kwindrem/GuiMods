@@ -124,7 +124,15 @@ MbPage {
             name: qsTr ("Show temperatures on Flow Overview")
             show: root.showFlowParams
             writeAccessLevel: User.AccessUser
-       }
+		}
+        MbSwitch
+        {
+            id: showBatteryTemps
+            bind: Utils.path (bindPrefixGuiMods, "/ShowBatteryTempOnFlows")
+            name: qsTr ("Show battery temperature on Flow Overview")
+            show: showTemps.item.value == 1
+            writeAccessLevel: User.AccessUser
+		}
         MbSwitch
         {
             id: shortenTankNames

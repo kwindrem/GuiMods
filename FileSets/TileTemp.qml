@@ -28,7 +28,8 @@ Tile {
     // small tile height threshold
     property bool squeeze: height < 50
 
-    property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, "/Temperature") }
+	property bool isBatteryTemperature: ! temperatureTypeItem.valid // if no type assume this is a battery temperature reported by inverter or battery service
+	property VBusItem temperatureItem: VBusItem { id: temperatureItem; bind: Utils.path(bindPrefix, isBatteryTemperature ? "/Dc/0/Temperature" : "/Temperature") }
     property VBusItem humidityItem: VBusItem { id: humidityItem; bind: Utils.path(bindPrefix, "/Humidity") }
     property string humidityText: humidityItem.valid ? (" " + humidityItem.value.toFixed (0) + "%") : ""
     property VBusItem rawValueItem: VBusItem { id: rawValueItem; bind: Utils.path(bindPrefix, "/RawValue") }
@@ -42,43 +43,45 @@ Tile {
 	property bool compact: false
 
     property variant tempNames: [qsTr("Battery"), qsTr("Fridge"), qsTr("Generic")]
-    property string tempName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : temperatureTypeItem.valid ? tempNames [temperatureTypeItem.value] : "TEMP"
+    property string tempName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : temperatureTypeItem.valid ? tempNames [temperatureTypeItem.value] : isBatteryTemperature ? "Battery" : "TEMP"
     property variant tempColors: ["#4aa3df", "#1abc9c", "#F39C12"]
-    property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : "#7f8c8d"
+    property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : isBatteryTemperature ? "#4aa3df" :"#7f8c8d"
 
     title: compact ? "" : tempName
 	color: alarmActive && alarmState ? "red":  tempColor
 
 	function doScroll()
 	{
-		nameText.doScroll()
-		valueText.doScroll()
+		if ( nameTextScroll.visible )
+			nameTextScroll.doScroll()
+		if ( valueTextScroll.visible )
+			valueTextScroll.doScroll()
 	}
 
 	values: Item
     {
-		width: root.width - 10
+		width: root.width - 8
         height: compact ? root.height : squeeze ? 17 : 21
 
-		MarqueeEnhanced
-        {
-			id: nameText
-            width: Math.max (Math.floor (parent.width * 0.5 ), 44)
-			height: compact ? 13 : parent.height
+		// use static fields if both fit side by side
+		TileText
+		{
+			id: nameTextFixed
 			text: compact ? tempName : ""
-            textHorizontalAlignment: Text.AlignLeft
-			visible: compact
-			scroll: false
+			height: compact ? 13 : parent.height
 			anchors
             {
                 verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
+                left: parent.left
 			}
+			horizontalAlignment: Text.AlignLeft
+			visible: compact && valueTextFixed.visible
 		}
-		MarqueeEnhanced
-        {
-			id: valueText
-            width: root.width - 10 - (compact ? nameText.width : 0)
-			height: compact ? 13 : parent.height
+
+		TileText
+		{
+			id: valueTextFixed
+			height: nameTextFixed.height
             text:
             {   
                 if (root.temperature == -99)
@@ -88,12 +91,43 @@ Tile {
                 else
                     return root.temperature.toFixed (1) + "°C" + humidityText
             }
-			textHorizontalAlignment: compact ? Text.AlignLeft : Text.AlignHCenter
-			scroll: false
 			anchors
             {
-                verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
+                verticalCenter: nameTextFixed.verticalCenter
                 right: parent.right
+			}
+			horizontalAlignment: compact ? Text.AlignRight : Text.AlignHCenter
+			visible: (nameTextFixed.paintedWidth + valueTextFixed.paintedWidth) <= (parent.width - 3)
+		}
+		// otherwise scroll values in fixed width fields
+		MarqueeEnhanced
+        {
+			id: nameTextScroll
+            width: Math.min (Math.max (Math.floor (parent.width * 0.5 ), 44), nameTextFixed.paintedWidth)
+			height: nameTextFixed.height
+			text: nameTextFixed.text
+            textHorizontalAlignment: Text.AlignLeft
+			visible: compact && ! valueTextFixed.visible
+			scroll: false
+			anchors
+			{
+				verticalCenter: nameTextFixed.verticalCenter
+				left: parent.left
+			}
+		}
+		MarqueeEnhanced
+        {
+			id: valueTextScroll
+            width: parent.width - 3 - (compact ? nameTextScroll.width : 0)
+			height: nameTextFixed.height
+            text: valueTextFixed.text
+			textHorizontalAlignment: compact ? Text.AlignLeft : Text.AlignRight
+			visible: compact && ! valueTextFixed.visible
+			scroll: false
+			anchors
+			{
+				verticalCenter: nameTextFixed.verticalCenter
+				right: parent.right
 			}
 		}
 	}

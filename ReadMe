@@ -16,6 +16,7 @@ Recent changes:
 		add service interval
 	GeneratorConnector functionality has been incorporated into GuiMods
 		making GeneratorConnector obsolete
+	added battery temperature(s)
 
 The following components have NOT been tested:
     Multi-phase(leg) systems
@@ -243,7 +244,12 @@ Configuration
     Show temperatures on Flow Overview
         Fluid levels and temperatures are displayed at the bottom of the Flow Overview when
         the associated switch is on.
-    
+
+	Show battery temperature on flow overviews
+		This preference controls whether battery temperature(s) are shown or hidden on the flow overviews
+		Due to space constraints, users may or may not wish to display battery temperature(s)
+		Battery temperature(s) are always shown on the Mobile and tanks/temperature/digital inputs overview
+
     Combine AC input/output loads
         The enhanced flow overview displays two load tiles: Loads on Input and Loads on Output.
         Confusion is likely especially when a system only connects to one load output.

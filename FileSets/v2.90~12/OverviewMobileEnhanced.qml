@@ -98,7 +98,7 @@ OverviewPage {
  //////// positions are left, center, right and top, center, bottom of infoArea
     property int tankWidth: 130
 
-    property int upperTileHeight: 185 /////////// was statusHeight
+    property int upperTileHeight: 185
 	property int acTileHeight: height - upperTileHeight
     
     property int infoWidth: width - tankWidth
@@ -167,20 +167,20 @@ OverviewPage {
 		id: statusTile
 		anchors { left: parent.left; top: parent.top }
 		width: root.infoWidth3Column
-		height: root.upperTileHeight - inverterTile.height ///////////////
+		height: root.upperTileHeight - inverterTile.height
 		color: "#4789d0"
 
 //////// relorder to give priority to errors
 		values: [
 			TileText {
 				text: systemName.valid && systemName.value !== "" ? systemName.value : sys.systemType.valid ? sys.systemType.value.toUpperCase() : ""
-				font.pixelSize: 18 /////////////////
+				font.pixelSize: 16
 				wrapMode: Text.WordWrap
-				width: statusTile.width
+				width: statusTile.width - 5
 			},
 			TileText {
 				text: wallClock.running ? wallClock.time : ""
-				font.pixelSize: 15 ////////////////
+				font.pixelSize: 15
 			},
 //////// combine SystemReason with notifications
 			MarqueeEnhanced {
@@ -192,7 +192,7 @@ OverviewPage {
 						return notificationText() + " || " + systemReasonMessage.text
 				}
 				width: statusTile.width
-				textHorizontalAlignment: Text.AlignHCenter //////////
+				textHorizontalAlignment: Text.AlignHCenter
 				interval: 100
 				SystemReasonMessage {
 					id: systemReasonMessage
@@ -208,7 +208,7 @@ OverviewPage {
 
 				function getValue()
 				{
-					if (speed.value < 0.1) //////////
+					if (speed.value < 0.5)	// blank speed if less than about 1 MPH
 						return " "
 					if (speedUnit.value === "km/h")
 						return (speed.value * 3.6).toFixed(1) + speedUnit.value
@@ -221,7 +221,8 @@ OverviewPage {
 			}
 		]
 	} // end Tile STATUS
-	Tile { //////////
+	Tile
+	{
 		title: qsTr("INVERTER")
 		id: inverterTile
 		anchors { left: parent.left; top: statusTile.bottom }
@@ -293,22 +294,22 @@ OverviewPage {
 			TileText {
 //////// change to show negative for battery drain
 				text: sys.battery.power.text
-				font.pixelSize: 18 /////////////////
+				font.pixelSize: 18
 			},
-			TileText { //////////
+			TileText {
 				text: sys.battery.voltage.format(2)
 			},
-			TileText { //////////
+			TileText {
 				text: sys.battery.current.format(1)
 			},
 			TileText {
 				text: qsTr("Remaining:")
-				visible: timeToGoText.visible ///////////
+				visible: timeToGoText.visible
 			},
 			TileText {
-				id: timeToGoText ///////////
+				id: timeToGoText
 				text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : "∞"
-				visible: timeToGo.valid && sys.battery.state.value == sys.batteryStateDischarging ///////////
+				visible: timeToGo.valid && sys.battery.state.value == sys.batteryStateDischarging
 				
 				VBusItem {
 					id: timeToGo
@@ -404,7 +405,7 @@ OverviewPage {
                 }
                 visible: showPvVI
             },
-    //////// add =current
+    //////// add current
             TileText {
                 text:
                 {
@@ -753,6 +754,10 @@ OverviewPage {
 		onDbusServiceFound: addService(service)
 	}
 
+	// hack to get value(s) from within a loop inside a function when service is changing
+	property string tempServiceName: ""
+	property VBusItem temperatureItem: VBusItem { bind: Utils.path(tempServiceName, "/Dc/0/Temperature") }
+
 //////// rewrite to use switch in place of if statements
     function addService(service)
     {
@@ -767,6 +772,13 @@ OverviewPage {
             numberOfMultis++
             if (numberOfMultis === 1)
                 inverterService = service.name;
+
+			root.tempServiceName = service.name
+			if (temperatureItem.valid)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
             break;;
 //////// add for VE.Direct inverters
         case DBusService.DBUS_SERVICE_INVERTER:
@@ -781,6 +793,14 @@ OverviewPage {
             if (pvChargerPrefix === "")
                 pvChargerPrefix = service.name;
             break;;
+        case DBusService.DBUS_SERVICE_BATTERY:
+			root.tempServiceName = service.name
+			if (temperatureItem.valid)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
+			break;;
         }
     }
 
@@ -819,11 +839,6 @@ OverviewPage {
 
 	VBusItem { id: dmc; bind: Utils.path(inverterService, "/Devices/Dmc/Version") }
 	VBusItem { id: bms; bind: Utils.path(inverterService, "/Devices/Bms/Version") }
-
-//////// TANK REPEATER - add to hide the service for the physical sensor
-    VBusItem { id: incomingTankName;
-        bind: Utils.path(settingsBindPreffix, "/Settings/Devices/TankRepeater/IncomingTankService") }
-//////// TANK REPEATER - end add
 
 
 

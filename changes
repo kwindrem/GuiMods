@@ -1,3 +1,10 @@
+v6.2:
+	added more space for temp name and value before scrolling
+	added battery temperature from Multi/Quattro or shunt
+		plue user preference to enable on flow overviews only
+	fixed: MobileOverviewEnhanced: speed flashes randomly when speed is very slow
+	fixed: MobileOverviewEnhanced: speed value cut off at bottom of status tile
+
 v6.1:
 	fixed: systemcalc crash in v2.90~18
 v6.0:

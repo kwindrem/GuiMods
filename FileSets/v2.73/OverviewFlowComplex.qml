@@ -101,6 +101,9 @@ OverviewPage {
 	property double acChargerFlow: noNoise (sys.acCharger.power)
 	property double fuelCellFlow: noNoise (sys.fuelCell.power)
 
+    VBusItem { id: showBatteryTempItem; bind: Utils.path(guiModsPrefix, "/ShowBatteryTempOnFlows") }
+    property bool showBatteryTemp: showBatteryTempItem.valid && showBatteryTempItem.value == 1
+    
 
     function getTimeFormat ()
     {
@@ -1307,6 +1310,10 @@ OverviewPage {
         onDbusServiceFound: addService(service)
     }
 
+	// hack to get value(s) from within a loop inside a function when service is changing
+	property string tempServiceName: ""
+	property VBusItem temperatureItem: VBusItem { bind: Utils.path(tempServiceName, "/Dc/0/Temperature") }
+
     function addService(service)
     {
          switch (service.type)
@@ -1320,11 +1327,26 @@ OverviewPage {
             numberOfMultis++
             if (numberOfMultis === 1)
                 inverterService = service.name;
+
+			root.tempServiceName = service.name
+			if (temperatureItem.valid && showBatteryTemp)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
             break;;
         case DBusService.DBUS_SERVICE_INVERTER:
             numberOfInverters++
             if (numberOfInverters === 1 && inverterService == "")
                 inverterService = service.name;
+            break;;
+        case DBusService.DBUS_SERVICE_BATTERY:
+			root.tempServiceName = service.name
+			if (temperatureItem.valid && showBatteryTemp)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
             break;;
        }
     }

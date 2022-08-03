@@ -92,6 +92,9 @@ OverviewPage {
     property real disabledTileOpacity: (showInactiveTiles && showInactiveTilesItem.value === 1) ? 0.3 : 1
     property bool showInactiveTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value >= 1
 
+    VBusItem { id: showBatteryTempItem; bind: Utils.path(guiModsPrefix, "/ShowBatteryTempOnFlows") }
+    property bool showBatteryTemp: showBatteryTempItem.valid && showBatteryTempItem.value == 1
+
 	// for debug, ignore validity checks so all tiles and their flow lines will show
     property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
@@ -1071,6 +1074,10 @@ OverviewPage {
         onDbusServiceFound: addService(service)
     }
 
+	// hack to get value(s) from within a loop inside a function when service is changing
+	property string tempServiceName: ""
+	property VBusItem temperatureItem: VBusItem { bind: Utils.path(tempServiceName, "/Dc/0/Temperature") }
+
     function addService(service)
     {
          switch (service.type)
@@ -1084,6 +1091,13 @@ OverviewPage {
             numberOfMultis++
             if (numberOfMultis === 1)
                 inverterService = service.name;
+
+			root.tempServiceName = service.name
+			if (temperatureItem.valid && showBatteryTemp)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
             break;;
 //////// add for VE.Direct inverters
         case DBusService.DBUS_SERVICE_INVERTER:
@@ -1120,6 +1134,14 @@ OverviewPage {
                 pvInverterPrefix2 = service.name;
             else if (numberOfPvInverters === 3)
                 pvInverterPrefix3 = service.name;
+            break;;
+        case DBusService.DBUS_SERVICE_BATTERY:
+			root.tempServiceName = service.name
+			if (temperatureItem.valid && showBatteryTemp)
+			{
+				numberOfTemps++
+				tempsModel.append({serviceName: service.name})
+			}
             break;;
         }
     }
