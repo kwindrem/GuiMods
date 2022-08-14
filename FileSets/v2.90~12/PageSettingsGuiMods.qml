@@ -143,7 +143,7 @@ MbPage {
         MbEditBox {
             id: dcSystemName
             description: qsTr("DC System tile name")
-            item.bind: "com.victronenergy.settings/GuiMods/CustomDcSystemName"
+            item.bind: Utils.path (bindPrefixGuiMods, "/CustomDcSystemName")
             maximumLength: 32
             enableSpaceBar: true
         }

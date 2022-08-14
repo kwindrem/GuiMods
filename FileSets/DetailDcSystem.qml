@@ -124,7 +124,7 @@ MbPage
 			id: noSystemDevicesRow
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: root.width; horizontalAlignment: Text.AlignHCenter
-					text: qsTr ("no DC system devces")
+					text: qsTr ("no DC system devices")
 					visible: systemModel.count == 0 }
 		}
 		// table of system DC sources and loads

@@ -1,3 +1,7 @@
+v6.3:
+	fixed: custom DC system name can't be set from GuiMods menu
+	fixed: typo on DC system detail page
+
 v6.2:
 	added more space for temp name and value before scrolling
 	added battery temperature from Multi/Quattro or shunt
