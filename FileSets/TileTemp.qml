@@ -42,25 +42,35 @@ Tile {
     property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
 	property bool compact: false
 
+	property int nameTextWidth: nameTextFixed.paintedWidth
+	property int nameScrollWidth: Math.min (Math.max (Math.floor (root.width * 0.5 ), 44), nameTextWidth)
+	property int valueTextWidth: valueTextFixed.paintedWidth
+	property int availableWidth: root.width - 8
+	property int availableValueWidth: availableWidth - (compact ? (nameScrollWidth + 3) : 0)
+	property bool scrollName: compact && nameTextWidth > nameScrollWidth
+	property bool scrollValue: valueTextWidth > availableValueWidth
+
     property variant tempNames: [qsTr("Battery"), qsTr("Fridge"), qsTr("Generic")]
     property string tempName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : temperatureTypeItem.valid ? tempNames [temperatureTypeItem.value] : isBatteryTemperature ? "Battery" : "TEMP"
     property variant tempColors: ["#4aa3df", "#1abc9c", "#F39C12"]
     property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : isBatteryTemperature ? "#4aa3df" :"#7f8c8d"
 
+	// compact puts name on same line as temp/humidity
+	//	otherwise name is in title and value on separate line
     title: compact ? "" : tempName
 	color: alarmActive && alarmState ? "red":  tempColor
 
 	function doScroll()
 	{
-		if ( nameTextScroll.visible )
+		if ( scrollName )
 			nameTextScroll.doScroll()
-		if ( valueTextScroll.visible )
+		if ( scrollValue )
 			valueTextScroll.doScroll()
 	}
 
 	values: Item
     {
-		width: root.width - 8
+		width: availableWidth
         height: compact ? root.height : squeeze ? 17 : 21
 
 		// use static fields if both fit side by side
@@ -75,9 +85,8 @@ Tile {
                 left: parent.left
 			}
 			horizontalAlignment: Text.AlignLeft
-			visible: compact && valueTextFixed.visible
+			visible: compact && ! scrollName
 		}
-
 		TileText
 		{
 			id: valueTextFixed
@@ -97,36 +106,37 @@ Tile {
                 right: parent.right
 			}
 			horizontalAlignment: compact ? Text.AlignRight : Text.AlignHCenter
-			visible: (nameTextFixed.paintedWidth + valueTextFixed.paintedWidth) <= (parent.width - 3)
+			visible: ! scrollValue
 		}
 		// otherwise scroll values in fixed width fields
 		MarqueeEnhanced
         {
 			id: nameTextScroll
-            width: Math.min (Math.max (Math.floor (parent.width * 0.5 ), 44), nameTextFixed.paintedWidth)
+            width: nameScrollWidth
 			height: nameTextFixed.height
 			text: nameTextFixed.text
             textHorizontalAlignment: Text.AlignLeft
-			visible: compact && ! valueTextFixed.visible
+			visible: scrollName
 			scroll: false
 			anchors
 			{
 				verticalCenter: nameTextFixed.verticalCenter
+				verticalCenterOffset: 2	// align Marquee with fixed text
 				left: parent.left
 			}
 		}
 		MarqueeEnhanced
         {
 			id: valueTextScroll
-            width: parent.width - 3 - (compact ? nameTextScroll.width : 0)
+            width: availableValueWidth
 			height: nameTextFixed.height
             text: valueTextFixed.text
-			textHorizontalAlignment: compact ? Text.AlignLeft : Text.AlignRight
-			visible: compact && ! valueTextFixed.visible
+			textHorizontalAlignment: Text.AlignLeft
+			visible: scrollValue
 			scroll: false
 			anchors
 			{
-				verticalCenter: nameTextFixed.verticalCenter
+				verticalCenter: nameTextScroll.verticalCenter
 				right: parent.right
 			}
 		}

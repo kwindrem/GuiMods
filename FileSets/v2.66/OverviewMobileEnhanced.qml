@@ -561,7 +561,7 @@ OverviewPage {
         interval: 15000
         repeat: true
 //////// modified to control compact differently
-        running: root.active && root.compact
+        running: root.active
     }
 
     ListView {

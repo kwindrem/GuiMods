@@ -1212,7 +1212,7 @@ OverviewPage {
         id: scrollTimer
         interval: 15000
         repeat: true
-        running: root.active && root.compact
+        running: root.active
     }
 
     ListView
