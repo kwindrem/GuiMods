@@ -1,3 +1,9 @@
+v6.6:
+	fixed: generator Service in counter not counting down
+
+v6.5:
+	fixed: AC chargers not showing up in overview pages
+	fixed: Alternator temperatyr not showing up in details page
 v6.4:
 	fixed: some temp tiles don't display values
 

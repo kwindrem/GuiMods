@@ -718,6 +718,8 @@ class StartStop(object):
 		accumulated = seconds - self._last_runtime_update
 
 		self._settings['accumulatedtotal'] = int(self._settings['accumulatedtotal']) + accumulated
+#### GENERATOR CONNECTOR - add service interval
+		self._settings['timeSinceService'] = int(self._settings['timeSinceService']) + accumulated
 		# Using calendar to get timestamp in UTC, not local time
 		today_date = str(calendar.timegm(datetime.date.today().timetuple()))
 

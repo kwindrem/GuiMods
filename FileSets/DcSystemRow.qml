@@ -137,7 +137,7 @@ Row {
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text:
             {
-				if (! temperatureItem.valid)
+				if (! dbusTemperatureItem.valid)
 					return ""
                 else if (tempScale == 2)
                     return ((dbusTemperatureItem.value * 9 / 5) + 32).toFixed (1) + " °F"

@@ -85,7 +85,7 @@ Item {
 //////// added AC charger
 	QtObject {
 		id: _acCharger
-		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/AcCharger/Power"); unit: "W"}
+		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/Charger/Power"); unit: "W"}
 	}
 
 //////// added wind generator

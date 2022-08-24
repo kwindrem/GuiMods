@@ -91,7 +91,6 @@ class Generator(object):
 			'accumulatedtotal': ['/Settings/{0}/AccumulatedTotal', 0, 0, 0, True],
 #### added service interval
 			'timeSinceService': ['/Settings/{0}/TimeSinceService', 0, 0, 0, True],
-			'serviceInterval': ['/Settings/{0}/ServiceInterval', 0, 0, 0, True],
 			'batterymeasurement': ['/Settings/{0}/BatteryService', 'default', 0, 0],
 			'minimumruntime': ['/Settings/{0}/MinimumRuntime', 0, 0, 86400],  # minutes
 			'stoponac1enabled': ['/Settings/{0}/StopWhenAc1Available', 0, 0, 10],

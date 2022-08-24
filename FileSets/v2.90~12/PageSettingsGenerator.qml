@@ -114,6 +114,8 @@ MbPage {
 				bind: Utils.path(settingsBindPrefix, "/AccumulatedTotal")
 				text: Math.round(item.value / 60 / 60)
 			}
+//// added to avoid full keyboard
+            numericOnlyLayout: true
 			matchString: "0123456789"
 			maximumLength: 6
 			ignoreChars: "h"
@@ -138,6 +140,7 @@ MbPage {
 				bind: Utils.path(settingsBindPrefix, "/ServiceInterval")
 				text: Math.round(item.value / 60 / 60)
 			}
+            numericOnlyLayout: true
 			matchString: "0123456789"
 			maximumLength: 6
 			ignoreChars: "h"
