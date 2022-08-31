@@ -1,15 +1,14 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
-
-#### added service interval dbus settings
 
 from dbus.mainloop.glib import DBusGMainLoop
 import dbus
-import gobject
 import argparse
 import sys
 import os
 import signal
+from gi.repository import GLib
+
 # Victron packages
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), 'ext', 'velib_python'))
 from vedbus import VeDbusService
@@ -22,10 +21,9 @@ from gen_utils import dummy
 import time
 import relay
 import fischerpanda
+from version import softwareversion
 
-softwareversion = '1.3.11'
-
-class Generator:
+class Generator(object):
 	def __init__(self):
 		self._exit = False
 		self._instances = {}
@@ -85,12 +83,10 @@ class Generator:
 
 		# Settings base
 		settingsbase = {
-			'autostart': ['/Settings/{0}/AutoStartEnabled', 1, 0, 1],
+			'autostart': ['/Settings/{0}/AutoStartEnabled', 0, 0, 1],
 			'batterymeasurement': ['/Settings/{0}/Service', '', 0, 0],
 			'accumulateddaily': ['/Settings/{0}/AccumulatedDaily', '', 0, 0, True],
 			'accumulatedtotal': ['/Settings/{0}/AccumulatedTotal', 0, 0, 0, True],
-#### added service interval
-			'timeSinceService': ['/Settings/{0}/TimeSinceService', 0, 0, 0, True],
 			'batterymeasurement': ['/Settings/{0}/BatteryService', 'default', 0, 0],
 			'minimumruntime': ['/Settings/{0}/MinimumRuntime', 0, 0, 86400],  # minutes
 			'stoponac1enabled': ['/Settings/{0}/StopWhenAc1Available', 0, 0, 10],
@@ -126,12 +122,12 @@ class Generator:
 			'acloadenabled': ['/Settings/{0}/AcLoad/Enabled', 0, 0, 1],
 			# Measuerement, 0 = Total AC consumption, 1 = AC on inverter output, 2 = Single phase
 			'acloadmeasuerment': ['/Settings/{0}/AcLoad/Measurement', 0, 0, 100],
-			'acloadstart': ['/Settings/{0}/AcLoad/StartValue', 1600, 5, 100000],
-			'acloadstop': ['/Settings/{0}/AcLoad/StopValue', 800, 0, 100000],
+			'acloadstart': ['/Settings/{0}/AcLoad/StartValue', 1600, 5, 1000000],
+			'acloadstop': ['/Settings/{0}/AcLoad/StopValue', 800, 0, 1000000],
 			'acloadstarttimer': ['/Settings/{0}/AcLoad/StartTimer', 20, 0, 10000],
 			'acloadstoptimer': ['/Settings/{0}/AcLoad/StopTimer', 20, 0, 10000],
-			'qh_acloadstart': ['/Settings/{0}/AcLoad/QuietHoursStartValue', 1900, 0, 100000],
-			'qh_acloadstop': ['/Settings/{0}/AcLoad/QuietHoursStopValue', 1200, 0, 100000],
+			'qh_acloadstart': ['/Settings/{0}/AcLoad/QuietHoursStartValue', 1900, 0, 1000000],
+			'qh_acloadstop': ['/Settings/{0}/AcLoad/QuietHoursStopValue', 1200, 0, 1000000],
 			# VE.Bus high temperature
 			'inverterhightempenabled': ['/Settings/{0}/InverterHighTemp/Enabled', 0, 0, 1],
 			'inverterhightempstarttimer': ['/Settings/{0}/InverterHighTemp/StartTimer', 20, 0, 10000],
@@ -184,17 +180,16 @@ class Generator:
 		self._dbusmonitor = self._create_dbus_monitor(dbus_tree, valueChangedCallback=self._dbus_value_changed,
 				deviceAddedCallback=self._device_added, deviceRemovedCallback=self._device_removed)
 
-		# Create dbus service
-		# Paths for each instance will be added to this service like:
-		# com.victronenergy.generator.startstop0/FischerPanda0/State
-		# com.victronenergy.generator.startstop0/Generator0/State
-		self._dbusservice = self._create_dbus_service()
+		# Set timezone to user selected timezone
+		tz = self._dbusmonitor.get_value('com.victronenergy.settings', '/Settings/System/TimeZone')
+		os.environ['TZ'] = tz if tz else 'UTC'
+		time.tzset()
 
 		# Call device_added for all existing devices at startup.
 		for service, instance in self._dbusmonitor.get_service_list().items():
 				self._device_added(service, instance)
 
-		gobject.timeout_add(1000, exit_on_error, self._handletimertick)
+		GLib.timeout_add(1000, exit_on_error, self._handletimertick)
 
 	def _handlechangedsetting(self, setting, oldvalue, newvalue):
 		for i in self._instances:
@@ -224,6 +219,11 @@ class Generator:
 			else:
 				self._add_device(dbusServiceName)
 
+		# Update env timezone when setting changes
+		if (dbusServiceName, dbusPath) == ('com.victronenergy.settings', '/Settings/System/TimeZone'):
+			os.environ['TZ'] = changes['Value'] if changes['Value'] else 'UTC'
+			time.tzset()
+
 		for i in self._instances:
 			self._instances[i].dbus_value_changed(dbusServiceName, dbusPath, options, changes, deviceInstance)
 
@@ -232,6 +232,7 @@ class Generator:
 			self._handle_builtin_relay('/Settings/Relay/Function')
 		for i in self._instances:
 			self._instances[i].device_removed(dbusservicename, instance)
+		self._remove_device(dbusservicename)
 
 	def _create_dbus_monitor(self, *args, **kwargs):
 		return DbusMonitor(*args, **kwargs)
@@ -248,8 +249,7 @@ class Generator:
 			# Check and create start/stop instance for the device
 			if i.check_device(self._dbusmonitor, service):
 				self._instances[service] = i.create(self._dbusmonitor,
-												self._dbusservice,
-												service, self._settings)
+												service, self._settings, i.device_instance)
 
 	def _handle_builtin_relay(self, dbuspath):
 		function = self._dbusmonitor.get_value('com.victronenergy.settings', dbuspath)
@@ -260,9 +260,8 @@ class Generator:
 		# otherwise remove the instance if exists
 		if function == 1:
 			self._instances[relaynr] = relay.create(self._dbusmonitor,
-													self._dbusservice,
 													relayservice,
-													self._settings)
+													self._settings, relay.device_instance)
 		elif relaynr in self._instances:
 			self._instances[relaynr].remove()
 			del self._instances[relaynr]
@@ -294,20 +293,6 @@ class Generator:
 			sys.exit(1)
 		return True
 
-	def _create_dbus_service(self):
-		dbusservice = VeDbusService("com.victronenergy.generator.startstop0")
-		dbusservice.add_mandatory_paths(
-			processname=__file__,
-			processversion=softwareversion,
-			connection='generator',
-			deviceinstance=0,
-			productid=None,
-			productname=None,
-			firmwareversion=None,
-			hardwareversion=None,
-			connected=1)
-		return dbusservice
-
 if __name__ == '__main__':
 	# Argument parsing
 	parser = argparse.ArgumentParser(
@@ -318,7 +303,7 @@ if __name__ == '__main__':
 						action='store_true')
 	args = parser.parse_args()
 
-	print '-------- dbus_generator, v' + softwareversion + ' is starting up --------'
+	print ('-------- dbus_generator, v' + softwareversion + ' is starting up --------')
 
 	logger = setup_logging(args.debug)
 
@@ -329,5 +314,5 @@ if __name__ == '__main__':
 	signal.signal(signal.SIGTERM, generator.terminate)
 
 	# Start and run the mainloop
-	mainloop = gobject.MainLoop()
+	mainloop = GLib.MainLoop()
 	mainloop.run()

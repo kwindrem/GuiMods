@@ -1,3 +1,6 @@
+v6.7:
+	added support for v2.90~26
+
 v6.6:
 	fixed: generator Service in counter not counting down
 
