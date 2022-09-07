@@ -52,7 +52,7 @@ fi
 if [ $scriptAction == 'INSTALL' ] ; then
 
     # insure the  GuiMods2 is uninstalled since they can't coexist
-    if [ -f "$installedFlagPrefix""GuiMods2" ]; then
+    if [ -f "$installedVersionPrefix""GuiMods2" ] || [ -f "$installedFlagPrefix""GuiMods2" ]; then
         logMessage "uninstalling the original GuiMods2 - can't coexist with GuiMods"
         "/data/GuiMods2/setup" "uninstall" "deferReboot"
         if (( $? == $exitReboot )); then
@@ -64,9 +64,10 @@ if [ $scriptAction == 'INSTALL' ] ; then
     fi
 
     # insure GeneratorConnector is uninstalled since its functionalty is now part of GuiMods
-    if [ -f "$installedFlagPrefix""GeneratorConnector" ]; then
+    if [ -f "$installedVersionPrefix""GeneratorConnector" ] || [ -f "$installedFlagPrefix""GeneratorConnector" ]; then
         logMessage "uninstalling the GeneratorConnector - GuiMods incorporates all it's features and more"
-        "/data/GeneratorConnector/setup" "uninstall" "deferReboot" "deferGuiReset"
+        "/data/GeneratorConnector/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"
+        touch "/data/settupOptions/GeneratorConnector/DO_NOT_AUTO_INSTALL"
     fi
 
 
@@ -397,7 +398,7 @@ if $restartSystemCalc ; then
 	svc -t /service/dbus-systemcalc-py
 fi
 if $restartGeneratorService ; then
-    logMessage "restarting dbus_generator"
+    logMessage "restarting dbus-generator-starter service"
     svc -t /service/dbus-generator-starter
 fi
 

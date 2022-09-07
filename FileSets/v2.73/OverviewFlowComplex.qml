@@ -39,15 +39,20 @@ OverviewPage {
     property bool showInverter: isMulti || numberOfInverters === 1 || showAllTiles
     property bool showLoadsOnOutput: showInverter || showAllTiles
     property bool showAcInput: isMulti || showPvOnInput || showAllTiles
-    property bool showLoadsOnInput: !dcCoupled && ((showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)) || showAllTiles)
-	property bool showPvOnInput: !dcCoupled && ( sys.pvOnGrid.power.valid || showAllTiles)
-    property bool showPvOnOutput: !dcCoupled && (sys.pvOnAcOut.power.valid || showAllTiles)
+	property bool hasLoadsOnInput: showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)
+    property bool showLoadsOnInput: !dcCoupled && (hasLoadsOnInput || showAllTiles)
+	property bool hasPvOnInput: sys.pvOnGrid.power.valid
+	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && (hasPvOnInput || showAllTiles)
+	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
+    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && (hasPvOnInput || showAllTiles)
 	property bool showPvCharger: sys.pvCharger.power.valid || showAllTiles
     property bool showDcSystem: ((dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0)) || showAllTiles)
-    property bool showAlternator: dcCoupled && (sys.alternator.power.valid || showAllTiles)
-    property bool showFuelCell: dcCoupled && (sys.fuelCell.power.valid || showAllTiles)
+    property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && (sys.alternator.power.valid || showAllTiles)
+	property bool hasFuelCell: sys.fuelCell.power.valid
+    property bool showFuelCell: (dcCoupled || !hasPvOnOutput) && (hasFuelCell || showAllTiles)
     property bool showWindGen: sys.windGenerator.power.valid || showAllTiles
-    property bool showAcCharger: dcCoupled && ((sys.acCharger != undefined && sys.acCharger.power.valid) || showAllTiles)
+	property bool hasAcCharger: sys.acCharger != undefined && sys.acCharger.power.valid
+    property bool showAcCharger: (dcCoupled  || !hasPvOnInput) && (hasAcCharger || showAllTiles)
 
     property int bottomOffset: showTanksTemps ? 45 : 5
     property int topOffset: showTanksTemps ? 1 : 5
@@ -187,7 +192,7 @@ OverviewPage {
 		title: qsTr("PV on Input")
 		width: inOutTileWidth
 		height: inOutTileHeight
-		visible: !dcCoupled && (showPvOnInput || showInactiveTiles)
+		visible: showPvOnInput || showInactiveTiles
         opacity: showPvOnInput ? 1 : disabledTileOpacity
 		MbIcon
 		{
@@ -242,7 +247,7 @@ OverviewPage {
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showLoadsOnInput ? 1 : disabledTileOpacity
-		visible: !dcCoupled && (showLoadsOnInput || showInactiveTiles)
+		visible: showLoadsOnInput || showInactiveTiles
 		anchors {
 			top: pvInverterOnInput.bottom
 			topMargin: 5
@@ -456,7 +461,7 @@ OverviewPage {
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showPvOnOutput ? 1 : disabledTileOpacity
-		visible: !dcCoupled && (showPvOnOutput || showInactiveTiles)
+		visible: showPvOnOutput || showInactiveTiles
 		MbIcon
 		{
 			source:
@@ -512,7 +517,7 @@ OverviewPage {
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAcCharger ? 1 : disabledTileOpacity
-		visible: dcCoupled && (showAcCharger || showInactiveTiles)
+		visible: showAcCharger || showInactiveTiles
 		anchors
 		{
             left: root.left; leftMargin: 5
@@ -555,7 +560,7 @@ OverviewPage {
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAlternator ? 1 : disabledTileOpacity
-		visible: dcCoupled && (showAlternator || showInactiveTiles)
+		visible: showAlternator || showInactiveTiles
 		anchors
 		{
             left: root.left; leftMargin: 5
@@ -638,7 +643,7 @@ OverviewPage {
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showFuelCell ? 1 : disabledTileOpacity
-		visible: dcCoupled && (showFuelCell || showInactiveTiles)
+		visible: showFuelCell || showInactiveTiles
         title: qsTr ("Fuel Cell")
          anchors {
             left: windGenBox.left

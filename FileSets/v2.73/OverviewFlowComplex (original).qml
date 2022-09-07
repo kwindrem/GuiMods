@@ -29,8 +29,7 @@ OverviewPage {
     property int inOutTileWidth: 145
     VBusItem { id: timeToGo;  bind: Utils.path(systemPrefix, "/Dc/Battery/TimeToGo") }
 
-    property int numberOfTanks: 0
-	property int numberOfMultis: 0
+    property int numberOfMultis: 0
     property int numberOfInverters: 0
     property string inverterService: ""
     property bool combineAcLoads: dcCoupled || _combineAcLoads.valid && _combineAcLoads.value === 1
@@ -40,20 +39,15 @@ OverviewPage {
     property bool showInverter: isMulti || numberOfInverters === 1 || showAllTiles
     property bool showLoadsOnOutput: showInverter || showAllTiles
     property bool showAcInput: isMulti || showPvOnInput || showAllTiles
-	property bool hasLoadsOnInput: showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)
-    property bool showLoadsOnInput: !dcCoupled && (hasLoadsOnInput || showAllTiles)
-	property bool hasPvOnInput: sys.pvOnGrid.power.valid
-	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && (hasPvOnInput || showAllTiles)
-	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
-    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && (hasPvOnInput || showAllTiles)
+    property bool showLoadsOnInput: !dcCoupled && ((showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)) || showAllTiles)
+	property bool showPvOnInput: !dcCoupled && ( sys.pvOnGrid.power.valid || showAllTiles)
+    property bool showPvOnOutput: !dcCoupled && (sys.pvOnAcOut.power.valid || showAllTiles)
 	property bool showPvCharger: sys.pvCharger.power.valid || showAllTiles
     property bool showDcSystem: ((dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0)) || showAllTiles)
-    property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && (sys.alternator.power.valid || showAllTiles)
-	property bool hasFuelCell: sys.fuelCell.power.valid
-    property bool showFuelCell: (dcCoupled || !hasPvOnOutput) && (hasFuelCell || showAllTiles)
+    property bool showAlternator: dcCoupled && (sys.alternator.power.valid || showAllTiles)
+    property bool showFuelCell: dcCoupled && (sys.fuelCell.power.valid || showAllTiles)
     property bool showWindGen: sys.windGenerator.power.valid || showAllTiles
-	property bool hasAcCharger: sys.acCharger != undefined && sys.acCharger.power.valid
-    property bool showAcCharger: (dcCoupled  || !hasPvOnInput) && (hasAcCharger || showAllTiles)
+    property bool showAcCharger: dcCoupled && ((sys.acCharger != undefined && sys.acCharger.power.valid) || showAllTiles)
 
     property int bottomOffset: showTanksTemps ? 45 : 5
     property int topOffset: showTanksTemps ? 1 : 5
@@ -61,7 +55,7 @@ OverviewPage {
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
     property int numberOfTemps: 0
 
-    property int tankCount: showTanksEnable ? numberOfTanks : 0
+    property int tankCount: showTanksEnable ? tankModel.rowCount : 0
     property int tempCount: showTempsEnable ? numberOfTemps : 0
     property int tankTempCount: tankCount + tempCount
     property bool showTanks: showTanksEnable ? showStatusBar ? false : tankCount > 0 ? true : false : false
@@ -193,7 +187,7 @@ OverviewPage {
 		title: qsTr("PV on Input")
 		width: inOutTileWidth
 		height: inOutTileHeight
-		visible: showPvOnInput || showInactiveTiles
+		visible: !dcCoupled && (showPvOnInput || showInactiveTiles)
         opacity: showPvOnInput ? 1 : disabledTileOpacity
 		MbIcon
 		{
@@ -248,7 +242,7 @@ OverviewPage {
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showLoadsOnInput ? 1 : disabledTileOpacity
-		visible: showLoadsOnInput || showInactiveTiles
+		visible: !dcCoupled && (showLoadsOnInput || showInactiveTiles)
 		anchors {
 			top: pvInverterOnInput.bottom
 			topMargin: 5
@@ -462,7 +456,7 @@ OverviewPage {
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showPvOnOutput ? 1 : disabledTileOpacity
-		visible: showPvOnOutput || showInactiveTiles
+		visible: !dcCoupled && (showPvOnOutput || showInactiveTiles)
 		MbIcon
 		{
 			source:
@@ -518,7 +512,7 @@ OverviewPage {
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAcCharger ? 1 : disabledTileOpacity
-		visible: showAcCharger || showInactiveTiles
+		visible: dcCoupled && (showAcCharger || showInactiveTiles)
 		anchors
 		{
             left: root.left; leftMargin: 5
@@ -561,7 +555,7 @@ OverviewPage {
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAlternator ? 1 : disabledTileOpacity
-		visible: showAlternator || showInactiveTiles
+		visible: dcCoupled && (showAlternator || showInactiveTiles)
 		anchors
 		{
             left: root.left; leftMargin: 5
@@ -644,7 +638,7 @@ OverviewPage {
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showFuelCell ? 1 : disabledTileOpacity
-		visible: showFuelCell || showInactiveTiles
+		visible: dcCoupled && (showFuelCell || showInactiveTiles)
         title: qsTr ("Fuel Cell")
          anchors {
             left: windGenBox.left
@@ -1237,8 +1231,11 @@ OverviewPage {
         interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
-        model: tanksModel
+        model: TankModel { id: tankModel }
         delegate: TileTankEnhanced {
+            // Without an intermediate assignment this will trigger a binding loop warning.
+            property variant theService: DBusServices.get(buddy.id)
+            service: theService
             width: tanksColum.tileWidth
             height: root.tanksHeight
             pumpBindPrefix: root.pumpBindPreffix
@@ -1259,7 +1256,6 @@ OverviewPage {
             z: -1
         }
     }
-    ListModel { id: tanksModel }
 
     ListView
     {
@@ -1322,10 +1318,6 @@ OverviewPage {
     {
          switch (service.type)
         {
-		case (service.type === DBusService.DBUS_SERVICE_TANK):
-			tanksModel.append({serviceName: service.name})
-            numberOfTanks++
-            break;;
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
             tempsModel.append({serviceName: service.name})
@@ -1362,7 +1354,6 @@ OverviewPage {
     // Detect available services of interest
     function discoverServices()
     {
-        numberOfTanks = 0
         numberOfTemps = 0
         numberOfMultis = 0
         numberOfInverters = 0

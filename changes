@@ -1,3 +1,10 @@
+v6.8:
+	DC Coupled overview now shows AC devices if space exists. Visa-versa for AC coupled
+	added wind generator, alternator to systemcalc in v2.87+
+		Victron adds wind generator to systemcalc in v2.90 - copied that code to v2.87)
+	fixed: dbus-generator-starter service crash
+	fixed: GeneratorConnector not uninstalled prior to GuiMods install
+
 v6.7:
 	added support for v2.90~26
 
