@@ -601,7 +601,7 @@ class SystemCalc:
 				p = self._dbusmonitor.get_value(dcSource, '/Dc/0/Power')
 				if p is None:
 					continue
-				if '/Dc/WindGeneratorPower' not in newvalues:
+				if '/Dc/WindGenerator/Power' not in newvalues:
 					newvalues['/Dc/WindGenerator/Power'] = p
 				else:
 					newvalues['/Dc/WindGenerator/Power'] += p

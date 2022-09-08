@@ -1,3 +1,7 @@
+v6.9:
+	added Venus OS v2.90~28
+	fixed: wind generator power not included properly in systemcalc
+
 v6.8:
 	DC Coupled overview now shows AC devices if space exists. Visa-versa for AC coupled
 	added wind generator, alternator to systemcalc in v2.87+
