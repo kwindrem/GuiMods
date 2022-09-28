@@ -740,6 +740,7 @@ OverviewPage {
 ////// replaced OverviewSolarInverter with OverviewBox
     OverviewBox {
         id: pvInverter
+        title: qsTr("PV Inverter")
 		titleColor: "#F4B350"
 		color: "#F39C12"
         visible: hasAcSolar || showInactiveTiles
@@ -758,7 +759,6 @@ OverviewPage {
 				return 0
 		}
         width: 148
-        title: qsTr("PV Inverter")
 
         anchors {
             right: root.right; rightMargin: 10;
@@ -768,11 +768,6 @@ OverviewPage {
 
         values:
         [
-			OverviewAcValuesEnhanced {
-                y: 8
-				connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-				visible: !coupledPvAc.visible
-			},
             TileText {
                 id: coupledPvAc
 
@@ -783,7 +778,7 @@ OverviewPage {
                 y: 10
                 text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
                 font.pixelSize: 19
-                visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
+                visible: hasAcSolar
             },
 //////// add individual PV inverter powers
             TileText {

@@ -1,3 +1,7 @@
+v6.10:
+	fixed PV Inverter layout on GuiMods Simple flow page
+	added leg powers to PV Inverter details page
+
 v6.9:
 	added Venus OS v2.90~28
 	fixed: wind generator power not included properly in systemcalc

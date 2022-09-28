@@ -39,46 +39,87 @@ MbPage
         Column 
         {
             spacing: 2
+           Row
+            {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr(" ") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Total") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L1" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L2" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L3" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr(" ") }
+            }
             Row
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignLeft
-                        text: qsTr("Total PV power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                         text: qsTr("Grid") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: EnhFmt.formatVBusItem (sys.pvOnGrid.power) }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL1) }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL2) }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL3) }
                 PowerGauge
                 {
                     id: pvGridGauge
-                    width: tableColumnWidth * 3.3
+                    width: tableColumnWidth * 1.3
                     height: 15
                     connection: sys.pvOnGrid
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
+                    visible: sys.pvOnGrid.power.valid
                 }
             }
             Row
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignLeft
-                        text: qsTr("Total PV power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                         text: qsTr("Output") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: EnhFmt.formatVBusItem (sys.pvOnAcOut.power) }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL1) }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL2) }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL3) }
                 PowerGauge
                 {
                     id: pvAcOutGauge
-                    width: tableColumnWidth * 3.3
+                    width: tableColumnWidth * 1.3
                     height: 15
                     connection: sys.pvOnAcOut
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
+                    visible: sys.pvOnAcOut.power.valid
                 }
             }
+			Row
+            {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr(" ") }
+			}
            Row
             {
                 id: tableHeaderRow
@@ -101,7 +142,6 @@ MbPage
                         width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Connection") }
             }
-
         }
     }
 
