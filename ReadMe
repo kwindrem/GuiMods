@@ -3,6 +3,7 @@ GuiMods has been revived with combined functionality of the original GuiMods and
 GuiMods2 has been decommissioned
 
 Recent changes:
+	added threshold to swithch to K units (previously this was fixed at 1000)
 	separate simple, DC coupled and AC coupled flow overviews can now be selected
 	Alternator, Wind Generator, Fuel Cell and AC Charger DC sources have been added
 	DC details page has been added
@@ -278,6 +279,11 @@ Configuration
         A preset is active for any value other than 0. For 0 the preset button disappears.
         If you wish to set a preset to the inverter's minimum current limit,
         specify a value of 1 for the preset.
+
+	Watts / Killowatts threshold
+		Controls the switch between showing values as W, A, V and KW, KA, KV
+		The spinner range is from 1000 to 10000
+		The default is to switch at 1000
         
     Temperature Scale
         Selects either °C or °F (or both) for temperatures displayed on the Flow and Mobile Overviews.

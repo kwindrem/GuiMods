@@ -15,9 +15,7 @@ OverviewPage {
     VBusItem { id: showInactiveTilesItem; bind: Utils.path(guiModsPrefix, "/ShowInactiveFlowTiles") }
     property real disabledTileOpacity: (showInactiveTiles && showInactiveTilesItem.value === 1) ? 0.3 : 1
     property bool showInactiveTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value >= 1
-
-	// for debug, ignore validity checks so all tiles and their flow lines will show
-    property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
+    property bool showInactiveFlow: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
 	property variant sys: theSystem
 	property string systemPrefix: "com.victronenergy.system"
@@ -36,23 +34,27 @@ OverviewPage {
     property variant outputLoad: combineAcLoads ? sys.acLoad : sys.acOutLoad
 
     property bool isMulti: numberOfMultis === 1
+
+	// for debug, ignore validity checks so all tiles and their flow lines will show
+    property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
+
     property bool showInverter: isMulti || numberOfInverters === 1 || showAllTiles
     property bool showLoadsOnOutput: showInverter || showAllTiles
     property bool showAcInput: isMulti || showPvOnInput || showAllTiles
 	property bool hasLoadsOnInput: showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)
-    property bool showLoadsOnInput: !dcCoupled && (hasLoadsOnInput || showAllTiles)
+    property bool showLoadsOnInput: !dcCoupled && hasLoadsOnInput
 	property bool hasPvOnInput: sys.pvOnGrid.power.valid
-	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && (hasPvOnInput || showAllTiles)
+	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && hasPvOnInput
 	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
-    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && (hasPvOnInput || showAllTiles)
-	property bool showPvCharger: sys.pvCharger.power.valid || showAllTiles
-    property bool showDcSystem: ((dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0)) || showAllTiles)
-    property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && (sys.alternator.power.valid || showAllTiles)
+    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnInput
+	property bool showPvCharger: sys.pvCharger.power.vali
+    property bool showDcSystem: (dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0))
+    property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && sys.alternator.power.valid
 	property bool hasFuelCell: sys.fuelCell.power.valid
-    property bool showFuelCell: (dcCoupled || !hasPvOnOutput) && (hasFuelCell || showAllTiles)
-    property bool showWindGen: sys.windGenerator.power.valid || showAllTiles
+    property bool showFuelCell: (dcCoupled || !hasPvOnOutput) && hasFuelCell
+    property bool showWindGen: sys.windGenerator.power.valid
 	property bool hasAcCharger: sys.acCharger != undefined && sys.acCharger.power.valid
-    property bool showAcCharger: (dcCoupled  || !hasPvOnInput) && (hasAcCharger || showAllTiles)
+    property bool showAcCharger: (dcCoupled  || !hasPvOnInput) && hasAcCharger
 
     property int bottomOffset: showTanksTemps ? 45 : 5
     property int topOffset: showTanksTemps ? 1 : 5
@@ -192,7 +194,7 @@ OverviewPage {
 		title: qsTr("PV on Input")
 		width: inOutTileWidth
 		height: inOutTileHeight
-		visible: showPvOnInput || showInactiveTiles
+		visible: showPvOnInput || (showInactiveTiles && !dcCoupled)
         opacity: showPvOnInput ? 1 : disabledTileOpacity
 		MbIcon
 		{
@@ -247,7 +249,7 @@ OverviewPage {
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showLoadsOnInput ? 1 : disabledTileOpacity
-		visible: showLoadsOnInput || showInactiveTiles
+		visible: showLoadsOnInput || (showInactiveTiles && !dcCoupled)
 		anchors {
 			top: pvInverterOnInput.bottom
 			topMargin: 5
@@ -461,7 +463,7 @@ OverviewPage {
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showPvOnOutput ? 1 : disabledTileOpacity
-		visible: showPvOnOutput || showInactiveTiles
+		visible: showPvOnOutput || (showInactiveTiles && !dcCoupled)
 		MbIcon
 		{
 			source:
@@ -517,7 +519,7 @@ OverviewPage {
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAcCharger ? 1 : disabledTileOpacity
-		visible: showAcCharger || showInactiveTiles
+		visible: showAcCharger || (showInactiveTiles && dcCoupled)
 		anchors
 		{
             left: root.left; leftMargin: 5
@@ -560,7 +562,7 @@ OverviewPage {
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAlternator ? 1 : disabledTileOpacity
-		visible: showAlternator || showInactiveTiles
+		visible: showAlternator || (showInactiveTiles && dcCoupled)
 		anchors
 		{
             left: root.left; leftMargin: 5
@@ -601,7 +603,7 @@ OverviewPage {
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showDcSystem ? 1 : disabledTileOpacity
-		visible: (showDcSystem || showInactiveTiles)
+		visible: showDcSystem || showInactiveTiles
         title: dcSystemNameItem.valid && dcSystemNameItem.value != "" ? dcSystemNameItem.value : qsTr ("DC System")
          anchors {
             left: root.left; leftMargin: 5
@@ -643,7 +645,7 @@ OverviewPage {
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showFuelCell ? 1 : disabledTileOpacity
-		visible: showFuelCell || showInactiveTiles
+		visible: showFuelCell || (showInactiveTiles && dcCoupled)
         title: qsTr ("Fuel Cell")
          anchors {
             left: windGenBox.left
@@ -764,15 +766,6 @@ OverviewPage {
 		DetailTarget { id: pvChargerTarget; detailsPage: "DetailPvCharger.qml" }
 	}
 
-	// display detail targets and help message when first displayed.
-    Timer {
-        id: helpTimer
-        running: false
-        repeat: false
-        interval: 5000
-        triggeredOnStart: true
-    }
-
 	// move ESS reason to Battery details page
 
 	// invisible item to connection all AC input connections to..
@@ -853,7 +846,7 @@ OverviewPage {
 		id: coupledAcConnection
 		ballCount: 1
 		path: straight
-		active: root.active && (showLoadsOnInput && showPvOnInput)
+		active: root.active && ((showLoadsOnInput && showPvOnInput) || (!dcCoupled && showInactiveFlow))
 		value: -Utils.sign (pvOnInputFlow + loadsOnInputFlow)
 		startPointVisible: false
 		endPointVisible: false
@@ -870,8 +863,8 @@ OverviewPage {
 	OverviewConnection {
 		id: pvInverterOnInputConnection
 		ballCount: showLoadsOnInput ? 1 : 2
-		path: showLoadsOnInput ? straight : corner
-		active: root.active && showPvOnInput
+		path: showLoadsOnInput || (!dcCoupled && showInactiveFlow) ? straight : corner
+		active: root.active && (showPvOnInput || (!dcCoupled && showInactiveFlow))
 		value: Utils.sign (pvOnInputFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -880,8 +873,8 @@ OverviewPage {
 			left: pvInverterOnInput.right; leftMargin: -8
 			right: acInBus.horizontalCenter
 			top: pvInverterOnInput.bottom; topMargin: -8
-			bottom: showLoadsOnInput ? pvInverterOnInput.bottom : multiAcInFlow.verticalCenter
-			bottomMargin: showLoadsOnInput ? 8 : 0
+			bottom: showLoadsOnInput || (!dcCoupled && showInactiveFlow) ? pvInverterOnInput.bottom : multiAcInFlow.verticalCenter
+			bottomMargin: showLoadsOnInput || (!dcCoupled && showInactiveFlow) ? 8 : 0
 		}
 	}
 
@@ -890,7 +883,7 @@ OverviewPage {
 		id: loadsOnInput
 		ballCount: 1
 		path: corner
-		active: root.active && showLoadsOnInput
+		active: root.active && (showLoadsOnInput || (!dcCoupled && showInactiveFlow))
 		value: Utils.sign (loadsOnInputFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -900,7 +893,7 @@ OverviewPage {
 			right: acInBus.horizontalCenter
             rightMargin: 0.5 // makes this line up with others
 			top:  acLoadOnInputBox.top; topMargin: 8
-			bottom: showPvOnInput ? acInBus.bottom : acInBus.top
+			bottom: showPvOnInput|| (!dcCoupled && showInactiveFlow) ? acInBus.bottom : acInBus.top
 		}
 	}
 
@@ -921,7 +914,7 @@ OverviewPage {
 
 		ballCount: 1
 		path: straight  
-		active: root.active && (showLoadsOnOutput || showPvOnOutput)
+		active: root.active && ((showLoadsOnOutput || showPvOnOutput) || (!dcCoupled && showInactiveFlow))
 		value: -Utils.sign (acOutLoadFlow + pvInverterOnAcOutFlow)
 		endPointVisible: false
 
@@ -938,7 +931,7 @@ OverviewPage {
 
 		ballCount: 1
 		path: corner
-		active: root.active && showLoadsOnOutput
+		active: root.active && (showLoadsOnOutput || (!dcCoupled && showInactiveFlow))
 		value: Utils.sign (acOutLoadFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -958,7 +951,7 @@ OverviewPage {
 
 		ballCount: 2
 		path: corner
-		active: root.active && showPvOnOutput
+		active: root.active && (showPvOnOutput || (!dcCoupled && showInactiveFlow))
 		value: Utils.sign (pvInverterOnAcOutFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -987,7 +980,7 @@ OverviewPage {
 		id: dcBus1
 		ballCount: 1
 		path: straight
-		active: root.active && (showAlternator || showDcSystem)
+		active: root.active && ((showAlternator || showDcSystem) || (dcCoupled && showInactiveFlow))
 		value: -Utils.sign (alternatorFlow + dcSystemFlow)
 		startPointVisible: false
 		endPointVisible: false
@@ -1003,7 +996,7 @@ OverviewPage {
 		id: dcBus2
 		ballCount: 1
 		path: straight
-		active: root.active && (showAlternator || showAcCharger || showDcSystem)
+		active: root.active && ((showAlternator || showAcCharger || showDcSystem) || (dcCoupled && showInactiveFlow))
 		value: Utils.sign (alternatorFlow + dcSystemFlow + acChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
@@ -1018,7 +1011,7 @@ OverviewPage {
 		id: dcBus3
 		ballCount: 2
 		path: straight
-		active: root.active && (showInverter || showFuelCell || showWindGen || showPvCharger)
+		active: root.active && ((showInverter || showFuelCell || showWindGen || showPvCharger) || showInactiveFlow)
 		value: -Utils.sign (inverterDcFlow + fuelCellFlow + windGenFlow + pvChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
@@ -1033,7 +1026,7 @@ OverviewPage {
 		id: dcBus4
 		ballCount: 1
 		path: straight
-		active: root.active && (showFuelCell || showWindGen || showPvCharger)
+		active: root.active && ((showFuelCell || showWindGen || showPvCharger) || showInactiveFlow)
 		value: -Utils.sign (fuelCellFlow + windGenFlow + pvChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
@@ -1048,7 +1041,7 @@ OverviewPage {
 		id: dcBus5
 		ballCount: 1
 		path: straight
-		active: root.active && (showWindGen || showPvCharger)
+		active: root.active && ((showWindGen || showPvCharger) || showInactiveFlow)
 		value: -Utils.sign (windGenFlow + pvChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
@@ -1066,7 +1059,7 @@ OverviewPage {
 		id: multiDcConnector
 		ballCount: 1
 		path: straight
-		active: root.active && showInverter
+		active: root.active && (showInverter || showInactiveFlow)
 		value: Utils.sign (inverterDcFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1082,7 +1075,7 @@ OverviewPage {
 		id: batteryDcConnector
 		ballCount: 1
 		path: straight
-		active: root.active && (sys.battery.soc.valid || showAllTiles || showDcSystem)
+		active: root.active && ((sys.battery.soc.valid || showDcSystem) || (dcCoupled && showInactiveFlow))
 		value: -Utils.sign (batteryFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1100,7 +1093,7 @@ OverviewPage {
 		id: acChargerConnection
 		ballCount: 1
 		path: corner
-		active: root.active && showAcCharger
+		active: root.active && (showAcCharger || (dcCoupled && showInactiveFlow))
 		value: Utils.sign (acChargerFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1119,7 +1112,7 @@ OverviewPage {
 		id: alternatorConnection
 		ballCount: 1
 		path: straight
-		active: root.active && showAlternator
+		active: root.active && (showAlternator || (dcCoupled && showInactiveFlow))
 		value: Utils.sign (alternatorFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1137,7 +1130,7 @@ OverviewPage {
 		id: dcSystemConnection
         ballCount: 2
         path: corner
-        active: root.active && showDcSystem
+        active: root.active && (showDcSystem || (dcCoupled && showInactiveFlow))
 		value: Utils.sign (dcSystemFlow)
         endPointVisible: false
         anchors
@@ -1157,7 +1150,7 @@ OverviewPage {
 		id: fuelCellConnection
 		ballCount: 2
 		path: corner
-		active: root.active && showFuelCell
+		active: root.active && (showFuelCell || (dcCoupled && showInactiveFlow))
 		value: Utils.sign (fuelCellFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1177,7 +1170,7 @@ OverviewPage {
 		id: windGenConnection
 		ballCount: 1
 		path: straight
-		active: root.active && showWindGen
+		active: root.active && (showWindGen || showInactiveFlow)
 		value: Utils.sign (windGenFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1195,7 +1188,7 @@ OverviewPage {
 		id: pvChargerConnection
 		ballCount: 2
 		path: corner
-		active: root.active && showPvCharger
+		active: root.active && (showPvCharger || showInactiveFlow)
 		value: Utils.sign (pvChargerFlow)
 		startPointVisible: true
 		endPointVisible: false
@@ -1224,7 +1217,7 @@ OverviewPage {
 
         visible: showTanks
         width: compact ? root.width : root.width * tankCount / tankTempCount
-        property int tileWidth: width / Math.min (count, 4.2)
+        property int tileWidth: width / Math.min (count, 5.2)
         height: root.tanksHeight
         anchors
         {

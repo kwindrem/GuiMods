@@ -70,7 +70,7 @@ Tile {
         MarqueeEnhanced {
             id: tankText
 //// modified to give bar more horizontal space
-            width: Math.max (Math.floor (parent.width * 0.3 ), 44)
+            width: parent.width - barWindow.width
             height: compact ? 13 : parent.height
             text: compact ? tankName : ""
             textHorizontalAlignment: Text.AlignLeft
@@ -83,14 +83,21 @@ Tile {
         }
 
         Rectangle {
+			id: barWindow
             color: "#95a5a6"
             border { width:1; color: "white" }
-            width: root.width - 10 -  (compact ? tankText.width + 3 : 0)
+			width:
+			{
+				if (compact)
+					return Math.max ((root.width - 5) / 2, 62)
+				else
+					return root.width - 10
+			}
             height: compact ? 13 : parent.height
             anchors {
 //// modified to give move bar over title's line if space is tight
                 verticalCenter: parent.verticalCenter; verticalCenterOffset: compact ? -9 : squeeze ? -4 : 0
-                right: parent.right
+				right: parent.right; rightMargin: 1
             }
 
             Rectangle {
@@ -129,6 +136,8 @@ Tile {
                         // increase precision if value is truncated to zero
                         if (remainingFixed == 0)
                             remainingFixed = remaining.toFixed(precision + 1)
+						if (fmt.unit == "gal")
+							fmt.unit = "g"
                         remainingText = remainingFixed + fmt.unit
                     }
                     else

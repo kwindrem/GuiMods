@@ -12,6 +12,7 @@ Item {
     property variant sys: theSystem
 
 	property string systemPrefix: "com.victronenergy.system"
+	property string settingsPrefix: "com.victronenergy.settings"
 	property string vebusPrefix: _vebusService.valid ? _vebusService.value : ""
 
 //////// add to support VE.Direct inverters
@@ -223,6 +224,10 @@ Item {
 		id: _dcSystem
 		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/System/Power"); unit: "W"}
 	}
+
+//////// add to support for adjustable watt / killowatt display switching
+	VBusItem { id: kwThresholdItem; bind: Utils.path(settingsPrefix, "/Settings/GuiMods/KilowattThreshold") }
+	property int kilowattThreshold: kwThresholdItem.valid ? kwThresholdItem.value : 1000
 
 //////// add to support VE.Direct inverters
 //////// and grid/genset meters

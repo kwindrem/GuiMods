@@ -12,6 +12,7 @@ MbPage {
 
     title: "Inverter detail"
 
+    property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"
 
 	property int fontPixelSize: 18

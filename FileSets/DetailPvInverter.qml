@@ -152,11 +152,11 @@ MbPage
 
         anchors
         {
-            top: root.top; topMargin: 60
+            top: root.top; topMargin: 93
             horizontalCenter: root.horizontalCenter
         }
         width: tableHeaderRow.width
-        height: root.height - 60
+        height: root.height - 93
         interactive: true
 
         model: pvInverterModel

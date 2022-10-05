@@ -1,3 +1,10 @@
+
+v6.11:
+	fixed: PV Inverter Detail - lines overlap
+	added K units threshold (previously fixed at 1000)
+	changed tank tile widths for better fit
+	changed "gal" to "g" for tank value display for better fit
+
 v6.10:
 	fixed PV Inverter layout on GuiMods Simple flow page
 	added leg powers to PV Inverter details page

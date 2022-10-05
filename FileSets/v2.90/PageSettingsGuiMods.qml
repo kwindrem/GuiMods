@@ -219,6 +219,20 @@ MbPage {
             writeAccessLevel: User.AccessUser
         }
         
+        MbSpinBox {
+            description: qsTr ("Watt / Kilowat threshold")
+			item
+			{
+				bind: Utils.path (bindPrefixGuiMods, "/KilowattThreshold")
+				unit: "W"
+				decimals: 0
+				step: 100
+				min: 1000
+				max: 10000
+			}
+            writeAccessLevel: User.AccessUser
+        }
+
         MbItemOptions
         {
             id: timeFormat
