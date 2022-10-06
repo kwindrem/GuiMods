@@ -246,6 +246,9 @@ Configuration
         Fluid levels and temperatures are displayed at the bottom of the Flow Overview when
         the associated switch is on.
 
+	Tank bar format
+		displays tank level percentage, actual remaining level (in units), or both
+
 	Show battery temperature on flow overviews
 		This preference controls whether battery temperature(s) are shown or hidden on the flow overviews
 		Due to space constraints, users may or may not wish to display battery temperature(s)

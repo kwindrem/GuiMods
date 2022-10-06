@@ -117,6 +117,18 @@ MbPage {
 			show: root.showFlowParams
             writeAccessLevel: User.AccessUser
         }
+		MbItemOptions
+		{
+            id: tankFormat
+			description: qsTr("Tank bar format")
+            bind: Utils.path (bindPrefixGuiMods, "/TankBarFormat")
+			possibleValues:
+			[
+				MbOption {description: qsTr("%"); value: 1},
+				MbOption {description: qsTr("units"); value: 2},
+				MbOption {description: qsTr("% + units"); value: 0}
+			]
+		}
         MbSwitch
         {
             id: showTemps

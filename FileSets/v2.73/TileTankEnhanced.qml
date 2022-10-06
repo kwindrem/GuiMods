@@ -14,6 +14,7 @@ Tile {
 
     property variant service
     property string bindPrefix: service ? service.name : ""
+    property string settingsPrefix: "com.victronenergy.settings"
 	property string pumpBindPrefix
 	property VBusItem levelItem: VBusItem { id: levelItem; bind: Utils.path(bindPrefix, "/Level"); decimals: 0; unit: "%" }
     property VBusItem fluidTypeItem: VBusItem { id: fluidTypeItem; bind: Utils.path(bindPrefix, "/FluidType") }
@@ -28,15 +29,21 @@ Tile {
 
 //// add to allow displaying remaining volume
     property VBusItem remainingItem: VBusItem { id: remainingItem; bind: Utils.path(bindPrefix, "/Remaining"); decimals: 0 }
-    property VBusItem volumeUnit: VBusItem { bind: "com.victronenergy.settings/Settings/System/VolumeUnit" }
+    property VBusItem volumeUnit: VBusItem { bind: Utils.path (settingsPrefix, "/Settings/System/VolumeUnit") }
+    property VBusItem capacityItem: VBusItem { bind: Utils.path (bindPrefix, "/Capacity") }
+    property real capacity: capacityItem.valid ? capacityItem.value : 0
 //// small tile height threshold
     property bool squeeze: height < 50
 
 //// modified to truncate tank name to 1 word if compact is true or 2 words if not
 //// and to replace "Waste" with "Gray"
     property VBusItem customNameItem: VBusItem { id: customNameItem; bind: Utils.path(bindPrefix, "/CustomName") }
-    property VBusItem shortenTankNames: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/ShortenTankNames" }
+    property VBusItem shortenTankNames: VBusItem { bind: Utils.path (settingsPrefix, "/Settings/GuiMods/ShortenTankNames") }
     property string tankName: truncateTankName ()
+
+//// add to allow %, units, both in tank bar
+    property VBusItem tankBarFormatItem: VBusItem { bind: Utils.path (settingsPrefix, "/Settings/GuiMods/TankBarFormat") }
+	property int tankBarFormat: tankBarFormatItem.valid ? tankBarFormatItem.value : 0
 
     function truncateTankName ()
     {
@@ -109,7 +116,19 @@ Tile {
 			width:
 			{
 				if (compact)
-					return Math.max ((root.width - 5) / 2, 62)
+				{
+					// extra space to display % and units
+					if (tankBarFormat == 0)
+						return (root.width - 5) * 0.7
+					// m3 requires additional space
+					else if (volumeUnit.value == 0)
+					{
+						var tempWidth = (root.width - 5) * 0.7
+						return Math.min (tempWidth, 60)
+					}
+					else
+						return (root.width - 5) * 0.5
+				}
 				else
 					return root.width - 10
 			}
@@ -129,7 +148,7 @@ Tile {
 				opacity: blink ? 1 : 0.5
 				anchors {
 					verticalCenter: parent.verticalCenter;
-					left: parent.left; leftMargin: 1
+					left: parent.left
 				}
 			}
 
@@ -139,33 +158,44 @@ Tile {
 //// include actual level in display
 				text:
                 {
-                    var levelText
-                    var remainingText
+					var levelText = ""
+                    var remainingText = ""
 
-                    if (levelItem.valid)
-                        levelText = levelItem.text
-                    else
-                        levelText = "?"
+					// show percentage - force percentage if no capacity
+					if (tankBarFormat == 0 || tankBarFormat == 1 || capacity == 0)
+					{
+						if (levelItem.valid)
+							levelText = levelItem.text
+						else
+							levelText = "?"
+					}
 
-                    if (remainingItem.valid)
-                    {
-                        var remaining = TankSensor.volumeConvertFromSI(volumeUnit.value, remainingItem.value)
-                        var fmt = TankSensor.getVolumeFormat(volumeUnit.value)
-                        var precision = fmt.precision
-                        var remainingFixed = remaining.toFixed(precision)
-                        // increase precision if value is truncated to zero
-                        if (remainingFixed == 0)
-                            remainingFixed = remaining.toFixed(precision + 1)
-						if (fmt.unit == "gal")
-							fmt.unit = "g"
-                        remainingText = remainingFixed + fmt.unit
-                    }
-                    else
-                        remainingText = "?"
-
-                    return levelText + " " + remainingText
+					// show units
+					if ((tankBarFormat == 0 || tankBarFormat == 2) && capacity != 0)
+					{
+						if (remainingItem.valid)
+						{
+							var remaining = TankSensor.volumeConvertFromSI(volumeUnit.value, remainingItem.value)
+							var fmt = TankSensor.getVolumeFormat(volumeUnit.value)
+							var precision = fmt.precision
+							var remainingFixed = remaining.toFixed(precision)
+							// increase precision if value is truncated to zero
+							if (remainingFixed == 0 && remaining != 0)
+								remainingFixed = remaining.toFixed(precision + 1)
+							if (fmt.unit == "gal")
+								fmt.unit = "g"
+							remainingText = remainingFixed + fmt.unit
+						}
+						else
+							remainingText = "?"
+					}
+					switch (tankBarFormat)
+					{
+						default: return levelText + " " + remainingText; break;
+						case 1: return levelText; break;
+						case 2: return remainingText; break;
+					}
                 }
-            
 				anchors.centerIn: parent
 				color: "white"
 			}

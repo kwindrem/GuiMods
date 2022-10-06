@@ -1,3 +1,7 @@
+v6.15:
+	added % / units / both option for tanks tiles
+	allow more space for tank bar
+
 v6.14:
 	fixed: white screen in v2.89 and earlier
 
