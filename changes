@@ -1,3 +1,7 @@
+v6.13:
+	fixed: battery not showing watts (just kilowatts) (for negative values)
+	fixed: typo in GuiMods settings (Kilowat)
+
 v6.12:
 	fixed: PV charger not showing on AC and DC coupled flow pages
 

@@ -204,7 +204,7 @@ MbPage {
         }
         
         MbSpinBox {
-            description: qsTr ("Watt / Kilowat threshold")
+            description: qsTr ("Watt / Kilowatt threshold")
 			item
 			{
 				bind: Utils.path (bindPrefixGuiMods, "/KilowattThreshold")

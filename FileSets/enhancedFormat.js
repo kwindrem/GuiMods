@@ -26,7 +26,7 @@ function formatValue (value, unit)
 	else
 		threshold = sys.kilowattThreshold
 
-	if (threshold == 0 || (value >= 0 && value < threshold) || (value < 0 && value > threshold))
+	if (threshold == 0 || (value >= 0 && value < threshold) || (value < 0 && value > -threshold))
 	{
 		if (value >= 100 || value <= -100)
 			return value.toFixed (0) + " " + unit
