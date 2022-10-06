@@ -1,3 +1,6 @@
+v6.14:
+	fixed: white screen in v2.89 and earlier
+
 v6.13:
 	fixed: battery not showing watts (just kilowatts) (for negative values)
 	fixed: typo in GuiMods settings (Kilowat)

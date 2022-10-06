@@ -209,15 +209,11 @@ MbPage {
         
         MbSpinBox {
             description: qsTr ("Watt / Kilowatt threshold")
-			item
-			{
-				bind: Utils.path (bindPrefixGuiMods, "/KilowattThreshold")
-				unit: "W"
-				decimals: 0
-				step: 100
-				min: 1000
-				max: 10000
-			}
+			bind: Utils.path (bindPrefixGuiMods, "/KilowattThreshold")
+			unit: "W"
+			stepSize: 100
+			min: 1000
+			max: 10000
             writeAccessLevel: User.AccessUser
         }
 
