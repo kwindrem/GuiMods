@@ -47,7 +47,7 @@ OverviewPage {
 	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && hasPvOnInput
 	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
     property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnInput
-	property bool showPvCharger: sys.pvCharger.power.vali
+	property bool showPvCharger: sys.pvCharger.power.valid
     property bool showDcSystem: (dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0))
     property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && sys.alternator.power.valid
 	property bool hasFuelCell: sys.fuelCell.power.valid

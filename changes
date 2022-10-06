@@ -1,3 +1,5 @@
+v6.12:
+	fixed: PV charger not showing on AC and DC coupled flow pages
 
 v6.11:
 	fixed: PV Inverter Detail - lines overlap
