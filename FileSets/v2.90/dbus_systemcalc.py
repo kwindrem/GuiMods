@@ -842,7 +842,7 @@ class SystemCalc:
 				# version of Venus it does not break user's expectations.
 				#newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power - alternator_power
 #### changed for GuiMods
-				newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power - alternator_power + windgen_power
+				newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power
 
 		elif self._settings['hasdcsystem'] == 1 and solarchargers_loadoutput_power is not None:
 			newvalues['/Dc/System/MeasurementType'] = 0 # estimated

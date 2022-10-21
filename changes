@@ -1,3 +1,11 @@
+v6.16:
+	show more precision in tank bar number for small values (based on tank capacity)
+	fixed: alternator and wind generator power not removed from DC System
+		in v2.89
+	changed: alternator power to be added rather than subtracted to DC System power
+		this may or may not be the correct math
+	fixed: generator service interval not working (shows 'nan' and can't be changed)
+
 v6.15:
 	added % / units / both option for tanks tiles
 	allow more space for tank bar

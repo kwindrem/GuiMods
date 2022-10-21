@@ -288,6 +288,10 @@ class SystemCalc:
 			'/Dc/Battery/ProductId': {'gettext': '0x%x'},
 			'/Dc/Charger/Power': {'gettext': '%.0F %%'},
 			'/Dc/FuelCell/Power': {'gettext': '%.0F %%'},
+#### added for GuiMods
+			'/Dc/Alternator/Power': {'gettext': '%.0F W'},
+			'/Dc/WindGenerator/Power': {'gettext': '%.0F W'},
+
 			'/Dc/Vebus/Current': {'gettext': '%.1F A'},
 			'/Dc/Vebus/Power': {'gettext': '%.0F W'},
 			'/Dc/System/Power': {'gettext': '%.0F W'},
@@ -767,6 +771,8 @@ class SystemCalc:
 				dc_pv_power = newvalues.get('/Dc/Pv/Power', 0)
 				charger_power = newvalues.get('/Dc/Charger/Power', 0)
 				fuelcell_power = newvalues.get('/Dc/FuelCell/Power', 0)
+				alternator_power = newvalues.get('/Dc/Alternator/Power', 0)
+				windgen_power = newvalues.get('/Dc/WindGenerator/Power', 0)
 
 				# If there are VE.Direct inverters, remove their power from the
 				# DC estimate. This is done using the AC value when the DC
@@ -782,7 +788,7 @@ class SystemCalc:
 							i, '/Ac/Out/L1/V', 0) * self._dbusmonitor.get_value(
 							i, '/Ac/Out/L1/I', 0)
 				newvalues['/Dc/System/MeasurementType'] = 0 # estimated
-				newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power
+				newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power
 
 		elif self._settings['hasdcsystem'] == 1 and solarchargers_loadoutput_power is not None:
 			newvalues['/Dc/System/MeasurementType'] = 0 # estimated

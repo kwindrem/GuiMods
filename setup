@@ -75,7 +75,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/TankBarFormat\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/Generator0/ServiceInterval\
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -134,7 +134,9 @@ if [ $scriptAction == 'INSTALL' ] ; then
 			{"path":"/GuiMods/GaugeLimits/MaxFuelCellPower", "default":0.0}, \
 			{"path":"/GuiMods/ShowBatteryTempOnFlows", "default":1, "min":0, "max":1}, \
 			{"path":"/GuiMods/KilowattThreshold", "default":1000, "min":1000, "max":10000}, \
-			{"path":"/GuiMods/TankBarFormat", "default":0, "min":0, "max":2} ]' > /dev/null
+			{"path":"/GuiMods/TankBarFormat", "default":0, "min":0, "max":2}, \
+			{"path":"/FischerPanda0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
+			{"path":"/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000} ]' > /dev/null
     fi
 
     temp=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowInactiveFlowTiles\

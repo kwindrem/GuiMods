@@ -31,7 +31,8 @@ Tile {
     property VBusItem remainingItem: VBusItem { id: remainingItem; bind: Utils.path(bindPrefix, "/Remaining"); decimals: 0 }
     property VBusItem volumeUnit: VBusItem { bind: Utils.path (settingsPrefix, "/Settings/System/VolumeUnit") }
     property VBusItem capacityItem: VBusItem { bind: Utils.path (bindPrefix, "/Capacity") }
-    property real capacity: capacityItem.valid ? capacityItem.value : 0
+    property real capacity: capacityItem.valid ? TankSensor.volumeConvertFromSI (volumeUnit.value, capacityItem.value) : 0
+
 //// small tile height threshold
     property bool squeeze: height < 50
 
@@ -177,14 +178,15 @@ Tile {
 						{
 							var remaining = TankSensor.volumeConvertFromSI(volumeUnit.value, remainingItem.value)
 							var fmt = TankSensor.getVolumeFormat(volumeUnit.value)
-							var precision = fmt.precision
-							var remainingFixed = remaining.toFixed(precision)
-							// increase precision if value is truncated to zero
-							if (remainingFixed == 0 && remaining != 0)
-								remainingFixed = remaining.toFixed(precision + 1)
 							if (fmt.unit == "gal")
 								fmt.unit = "g"
-							remainingText = remainingFixed + fmt.unit
+							// show only one significant digit for 0 value
+							if (remaining == 0)
+								fmt.precision = 0
+							// increase precision if less than 2 significant digits at full capacity
+							else if (capacity * Math.pow (10, fmt.precision) < 10)
+								fmt.precision += 1
+							remainingText = remaining.toFixed(fmt.precision) + fmt.unit
 						}
 						else
 							remainingText = "?"
