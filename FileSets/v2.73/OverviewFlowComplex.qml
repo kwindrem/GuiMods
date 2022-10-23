@@ -73,7 +73,9 @@ OverviewPage {
     property bool compact: showTanks && showTemps && tankTempCount > 4
     property int tanksHeight: compact ? 22 : 45
 
-    VBusItem { id: ignoreAcInput; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+    VBusItem { id: ignoreAcInput1; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+    VBusItem { id: ignoreAcInput2; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn2") }
+    VBusItem { id: acActiveInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
 
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
@@ -141,10 +143,22 @@ OverviewPage {
 		height: inOutTileHeight
 		title:
 		{
-			if (ignoreAcInput.valid && ignoreAcInput.value == 1)
-				return qsTr ("AC In Ignored")
+			// input 1 is active
+			if (! acActiveInput.valid || acActiveInput.value == 0)
+			{
+				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
+					return qsTr ("AC In 1 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
+			// input 2 is active
 			else
-				return getAcSourceName(sys.acSource)
+			{
+				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
+					return qsTr ("AC In 2 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
 		}
 		titleColor: "#E74c3c"
 		color: "#C0392B"

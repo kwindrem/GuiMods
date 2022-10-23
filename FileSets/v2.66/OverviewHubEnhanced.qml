@@ -148,7 +148,9 @@ OverviewPage {
     VBusItem { id: pvInverterName3; bind: Utils.path(pvInverterPrefix3, "/CustomName") }
 
 //////// add to display AC input ignored
-    VBusItem { id: ignoreAcInput; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+    VBusItem { id: ignoreAcInput1; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn1") }
+    VBusItem { id: ignoreAcInput2; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn2") }
+    VBusItem { id: acActiveInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
 
     VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
     VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
@@ -165,10 +167,22 @@ OverviewPage {
 		height: showStatusBar ? 100 : 120
 		title:
 		{
-			if (ignoreAcInput.valid && ignoreAcInput.value == 1)
-				return qsTr ("AC In Ignored")
+			// input 1 is active
+			if (! acActiveInput.valid || acActiveInput.value == 0)
+			{
+				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
+					return qsTr ("AC In 1 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
+			// input 2 is active
 			else
-				return getAcSourceName(sys.acSource)
+			{
+				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
+					return qsTr ("AC In 2 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
 		}
 		titleColor: "#E74c3c"
 		color: "#C0392B"

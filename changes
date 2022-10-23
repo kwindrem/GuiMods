@@ -1,3 +1,6 @@
+v6.17:
+	fixed: AC input tile shows AC In Ignored when it is not
+
 v6.16:
 	show more precision in tank bar number for small values (based on tank capacity)
 	fixed: alternator and wind generator power not removed from DC System
@@ -49,7 +52,7 @@ v6.6:
 
 v6.5:
 	fixed: AC chargers not showing up in overview pages
-	fixed: Alternator temperatyr not showing up in details page
+	fixed: Alternator temperature not showing up in details page
 v6.4:
 	fixed: some temp tiles don't display values
 
