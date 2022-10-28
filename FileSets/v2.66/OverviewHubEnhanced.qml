@@ -348,7 +348,7 @@ OverviewPage {
 				text: sys.battery.voltage.format(2) + "   " + sys.battery.current.format(1)
 			}
             TileText {
-                text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr ("Remain: ∞")
+                text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr (" ")
             }
         }
 		DetailTarget { id: batteryTarget;  detailsPage: "DetailBattery.qml" }

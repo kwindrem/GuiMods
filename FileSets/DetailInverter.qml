@@ -430,7 +430,7 @@ MbPage {
     function formatValueDiff (item1, item2, unit)
     {
         if (item1.valid && item2.valid)
-            return EnhFmt.formatValue (item2.value - item2.value, unit)
+            return EnhFmt.formatValue (item1.value - item2.value, unit)
         else
             return "--"
     }

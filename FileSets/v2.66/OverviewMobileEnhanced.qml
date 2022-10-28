@@ -307,12 +307,12 @@ OverviewPage {
 			},
 			TileText {
 				text: qsTr("Remaining:")
-				visible: timeToGoText.visible
+				visible: timeToGo.valid
 			},
 			TileText {
 				id: timeToGoText
-				text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : "∞"
-				visible: timeToGo.valid && sys.battery.state.value == sys.batteryStateDischarging
+				text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : " "
+				visible: timeToGo.valid
 				
 				VBusItem {
 					id: timeToGo

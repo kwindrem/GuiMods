@@ -1,3 +1,11 @@
+v6.18:
+	added support for Venus OS v3.00~4
+	fixed: Inverter detail not showing inverter power (always 0)
+	fixed: remaining time not always shown
+		now shown if parameter is valid
+		parameter goes invalid if TTG is > 10 days !!!
+		used to show Remain: infinite - now shows blank
+
 v6.17:
 	fixed: AC input tile shows AC In Ignored when it is not
 
