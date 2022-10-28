@@ -1,4 +1,4 @@
-v6.18:
+v6.19:
 	added support for Venus OS v3.00~4
 	fixed: Inverter detail not showing inverter power (always 0)
 	fixed: remaining time not always shown
