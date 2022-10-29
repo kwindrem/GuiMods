@@ -1,3 +1,7 @@
+v7.0~1:
+	added motor drive
+	average calculated DC System power to minimize wild swings in displayed value
+
 v6.19:
 	added support for Venus OS v3.00~4
 	fixed: Inverter detail not showing inverter power (always 0)
