@@ -337,12 +337,12 @@ class SystemCalc:
 		for service, instance in self._dbusmonitor.get_service_list().items():
 			self._device_added(service, instance, do_service_change=False)
 
-		self._handleservicechange()
-		self._updatevalues()
-		
 #### added for GuiMods
 		self.dcSystemPower = [0, 0, 0]
 
+		self._handleservicechange()
+		self._updatevalues()
+		
 		GLib.timeout_add(1000, exit_on_error, self._handletimertick)
 
 	def _create_dbus_monitor(self, *args, **kwargs):
@@ -816,9 +816,9 @@ class SystemCalc:
 				#newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power - alternator_power
 #### changed for GuiMods
 				# average DC system power over 3 passes (seconds) to minimize wild swings in displayed value
-				self.dcSystemPower[0] = self.dcSystemPower[1]
-				self.dcSystemPower[1] = self.dcSystemPower[2]
-				self.dcSystemPower[2] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power - motordrive_power
+				self.dcSystemPower[2] = self.dcSystemPower[1]
+				self.dcSystemPower[1] = self.dcSystemPower[0]
+				self.dcSystemPower[0] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power - motordrive_power
 				newvalues['/Dc/System/Power'] = (self.dcSystemPower[0] + self.dcSystemPower[1] + self.dcSystemPower[2]) / 3
 				
 		elif self._settings['hasdcsystem'] == 1 and solarchargers_loadoutput_power is not None:
