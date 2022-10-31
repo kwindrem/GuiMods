@@ -75,7 +75,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/Generator0/ServiceInterval\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/MaxMotorDriveLoad\
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -136,7 +136,9 @@ if [ $scriptAction == 'INSTALL' ] ; then
 			{"path":"/GuiMods/KilowattThreshold", "default":1000, "min":1000, "max":10000}, \
 			{"path":"/GuiMods/TankBarFormat", "default":0, "min":0, "max":2}, \
 			{"path":"/FischerPanda0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
-			{"path":"/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000} ]' > /dev/null
+			{"path":"/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
+			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveCharge", "default":0.0}, \
+			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveLoad", "default":0.0} ]' > /dev/null
     fi
 
     temp=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowInactiveFlowTiles\
@@ -280,6 +282,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/DcSystemRow.qml"
     updateActiveFile "$qmlDir/DetailDcSystem.qml"
     updateActiveFile "$qmlDir/DetailAlternator.qml"
+    updateActiveFile "$qmlDir/DetailMotorDrive.qml"
     updateActiveFile "$qmlDir/DetailAcCharger.qml"
     updateActiveFile "$qmlDir/DetailWindGen.qml"
     updateActiveFile "$qmlDir/timeToGo.js"
@@ -287,10 +290,10 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/TileDigIn.qml"
     updateActiveFile "$qmlDir/SystemStateShort.qml"
     updateActiveFile "/opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py"
-	updateActiveFile "$qmlDir/enhancedFormat.js"
     if $thisFileUpdated; then
 		restartSystemCalc=true
     fi
+	updateActiveFile "$qmlDir/enhancedFormat.js"
     updateActiveFile "$qmlDir/DetailTarget.qml"
     updateActiveFile "$qmlDir/DetailButton.qml"
     updateActiveFile "/opt/victronenergy/gui/qml/TileManualStartEnhanced.qml"
@@ -361,14 +364,15 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
 	restoreActiveFile "$qmlDir/OverviewTanksTempsDigInputs.qml"
 	restoreActiveFile "$qmlDir/TileDigIn.qml"
 	restoreActiveFile "$qmlDir/DetailAlternator.qml"
+	restoreActiveFile "$qmlDir/DetailMotorDrive.qml"
 	restoreActiveFile "$qmlDir/AlternatorRow.qml"
 	restoreActiveFile "$qmlDir/DetailWindGen.qml"
 	restoreActiveFile "$qmlDir/SystemStateShort.qml"
     restoreActiveFile "/opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py"
-	restoreActiveFile "$qmlDir/enhancedFormat.js"
     if $thisFileUpdated ; then
 		restartSystemCalc=true
 	fi
+	restoreActiveFile "$qmlDir/enhancedFormat.js"
 	restoreActiveFile "$qmlDir/DetailTarget.qml"
 	restoreActiveFile "$qmlDir/DetailButton.qml"
 	restoreActiveFile "/opt/victronenergy/gui/qml/TileManualStartEnhanced.qml"

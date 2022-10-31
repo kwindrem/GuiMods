@@ -3,6 +3,7 @@ GuiMods has been revived with combined functionality of the original GuiMods and
 GuiMods2 has been decommissioned
 
 Recent changes:
+	added motor drive tile to DC Coupled overview
 	added threshold to swithch to K units (previously this was fixed at 1000)
 	separate simple, DC coupled and AC coupled flow overviews can now be selected
 	Alternator, Wind Generator, Fuel Cell and AC Charger DC sources have been added
@@ -387,6 +388,10 @@ Configuration
 	Max Wind Generator power is the maximum power expected from all wind generators in the system
 
 	Max Fuel Cell power is the maximum power expected from all fuel cells in the system
+
+	Max Motor Drive load power is the maximum power expected from all motor drives when they are consuming power
+
+	Max Motor Drive charge power is the maximum power expected from all motor drives when they are generating power
 
 Installation:
 

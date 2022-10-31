@@ -492,7 +492,7 @@ OverviewPage {
 				}
 				anchors.left: parent.left; anchors.leftMargin: (showTanksTemps && pvChargerCompact) ? 15 : 5
 				height: 15
-				text: pvName1.valid ? pvName1.text : "pv 1"
+				text: pvName1.valid ? pvName1.value : "pv 1"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv1Name.doScroll() }
@@ -541,7 +541,7 @@ OverviewPage {
 				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
 				anchors.left: parent.left; anchors.leftMargin: 5
 				height: 15
-				text: pvName2.valid ? pvName2.text : "pv 2"
+				text: pvName2.valid ? pvName2.value : "pv 2"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv2Name.doScroll() }
@@ -590,7 +590,7 @@ OverviewPage {
 				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
 				anchors.left: parent.left; anchors.leftMargin: 5
 				height: 15
-				text: pvName3.valid ? pvName3.text : "pv 3"
+				text: pvName3.valid ? pvName3.value : "pv 3"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv3Name.doScroll() }
@@ -651,7 +651,7 @@ OverviewPage {
 				}
 				anchors.left: parent.left; anchors.leftMargin: ( ! showTanksTemps && pvChargerCompact) ? 15 : 5
 				height: 15
-				text: pvName4.valid ? pvName4.text : "pv 4"
+				text: pvName4.valid ? pvName4.value : "pv 4"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
@@ -673,7 +673,7 @@ OverviewPage {
 				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
 				anchors.left: parent.left; anchors.leftMargin: 5
 				height: 15
-				text: pvName5.valid ? pvName5.text : "pv 5"
+				text: pvName5.valid ? pvName5.value : "pv 5"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv5Name.doScroll() }
@@ -695,7 +695,7 @@ OverviewPage {
 				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
 				anchors.left: parent.left; anchors.leftMargin: 5
 				height: 15
-				text: pvName6.valid ? pvName6.text : "pv 6"
+				text: pvName6.valid ? pvName6.value : "pv 6"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
@@ -717,7 +717,7 @@ OverviewPage {
 				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
 				anchors.left: parent.left; anchors.leftMargin: 5
 				height: 15
-				text: pvName7.valid ? pvName7.text : "pv 7"
+				text: pvName7.valid ? pvName7.value : "pv 7"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
