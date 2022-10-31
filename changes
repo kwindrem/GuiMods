@@ -1,6 +1,7 @@
-v7.0~1:
+v7.0:
 	added motor drive
 	average calculated DC System power to minimize wild swings in displayed value
+	fixed: CANbus PV charger names not showing up in flow overview tile
 
 v6.19:
 	added support for Venus OS v3.00~4
