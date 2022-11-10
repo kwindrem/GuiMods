@@ -17,13 +17,8 @@ MbPage
     property color backgroundColor: "#b3b3b3"
 
     property int rowTitleWidth: 130
-<<<<<<< HEAD
     property int tableColumnWidth: 80
     property int totalDataWidth: tableColumnWidth * 4
-=======
-    property int tableColumnWidth: 100
-    property int totalDataWidth: tableColumnWidth * 3
->>>>>>> 86bae8a0caace3a2a2ddebbe7da4d0542c9cc253
 
 	VBusItem { id: motorDrivePowerItem; bind: Utils.path(systemPrefix, "/Dc/MotorDrive/Power") }
 
@@ -76,12 +71,9 @@ MbPage
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Name") }
-<<<<<<< HEAD
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Direction") }
-=======
->>>>>>> 86bae8a0caace3a2a2ddebbe7da4d0542c9cc253
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Power") }
@@ -115,10 +107,7 @@ MbPage
             tableColumnWidth: root.tableColumnWidth
             rowTitleWidth: root.rowTitleWidth
             width: theTable.width
-<<<<<<< HEAD
 			showDirection: true
-=======
->>>>>>> 86bae8a0caace3a2a2ddebbe7da4d0542c9cc253
             showTemperature: true
             showRpm: true
             Connections
@@ -144,11 +133,7 @@ MbPage
     {
         switch (service.type)
         {
-<<<<<<< HEAD
         case DBusService.DBUS_SERVICE_MOTOR_DRIVE:
-=======
-        case DBusService.DBUS_SERVICE_ALTERNATOR:
->>>>>>> 86bae8a0caace3a2a2ddebbe7da4d0542c9cc253
 			dcModel.append ( {serviceName: service.name, serviceType: service.type } )
             break;;
         }
