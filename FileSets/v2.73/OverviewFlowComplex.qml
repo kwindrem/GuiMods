@@ -27,18 +27,18 @@ OverviewPage {
     property int inOutTileWidth: 145
     VBusItem { id: timeToGo;  bind: Utils.path(systemPrefix, "/Dc/Battery/TimeToGo") }
 
-    property int numberOfMultis: 0
-    property int numberOfInverters: 0
-    property string inverterService: ""
+	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
+    property bool isMulti: vebusService.valid
+    property string veDirectInverterService: ""
+    property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
+    
     property bool combineAcLoads: dcCoupled || _combineAcLoads.valid && _combineAcLoads.value === 1
     property variant outputLoad: combineAcLoads ? sys.acLoad : sys.acOutLoad
-
-    property bool isMulti: numberOfMultis === 1
 
 	// for debug, ignore validity checks so all tiles and their flow lines will show
     property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
-    property bool showInverter: isMulti || numberOfInverters === 1 || showAllTiles
+    property bool showInverter: inverterService != "" || showAllTiles
     property bool showLoadsOnOutput: showInverter || showAllTiles
     property bool showAcInput: isMulti || showPvOnInput || showAllTiles
 	property bool hasLoadsOnInput: showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)
@@ -1336,10 +1336,6 @@ OverviewPage {
             break;;
 
         case DBusService.DBUS_SERVICE_MULTI:
-            numberOfMultis++
-            if (numberOfMultis === 1)
-                inverterService = service.name;
-
 			root.tempServiceName = service.name
 			if (temperatureItem.valid && showBatteryTemp)
 			{
@@ -1348,9 +1344,8 @@ OverviewPage {
 			}
             break;;
         case DBusService.DBUS_SERVICE_INVERTER:
-            numberOfInverters++
-            if (numberOfInverters === 1 && inverterService == "")
-                inverterService = service.name;
+            if (veDirectInverterService == "")
+				veDirectInverterService = service.name;
             break;;
         case DBusService.DBUS_SERVICE_BATTERY:
 			root.tempServiceName = service.name
@@ -1367,10 +1362,8 @@ OverviewPage {
     function discoverServices()
     {
         numberOfTemps = 0
-        numberOfMultis = 0
-        numberOfInverters = 0
         tempsModel.clear()
-        inverterService = ""
+		veDirectInverterService = ""
         for (var i = 0; i < DBusServices.count; i++)
         {
             addService(DBusServices.at(i))

@@ -72,13 +72,13 @@ OverviewPage {
 
     property bool compact: tankTempCount > (pumpButton.pumpEnabled ? 5 : 6)
 
-    property int numberOfMultis: 0
-    property string multiPrefix: ""
-//////// add for VE.Direct inverters
-    property int numberOfInverters: 0
-    property string inverterService: ""
-    property bool isMulti: numberOfMultis === 1
-    property bool isInverter: numberOfMultis === 0 && numberOfInverters === 1
+	property string systemPrefix: "com.victronenergy.system"
+	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
+    property bool isMulti: vebusService.valid
+    property string veDirectInverterService: ""
+    property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
+
+    property bool isInverter: ! isMulti && veDirectInverterService != ""
     property bool hasAcInput: isMulti
     VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
     property bool hasAcOutSystem: _hasAcOutSystem.value === 1
@@ -87,7 +87,6 @@ OverviewPage {
     property bool hasSystemState: _systemState.valid
 
 //////// add for SYSTEM tile and voltage, power and frequency values
-    property string systemPrefix: "com.victronenergy.system"
     property VBusItem _systemState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State") }
 //////// add for PV CHARGER voltage and current
     property string pvChargerPrefix: ""
@@ -768,10 +767,6 @@ OverviewPage {
             tempsModel.append({serviceName: service.name})
             break;;
         case DBusService.DBUS_SERVICE_MULTI:
-            numberOfMultis++
-            if (numberOfMultis === 1)
-                inverterService = service.name;
-
 			root.tempServiceName = service.name
 			if (temperatureItem.valid)
 			{
@@ -781,9 +776,8 @@ OverviewPage {
             break;;
 //////// add for VE.Direct inverters
         case DBusService.DBUS_SERVICE_INVERTER:
-            numberOfInverters++
-            if (numberOfInverters === 1 && inverterService == "")
-                inverterService = service.name;
+            if (veDirectInverterService == "")
+				veDirectInverterService = service.name;
             break;;
 
 //////// add for PV CHARGER voltage and current display
@@ -809,9 +803,7 @@ OverviewPage {
     {
         numberOfTemps = 0
         numberOfPvChargers = 0
-        numberOfMultis = 0
-        numberOfInverters = 0
-        inverterService = ""
+		veDirectInverterService = ""
         tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))

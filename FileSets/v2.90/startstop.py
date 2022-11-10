@@ -1156,7 +1156,7 @@ class StartStop(object):
 		# dbus and settings updates trigger time-intensive processing so only do this once every 60 seconds
 		doUpdate = False
 		if internalRun:
-			if mtime - self._last_update_mtime >= 10:   #### change to 60 after debug
+			if mtime - self._last_update_mtime >= 60:
 				doUpdate = True
 				self._last_update_mtime = mtime
 		# it is also done one last time when state is no longer RUNNING

@@ -267,6 +267,7 @@ MbPage
 		case DBusService.DBUS_SERVICE_ALTERNATOR:
 		case DBusService.DBUS_SERVICE_AC_CHARGER:
         case DBusService.DBUS_SERVICE_FUELCELL:
+        case DBusService.DBUS_SERVICE_MOTOR_DRIVE:
 			// skip if tile present in flow (flow == DC Coupled)
 			if (flowOverview != 2)
 				otherModel.append ( {serviceName: service.name, serviceType: service.type } )

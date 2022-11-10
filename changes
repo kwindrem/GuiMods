@@ -1,3 +1,17 @@
+<<<<<<< Updated upstream
+=======
+v7.1:
+	removed Motor drive from DC system detail
+	fixed: alternator power shown instead of motor drive power on motor drive detail
+	added: power direction on motor drive detail
+	show AC Input tile even if more than one Multi/Quatro is present
+
+v7.0:
+	added motor drive
+	average calculated DC System power to minimize wild swings in displayed value
+	fixed: CANbus PV charger names not showing up in flow overview tile
+
+>>>>>>> Stashed changes
 v6.19:
 	added support for Venus OS v3.00~4
 	fixed: Inverter detail not showing inverter power (always 0)

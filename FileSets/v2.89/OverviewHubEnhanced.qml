@@ -24,8 +24,13 @@ OverviewPage {
 	id: root
 
     property variant sys: theSystem
-    property bool isMulti: numberOfMultis === 1
-    property bool hasInverter: isMulti || numberOfInverters === 1
+
+	property string systemPrefix: "com.victronenergy.system"
+	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
+    property bool isMulti: vebusService.valid
+    property string veDirectInverterService: ""
+    property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
+    
     property bool hasAcInput: isMulti || showAllTiles
     property bool hasAcOutSystem: _hasAcOutSystem.value === 1
     property bool hasDcSystem: hasDcSys.value > 0 || showAllTiles
@@ -72,11 +77,6 @@ OverviewPage {
     property string pvInverterPrefix2: ""
     property string pvInverterPrefix3: ""
     property int numberOfPvInverters: 0
-
-    property int numberOfMultis: 0
-//////// add for VE.Direct inverters
-    property int numberOfInverters: 0
-    property string inverterService: ""
 
 //////// added for control show/hide gauges, tanks and temps from menus
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
@@ -1097,10 +1097,6 @@ OverviewPage {
             tempsModel.append({serviceName: service.name})
             break;;
         case DBusService.DBUS_SERVICE_MULTI:
-            numberOfMultis++
-            if (numberOfMultis === 1)
-                inverterService = service.name;
-
 			root.tempServiceName = service.name
 			if (temperatureItem.valid && showBatteryTemp)
 			{
@@ -1110,9 +1106,8 @@ OverviewPage {
             break;;
 //////// add for VE.Direct inverters
         case DBusService.DBUS_SERVICE_INVERTER:
-            numberOfInverters++
-            if (numberOfInverters === 1 && inverterService == "")
-                inverterService = service.name;
+            if (veDirectInverterService == "")
+				veDirectInverterService = service.name;
             break;;
 
 //////// add for PV CHARGER voltage and current display
@@ -1161,9 +1156,7 @@ OverviewPage {
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfPvInverters = 0
-        numberOfMultis = 0
-        numberOfInverters = 0
-        inverterService = ""
+		veDirectInverterService = ""
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
         pvChargerPrefix3 = ""
