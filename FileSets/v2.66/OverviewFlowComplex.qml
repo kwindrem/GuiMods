@@ -56,6 +56,9 @@ OverviewPage {
 	property bool hasAcCharger: sys.acCharger != undefined && sys.acCharger.power.valid
     property bool showAcCharger: (dcCoupled  || !hasPvOnInput) && hasAcCharger
 
+	VBusItem { id: motorDrivePowerItem; bind: Utils.path(systemPrefix, "/Dc/MotorDrive/Power") }
+    property bool showMotorDrive: (dcCoupled || !hasLoadsOnInput) && ! showAlternator && motorDrivePowerItem.valid
+
     property int bottomOffset: showTanksTemps ? 45 : 5
     property int topOffset: showTanksTemps ? 1 : 5
     property string settingsBindPreffix: "com.victronenergy.settings"
@@ -104,6 +107,7 @@ OverviewPage {
 	property double pvChargerFlow: showPvCharger ? noNoise (sys.pvCharger.power) : 0
 	property double dcSystemFlow: showDcSystem ? -noNoise (sys.dcSystem.power) : 0
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
+	property double motorDriveFlow: showMotorDrive ? noNoise (motorDrivePowerItem) : 0
 	property double inverterDcFlow: showInverter ? noNoise (sys.vebusDc.power) : 0
 	property double batteryFlow: noNoise (sys.battery.power)
 	property double windGenFlow: noNoise (sys.windGenerator.power)
@@ -610,6 +614,50 @@ OverviewPage {
 		DetailTarget { id: alternatorTarget; detailsPage: "DetailAlternator.qml" }
     }
 
+    OverviewBox
+    {
+        id: motorDriveBox
+ 		title: qsTr ("Motor Drive") 
+		color: "#157894"
+		titleColor: "#419FB9"
+		height: inOutTileHeight
+		width: inOutTileWidth
+        opacity: showMotorDrive ? 1 : disabledTileOpacity
+		visible: showMotorDrive
+		anchors
+		{
+            left: root.left; leftMargin: 5
+            bottom: dcSystemBox.top; bottomMargin: 5
+        }
+		values: TileText {
+            text: EnhFmt.formatVBusItem (motorDrivePowerItem)
+            font.pixelSize: 17
+            visible: showMotorDrive
+            anchors
+            {
+                bottom: parent.bottom; bottomMargin: 0
+                horizontalCenter: parent.horizontalCenter
+            }
+        }
+        PowerGauge
+        {
+            id: motorDriveGauge
+            width: parent.width
+            height: 10
+            anchors
+            {
+                top: parent.top; topMargin: 20
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: motorDrivePowerItem
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxMotorDriveLoad"
+            maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxMotorDriveCharge"
+            show: showGauges && showMotorDrive
+            showLabels: true
+        }
+		DetailTarget { id: motorDriveTarget; detailsPage: "DetailMotorDrive.qml" }
+    }
+
     VBusItem { id: dcSystemNameItem; bind: Utils.path(settingsPrefix, "/Settings/GuiMods/CustomDcSystemName") }
 
     OverviewBox {
@@ -994,8 +1042,8 @@ OverviewPage {
 		id: dcBus1
 		ballCount: 1
 		path: straight
-		active: root.active && ((showAlternator || showDcSystem) || (dcCoupled && showInactiveFlow))
-		value: -Utils.sign (alternatorFlow + dcSystemFlow)
+		active: root.active && ((showAlternator || showMotorDrive || showDcSystem) || (dcCoupled && showInactiveFlow))
+		value: -Utils.sign (alternatorFlow + motorDriveFlow + dcSystemFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1010,8 +1058,8 @@ OverviewPage {
 		id: dcBus2
 		ballCount: 1
 		path: straight
-		active: root.active && ((showAlternator || showAcCharger || showDcSystem) || (dcCoupled && showInactiveFlow))
-		value: Utils.sign (alternatorFlow + dcSystemFlow + acChargerFlow)
+		active: root.active && ((showAlternator || showMotorDrive || showAcCharger || showDcSystem) || (dcCoupled && showInactiveFlow))
+		value: Utils.sign (alternatorFlow + motorDriveFlow + dcSystemFlow + acChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1126,8 +1174,8 @@ OverviewPage {
 		id: alternatorConnection
 		ballCount: 1
 		path: straight
-		active: root.active && (showAlternator || (dcCoupled && showInactiveFlow))
-		value: Utils.sign (alternatorFlow)
+		active: root.active && (showAlternator || showMotorDrive || (dcCoupled && showInactiveFlow))
+		value: Utils.sign (alternatorFlow + motorDriveFlow)
 		startPointVisible: true
 		endPointVisible: false
         anchors
@@ -1412,7 +1460,7 @@ OverviewPage {
 	property variant targetList:
 	[
 		acInputTarget, pvOnInputTarget, acLoadsOnInputTarget,
-		acChargerTarget, alternatorTarget, dcSystemTarget,
+		acChargerTarget, alternatorTarget, motorDriveTarget, dcSystemTarget,
 		multiTarget, batteryTarget,
 		acLoadsOnOutputTarget, pvOnOutputTarget, fuelCellTarget, windGenTarget, pvChargerTarget 
 	]

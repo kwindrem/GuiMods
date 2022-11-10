@@ -21,6 +21,9 @@ Row {
 	property bool showRpm: false
 	property bool showVoltage: false
 	property bool showCurrent: false
+	property string speedParam: "/Speed"
+	property string temperatureParam: "/Dc/0/Temperature"
+
 
     Component.onCompleted:
     {
@@ -43,6 +46,12 @@ Row {
 			useMonitorMode = true
 			positivePowerIsConsuming = true
 		}
+		else if (serviceType == DBusService.DBUS_SERVICE_MOTOR_DRIVE)
+		{
+			positivePowerIsConsuming = true
+			speedParam = "/Motor/RPM"
+			temperatureParam = "/Motor/Temperature"
+		}
 	}
 
     // uses the same sizes as DetailsDcSystem page
@@ -58,8 +67,8 @@ Row {
 	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/0/Voltage") }
 	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/0/Current") }
 	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, "/Dc/0/Temperature") }
-	VBusItem { id: stateItem; bind: Utils.path (serviceName, "/State") }
-	VBusItem { id: rpmItem; bind: Utils.path (serviceName, "/Speed") }
+	VBusItem { id: stateItem; bind: Utils.path (serviceName, temperatureParam) }
+	VBusItem { id: rpmItem; bind: Utils.path (serviceName, speedParam) }
 
 	// use system temperature scale if it exists (v2.90 onward) - otherwise use the GuiMods version
     property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }

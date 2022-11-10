@@ -240,5 +240,31 @@ MbPage {
             show: showGauges.checked
             writeAccessLevel: User.AccessInstaller
         }
+        MbEditBox
+        {
+            description: qsTr ("Max Motor Drive load power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxMotorDriveLoad")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
+        MbEditBox
+        {
+            description: qsTr ("Max Motor Drive charge power")
+            maximumLength: 6
+            item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/MaxMotorDriveCharge")
+            matchString: "0123456789"
+            numericOnlyLayout: true
+            overwriteMode: false
+            unit: "W"
+            enableSpaceBar: true
+            show: showGauges.checked
+            writeAccessLevel: User.AccessInstaller
+        }
     }
 }
