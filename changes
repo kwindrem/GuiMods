@@ -1,3 +1,6 @@
+v7.2:
+	add support for v3.00~7
+
 v7.1:
 	removed Motor drive from DC system detail
 	fixed: alternator power shown instead of motor drive power on motor drive detail
