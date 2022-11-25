@@ -177,7 +177,7 @@ MbPage {
         }
         MbEditBox
         {
-            description: qsTr ("Max DC load power")
+            description: qsTr ("Max DC System load power")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/DcSystemMaxLoad")
             matchString: "0123456789"
@@ -190,7 +190,7 @@ MbPage {
         }
         MbEditBox
         {
-            description: qsTr ("Max DC charger power")
+            description: qsTr ("Max DC System charger power")
             maximumLength: 6
             item.bind: Utils.path (bindPrefixGuiMods, "/GaugeLimits/DcSystemMaxCharge")
             matchString: "0123456789"

@@ -48,6 +48,11 @@ Tile {
 			return qsTr("CO2 alarm")
 		case 9:
 			return qsTr("Generator")
+		case 10:
+			return qsTr("Generic I/O")
+//// added for ExtTransferSwitch package
+		case 11:
+			return qsTr("Ext transfer switch")
 		default:
 			return "Unknown"
 		}
@@ -81,6 +86,11 @@ Tile {
 			return qsTr("Running")
 		case 11:
 			return qsTr("Stopped")
+//// added for ExtTransferSwitch package
+		case 12:
+			return qsTr("Generator In")
+		case 13:
+			return qsTr("Grid In")
 		default:
 			return qsTr("Unknown")
 		}
