@@ -52,7 +52,7 @@ Tile {
 			return qsTr("Generic I/O")
 //// added for ExtTransferSwitch package
 		case 11:
-			return qsTr("Ext transfer switch")
+			return qsTr("Transfer switch")
 		default:
 			return "Unknown"
 		}
@@ -88,9 +88,9 @@ Tile {
 			return qsTr("Stopped")
 //// added for ExtTransferSwitch package
 		case 12:
-			return qsTr("Generator In")
+			return qsTr("On Generator")
 		case 13:
-			return qsTr("Grid In")
+			return qsTr("On Grid")
 		default:
 			return qsTr("Unknown")
 		}
