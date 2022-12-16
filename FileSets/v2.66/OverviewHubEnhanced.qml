@@ -31,8 +31,8 @@ OverviewPage {
     property string veDirectInverterService: ""
     property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
     
-    property bool hasAcInput: isMulti || showAllTiles
-    property bool showAcLoads: isMulti || (veDirectInverterService != "" && veDirectInverterService.valid)
+    property bool showAcInput: isMulti || showAllTiles
+    property bool showAcLoads: isMulti || veDirectInverterService != ""
     property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
     property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
     property bool hasDcSystem: hasDcSys.value > 0 || showAllTiles
@@ -162,8 +162,8 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
-        opacity: hasAcInput ? 1 : disabledTileOpacity
-        visible: hasAcInput || showInactiveTiles
+        opacity: showAcInput ? 1 : disabledTileOpacity
+        visible: showAcInput || showInactiveTiles
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title:
@@ -219,7 +219,7 @@ OverviewPage {
 			useInputCurrentLimit: true
             maxForwardPowerParameter: ""
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
-            show: showGauges && hasAcInput
+            show: showGauges && showAcInput
         }
 		DetailTarget { id: acInputTarget; detailsPage: "DetailAcInput.qml" }
 	}
@@ -855,7 +855,7 @@ OverviewPage {
 
 	OverviewConnection {
 		id: acInToMulti
-        visible: hasAcInput
+        visible: showAcInput
 		ballCount: 2
 		path: straight
 		active: root.active

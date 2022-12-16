@@ -1,3 +1,6 @@
+v7.7:
+	fixed: AC load tile not showing for VE.Direct inverter
+
 v7.5/7.6:
 	fixed: DC System not always hidden
 	fixed: GuiMods Simple flow - AC out not displayed if all loads are on the input
