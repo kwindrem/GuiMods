@@ -33,6 +33,9 @@ OverviewPage {
     
     property bool hasAcInput: isMulti || showAllTiles
     property bool hasAcOutSystem: _hasAcOutSystem.value === 1
+    property bool showAcLoads: (hasAcOutSystem && isMulti) || (veDirectInverterService != "" && veDirectInverterService.valid)
+    property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
+    property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
     property bool hasDcSystem: hasDcSys.value > 0 || showAllTiles
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid || showAllTiles
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid || showAllTiles
@@ -272,8 +275,8 @@ OverviewPage {
 
 	OverviewBox {
 		id: acLoadBox
-        visible: hasAcOutSystem || showInactiveTiles
-        opacity: hasAcOutSystem ? 1 : disabledTileOpacity
+        visible: showAcLoads || showInactiveTiles
+        opacity: showAcLoads ? 1 : disabledTileOpacity
 		title: qsTr("AC Loads")
 		color: "#27AE60"
 		titleColor: "#2ECC71"
@@ -301,7 +304,7 @@ OverviewPage {
             }
             connection: sys.acLoad
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
-            show: showGauges && hasAcOutSystem
+            show: showGauges && showAcLoads
         }
 		DetailTarget { id: loadsOnOutputTarget;  detailsPage: "DetailLoadsOnOutput.qml" }
 	}
@@ -361,8 +364,8 @@ OverviewPage {
 ////// wider to make room for current
 		width: multi.width + 20
 		height: 45
-        opacity: hasDcSystem ? 1 : disabledTileOpacity
-        visible: hasDcSystem || sys.dcSystem.power.valid || showInactiveTiles
+        opacity: showDcSystem ? 1 : disabledTileOpacity
+        visible: showDcSystem
         title: dcSystemNameItem.valid && dcSystemNameItem.value != "" ? dcSystemNameItem.value : qsTr ("DC System")
 
 		anchors {
@@ -401,7 +404,7 @@ OverviewPage {
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
             showLabels: true
-            show: showGauges && hasDcSystem || sys.dcSystem.power.valid
+            show: showGauges && showDcSystem
 
         }
 		DetailTarget { id: dcSystemTarget;  detailsPage: "DetailDcSystem.qml" }
@@ -409,7 +412,7 @@ OverviewPage {
 
     function dcSystemText ()
     {
-        if (hasDcSystem && sys.dcSystem.power.valid)
+        if (showDcSystem)
         {
             var current = sys.dcSystem.power.value / sys.battery.voltage.value
 			return EnhFmt.formatVBusItem (sys.dcSystem.power) + " " + EnhFmt.formatValue (current, "A")
@@ -870,7 +873,7 @@ OverviewPage {
 		id: multiToAcLoads
 		ballCount: 2
 		path: straight
-        active: root.active && ( hasAcOutSystem || showAllTiles )
+        active: root.active && ( showAcLoads || showAllTiles )
 		value: flow(sys.acLoad.power)
 
 		anchors {
@@ -963,7 +966,7 @@ OverviewPage {
 		id: batteryToDcSystem
 		ballCount: 2
 		path: straight
-        active: root.active && ( hasDcSystem|| showAllTiles )
+        active: root.active && ( hasDcSystem || showAllTiles )
 		value: flow(sys.dcSystem.power)
 
 		anchors {

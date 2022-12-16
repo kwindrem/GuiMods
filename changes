@@ -1,3 +1,9 @@
+v7.5:
+	fixed: DC System not always hidden
+	fixed: GuiMods Simple flow - AC out not displayed if all loads are on the input
+	hide gauge labels if there is nothing displayed in that direction
+		eg if nothing left of zero don't show left label
+
 v7.4:
 	changed transfer switch text
 

@@ -31,16 +31,19 @@ Item {
 	// overload range is 10% of forward to reverse limits
 	property real overload: (maxForwardLimit + maxReverseLimit) * 0.1
 	property real maxForwardDisplayed: maxForwardLimit > 0 ? maxForwardLimit + overload : 0
-	property real maxReverseDisplayed: maxReverseLimit > 0 ? maxReverseDisplayed = maxReverseLimit + overload : 0
+	property real maxReverseDisplayed: maxReverseLimit > 0 ? maxReverseLimit + overload : 0
 	property real totalPowerDisplayed: maxForwardDisplayed + maxReverseDisplayed
 
 	property bool showLabels: false
 	property variant endLabelColor: "white"
-    property real labelOffset: showGauge && showLabels && maxForwardPowerParameter != 0 && maxReversePowerParameter != 0 ? 15 : 0
+    property real labelOffset: 15
+	property real showLeftLabel: showGauge && showLabels && maxReverseLimit != 0
+	property bool showRightLabel: showGauge && showLabels && maxForwardLimit != 0
+	property int labelCount: (showLeftLabel ? 1 : 0) + (showRightLabel ? 1 : 0)
 
 	property bool showGauge: root.connection != undefined && totalPowerDisplayed > 0 && phaseCount > 0
-	property real scaleFactor: showGauge ? (root.width - (labelOffset * 2)) / totalPowerDisplayed : 0
-	property real zeroOffset: showGauge ? maxReverseDisplayed * scaleFactor + labelOffset : 0
+	property real scaleFactor: showGauge ? (root.width - (labelCount * labelOffset)) / totalPowerDisplayed : 0
+	property real zeroOffset: showGauge ? ( maxReverseDisplayed * scaleFactor + (showLeftLabel ? labelOffset : 0 )) : 0
 
     property int barSpacing: phaseCount > 0 ? Math.max (height / (phaseCount + 1), 2) : 0
     property int barHeight: barSpacing < 3 ? barSpacing : barSpacing - 1
@@ -58,7 +61,7 @@ Item {
 	{
 		anchors.fill: leftlabelText
 		color: endLabelBackgroundColor
-        show: labelOffset > 0
+        show: showLeftLabel
 	}
     TileText
     {
@@ -73,14 +76,14 @@ Item {
 			verticalCenterOffset: 1
             left: root.left
         }
-        show: labelOffset > 0
+        show: showLeftLabel
     }
     // right end label
  	Rectangle
 	{
 		anchors.fill: rightLabelText
 		color: endLabelBackgroundColor
-        show: labelOffset > 0
+        show: showRightLabel
 	}
    TileText
     {
@@ -94,7 +97,7 @@ Item {
 			verticalCenter: leftlabelText.verticalCenter
             right: root.right
         }
-        show: leftlabelText.visible
+        show: showRightLabel
     }
     // overload range Left
     Rectangle
@@ -108,7 +111,7 @@ Item {
         anchors
         {
             top: root.top
-            left: root.left; leftMargin: labelOffset
+            left: root.left; leftMargin: showLeftLabel ? labelOffset : 0
         }
     }
     // OK range (both left and right in a single rectangle)
