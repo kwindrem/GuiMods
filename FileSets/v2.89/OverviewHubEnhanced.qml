@@ -32,8 +32,7 @@ OverviewPage {
     property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
     
     property bool hasAcInput: isMulti || showAllTiles
-    property bool hasAcOutSystem: _hasAcOutSystem.value === 1
-    property bool showAcLoads: (hasAcOutSystem && isMulti) || (veDirectInverterService != "" && veDirectInverterService.valid)
+    property bool showAcLoads: isMulti || (veDirectInverterService != "" && veDirectInverterService.valid)
     property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
     property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid || showAllTiles
@@ -154,7 +153,6 @@ OverviewPage {
     VBusItem { id: ignoreAcInput2; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn2") }
     VBusItem { id: acActiveInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
 
-    VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
     VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
     Component.onCompleted: { discoverServices(); showHelp () }
