@@ -56,7 +56,7 @@ Item {
 	{
 		anchors.fill: dischargeText
 		color: endLabelBackgroundColor
-        show: labelOffset > 0
+        visible: labelOffset > 0
 	}
     TileText
     {
@@ -71,14 +71,14 @@ Item {
 			verticalCenterOffset: 1
             left: root.left
         }
-        show: showGauge
+        visible: showGauge
     }
     // charge end label
  	Rectangle
 	{
 		anchors.fill: chargeText
 		color: endLabelBackgroundColor
-        show: labelOffset > 0
+        visible: labelOffset > 0
 	}
     TileText
     {
@@ -92,7 +92,7 @@ Item {
 			verticalCenter: dischargeText.verticalCenter
             right: root.right
         }
-        show: showGauge
+        visible: showGauge
     }
     // discharge overload range (beginning of bar dischargeOverload)
     Rectangle

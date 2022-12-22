@@ -79,7 +79,6 @@ OverviewPage {
     property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
 
     property bool isInverter: ! isMulti && veDirectInverterService != ""
-
     property bool hasAcInput: isMulti
     VBusItem { id: _hasAcOutSystem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasAcOutSystem" }
     property bool hasAcOutSystem: _hasAcOutSystem.value === 1
@@ -221,7 +220,8 @@ OverviewPage {
 			}
 		]
 	} // end Tile STATUS
-	Tile {
+	Tile
+	{
 		title: qsTr("INVERTER")
 		id: inverterTile
 		anchors { left: parent.left; top: statusTile.bottom }
@@ -229,8 +229,6 @@ OverviewPage {
 		height: 62
 		color: "#4789d0"
 
-
-//////// relorder to give priority to errors
 		values: [
 			TileText
 			{
@@ -311,7 +309,7 @@ OverviewPage {
 				id: timeToGoText
 				text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : " "
 				visible: timeToGo.valid
-
+				
 				VBusItem {
 					id: timeToGo
 					bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo")
@@ -346,6 +344,10 @@ OverviewPage {
 	    height: (root.upperTileHeight / 2) - 5
 	    color: "#16a085"
 	    values: [
+			TileText { // spacer
+				font.pixelSize: 6
+				text: ""
+			},
 			TileText {
 				font.pixelSize: 22
 				text: EnhFmt.formatVBusItem (sys.dcSystem.power)
@@ -365,7 +367,7 @@ OverviewPage {
             height: 8
             anchors
             {
-                top: parent.top; topMargin: 20
+                top: parent.top; topMargin: 22
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.dcSystem
@@ -402,7 +404,7 @@ OverviewPage {
                 }
                 visible: showPvVI
             },
-    //////// add =current
+    //////// add current
             TileText {
                 text:
                 {
@@ -494,9 +496,9 @@ OverviewPage {
 				top: parent.top; topMargin: 20
 				horizontalCenter: parent.horizontalCenter
 			}
-			useInputCurrentLimit: true
 			connection: sys.acInput
-			maxForwardPowerParameter: "" // handled internally - uses input current limit and AC input voltage
+			useInputCurrentLimit: true
+			maxForwardPowerParameter: ""
 			maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
 			visible: showGauges && hasAcInput
 		}
@@ -558,7 +560,6 @@ OverviewPage {
         id: scrollTimer
         interval: 15000
         repeat: true
-//////// modified to control compact differently
         running: root.active
     }
 
@@ -829,6 +830,7 @@ OverviewPage {
 
 	VBusItem { id: dmc; bind: Utils.path(inverterService, "/Devices/Dmc/Version") }
 	VBusItem { id: bms; bind: Utils.path(inverterService, "/Devices/Bms/Version") }
+
 
 
 // Details targets

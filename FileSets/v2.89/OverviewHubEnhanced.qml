@@ -218,7 +218,7 @@ OverviewPage {
 			useInputCurrentLimit: true
             maxForwardPowerParameter: ""
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
-            show: showGauges && showAcInput
+            visible: showGauges && showAcInput
         }
 		DetailTarget { id: acInputTarget; detailsPage: "DetailAcInput.qml" }
 	}
@@ -243,7 +243,7 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             inverterService: root.inverterService
-            show: showGauges
+            visible: showGauges
         }
 		DetailTarget { id: multiTarget;  detailsPage: "DetailInverter.qml"; width: 60; height: 60 }
 	}
@@ -267,7 +267,7 @@ OverviewPage {
             top: multi.top; topMargin: 96
             horizontalCenter: multi.horizontalCenter
         }
-        show: wallClock.running
+        visible: wallClock.running
     }
 
 	OverviewBox {
@@ -301,7 +301,7 @@ OverviewPage {
             }
             connection: sys.acLoad
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
-            show: showGauges && showAcLoads
+            visible: showGauges && showAcLoads
         }
 		DetailTarget { id: loadsOnOutputTarget;  detailsPage: "DetailLoadsOnOutput.qml" }
 	}
@@ -321,7 +321,7 @@ OverviewPage {
                 top: parent.top; topMargin: 52
                 horizontalCenter: parent.horizontalCenter
             }
-            show: showGauges
+            visible: showGauges
         }
 
 ////// MODIFIED to show tanks
@@ -401,7 +401,7 @@ OverviewPage {
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
             showLabels: true
-            show: showGauges && showDcSystem
+            visible: showGauges && showDcSystem
 
         }
 		DetailTarget { id: dcSystemTarget;  detailsPage: "DetailDcSystem.qml" }
@@ -746,7 +746,7 @@ OverviewPage {
             }
             connection: sys.pvCharger
 			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
-            show: showGauges && hasDcSolar
+            visible: showGauges && hasDcSolar
         }
 		DetailTarget { id: pvChargerTarget;  detailsPage: "DetailPvCharger.qml" }
 	}
@@ -842,7 +842,7 @@ OverviewPage {
             }
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-            show: showGauges && hasAcSolar && !hasDcAndAcSolar
+            visible: showGauges && hasAcSolar && !hasDcAndAcSolar
         }
 		DetailTarget { id: pvInverterTarget;  detailsPage: "DetailPvInverter.qml" }
     }

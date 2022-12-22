@@ -329,7 +329,7 @@ OverviewPage {
 			useInputCurrentLimit: true
             maxForwardPowerParameter: ""
             maxReversePowerParameter: ""
-            show: showGauges
+            visible: showGauges
         }
 	}
 

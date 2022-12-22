@@ -99,6 +99,7 @@ Tile {
 			width:
 			{
 				if (compact)
+				{
 					// extra space to display % and units
 					if (tankBarFormat == 0)
 						return (root.width - 5) * 0.7

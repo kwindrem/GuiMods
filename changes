@@ -1,3 +1,7 @@
+v7.8:
+	add support for v3.00~14
+	fixed: enhanced generator overview was not shown in versions before v2.73
+
 v7.7:
 	fixed: AC load tile not showing for VE.Direct inverter
 

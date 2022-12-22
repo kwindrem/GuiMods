@@ -142,7 +142,7 @@ OverviewPage
         width: listWidth
         height: listHeight
         orientation: ListView.Horizontal
-        show: numberOfRelaysShown > 0
+        visible: numberOfRelaysShown > 0
         interactive: false
 
         model: relaysModel

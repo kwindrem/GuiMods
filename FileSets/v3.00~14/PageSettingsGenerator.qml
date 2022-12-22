@@ -1,3 +1,5 @@
+//// addd service interval and reset
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -8,7 +10,7 @@ MbPage {
 	property string settingsBindPrefix
 	property string startStopBindPrefix
 
-	model: VisualItemModel {
+	model: VisibleItemModel {
 
 		MbSubMenu {
 			id: conditions
@@ -24,10 +26,12 @@ MbPage {
 
 		MbSpinBox {
 			description: qsTr("Minimum run time")
-			bind: Utils.path(settingsBindPrefix, "/MinimumRuntime")
-			unit: "m"
-			numOfDecimals: 0
-			stepSize: 1
+			item {
+				bind: Utils.path(settingsBindPrefix, "/MinimumRuntime")
+				unit: "m"
+				decimals: 0
+				step: 1
+			}
 		}
 
 		MbSwitch {
@@ -110,6 +114,8 @@ MbPage {
 				bind: Utils.path(settingsBindPrefix, "/AccumulatedTotal")
 				text: Math.round(item.value / 60 / 60)
 			}
+//// added to avoid full keyboard
+            numericOnlyLayout: true
 			matchString: "0123456789"
 			maximumLength: 6
 			ignoreChars: "h"
@@ -122,6 +128,43 @@ MbPage {
 			Keys.onSpacePressed: {
 				if (!enabled)
 					toast.createToast(qsTr("It is not possible to modify the counters while the generator is running"))
+			}
+		}
+
+//// addd service interval and reset
+		MbEditBox
+		{
+			id: serviceInterval
+			description: qsTr("Generator service interval (hours)")
+			item {
+				bind: Utils.path(settingsBindPrefix, "/ServiceInterval")
+				text: Math.round(item.value / 60 / 60)
+			}
+            numericOnlyLayout: true
+			matchString: "0123456789"
+			maximumLength: 6
+			ignoreChars: "h"
+
+			function editTextToValue() {
+				return parseInt(_editText, 10)  * 60 * 60
+			}
+		}
+		MbOK
+		{
+			description: qsTr("Reset service timer")
+			value: qsTr("Press to reset")
+			show: timeSinceService.valid && timeSinceService.value > 0
+			editable: true
+			VBusItem
+			{
+				id: timeSinceService
+				bind: Utils.path(settingsBindPrefix, "/TimeSinceService")
+			}
+
+			function clicked()
+			{
+				timeSinceService.setValue (0)
+				toast.createToast(qsTr("the service timer has been reset to ") + (serviceInterval.item.value / 3600).toFixed (0) + "h")
 			}
 		}
 	}

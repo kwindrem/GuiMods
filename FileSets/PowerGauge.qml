@@ -61,7 +61,7 @@ Item {
 	{
 		anchors.fill: leftlabelText
 		color: endLabelBackgroundColor
-        show: showLeftLabel
+        visible: showLeftLabel
 	}
     TileText
     {
@@ -76,14 +76,14 @@ Item {
 			verticalCenterOffset: 1
             left: root.left
         }
-        show: showLeftLabel
+        visible: showLeftLabel
     }
     // right end label
  	Rectangle
 	{
 		anchors.fill: rightLabelText
 		color: endLabelBackgroundColor
-        show: showRightLabel
+        visible: showRightLabel
 	}
    TileText
     {
@@ -97,7 +97,7 @@ Item {
 			verticalCenter: leftlabelText.verticalCenter
             right: root.right
         }
-        show: showRightLabel
+        visible: showRightLabel
     }
     // overload range Left
     Rectangle

@@ -27,22 +27,20 @@ PageStackWindow {
 	property bool isOverviewPage: pageStack.currentPage && pageStack.currentPage.model === overviewModel;
 	property bool isOfflineFwUpdatePage: pageStack.currentPage && pageStack.currentPage.objectName === "offlineFwUpdatePage";
 
-
 //////// modified for GuiMods pages
-    property string hubOverviewType: theSystem.systemType.valid ?
-                        withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : "unknown"
+	property string hubOverviewType: theSystem.systemType.valid ?
+						withoutGridMeter.value === 1 ? "Hub" : theSystem.systemType.value : "unknown"
     property string currentHubOverview: "OverviewHub.qml"
     property string currentMobileOverview: ""
     property string currentGeneratorOverview: ""
-
 
 	// Keep track of the current view (menu/overview) to show as default next time the
 	// CCGX is restarted
 	onIsOverviewPageChanged: startWithMenu.setValue(isOverviewPage ? 0 : 1)
 
-    // Add the correct OverviewGridParallelEnhanced page
+	// Add the correct OverviewGridParallelEnhanced page
 //////// modified for OverviewHubEnhanced page
-    onHubOverviewTypeChanged: selectHubOverview ()
+	onHubOverviewTypeChanged: selectHubOverview ()
 
     VBusItem
     {
@@ -111,8 +109,14 @@ PageStackWindow {
 
 	VBusItem {
 		id: fischerPandaGenOverview
-		bind: "com.victronenergy.settings/Settings/Services/FischerPandaAutoStartStop"
-		onValueChanged: extraOverview("OverviewGeneratorFp.qml", value === 1)
+		bind: "com.victronenergy.generator.startstop1/AutoStartEnabled"
+		onValueChanged: {
+			extraOverview("OverviewGeneratorFp.qml", value === 1)
+			// Switch to FP overview in case it is the default one
+			if (isOverviewPage) {
+				pageStack.currentPage.currentIndex = getDefaultOverviewIndex()
+			}
+		}
 	}
 	function selectGeneratorOverview ()
 	{
@@ -168,7 +172,7 @@ PageStackWindow {
                 extraOverview (newMobileOverview, true)
             else
                 replaceOverview (currentMobileOverview, newMobileOverview)
-                currentMobileOverview = newMobileOverview
+			currentMobileOverview = newMobileOverview
         }
         else
         {
@@ -196,6 +200,21 @@ PageStackWindow {
         onValueChanged: extraOverview ("OverviewRelays.qml", value === 1)
     }
 
+//////// show/hide the Overview Tanks/Temps/Digital Inputs page
+    VBusItem {
+        id: showOverviewTanksTemps
+        bind: "com.victronenergy.settings/Settings/GuiMods/ShowTanksTempsDigIn"
+        onValueChanged: extraOverview ("OverviewTanksTempsDigInputs.qml", value === 1)
+    }
+
+    VBusItem {
+        id: tanksOverview
+        bind: "com.victronenergy.settings/Settings/Gui/TanksOverview"
+        onValueChanged:{
+            extraOverview("OverviewTanks.qml", value === 1)
+        }
+    }
+
 	VBusItem {
 		id: startWithMenu
 		bind: "com.victronenergy.settings/Settings/Gui/StartWithMenuView"
@@ -212,6 +231,15 @@ PageStackWindow {
 		bind: "com.victronenergy.settings/Settings/Gui/DefaultOverview"
 	}
 
+	VBusItem {
+		id: touchEnabled
+		bind: "com.victronenergy.settings/Settings/Gui/TouchEnabled"
+		onValueChanged: {
+			if (completed)
+				toast.createToast(value ? qsTr("Touch input on") : qsTr("Touch input off"), 3000)
+		}
+	}
+
 	// Note: finding a firmware image on the storage device is error 4 for vrm storage
 	// since it should not be used for logging. That fact is used here to determine if
 	// there is a firmware image.
@@ -222,6 +250,11 @@ PageStackWindow {
 				setTopPage(offlineFwUpdates)
 			}
 		}
+	}
+
+	Connections {
+		target: vePlatform
+		onMouseRejected: toast.createToast(qsTr("Touch input disabled"), 1000)
 	}
 
 	onAlarmChanged: {
@@ -336,9 +369,9 @@ PageStackWindow {
 		}
 	}
 
-    Component.onCompleted: {
-        completed = true
-    }
+	Component.onCompleted: {
+		completed = true
+	}
 
 	ListModel {
 		id: overviewModel
@@ -367,7 +400,7 @@ PageStackWindow {
 	Timer {
 		interval: 2000
 		running: completed && overviewsLoaded && startWithMenu.valid
-        onTriggered:
+		onTriggered:
         {
 //////// modified for OverviewGridParallelEnhanced page
             selectHubOverview ()
@@ -427,19 +460,19 @@ PageStackWindow {
 	}
 
 //////// Modified to append page if oldPage not found
-    function replaceOverview(oldPage, newPage)
-    {
-        for (var i = 0; i < overviewModel.count; i++)
+	function replaceOverview(oldPage, newPage)
+	{
+		for (var i = 0; i < overviewModel.count; i++)
         {      
-            if (overviewModel.get(i).pageSource === oldPage)
+			if (overviewModel.get(i).pageSource === oldPage)
             {         
-                overviewModel.get(i).pageSource = newPage
+				overviewModel.get(i).pageSource = newPage
                 return
             }
         }
         // here if oldPage wasn't found -- append the new page
         overviewModel.append({"pageSource": newPage})
-    }
+	}
 
 	// Central mover for the ball animation on the overviews
 	// Instead of using a timer per line, using a central one
@@ -462,6 +495,9 @@ PageStackWindow {
 	// increment everytime another page wants to be on top.
 	function setTopPage(page)
 	{
+		if (touchEnabled.valid && !touchEnabled.value)
+			return
+
 		if (isNotificationPage || isOverviewPage || isOfflineFwUpdatePage)
 			rootWindow.pageStack.replace(page);
 		else
@@ -492,4 +528,6 @@ PageStackWindow {
 		if (alarm)
 			showPageNotifications()
 	}
+
+	FirmwareUpdate { id: firmwareUpdate }
 }

@@ -63,6 +63,7 @@ OverviewPage {
     property int topOffset: showTanksTemps ? 1 : 5
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
+    property int numberOfTanks: 0
     property int numberOfTemps: 0
 
     property int tankCount: showTanksEnable ? numberOfTanks : 0
