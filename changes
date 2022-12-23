@@ -1,3 +1,6 @@
+v7.9:
+	fixed: white screen for AC and DC coupled flow pages
+
 v7.8:
 	add support for v3.00~14
 	fixed: enhanced generator overview was not shown in versions before v2.73

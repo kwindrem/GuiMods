@@ -199,7 +199,7 @@ OverviewPage {
 			useInputCurrentLimit: true
             maxForwardPowerParameter: ""
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
-            show: showGauges && showAcInput
+            visible: showGauges && showAcInput
         }
 		DetailTarget { id: acInputTarget; detailsPage: "DetailAcInput.qml" }
 	}
@@ -254,7 +254,7 @@ OverviewPage {
             }
             connection: sys.pvOnGrid
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
-            show: showGauges && showPvOnInput
+            visible: showGauges && showPvOnInput
         }
 		DetailTarget { id: pvOnInputTarget; detailsPage: "DetailPvInverter.qml" }
 	}
@@ -291,7 +291,7 @@ OverviewPage {
             }
             connection: sys.acInLoad
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower"
-            show: showGauges && showLoadsOnInput
+            visible: showGauges && showLoadsOnInput
         }
 		DetailTarget { id: acLoadsOnInputTarget; detailsPage: "DetailLoadsOnInput.qml" }
 	}
@@ -331,7 +331,7 @@ OverviewPage {
             }
             connection: outputLoad
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
-            show: showGauges && showLoadsOnOutput
+            visible: showGauges && showLoadsOnOutput
         }
 		DetailTarget { id: acLoadsOnOutputTarget; detailsPage: "DetailLoadsOnOutput.qml" }
 	}
@@ -366,7 +366,7 @@ OverviewPage {
                 horizontalCenter: multi.horizontalCenter
             }
             inverterService: root.inverterService
-            show: showGauges
+            visible: showGauges
         }
 		DetailTarget { id: multiTarget; detailsPage: "DetailInverter.qml"; width: 60; height: 60 }
 	}
@@ -383,7 +383,7 @@ OverviewPage {
             horizontalCenter: multi.horizontalCenter;
             horizontalCenterOffset: -10
         }
-        show: wallClock.running
+        visible: wallClock.running
     }
 
 	Battery {
@@ -407,7 +407,7 @@ OverviewPage {
                 top: parent.top; topMargin: 30
                 horizontalCenter: parent.horizontalCenter
             }
-            show: showGauges
+            visible: showGauges
         }
 		values: Column {
 			y: 0
@@ -523,7 +523,7 @@ OverviewPage {
             }
             connection: sys.pvOnAcOut
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
-            show: showGauges && showPvOnOutput
+            visible: showGauges && showPvOnOutput
         }
 		DetailTarget { id: pvOnOutputTarget; detailsPage: "DetailPvInverter.qml" }
 	}
@@ -566,7 +566,7 @@ OverviewPage {
             connection: sys.acCharger
             reversePower: true
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAcChargerPower"
-            show: showGauges && showAcCharger
+            visible: showGauges && showAcCharger
         }
 		DetailTarget { id: acChargerTarget; detailsPage: "DetailAcCharger.qml" }
     }
@@ -609,7 +609,7 @@ OverviewPage {
             connection: sys.alternator
             reversePower: true
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
-            show: showGauges && showAlternator
+            visible: showGauges && showAlternator
         }
 		DetailTarget { id: alternatorTarget; detailsPage: "DetailAlternator.qml" }
     }
@@ -652,7 +652,7 @@ OverviewPage {
             connection: motorDrivePowerItem
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxMotorDriveLoad"
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxMotorDriveCharge"
-            show: showGauges && showMotorDrive
+            visible: showGauges && showMotorDrive
             showLabels: true
         }
 		DetailTarget { id: motorDriveTarget; detailsPage: "DetailMotorDrive.qml" }
@@ -695,7 +695,7 @@ OverviewPage {
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
             maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
             showLabels: true
-            show: showGauges && showDcSystem
+            visible: showGauges && showDcSystem
         }
 		DetailTarget { id: dcSystemTarget; detailsPage: "DetailDcSystem.qml" }
     }
@@ -735,7 +735,7 @@ OverviewPage {
             }
             connection: sys.fuelCell
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFuelCellPower"
-            show: showGauges && fuelCellBox.visible
+            visible: showGauges && fuelCellBox.visible
         }
 		DetailTarget { id: fuelCellTarget; detailsPage: "DetailFuelCell.qml" }
     }
@@ -775,7 +775,7 @@ OverviewPage {
             }
             connection: sys.windGenerator
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxWindGenPower"
-            show: showGauges && showWindGen
+            visible: showGauges && showWindGen
         }
 		DetailTarget { id: windGenTarget; detailsPage: "DetailWindGen.qml" }
     }
@@ -823,7 +823,7 @@ OverviewPage {
             }
             connection: sys.pvCharger
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
-            show: showGauges && showPvCharger
+            visible: showGauges && showPvCharger
         }
 		DetailTarget { id: pvChargerTarget; detailsPage: "DetailPvCharger.qml" }
 	}
@@ -1442,7 +1442,7 @@ OverviewPage {
         anchors.fill: helpBox
         wrapMode: Text.WordWrap
         font.pixelSize: 12
-        show: helpBox.visible
+        visible: helpBox.visible
     }
 
 	//// hard key handler
