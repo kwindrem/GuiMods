@@ -229,6 +229,8 @@ class StartStop(object):
 		self._dbusservice.add_path('/Alarms/NoGeneratorAtAcIn', value=None)
 		# Autostart
 		self._dbusservice.add_path('/AutoStartEnabled', value=None, writeable=True, onchangecallback=self._set_autostart)
+		# Accumulated runtime
+		self._dbusservice.add_path('/AccumulatedRuntime', value=None)
 
 		# We need to set the values after creating the paths to trigger the 'onValueChanged' event for the gui
 		# otherwise the gui will report the paths as invalid if we remove and recreate the paths without
@@ -247,6 +249,7 @@ class StartStop(object):
 		self._dbusservice['/QuietHours'] = 0
 		self._dbusservice['/Alarms/NoGeneratorAtAcIn'] = 0
 		self._dbusservice['/AutoStartEnabled'] = self._settings['autostart']
+		self._dbusservice['/AccumulatedRuntime'] = int(self._settings['accumulatedtotal'])
 
 #### GENERATOR CONNECTOR - add these paths
 		# generator input running state
@@ -724,7 +727,7 @@ class StartStop(object):
 		seconds = self._dbusservice['/Runtime']
 		accumulated = seconds - self._last_runtime_update
 
-		self._settings['accumulatedtotal'] = accumulatedtotal = int(self._settings['accumulatedtotal']) + accumulated
+		self._settings['accumulatedtotal'] = int(self._settings['accumulatedtotal']) + accumulated
 #### GENERATOR CONNECTOR - add service interval
 		self._settings['timeSinceService'] = int(self._settings['timeSinceService']) + accumulated
 		# Using calendar to get timestamp in UTC, not local time
@@ -751,7 +754,6 @@ class StartStop(object):
 		self._settings['accumulateddaily'] = json.dumps(accumulated_days, sort_keys=True)
 		self._dbusservice['/TodayRuntime'] = self._interval_runtime(0)
 		self._dbusservice['/TestRunIntervalRuntime'] = self._interval_runtime(self._settings['testruninterval'])
-		self._dbusservice['/AccumulatedRuntime'] = accumulatedtotal
 
 	def _interval_runtime(self, days):
 		summ = 0
