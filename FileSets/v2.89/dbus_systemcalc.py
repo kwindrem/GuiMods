@@ -326,11 +326,11 @@ class SystemCalc:
 		for service, instance in self._dbusmonitor.get_service_list().items():
 			self._device_added(service, instance, do_service_change=False)
 
-		self._handleservicechange()
-		self._updatevalues()
-
 #### added for GuiMods
 		self.dcSystemPower = [0, 0, 0]
+
+		self._handleservicechange()
+		self._updatevalues()
 
 		GLib.timeout_add(1000, exit_on_error, self._handletimertick)
 
@@ -794,6 +794,7 @@ class SystemCalc:
 				charger_power = newvalues.get('/Dc/Charger/Power', 0)
 				fuelcell_power = newvalues.get('/Dc/FuelCell/Power', 0)
 				alternator_power = newvalues.get('/Dc/Alternator/Power', 0)
+#### added for GuiMods
 				windgen_power = newvalues.get('/Dc/WindGenerator/Power', 0)
 				motordrive_power = newvalues.get('/Dc/MotorDrive/Power', 0)
 

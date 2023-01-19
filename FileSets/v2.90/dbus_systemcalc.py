@@ -842,6 +842,7 @@ class SystemCalc:
 				charger_power = newvalues.get('/Dc/Charger/Power', 0)
 				fuelcell_power = newvalues.get('/Dc/FuelCell/Power', 0)
 				alternator_power = newvalues.get('/Dc/Alternator/Power', 0)
+#### added for GuiMods
 				windgen_power = newvalues.get('/Dc/WindGenerator/Power', 0)
 				motordrive_power = newvalues.get('/Dc/MotorDrive/Power', 0)
 

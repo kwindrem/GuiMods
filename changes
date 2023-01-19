@@ -1,3 +1,6 @@
+v7.11:
+	fixed: systemcalc crash (no devices shown on GUI)
+
 v7.10:
 	add support for v3.00~15
 
