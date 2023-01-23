@@ -271,6 +271,7 @@ MbPage {
 		MbSubMenu {
 			id: feedinSetupItem
 			description: qsTr("Grid feed-in")
+			show: hub4Mode.value !== hub4Disabled
 			subpage: Component {
 				PageSettingsHub4Feedin {
 					title: feedinSetupItem.description
@@ -301,6 +302,7 @@ MbPage {
 			id: deviceItem
 			description: qsTr("Debug")
 			show: hub4Mode.value !== hub4Disabled && user.accessLevel >= User.AccessService
+			backgroundColor: style.backgroundColorService
 			subpage: Component {
 				PageHub4Debug { }
 			}

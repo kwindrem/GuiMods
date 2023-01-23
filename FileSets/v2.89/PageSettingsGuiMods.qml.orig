@@ -1,195 +1,312 @@
 import QtQuick 1.1
-import Qt.labs.components.native 1.0
 import com.victron.velib 1.0
+import "utils.js" as Utils
 
-MbItem {
-	id: root
-	cornerMark: !readOnly && !spinbox.enabled
+MbPage {
+	property string cgwacsPath: "com.victronenergy.settings/Settings/CGwacs"
+	property string settingsPrefix: "com.victronenergy.settings"
+	property string batteryLifePath: cgwacsPath + "/BatteryLife"
+	// Hub4Mode
+	property int hub4PhaseCompensation: 1
+	property int hub4PhaseSplit: 2
+	property int hub4Disabled: 3
+	// BatteryLifeState
+	property int batteryLifeStateDisabled: 0
+	property int batteryLifeStateRestart: 1
+	property int batteryLifeStateDefault: 2
+	property int batteryLifeStateAbsorption: 3
+	property int batteryLifeStateFloat: 4
+	property int batteryLifeStateDischarged: 5
+	property int batteryLifeStateForceCharge: 6
+	property int batteryLifeStateSustain: 7
+	property int batteryLifeStateLowSocCharge: 8
+	property int batteryKeepCharged: 9
+	property int batterySocGuardDefault: 10
+	property int batterySocGuardDischarged: 11
+	property int batterySocGuardLowSocCharge: 12
 
-	property bool valid: vItem.value !== undefined
-	property alias bind: vItem.bind
-	property string description
-	property double stepSize: 0.5
-	property int numOfDecimals: 1
-	property bool readOnly: !userHasWriteAccess
-	property alias unit: unit.text
-	property alias localValue: spinbox.value
-	property alias value: vItem.value
-	property alias item: vItem
-	property alias min: spinbox.minimumValue
-	property alias max: spinbox.maximumValue
-	property bool hasDefault: vItem.def !== undefined
-	property bool useVirtualKeyboard
-	property variant spinboxToolbarHandler: editMode ? _spinboxToolbarHandler : navigationHandler
-	default property alias values: container.data
+	property VBusItem systemType: VBusItem { bind: "com.victronenergy.system/SystemType" }
+	property VBusItem gridSetpoint: VBusItem { bind: "com.victronenergy.settings/Settings/CGwacs/AcPowerSetPoint" }
+	property VBusItem maxChargePowerItem: VBusItem { bind: Utils.path(cgwacsPath, "/MaxChargePower") }
+	property VBusItem maxDischargePowerItem: VBusItem { bind: Utils.path(cgwacsPath, "/MaxDischargePower") }
+	property VBusItem socLimitItem: VBusItem { bind: Utils.path(batteryLifePath, "/SocLimit") }
+	property VBusItem minSocLimitItem: VBusItem { bind: Utils.path(batteryLifePath, "/MinimumSocLimit") }
+	property VBusItem stateItem: VBusItem { bind: Utils.path(batteryLifePath, "/State") }
+	property VBusItem hub4Mode: VBusItem { bind: Utils.path(cgwacsPath, "/Hub4Mode") }
+	property VBusItem maxChargeCurrentControl: VBusItem { bind: "com.victronenergy.system/Control/MaxChargeCurrent" }
 
-	editMode: spinbox.enabled
-	height: keyboard.y + keyboard.height + 1
-	toolbarHandler: spinboxToolbarHandler
+	title: systemType.value === "Hub-4" ? systemType.value : qsTr("ESS")
+	model: systemType.value === "ESS" || systemType.value === "Hub-4" ? hub4Settings : noHub4
 
-	ToolbarHandler {
-		id: _spinboxToolbarHandler
-		property string leftIcon: "icon-toolbar-cancel"
-		property string rightIcon: hasDefault ? "" : "icon-toolbar-ok"
-		property string rightText: hasDefault ? qsTr("Default") : ""
+	VisualItemModel {
+		id: noHub4
 
-		function leftAction()
-		{
-			cancel()
-		}
-
-		function rightAction()
-		{
-			save()
+		MbItemText {
+			text: qsTr("No ESS Assistant found")
 		}
 	}
 
-	signal exitEditMode(bool changed, variant newValue)
-	signal maxValueReached()
-	signal minValueReached()
-
-	VBusItem {
-		id: vItem
-		isSetting: true
+	function isBatteryLifeActive(state) {
+		switch (state) {
+		case batteryLifeStateRestart:
+		case batteryLifeStateDefault:
+		case batteryLifeStateAbsorption:
+		case batteryLifeStateFloat:
+		case batteryLifeStateDischarged:
+		case batteryLifeStateForceCharge:
+		case batteryLifeStateSustain:
+		case batteryLifeStateLowSocCharge:
+			return true
+		default:
+			return false
+		}
 	}
 
-	Item {
-		id: verticalCentered
-		height: root.defaultHeight
-		width: root.width
-
-		MbTextDescription {
-			id: name
-			anchors {
-				left: parent.left; leftMargin: style.marginDefault
-				verticalCenter: parent.verticalCenter
-			}
-
-			isCurrentItem: root.ListView.isCurrentItem
-			text: root.description
-			opacity: valid ? style.opacityEnabled : style.opacityDisabled
+	function isBatterySocGuardActive(state) {
+		switch (state) {
+		case batterySocGuardDefault:
+		case batterySocGuardDischarged:
+		case batterySocGuardLowSocCharge:
+			return true
+		default:
+			return false
 		}
+	}
 
-		Item {
-			id: container
-			width: childrenRect.width
-			height: childrenRect.height
-			anchors {
-				right: graytag.left; rightMargin: style.marginDefault
-				verticalCenter: parent.verticalCenter
-			}
-		}
+	VisualItemModel {
+		id: hub4Settings
 
-		MbBackgroundRect {
-			id: graytag
-			color: !spinbox.enabled? "#ddd": "#fff"
-			height: spinbox.height + 6
-			width:  spinbox.width  + unit.width + 10
-			border.color: "#ddd"
-			border.width: spinbox.enabled ? 1 : 0
-			anchors {
-				right: parent.right; rightMargin: style.marginDefault
-				verticalCenter: parent.verticalCenter
-			}
-		}
-
-		MbTextValue {
-			id: unit
-			item.invalidText: ""
-			anchors {
-				right: parent.right; rightMargin: style.marginDefault + 5
-				verticalCenter: spinbox.verticalCenter
-			}
-		}
-
-		SpinBox {
-			id: spinbox
-
-			color: style.color2
-			font.pixelSize: name.font.pixelSize
-			font.family: name.font.family
-			font.bold: false
-			minimumValue: vItem.min === undefined ? 0 : vItem.min
-			maximumValue: vItem.max === undefined ? 100 : vItem.max
-			stepSize: root.stepSize
-			enabled: false
-			greyed: valid
-			numOfDecimals: root.numOfDecimals
-			anchors {
-				right: unit.left
-				verticalCenter: parent.verticalCenter
+		MbItemOptions {
+			function getLocalValue(hub4Mode, state) {
+				if (hub4Mode === undefined || state === undefined)
+					return undefined
+				if (hub4Mode === hub4Disabled)
+					return 3
+				if (isBatteryLifeActive(state))
+					return 0
+				if (isBatterySocGuardActive(state))
+					return 1
+				if (state === batteryKeepCharged)
+					return 2
+				return 0
 			}
 
-			/* note: these functions break binding hence the Binding item below */
-			Keys.onRightPressed: { if (value === maximumValue) maxValueReached(); spinbox.up(event.isAutoRepeat); }
-			Keys.onLeftPressed: { if (value === minimumValue) minValueReached(); spinbox.down(event.isAutoRepeat); }
-			Keys.onUpPressed: { if (value === maximumValue) maxValueReached(); spinbox.up(event.isAutoRepeat); }
-			Keys.onDownPressed: { if (value === minimumValue) minValueReached(); spinbox.down(event.isAutoRepeat); }
-
-			/* Focus is removed to ignore keypresses */
-			Keys.onSpacePressed: save(false)
-
-			Keys.onReturnPressed: {
-				if (hasDefault) {
-					value = vItem.defaultValue
-				} else {
-					save(false)
+			description: qsTr("Mode")
+			localValue: getLocalValue(hub4Mode.value, stateItem.value)
+			possibleValues:[
+				MbOption { description: qsTr("Optimized (with BatteryLife)"); value: 0 },
+				MbOption { description: qsTr("Optimized (without BatteryLife)"); value: 1 },
+				MbOption { description: qsTr("Keep batteries charged"); value: 2 },
+				MbOption { description: qsTr("External control"); value: 3 }
+			]
+			onLocalValueChanged: {
+				if (localValue === undefined)
+					return
+				// Hub 4 mode
+				if (localValue === 3 && hub4Mode.value !== hub4Disabled) {
+					hub4Mode.setValue(hub4Disabled)
+				} else if (localValue !== 3 && hub4Mode.value === hub4Disabled) {
+					hub4Mode.setValue(hub4PhaseCompensation)
+				}
+				// BatteryLife state
+				switch (localValue) {
+				case 0:
+					if (!isBatteryLifeActive(stateItem.value))
+						stateItem.setValue(batteryLifeStateRestart)
+					break
+				case 1:
+					if (!isBatterySocGuardActive(stateItem.value))
+						stateItem.setValue(batterySocGuardDefault)
+					break
+				case 2:
+					stateItem.setValue(batteryKeepCharged)
+					break
+				case 3:
+					stateItem.setValue(batteryLifeStateDisabled)
+					break
 				}
 			}
-
-			Keys.onEscapePressed: cancel()
 		}
 
-		MouseArea {
-			anchors {
-				fill: spinbox
-				leftMargin: -20
-				rightMargin: -20
+		MbItemOptions {
+			id: withoutGridMeter
+			description: qsTr("Grid metering")
+			bind: Utils.path(cgwacsPath, '/RunWithoutGridMeter')
+			show: hub4Mode.value !== hub4Disabled
+			enabled: userHasWriteAccess
+			possibleValues:[
+				MbOption { description: qsTr("External meter"); value: 0 },
+				MbOption { description: qsTr("Inverter/Charger"); value: 1 }
+			]
+		}
+
+		MbSwitch {
+			bind: Utils.path(settingsPrefix, "/Settings/SystemSetup/HasAcOutSystem")
+			name: qsTr("Inverter AC output in use")
+			show: withoutGridMeter.value == 0
+		}
+
+
+		MbItemOptions {
+			description: qsTr("Multiphase regulation")
+			bind: hub4Mode.bind
+			show: hub4Mode.value !== hub4Disabled && stateItem.value !== batteryKeepCharged
+			enabled: userHasWriteAccess
+			possibleValues:[
+				MbOption { description: qsTr("Total of all phases"); value: hub4PhaseCompensation },
+				MbOption { description: qsTr("Individual phase"); value: hub4PhaseSplit }
+			]
+			onOptionSelected: {
+				if (newValue === hub4PhaseSplit) {
+					toast.createToast(qsTr("Each phase is regulated to individually achieve the grid setpoint (system efficiency is decreased).\n\n" +
+					"CAUTION: Use only if required by the utility provider"), 15000);
+				} else if (newValue === hub4PhaseCompensation) {
+					toast.createToast(qsTr("The total of all phases is intelligently regulated to achieve the grid setpoint (system efficiency is optimised).\n\n" +
+					"Use unless prohibited by the utility provider"), 15000);
+				}
 			}
-
-			onPressed: handleMouseClick(true)
 		}
-	}
 
-	Keyboard {
-		id: keyboard
-		anchors.top: verticalCentered.bottom
-		anchors.topMargin: -1
-		width: root.width
-		active: spinbox.enabled && useVirtualKeyboard
-		layout: "KeyboardLoaderPlusMin.qml"
-		onAnimatingChanged: listview.positionViewAtIndex(currentIndex, ListView.Contain)
-	}
-
-	/* binding is done explicitly to reenable binding after edit */
-	Binding {
-		target: spinbox
-		property: "value"
-		value: vItem.value
-		when: valid && !spinbox.enabled
-	}
-
-	function edit(isMouse)
-	{
-		if (valid && !readOnly)
-		{
-			useVirtualKeyboard = isMouse === true
-			spinbox.enabled = true
-			spinbox.focus = true
+		MbSpinBox {
+			id: minSocLimit
+			description: qsTr("Minimum SOC (unless grid fails)")
+			enabled: userHasWriteAccess
+			show: hub4Mode.value !== hub4Disabled && stateItem.value !== batteryKeepCharged
+			bind: Utils.path(batteryLifePath, "/MinimumSocLimit")
+			numOfDecimals: 0
+			unit: "%"
+			min: 0
+			max: 100
+			stepSize: 5
 		}
-	}
 
-	function save() {
-		var newValue = spinbox.value
-		vItem.setValue(spinbox.value)
-		focus = true;
-		spinbox.enabled = false
-		exitEditMode(true, newValue)
-	}
+		MbItemValue {
+			id: socLimit
+			description: qsTr("Active SOC limit")
+			show: hub4Mode.value !== hub4Disabled && isBatteryLifeActive(stateItem.value)
+			item.value: Math.max(minSocLimitItem.value, socLimitItem.value)
+			item.unit: '%'
+		}
 
-	function cancel() {
-		focus = true
-		spinbox.enabled = false
-		exitEditMode(false, undefined)
+		MbItemOptions {
+			description: qsTr("BatteryLife state")
+			value: stateItem.value
+			readonly: true
+			show: hub4Mode.value !== hub4Disabled && isBatteryLifeActive(stateItem.value)
+			possibleValues:[
+				// Values below taken from MaintenanceState enum in dbus-cgwacs
+				MbOption { description: qsTr("Self-consumption"); value: 2 },
+				MbOption { description: qsTr("Self-consumption"); value: 3 },
+				MbOption { description: qsTr("Self-consumption"); value: 4 },
+				MbOption { description: qsTr("Discharge disabled"); value: 5 },
+				MbOption { description: qsTr("Slow charge"); value: 6 },
+				MbOption { description: qsTr("Sustain"); value: 7 },
+				MbOption { description: qsTr("Recharge"); value: 8 }
+			]
+		}
+
+		MbSwitch {
+			id: maxChargePowerSwitch
+			name: qsTr("Limit charge power")
+			checked: maxChargePowerItem.value >= 0
+			enabled: userHasWriteAccess
+			show: hub4Mode.value !== hub4Disabled && !(maxChargeCurrentControl.valid && maxChargeCurrentControl.value)
+			onCheckedChanged: {
+				if (checked && maxChargePowerItem.value < 0)
+					maxChargePowerItem.setValue(1000)
+				else if (!checked && maxChargePowerItem.value >= 0)
+					maxChargePowerItem.setValue(-1)
+			}
+		}
+
+		MbSpinBox {
+			id: maxChargePower
+			description: qsTr("Maximum charge power")
+			enabled: userHasWriteAccess
+			show: maxChargePowerSwitch.show && maxChargePowerSwitch.checked
+			bind: Utils.path(cgwacsPath, "/MaxChargePower")
+			numOfDecimals: 0
+			unit: "W"
+			min: 0
+			max: 200000
+			stepSize: 50
+		}
+
+		MbSwitch {
+			id: maxInverterPowerSwitch
+			name: qsTr("Limit inverter power")
+			checked: maxDischargePowerItem.value >= 0
+			enabled: userHasWriteAccess
+			show: hub4Mode.value !== hub4Disabled && stateItem.value !== batteryKeepCharged
+			onCheckedChanged: {
+				if (checked && maxDischargePowerItem.value < 0)
+					maxDischargePowerItem.setValue(1000)
+				else if (!checked && maxDischargePowerItem.value >= 0)
+					maxDischargePowerItem.setValue(-1)
+			}
+		}
+
+		MbSpinBox {
+			id: maxDischargePower
+			description: qsTr("Maximum inverter power")
+			enabled: userHasWriteAccess
+			show: maxInverterPowerSwitch.show && maxInverterPowerSwitch.checked
+			bind: Utils.path(cgwacsPath, "/MaxDischargePower")
+			numOfDecimals: 0
+			unit: "W"
+			min: 0
+			max: 300000
+			stepSize: 50
+		}
+
+		MbSpinBox {
+			description: qsTr("Grid setpoint")
+			show: hub4Mode.value !== hub4Disabled && stateItem.value !== batteryKeepCharged
+			enabled: userHasWriteAccess
+			bind: "com.victronenergy.settings/Settings/CGwacs/AcPowerSetPoint"
+			numOfDecimals: 0
+			unit: "W"
+			stepSize: 10
+		}
+
+		MbSubMenu {
+			id: feedinSetupItem
+			description: qsTr("Grid feed-in")
+			show: hub4Mode.value !== hub4Disabled
+			subpage: Component {
+				PageSettingsHub4Feedin {
+					title: feedinSetupItem.description
+				}
+			}
+		}
+
+		MbSubMenu {
+			id: scheduleSettings
+			property string bindPrefix: "com.victronenergy.settings/Settings/CGwacs/BatteryLife/Schedule/Charge/"
+			description: qsTr("Scheduled charging")
+			show: hub4Mode.value !== hub4Disabled && stateItem.value !== batteryKeepCharged
+			subpage: Component {
+				MbPage {
+					title: scheduleSettings.description
+					model: VisualItemModel {
+						ChargeScheduleItem { bindPrefix: scheduleSettings.bindPrefix; scheduleNumber: 0 }
+						ChargeScheduleItem { bindPrefix: scheduleSettings.bindPrefix; scheduleNumber: 1 }
+						ChargeScheduleItem { bindPrefix: scheduleSettings.bindPrefix; scheduleNumber: 2 }
+						ChargeScheduleItem { bindPrefix: scheduleSettings.bindPrefix; scheduleNumber: 3 }
+						ChargeScheduleItem { bindPrefix: scheduleSettings.bindPrefix; scheduleNumber: 4 }
+					}
+				}
+			}
+		}
+
+		MbSubMenu {
+			id: deviceItem
+			description: qsTr("Debug")
+			show: hub4Mode.value !== hub4Disabled && user.accessLevel >= User.AccessService
+			backgroundColor: style.backgroundColorService
+			subpage: Component {
+				PageHub4Debug { }
+			}
+		}
 	}
 }
