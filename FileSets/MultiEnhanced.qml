@@ -7,6 +7,9 @@ import "utils.js" as Utils
 MbIcon {
 	id: multi
 	iconId: "overview-inverter"
+////// GuiMods fix the size since icon scaling sometimes fails and creates the incorrect width (and maybe height)
+		width: 126
+		height: 132.6
 
 	property string systemPrefix: "com.victronenergy.system"
 	property VBusItem systemState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State") }

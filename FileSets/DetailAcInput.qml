@@ -57,15 +57,17 @@ MbPage {
     property real acLimitPreset3: acLimitPreset3Item.valid ? acLimitPreset3Item.value : 0
     property real acLimitPreset4: acLimitPreset4Item.valid ? acLimitPreset4Item.value : 0
 
+	property bool currentLimitIsAdjustable: currentLimitIsAdjustableItem.valid && currentLimitIsAdjustableItem.value == 1  && currentLimitItem.valid
+
     Component.onCompleted: { discoverServices(); getActualCurrent () }
 
-//    VBusItem
-//    {
-//        id: currentLimitIsAdjustable
-//        bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable")
-//        onValueChanged: getActualCurrent ()
-//        onValidChanged: getActualCurrent ()
-//    }
+    VBusItem
+    {
+        id: currentLimitIsAdjustableItem
+        bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimitIsAdjustable")
+        onValueChanged: getActualCurrent ()
+        onValidChanged: getActualCurrent ()
+    }
     VBusItem
     {
         id: currentLimitItem
@@ -101,6 +103,7 @@ MbPage {
         spacing: 5
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        width: parent.width - 6
         Column 
         {
             spacing: 2
@@ -112,6 +115,7 @@ MbPage {
                     width: rowTitleWidth + totalDataWidth
                     height: 15
                     connection: sys.acInput
+					useInputCurrentLimit: true
 					maxForwardPowerParameter: "" // handled internally - uses input current limit and AC input voltage
 					maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
                 }
@@ -241,18 +245,27 @@ MbPage {
         }
         Column
         {
-            Row
-            {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Current Limit") }
-            }
-            width: 140
+			id: currentButtonColumn
+            width: 128
             spacing: 4
 
             Row
             {
-                width: (parent.width / 2) - 4
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: currentButtonColumn.width; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Current Limit") }
+            }
+            Row
+            {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: currentButtonColumn.width; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("is not adjustable")}
+				visible: !currentLimitIsAdjustable
+            }
+            Row
+            {
+				visible: currentLimitIsAdjustable
+                width: (parent.width / 2) - 2
                 spacing: 4
                 DetailButton
                 {
@@ -265,10 +278,10 @@ MbPage {
                     onClicked: setNewValue (acLimitPreset1)
                     enabled: acLimitPreset1 === 0 ? false : true
                     content: TileText
-                            {
-                                text: qsTr(acLimitPreset1 + " A"); font.bold: true;
-                                color: "white"
-                            }
+						{
+							text: qsTr(acLimitPreset1 + " A"); font.bold: true;
+							color: "white"
+						}
                 }
                 DetailButton
                 {
@@ -281,15 +294,16 @@ MbPage {
                     onClicked: setNewValue (acLimitPreset2)
                     enabled: acLimitPreset2 === 0 ? false : true
                     content: TileText
-                            {
-                                text: qsTr(acLimitPreset2 + " A"); font.bold: true;
-                                color: "white"
-                            }
+						{
+							text: qsTr(acLimitPreset2 + " A"); font.bold: true;
+							color: "white"
+						}
                 }
             }
             Row
             {
-                width: (parent.width / 2) - 4
+				visible: currentLimitIsAdjustable
+                width: (parent.width / 2) - 2
                 spacing: 4
                 DetailButton
                 {
@@ -302,13 +316,14 @@ MbPage {
                     onClicked: setNewValue (acLimitPreset3)
                     enabled: acLimitPreset3 === 0 ? false : true
                     content: TileText
-                            {
-                                text: qsTr(acLimitPreset3 + " A"); font.bold: true;
-                                color: "white"
-                            }
+						{
+							text: qsTr(acLimitPreset3 + " A"); font.bold: true;
+							color: "white"
+						}
                 }
                 DetailButton
                 {
+				visible: currentLimitIsAdjustable
                     id: preset4button
                     baseColor: newCurrentLimit === acLimitPreset4 ? "black" : root.buttonColor
                     pressedColor: root.pressedColor
@@ -318,15 +333,16 @@ MbPage {
                     onClicked: setNewValue (acLimitPreset4)
                     enabled: acLimitPreset4 === 0 ? false : true
                     content: TileText
-                            {
-                                text: qsTr(acLimitPreset4 + " A"); font.bold: true;
-                                color: "white"
-                            }
+						{
+							text: qsTr(acLimitPreset4 + " A"); font.bold: true;
+							color: "white"
+						}
                 }
             }
             Row
             {
-                width: (parent.width / 2) - 4
+				visible: currentLimitIsAdjustable
+                width: (parent.width / 2) - 2
                 spacing: 4
                 DetailButton
                 {
@@ -339,10 +355,10 @@ MbPage {
                     onClicked: trimNewValue (-1)
                     enabled: newCurrentLimit === acLimitPreset4 ? false : true
                     content: TileText
-                            {
-                                text: qsTr("-1 A"); font.bold: true;
-                                color: "white"
-                            }
+						{
+							text: qsTr("-1 A"); font.bold: true;
+							color: "white"
+						}
                 }
                 DetailButton
                 {
@@ -354,14 +370,15 @@ MbPage {
                     enablePressAndHold: true
                     onClicked: trimNewValue (+1)
                     content: TileText
-                            {
-                                text: qsTr("+1 A"); font.bold: true;
-                                color: "white"
-                            }
+						{
+							text: qsTr("+1 A"); font.bold: true;
+							color: "white"
+						}
                 }
             }
             Row
             {
+				visible: currentLimitIsAdjustable
                 width: parent.width
                 spacing: 4
                 DetailButton
@@ -373,7 +390,7 @@ MbPage {
                     width: parent.width
                     onClicked: accept()
                     content: TileText { text: qsTr ("Accept New");
-                            font.bold: true; color: newCurrentLimit !== actualCurrentLimit ? "white" : "#d9d9d9" }
+					font.bold: true; color: newCurrentLimit !== actualCurrentLimit ? "white" : "#d9d9d9" }
                 }
             }
         }
@@ -381,16 +398,14 @@ MbPage {
 
     function setNewValue (newValue)
     {
-//        if (!currentLimitIsAdjustable.valid || currentLimitIsAdjustable.value != 1)
-//            return
-
-        newCurrentLimit = newValue
+        if (currentLimitIsAdjustable)
+            newCurrentLimit = newValue
     }
 
     function trimNewValue (trimValue)
     {
-//        if (!currentLimitIsAdjustable.valid || currentLimitIsAdjustable.value != 1)
-//            return
+        if (!currentLimitIsAdjustable)
+            return
 
         newCurrentLimit += trimValue
         if (newCurrentLimit < 0)
@@ -405,10 +420,7 @@ MbPage {
  
     function accept ()
     {
-//        if (!currentLimitIsAdjustable.valid || currentLimitIsAdjustable.value != 1)
-//            return
-
-        if (currentLimitItem.valid)
+        if (currentLimitIsAdjustable)
         {
             currentLimitItem.setValue (newCurrentLimit)
             pageStack.pop() // return to main screen after changing input current limit

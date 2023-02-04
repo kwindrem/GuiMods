@@ -1,3 +1,10 @@
+v7.13:
+	fixed: Multi tile and DC System tiles are sometimes sized incorrectly.
+		The DC system tile is sized relative to this so it's wrong width also
+
+	add warning when AC current limit can't be changed
+	fixed: AC input detail gauge not showing positive power
+
 v7.12:
 	fixed: menu items not being hidden
 

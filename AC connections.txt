@@ -1,0 +1,11 @@
+/Ac/Genset
+/Ac/Grid
+/Ac/ActiveIn
+
+/Ac/Consumption
+/Ac/ConsumptionOnOutput
+/Ac/ConsumptionOnInput
+
+/Ac/PvOnOutput
+/Ac/PvOnGenset
+/Ac/PvOnGrid
