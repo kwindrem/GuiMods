@@ -312,7 +312,14 @@ OverviewPage {
 				text: qsTr ("--")
 				font.pixelSize: 22
 				visible: !sys.genset.power.valid
-			}			
+			},
+			OverviewAcValuesEnhanced { connection: sys.alternator },
+			TileText{
+				width: acInTile.width - 5
+				text: qsTr ("--")
+				font.pixelSize: 22
+				visible: !sys.alternator.power.valid
+			}
 		]
 ////// add power bar graph
         PowerGauge
