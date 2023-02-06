@@ -8,6 +8,8 @@
  
 import QtQuick 1.1
 import "utils.js" as Utils
+import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 OverviewPage {
 	id: root
@@ -303,34 +305,42 @@ OverviewPage {
 		height: 136
 		color: "#82acde"
 		anchors { top: imageTile.bottom; left: parent.left }
-		values:
-		[
-			OverviewAcValuesEnhanced { connection: sys.genset },
-			TileText
-			{
+		values: [
+			TileText {
 				width: acInTile.width - 5
 				text: qsTr ("--")
 				font.pixelSize: 22
-				visible: !sys.genset.power.valid
-			}			
+				visible: !sys.alternator.power.valid && !sys.genset.power.valid
+			},
+			PowerGauge {
+				id: gauge
+				width: parent.width
+				height: 15
+				connection: sys.alternator
+				reversePower: false
+				maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
+				visible: showGauges && sys.alternator.power.valid
+			},
+			TileText {
+				width: acInTile.width - 5
+				text: EnhFmt.formatVBusItem (sys.alternator.power, " W")
+				visible: sys.alternator.power.valid
+			},
+			PowerGauge {
+				id: acInBar
+				width: parent.width
+				height: 12
+				connection: sys.genset
+				useInputCurrentLimit: true
+				maxForwardPowerParameter: ""
+				maxReversePowerParameter: ""
+				visible: showGauges && sys.genset.power.valid
+			},
+			OverviewAcValuesEnhanced { 
+				connection: sys.genset 
+				visible: sys.genset.power.valid
+			}
 		]
-////// add power bar graph
-        PowerGauge
-        {
-            id: acInBar
-            width: parent.width
-            height: 12
-            anchors
-            {
-                top: parent.top; topMargin: 20
-                horizontalCenter: parent.horizontalCenter
-            }
-			connection: sys.genset
-			useInputCurrentLimit: true
-            maxForwardPowerParameter: ""
-            maxReversePowerParameter: ""
-            visible: showGauges
-        }
 	}
 
 	Tile {
