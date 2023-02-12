@@ -369,11 +369,11 @@ class SystemCalc:
 		for service, instance in self._dbusmonitor.get_service_list().items():
 			self._device_added(service, instance, do_service_change=False)
 
-		self._handleservicechange()
-		self._updatevalues()
-
 #### added for GuiMods
 		self.dcSystemPower = [0, 0, 0]
+
+		self._handleservicechange()
+		self._updatevalues()
 
 		GLib.timeout_add(1000, exit_on_error, self._handletimertick)
 
