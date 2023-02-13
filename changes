@@ -1,3 +1,11 @@
+v7.15:
+	fixed: systemcalc crash in v2.90-2.93 (no devices shown on GUI)
+	fixed: PV Inverter tile on GuiMods Simple flow doesn't use W/KW formatting
+	added DC source (alternator) to Generator Overview
+
+v7.14:
+	added v2.93~2
+
 v7.13:
 	fixed: Multi tile and DC System tiles are sometimes sized incorrectly.
 		The DC system tile is sized relative to this so it's wrong width also

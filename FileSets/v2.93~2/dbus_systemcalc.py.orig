@@ -1,8 +1,6 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
-#### modified for GuiMods
-
 from dbus.mainloop.glib import DBusGMainLoop
 import dbus
 import argparse
@@ -181,15 +179,6 @@ class SystemCalc:
 			},
 			'com.victronenergy.alternator': {
 				'/Dc/0/Power': dummy
-			},
-#### added for GuiMods
-			'com.victronenergy.dcsource': {
-				'/Dc/0/Power': dummy,
-				'/Settings/MonitorMode': dummy
-			},
-			'com.victronenergy.motordrive':
-			{
-				'/Dc/0/Power': dummy
 			}
 		}
 
@@ -334,10 +323,6 @@ class SystemCalc:
 			'/Dc/Charger/Power': {'gettext': '%.0F %%'},
 			'/Dc/FuelCell/Power': {'gettext': '%.0F %%'},
 			'/Dc/Alternator/Power': {'gettext': '%.0F W'},
-#### added for GuiMods
-			'/Dc/WindGenerator/Power': {'gettext': '%.0F W'},
-			'/Dc/MotorDrive/Power': {'gettext': '%.0F W'},
-
 			'/Dc/Vebus/Current': {'gettext': '%.1F A'},
 			'/Dc/Vebus/Power': {'gettext': '%.0F W'},
 			'/Dc/System/Power': {'gettext': '%.0F W'},
@@ -368,9 +353,6 @@ class SystemCalc:
 		self._changed = True
 		for service, instance in self._dbusmonitor.get_service_list().items():
 			self._device_added(service, instance, do_service_change=False)
-
-#### added for GuiMods
-		self.dcSystemPower = [0, 0, 0]
 
 		self._handleservicechange()
 		self._updatevalues()
@@ -637,48 +619,15 @@ class SystemCalc:
 		# ==== ALTERNATOR ====
 		alternators = self._dbusmonitor.get_service_list('com.victronenergy.alternator')
 		for alternator in alternators:
-#### changed for GuiMods
-			# some alternators do not provide a valid power value if not running
-			#	or below a minimum power/current
-			# so fill in a zero power so that the systemcalc power becomes valid
 			# Assume the battery connected to output 0 is the main battery
 			p = self._dbusmonitor.get_value(alternator, '/Dc/0/Power')
 			if p is None:
-				#### continue
-				p = 0
+				continue
 
 			if '/Dc/Alternator/Power' not in newvalues:
 				newvalues['/Dc/Alternator/Power'] = p
 			else:
 				newvalues['/Dc/Alternator/Power'] += p
-
-#### added for GuiMods
-		# ==== MOTOR DRIVE ====
-		motordrives = self._dbusmonitor.get_service_list('com.victronenergy.motordrive')
-		for motordrive in motordrives:
-			p = self._dbusmonitor.get_value(motordrive, '/Dc/0/Power')
-			if p is None:
-				p = 0
-
-			if '/Dc/MotorDrive/Power' not in newvalues:
-				newvalues['/Dc/MotorDrive/Power'] = p
-			else:
-				newvalues['/Dc/MotorDrive/Power'] += p
-
-#### added for GuiMods
-		# ==== DC SOURCES ====
-		dcSources = self._dbusmonitor.get_service_list('com.victronenergy.dcsource')
-		for dcSource in dcSources:
-			monitorMode = self._dbusmonitor.get_value(dcSource,'/Settings/MonitorMode')
-			# ==== WIND GENERATOR ====
-			if monitorMode == -8:
-				p = self._dbusmonitor.get_value(dcSource, '/Dc/0/Power')
-				if p is None:
-					continue
-				if '/Dc/WindGenerator/Power' not in newvalues:
-					newvalues['/Dc/WindGenerator/Power'] = p
-				else:
-					newvalues['/Dc/WindGenerator/Power'] += p
 
 		# ==== CHARGERS ====
 		chargers = self._dbusmonitor.get_service_list('com.victronenergy.charger')
@@ -842,9 +791,6 @@ class SystemCalc:
 				charger_power = newvalues.get('/Dc/Charger/Power', 0)
 				fuelcell_power = newvalues.get('/Dc/FuelCell/Power', 0)
 				alternator_power = newvalues.get('/Dc/Alternator/Power', 0)
-#### added for GuiMods
-				windgen_power = newvalues.get('/Dc/WindGenerator/Power', 0)
-				motordrive_power = newvalues.get('/Dc/MotorDrive/Power', 0)
 
 				# If there are VE.Direct inverters, remove their power from the
 				# DC estimate. This is done using the AC value when the DC
@@ -865,12 +811,7 @@ class SystemCalc:
 				# displayed. For now, we leave it out so that in the current
 				# version of Venus it does not break user's expectations.
 				#newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power - alternator_power
-#### changed for GuiMods
-				# average DC system power over 3 passes (seconds) to minimize wild swings in displayed value
-				self.dcSystemPower[0] = self.dcSystemPower[1]
-				self.dcSystemPower[1] = self.dcSystemPower[2]
-				self.dcSystemPower[2] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power - motordrive_power
-				newvalues['/Dc/System/Power'] = (self.dcSystemPower[0] + self.dcSystemPower[1] + self.dcSystemPower[2]) / 3
+				newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power
 
 		elif self._settings['hasdcsystem'] == 1 and solarchargers_loadoutput_power is not None:
 			newvalues['/Dc/System/MeasurementType'] = 0 # estimated
@@ -1136,6 +1077,7 @@ class SystemCalc:
 			tz = changes.get('Value')
 			if tz is not None:
 				os.environ['TZ'] = tz
+				time.tzset()
 
 	def _device_added(self, service, instance, do_service_change=True):
 		if do_service_change:

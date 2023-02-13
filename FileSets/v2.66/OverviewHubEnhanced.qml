@@ -36,13 +36,16 @@ OverviewPage {
     property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
     property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
     property bool hasDcSystem: hasDcSys.value > 0 || showAllTiles
-	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid || showAllTiles
-	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid || showAllTiles
+	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
+	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
-	property bool hasAcSolarOnOut: sys.pvOnAcOut.power.valid || showAllTiles
+	property bool hasAcSolarOnOut: sys.pvOnAcOut.power.valid
 	property bool hasAcSolar: hasAcSolarOnIn || hasAcSolarOnOut
-	property bool hasDcSolar: sys.pvCharger.power.valid || showAllTiles
+	property bool hasDcSolar: sys.pvCharger.power.valid
 	property bool hasDcAndAcSolar: hasAcSolar && hasDcSolar
+	property bool showDcAndAcSolar: hasDcAndAcSolar || showAllTiles
+	property bool showDcSolar: hasDcSolar || showAllTiles
+	property bool showAcSolar: hasAcSolar || showAllTiles
 ////// ADDED to show tanks
     property int bottomOffset: 45
     property string settingsBindPreffix: "com.victronenergy.settings"
@@ -441,9 +444,9 @@ OverviewPage {
         height:
         {
 			var availableHeight = root.height - 3 - acLoadBox.height - 5 - (showTanksTemps ? bottomOffset + 3 : 5)
-			if (hasDcAndAcSolar)
+			if (showDcAndAcSolar)
 				return ((availableHeight - 5) / 2) + 4
-			else if (hasDcSolar)
+			else if (showDcSolar)
 				return availableHeight
 			else
 				return 0
@@ -463,7 +466,7 @@ OverviewPage {
                 right: parent.right; rightMargin: 2
             }
             opacity: 0.5
-            visible: ! hasDcAndAcSolar
+            visible: ! showDcAndAcSolar
         }
 
 //////// modified to add power for individual PV charger info
@@ -498,7 +501,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv1Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 1 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 1 && ! showDcAndAcSolar
 			},
             TileText {
                 y: pvOffset1 + (pvChargerCompact ? 0 : pvRowSpacing)
@@ -506,7 +509,7 @@ OverviewPage {
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				anchors.right: parent.right; anchors.rightMargin: 5
                 font.pixelSize: 15
-                visible: numberOfPvChargers >= 1 && ! hasDcAndAcSolar
+                visible: numberOfPvChargers >= 1 && ! showDcAndAcSolar
             },
             TileText {
                 y: pvOffset1 + pvRowSpacing * (pvChargerCompact ? 1 : 2)
@@ -547,7 +550,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv2Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 2 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 2 && ! showDcAndAcSolar
 			},
             TileText {
                 y: pvOffset2 + (pvChargerCompact ? 0 : pvRowSpacing)
@@ -555,7 +558,7 @@ OverviewPage {
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				anchors.right: parent.right; anchors.rightMargin: 5
 				font.pixelSize: 15
-                visible: numberOfPvChargers >= 2 && ! hasDcAndAcSolar
+                visible: numberOfPvChargers >= 2 && ! showDcAndAcSolar
             },
             TileText {
                 y: pvOffset2 + pvRowSpacing * (pvChargerCompact ? 1 : 2)
@@ -596,7 +599,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv3Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 3 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 3 && ! showDcAndAcSolar
 			},
             TileText {
                 y: pvOffset3 + (pvChargerCompact ? 0 : pvRowSpacing)
@@ -604,7 +607,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-                visible: numberOfPvChargers >= 3 && ! hasDcAndAcSolar
+                visible: numberOfPvChargers >= 3 && ! showDcAndAcSolar
             },
             TileText {
                 y: pvOffset3 + pvRowSpacing * (pvChargerCompact ? 1 : 2)
@@ -665,7 +668,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 4 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -679,7 +682,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv5Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! showDcAndAcSolar
 			},
             TileText {
                 y: pvOffset5 + pvChargerCompact ? 0 : pvRowSpacing
@@ -687,7 +690,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! showDcAndAcSolar
             },
 			MarqueeEnhanced
 			{
@@ -701,7 +704,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! showDcAndAcSolar
 			},
             TileText {
                 y: pvOffset6 + (pvChargerCompact ? 0 : pvRowSpacing)
@@ -709,7 +712,7 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! showDcAndAcSolar
             },
   			MarqueeEnhanced
 			{
@@ -723,7 +726,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv6Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! showDcAndAcSolar
 			},
             TileText {
                 y: pvOffset7 + (pvChargerCompact ? 0 : pvRowSpacing)
@@ -731,14 +734,14 @@ OverviewPage {
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
                 font.pixelSize: 15
-				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 7 && pvChargerRows >= 7 && ! showDcAndAcSolar
 			}
 		]
 ////// add power bar graph
 		PowerGauge
         {
             id: pvChargerBar
-            width: parent.width - (hasDcAndAcSolar && ! showTanksTemps ? 20 : 0)
+            width: parent.width - (showDcAndAcSolar && ! showTanksTemps ? 20 : 0)
             height: 10
             anchors
             {
@@ -747,7 +750,7 @@ OverviewPage {
             }
             connection: sys.pvCharger
 			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
-            show: showGauges && hasDcSolar
+            show: showGauges && showDcSolar
         }
 		DetailTarget { id: pvChargerTarget;  detailsPage: "DetailPvCharger.qml" }
 	}
@@ -765,9 +768,9 @@ OverviewPage {
         {
 			var availableHeight = root.height - 3 - acLoadBox.height -5
 			availableHeight -= (showTanksTemps ? bottomOffset + 3 : 5)
-			if (hasDcAndAcSolar)
+			if (showDcAndAcSolar)
 				availableHeight -= pvChargerBox.height + 5
-			if (hasAcSolar)
+			if (showAcSolar)
 				return availableHeight
 			else
 				return 0
@@ -777,16 +780,10 @@ OverviewPage {
 
         anchors {
             right: root.right; rightMargin: 10;
-            bottom: hasDcAndAcSolar ? pvChargerBox.top : root.bottom
-            bottomMargin: hasDcAndAcSolar ? 5 : showTanksTemps ? bottomOffset + 3 : 5
+            bottom: showDcAndAcSolar ? pvChargerBox.top : root.bottom
+            bottomMargin: showDcAndAcSolar ? 5 : showTanksTemps ? bottomOffset + 3 : 5
         }
 
-        OverviewAcValuesEnhanced {
-            connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-            visible: !coupledPvAc.visible
-        }
-
-//////// add individual PV inverter powers
         values:
         [
             TileText {
@@ -797,42 +794,43 @@ OverviewPage {
                 property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
 
                 y: 10
-                text: (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2).toFixed(0) + "W"
-                font.pixelSize: hasDcAndAcSolar ? 20 : 25
-                visible: hasDcAndAcSolar || (hasAcSolarOnIn && hasAcSolarOnOut) || (hasAcSolarOnAcIn1 && hasAcSolarOnAcIn2)
+                text: EnhFmt.formatValue (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2, "W")
+                font.pixelSize: 19
+                visible: showAcSolar
             },
+//////// add individual PV inverter powers
             TileText {
                 y: 31
                 text: pvInverterName1.valid ? pvInverterName1.text : "-"
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
                 y: 47
                 text: EnhFmt.formatVBusItem (pvInverterPower1, "W")
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
                 y: 63
                 text: pvInverterName2.valid ? pvInverterName2.text : "-"
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
                 y: 77
                 text: EnhFmt.formatVBusItem (pvInverterPower2, "W")
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters > 1
             },
             TileText {
                 y: 93
                 text: pvInverterName3.valid ? pvInverterName3.text : "-"
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
+                visible: !showDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             },
             TileText {
                 y: 107
                 text: EnhFmt.formatVBusItem (pvInverterPower3, "W")
                 font.pixelSize: 15
-                visible: !hasDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
+                visible: !showDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
             }
         ]
 ////// add power bar graph
@@ -848,7 +846,7 @@ OverviewPage {
             }
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-            show: showGauges && hasAcSolar && !hasDcAndAcSolar
+            show: showGauges && showAcSolar && !showDcAndAcSolar
         }
 		DetailTarget { id: pvInverterTarget;  detailsPage: "DetailPvInverter.qml" }
     }
@@ -889,12 +887,12 @@ OverviewPage {
 
 		ballCount: 4
 		path: corner
-		active: root.active && (hasAcSolar || showAllTiles )
+		active: root.active && showAcSolar
 		value: hasDcAndAcSolar ? hasDcAndAcFlow : flow(sys.pvOnAcOut.power)
 
 		anchors {
 			left: pvInverter.left; leftMargin: 8
-			top: pvInverter.verticalCenter; topMargin: hasDcAndAcSolar ? 10 : 0
+			top: pvInverter.verticalCenter; topMargin: showDcAndAcSolar ? 10 : 0
 			right: multi.horizontalCenter; rightMargin: -20
 			bottom: multi.bottom; bottomMargin: 10
 		}
@@ -904,8 +902,8 @@ OverviewPage {
 	Item {
 		id: dcConnect
 		anchors {
-			left: multi.horizontalCenter; leftMargin: hasAcSolar ? -20  : 0
-			bottom: dcSystemBox.top; bottomMargin: hasDcAndAcSolar ? 7 : 10
+			left: multi.horizontalCenter; leftMargin: showAcSolar ? -20  : 0
+			bottom: dcSystemBox.top; bottomMargin: showDcAndAcSolar ? 7 : 10
 		}
 	}
 
@@ -930,7 +928,7 @@ OverviewPage {
 		id: pvChargerBoxDcConnect
 		ballCount: 3
 		path: straight
-		active: root.active && (hasDcSolar || showAllTiles )
+		active: root.active && showDcSolar
 		value: -flow(sys.pvCharger.power)
 		startPointVisible: false
 
