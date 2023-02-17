@@ -56,7 +56,6 @@ MbPage
                     width: (root.width * 0.8) - totalLabel.paintedWidth - tableColumnWidth
                     height: 15
                     connection: sys.alternator
-                    reversePower: true
 					maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
                 }
 			}
