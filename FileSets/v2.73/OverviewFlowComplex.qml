@@ -607,7 +607,6 @@ OverviewPage {
                 horizontalCenter: parent.horizontalCenter
             }
             connection: sys.alternator
-            reversePower: true
             maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
             visible: showGauges && showAlternator
         }

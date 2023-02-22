@@ -1,7 +1,10 @@
+v7.16:
+	added v3.00~17
+	fixed: alternator gauge polarity was backwards	
+
 v7.15:
 	fixed: systemcalc crash in v2.90-2.93 (no devices shown on GUI)
 	fixed: PV Inverter tile on GuiMods Simple flow doesn't use W/KW formatting
-	added DC source (alternator) to Generator Overview
 
 v7.14:
 	added v2.93~2
