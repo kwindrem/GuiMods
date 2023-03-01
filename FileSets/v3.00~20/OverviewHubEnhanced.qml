@@ -1004,7 +1004,7 @@ OverviewPage {
 		ballCount: 3
 		path: straight
 		active: root.active
-		value: Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.vebusDc.power))
+		value: -Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.vebusDc.power))
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1037,7 +1037,7 @@ OverviewPage {
 
 	OverviewConnection {
 		id: multiToDcConnect
-		ballCount: 3
+		ballCount: showTanksTemps ? 2 : 4
 		path: straight
 		active: root.active
 		value: -flow(sys.vebusDc.power);
@@ -1074,7 +1074,7 @@ OverviewPage {
 		ballCount: 1
 		path: straight
 		active: root.active
-		value: Utils.sign(noNoise(sys.pvCharger.power + sys.vebusDc.power) + alternatorFlow)
+		value: Utils.sign(noNoise(sys.pvCharger.power) + noNoise(sys.vebusDc.power) + alternatorFlow)
 		startPointVisible: false
 
 		anchors {
