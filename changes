@@ -1,3 +1,8 @@
+v7.17:
+	fixed: flow direction backwards for AC In Loads
+	fixed: PV on Output shows when PV on Input is present not when PV on Output is present
+	show alternator in place of AC input if no AC input
+		(simple flow page and generator overview)
 v7.16:
 	added v3.00~17
 	fixed: alternator gauge polarity was backwards	

@@ -3,22 +3,8 @@ GuiMods has been revived with combined functionality of the original GuiMods and
 GuiMods2 has been decommissioned
 
 Recent changes:
-	added motor drive tile to DC Coupled overview
-	added threshold to swithch to K units (previously this was fixed at 1000)
-	separate simple, DC coupled and AC coupled flow overviews can now be selected
-	Alternator, Wind Generator, Fuel Cell and AC Charger DC sources have been added
-	DC details page has been added
-	Mobile Overview now has access to details pages
-	Gauges and details pages have been added to Mobile Overview
-	Hard buttons (CCGX) can now be used to access to details pages
-		and to make selections on the AC input and Inverter details
-	Generator Overview has been enhanced
-		new layout
-		add auto run enable/disable
-		add service interval
-	GeneratorConnector functionality has been incorporated into GuiMods
-		making GeneratorConnector obsolete
-	added battery temperature(s)
+	Treat an alternator as a "generator" source
+		for cases where an AC generator or the grid is not avalable
 
 The following components have NOT been tested:
     Multi-phase(leg) systems
@@ -277,6 +263,19 @@ Configuration
         In addition "Waste" is replaced with "Gray" to be consistent with "Black" and in line
         with common RV terminology.
     
+	Replace AC in if inactive
+		Some systems do not have an AC generator but do have an alternator connected as a battery charger.
+		In these systems, the alternator information is displayed as if it were the system's generator.			
+
+		When this option is on, a DC alternator is displayed as a secondary "generator", replacing the
+			AC generator information when the AC input is not present.
+		The AC input tile on the GuiMods Simple Overview page is replaced
+			with an Alternator tile if this option is on, an alternator exist
+				and the AC input is not present.
+		The GENERATOR POWER tile on the enhanced Generator Overview is replaced
+			with an ALTERNATOR POWER tile if this option is on, an alternator exists
+				and the AC input type is not generator or the generator is not producing power.
+
     AC Input Limit Preset 1 - 4
         Provides rapid selection of common AC input current limits through the popup
             accessed by touching the lower portion of the AC input tile.

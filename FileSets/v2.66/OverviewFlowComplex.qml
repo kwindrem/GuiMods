@@ -46,7 +46,7 @@ OverviewPage {
 	property bool hasPvOnInput: sys.pvOnGrid.power.valid
 	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && hasPvOnInput
 	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
-    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnInput
+    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnOutput
 	property bool showPvCharger: sys.pvCharger.power.valid
     property bool showDcSystem: (dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0))
     property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && sys.alternator.power.valid
@@ -107,7 +107,7 @@ OverviewPage {
 
 	property double pvChargerFlow: showPvCharger ? noNoise (sys.pvCharger.power) : 0
 	property double dcSystemFlow: showDcSystem ? -noNoise (sys.dcSystem.power) : 0
-	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
+	property double alternatorFlow: showAlternator ? -noNoise (sys.alternator.power) : 0
 	property double motorDriveFlow: showMotorDrive ? noNoise (motorDrivePowerItem) : 0
 	property double inverterDcFlow: showInverter ? noNoise (sys.vebusDc.power) : 0
 	property double batteryFlow: noNoise (sys.battery.power)

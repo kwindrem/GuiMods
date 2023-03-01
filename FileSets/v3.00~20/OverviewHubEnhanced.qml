@@ -26,15 +26,21 @@ OverviewPage {
     property variant sys: theSystem
 
 	property string systemPrefix: "com.victronenergy.system"
+    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
 	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
     property bool isMulti: vebusService.valid
     property string veDirectInverterService: ""
     property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
     
-    property bool showAcInput: isMulti || showAllTiles
+    VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
+    property bool hasAlternator: sys.alternator.power.valid
+    property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && (sys.acSource == 0 || sys.acSource == 240) 
+    property bool showAcInput: isMulti && ! replaceAcIn || showAllTiles 
+    property bool showAlternator: !showAcInput && hasAlternator
+	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
     property bool showAcLoads: isMulti || veDirectInverterService != ""
     property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
-    property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
+    property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles 
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -82,8 +88,18 @@ OverviewPage {
     property string pvInverterPrefix3: ""
     property int numberOfPvInverters: 0
 
+//////// add for alternator - alternator replaces AC in if AC in is not present
+	property string alternatorPrefix1: ""
+	property string alternatorPrefix2: ""
+    property int numberOfAlternators: 0
+    VBusItem { id: alternatorName1;  bind: Utils.path(alternatorPrefix1, "/CustomName") }
+    VBusItem { id: alternatorPower1; bind: Utils.path(alternatorPrefix1, "/Dc/0/Power") }
+    VBusItem { id: alternatorVoltage1; bind: Utils.path(alternatorPrefix1, "/Dc/0/Voltage") }
+    VBusItem { id: alternatorCurrent1; bind: Utils.path(alternatorPrefix1, "/Dc/0/Current") }
+    VBusItem { id: alternatorName2;  bind: Utils.path(alternatorPrefix2, "/CustomName") }
+    VBusItem { id: alternatorPower2; bind: Utils.path(alternatorPrefix2, "/Dc/0/Power") }
+
 //////// added for control show/hide gauges, tanks and temps from menus
-    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
     property bool showGauges: showGaugesItem.valid ? showGaugesItem.value === 1 ? true : false : false
     VBusItem { id: showTanksItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTanks") }
@@ -226,6 +242,81 @@ OverviewPage {
 		DetailTarget { id: acInputTarget; detailsPage: "DetailAcInput.qml" }
 	}
 
+
+	//// add alternator if AC input not present
+	OverviewBox {
+		id: alternatorBox
+ 		title: qsTr ("Alternator") 
+		color: "#157894"
+		titleColor: "#419FB9"
+        opacity: showAlternator ? 1 : disabledTileOpacity
+        visible: showAlternator || showInactiveTiles && ! acInBox.visible
+		width: 148
+		height: showStatusBar ? 100 : 120
+		anchors.fill: acInBox
+        values: Column
+        {
+			width: parent.width
+			TileText
+			{
+				text: " "
+				font.pixelSize: 6
+			}
+			TileText
+			{
+				text: EnhFmt.formatVBusItem (sys.alternator.power, "W")
+				font.pixelSize: 19
+			}
+            TileText
+            {
+                text: alternatorName1.valid ? alternatorName1.text : "-"
+                visible: showAlternator && numberOfAlternators >= 1
+            }
+            TileText
+            {
+                text:  EnhFmt.formatVBusItem (alternatorPower1, "W")
+                font.pixelSize: 15
+                visible: showAlternator && numberOfAlternators > 1
+            }
+            TileText {
+                text: EnhFmt.formatVBusItem (alternatorVoltage1, "V")
+                font.pixelSize: 15
+                visible: showAlternator && numberOfAlternators == 1
+            }
+            TileText {
+                text: EnhFmt.formatVBusItem (alternatorCurrent1, "A")
+                font.pixelSize: 15
+                visible: showAlternator && numberOfAlternators == 1
+            }
+            TileText
+            {
+                text: alternatorName2.valid ? alternatorName2.text : "-"
+                visible: showAlternator && numberOfAlternators >= 2
+            }
+            TileText
+            {
+                text:  EnhFmt.formatVBusItem (alternatorPower1, "W")
+                font.pixelSize: 15
+                visible: showAlternator && numberOfAlternators >= 2
+            }
+		}
+
+        PowerGauge
+        {
+            id: alternatorBar
+            width: parent.width
+            height: 12
+            anchors
+            {
+                top: parent.top; topMargin: 16
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: sys.alternator
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
+            visible: showGauges && showAlternator
+        }
+		DetailTarget { id: alternatorTarget; detailsPage: "DetailAlternator.qml" }
+	}
 
 	MultiEnhanced {
 		id: multi
@@ -397,7 +488,7 @@ OverviewPage {
             anchors
             {
                 top: parent.top; topMargin: 19
-                left: parent.left; leftMargin: 18 ///////////
+                left: parent.left; leftMargin: 18
                 right: parent.right
             }
             connection: sys.dcSystem
@@ -791,9 +882,10 @@ OverviewPage {
                 property double pvInverterOnAcOut: sys.pvOnAcOut.power.valid ? sys.pvOnAcOut.power.value : 0
                 property double pvInverterOnAcIn1: sys.pvOnAcIn1.power.valid ? sys.pvOnAcIn1.power.value : 0
                 property double pvInverterOnAcIn2: sys.pvOnAcIn2.power.valid ? sys.pvOnAcIn2.power.value : 0
+                property bool powerValid: sys.pvOnAcOut.power.valid || sys.pvOnAcIn1.power.valid || sys.pvOnAcIn2.power.valid
 
                 y: 10
-                text: EnhFmt.formatValue (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2, "W")
+                text: powerValid ? EnhFmt.formatValue (pvInverterOnAcOut + pvInverterOnAcIn1 + pvInverterOnAcIn2, "W") : ""
                 font.pixelSize: 19
                 visible: showAcSolar
             },
@@ -906,6 +998,43 @@ OverviewPage {
 		}
 	}
 
+	OverviewConnection
+	{
+		id: dcBus2
+		ballCount: 3
+		path: straight
+		active: root.active
+		value: Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.vebusDc.power))
+		startPointVisible: false
+		endPointVisible: false
+
+		anchors {
+			right: dcConnect.left
+			top: dcConnect.top
+
+			left: multi.left; leftMargin: -10
+			bottom: dcConnect.top
+		}
+	}
+
+	OverviewConnection
+	{
+		id: alternatorToDcBus2
+		ballCount: 3
+		path: corner
+		active: root.active && showAlternator
+		value: Utils.sign (alternatorFlow)
+		endPointVisible: false
+		anchors
+		{
+			left: alternatorBox.right; leftMargin: -10
+			top: alternatorBox.bottom; topMargin: -15
+
+			right: dcBus2.left
+			bottom: dcBus2.bottom
+		}
+	}
+
 	OverviewConnection {
 		id: multiToDcConnect
 		ballCount: 3
@@ -941,19 +1070,19 @@ OverviewPage {
 	}
 
 	OverviewConnection {
-		id: chargersToBattery
-		ballCount: 3
+		id: batteryToDcBus2
+		ballCount: 1
 		path: straight
 		active: root.active
-		value: Utils.sign(noNoise(sys.pvCharger.power) + noNoise(sys.vebusDc.power))
+		value: Utils.sign(noNoise(sys.pvCharger.power + sys.vebusDc.power) + alternatorFlow)
 		startPointVisible: false
 
 		anchors {
-			left: dcConnect.left
-			top: dcConnect.top
+			left: dcBus2.left
+			top: dcBus2.top
 
 			right: battery.right; rightMargin: 10
-			bottom: dcConnect.top
+			bottom: dcBus2.top
 		}
 	}
 
@@ -1150,6 +1279,14 @@ OverviewPage {
 				tempsModel.append({serviceName: service.name})
 			}
             break;;
+//////// add for alternator
+        case DBusService.DBUS_SERVICE_ALTERNATOR:
+            numberOfAlternators++
+            if (numberOfAlternators === 1)
+				alternatorPrefix1 = service.name;
+            else if (numberOfAlternators === 2)
+				alternatorPrefix2 = service.name;
+            break;;
         }
     }
 
@@ -1159,6 +1296,7 @@ OverviewPage {
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfPvInverters = 0
+        numberOfAlternators = 0
 		veDirectInverterService = ""
         pvChargerPrefix1 = ""
         pvChargerPrefix2 = ""
@@ -1170,6 +1308,8 @@ OverviewPage {
         pvInverterPrefix1 = ""
         pvInverterPrefix2 = ""
         pvInverterPrefix3 = ""
+        alternatorPrefix1 = ""
+        alternatorPrefix2 = ""
         tempsModel.clear()
         for (var i = 0; i < DBusServices.count; i++)
         {
@@ -1214,7 +1354,7 @@ OverviewPage {
 	// list of all details touchable areas
 	property variant targetList:
 	[
-		acInputTarget, batteryTarget,
+		acInputTarget, alternatorTarget, batteryTarget,
 		multiTarget, dcSystemTarget,
 		loadsOnOutputTarget, pvInverterTarget, pvChargerTarget 
 	]
