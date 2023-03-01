@@ -973,13 +973,10 @@ OverviewPage {
 
 	OverviewConnection {
 		id: pvInverterToMulti
-
-		property int hasDcAndAcFlow: Utils.sign(noNoise(sys.pvOnAcOut.power) + noNoise(sys.pvOnAcIn1.power) + noNoise(sys.pvOnAcIn2.power))
-
 		ballCount: 4
 		path: corner
 		active: root.active && showAcSolar
-		value: hasDcAndAcSolar ? hasDcAndAcFlow : flow(sys.pvOnAcOut.power)
+		value: Utils.sign(noNoise(sys.pvOnAcOut.power) + noNoise(sys.pvOnAcIn1.power) + noNoise(sys.pvOnAcIn2.power))
 
 		anchors {
 			left: pvInverter.left; leftMargin: 8
