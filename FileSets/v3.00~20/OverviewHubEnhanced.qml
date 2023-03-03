@@ -161,6 +161,10 @@ OverviewPage {
 
 //////// add to display PV Inverter power
     VBusItem { id: pvInverterPower1; bind: Utils.path(pvInverterPrefix1, "/Ac/Power") }
+    VBusItem { id: pvInverterL1Power1; bind: Utils.path(pvInverterPrefix1, "/Ac/L1/Power") }
+    VBusItem { id: pvInverterL2Power1; bind: Utils.path(pvInverterPrefix1, "/Ac/L2/Power") }
+    VBusItem { id: pvInverterL3Power1; bind: Utils.path(pvInverterPrefix1, "/Ac/L3/Power") }
+	property int pvInverterPhaseCount1: hasAcSolarOnOut ? sys.pvOnAcOut.phaseCount : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1.phaseCount : sys.pvOnAcIn2.phaseCount
     VBusItem { id: pvInverterName1; bind: Utils.path(pvInverterPrefix1, "/CustomName") }
     VBusItem { id: pvInverterPower2; bind: Utils.path(pvInverterPrefix2, "/Ac/Power") }
     VBusItem { id: pvInverterName2; bind: Utils.path(pvInverterPrefix2, "/CustomName") }
@@ -893,38 +897,54 @@ OverviewPage {
             TileText {
                 y: 31
                 text: pvInverterName1.valid ? pvInverterName1.text : "-"
-                visible: !showDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters >= 2
             },
             TileText {
                 y: 47
                 text: EnhFmt.formatVBusItem (pvInverterPower1, "W")
                 font.pixelSize: 15
-                visible: !showDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters >= 2
             },
             TileText {
                 y: 63
                 text: pvInverterName2.valid ? pvInverterName2.text : "-"
-                visible: !showDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters >= 2
             },
             TileText {
                 y: 77
                 text: EnhFmt.formatVBusItem (pvInverterPower2, "W")
                 font.pixelSize: 15
-                visible: !showDcAndAcSolar && numberOfPvInverters > 1
+                visible: !showDcAndAcSolar && numberOfPvInverters >= 2
             },
             TileText {
                 y: 93
                 text: pvInverterName3.valid ? pvInverterName3.text : "-"
-                visible: !showDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
+                visible: !showDcAndAcSolar && numberOfPvInverters >=3 && ! showTanksTemps
             },
             TileText {
                 y: 107
                 text: EnhFmt.formatVBusItem (pvInverterPower3, "W")
                 font.pixelSize: 15
-                visible: !showDcAndAcSolar && numberOfPvInverters > 2 && ! showTanksTemps
-            }
+                visible: !showDcAndAcSolar && numberOfPvInverters >=3 && ! showTanksTemps
+            },
+              TileText {
+                y: 31
+                text: qsTr ("L1: ") + EnhFmt.formatVBusItem (pvInverterL1Power1, "W")
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 2
+			},
+              TileText {
+                y: 47
+                text: qsTr ("L2: ") + EnhFmt.formatVBusItem (pvInverterL2Power1, "W")
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 2
+			},
+              TileText {
+                y: 63
+                text: qsTr ("L3: ") + EnhFmt.formatVBusItem (pvInverterL3Power1, "W")
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 3
+			}
         ]
 ////// add power bar graph
+////// only shows one of possibly 3 PV inverter locations !!!!!!!!!!!!!!!!!!!!!
         PowerGauge
         {
             id: pvInverterBar
@@ -935,7 +955,13 @@ OverviewPage {
                 top: parent.top; topMargin: 19
                 horizontalCenter: parent.horizontalCenter
             }
-            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
+            maxForwardPowerParameter:
+            {
+				if (hasAcSolarOnOut)
+					return "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
+				else
+					return "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
+			}
             connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
             visible: showGauges && showAcSolar && !showDcAndAcSolar
         }
