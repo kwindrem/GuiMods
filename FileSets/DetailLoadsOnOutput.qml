@@ -4,6 +4,7 @@
 import QtQuick 1.1
 import "utils.js" as Utils
 import com.victron.velib 1.0
+import "enhancedFormat.js" as EnhFmt
 
 MbPage {
 	id: root
@@ -110,13 +111,13 @@ MbPage {
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (outputLoad.powerL1, " W") }
+                        text: EnhFmt.formatVBusItem (outputLoad.powerL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (outputLoad.powerL2, " W"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (outputLoad.powerL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (outputLoad.powerL3, " W"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (outputLoad.powerL3, "W"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -125,13 +126,13 @@ MbPage {
                         text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (voltageL1, " V") }
+                        text: EnhFmt.formatVBusItem (voltageL1, "V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (voltageL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (voltageL2, "V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (voltageL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (voltageL3, "V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -155,7 +156,7 @@ MbPage {
                         text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValue (frequencyL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (frequencyL1, "Hz") }
             }
             Row
             {
@@ -222,21 +223,6 @@ MbPage {
                 return current.toFixed (1) + unit
             else
                 return current.toFixed (0) + unit
-        }
-        else
-            return "--"
-    }
-
-    function formatValue (item, unit)
-    {
-        var value
-        if (item.valid)
-        {
-            value = item.value
-            if (value < 100)
-                return value.toFixed (1) + unit
-            else
-                return value.toFixed (0) + unit
         }
         else
             return "--"

@@ -50,7 +50,7 @@ MbPage
                     text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatVBusItem (motorDrivePowerItem, " W")
+                    text: EnhFmt.formatVBusItem (motorDrivePowerItem, "W")
                 }
                 PowerGauge
                 {

@@ -56,13 +56,13 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPower, " W") }
+            text: EnhFmt.formatVBusItem (pvPower, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: multiTrackerHeader ? " " : EnhFmt.formatVBusItem (pvVoltage, " V") }
+            text: multiTrackerHeader ? " " : EnhFmt.formatVBusItem (pvVoltage, "V") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: multiTrackerHeader ? " " : calculateCurrent (pvPower, pvVoltage, " A") }
+            text: multiTrackerHeader ? " " : calculateCurrent (pvPower, pvVoltage, "A") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: showNameAndTotal ? state.text : " " }
@@ -71,7 +71,7 @@ Row {
     function calculateCurrent (powerItem, voltageItem, unit)
     {
         if (powerItem.valid && voltageItem.valid && voltageItem.value != 0)
-			return EnhFmt.formatValue (powerItem.value / voltageItem.value, "A")
+			return EnhFmt.formatValue (powerItem.value / voltageItem.value, unit)
         else
             return ""
     }

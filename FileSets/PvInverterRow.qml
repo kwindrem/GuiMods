@@ -40,16 +40,16 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvTotalPower, " W") }
+            text: EnhFmt.formatVBusItem (pvTotalPower, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPowerL1, " W") }
+            text: EnhFmt.formatVBusItem (pvPowerL1, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPowerL2, " W") }
+            text: EnhFmt.formatVBusItem (pvPowerL2, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPowerL3, " W") }
+            text: EnhFmt.formatVBusItem (pvPowerL3, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
             text: 

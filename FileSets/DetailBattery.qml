@@ -139,7 +139,7 @@ MbPage
                     text: qsTr ("Current") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatValueAbs (sys.battery.power.value / sys.battery.voltage.value, " A") }
+                    text: EnhFmt.formatValueAbs (sys.battery.power.value / sys.battery.voltage.value, "A") }
              Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: chargingText.text }
         }
