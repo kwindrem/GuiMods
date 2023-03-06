@@ -121,12 +121,12 @@ MbPage {
                                 total += pOutL1.value - pInL1.value
                                 totalValid = true
                             }
-                            if (pOutL2.vaild && pInL2.valid)
+                            if (pOutL2.valid && pInL2.valid)
                             {
                                 total += pOutL2.value - pInL2.value
                                 totalValid = true
                             }
-                            if (pOutL3.vaild && pInL3.valid)
+                            if (pOutL3.valid && pInL3.valid)
                             {
                                 total += pOutL3.value - pInL3.value
                                 totalValid = true

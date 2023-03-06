@@ -225,7 +225,7 @@ Item {
         anchors
         {
             top: root.top; topMargin: firstBarVertPos + barSpacing * 2
-            left: root.left; leftMargin: bar2offset
+            left: root.left; leftMargin: bar3offset
         }
         visible: showGauge
     }
