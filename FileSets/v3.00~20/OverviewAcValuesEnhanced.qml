@@ -1,7 +1,6 @@
 ////// modified to show voltage, current and frequency in flow overview
 // only displays values for sys.acInput and sys.acLoad
 // because other connections don't have related parameters
-// may not support paralleled Multis/Quatros
 ////// modified to show power bar graphs
 
 

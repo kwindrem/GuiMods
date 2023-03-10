@@ -41,7 +41,6 @@ OverviewPage {
     property bool showAcLoads: isMulti || veDirectInverterService != ""
     property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
     property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
-    property bool hasDcSystem: hasDcSys.value > 0 || showAllTiles
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -56,9 +55,10 @@ OverviewPage {
     property int bottomOffset: 45
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
+    property int numberOfTanks: 0
     property int numberOfTemps: 0
 //////// added/modified for control show/hide gauges, tanks and temps from menus
-    property int tankCount: showTanksEnable ? tankModel.rowCount : 0
+    property int tankCount: showTanksEnable ? numberOfTanks : 0
     property int tempCount: showTempsEnable ? numberOfTemps : 0
     property int tankTempCount: tankCount + tempCount
     property bool showTanks: showTanksEnable ? showStatusBar ? false : tankCount > 0 ? true : false : false
@@ -101,7 +101,6 @@ OverviewPage {
     VBusItem { id: alternatorPower2; bind: Utils.path(alternatorPrefix2, "/Dc/0/Power") }
 
 //////// added for control show/hide gauges, tanks and temps from menus
-    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
     property bool showGauges: showGaugesItem.valid ? showGaugesItem.value === 1 ? true : false : false
     VBusItem { id: showTanksItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTanks") }
@@ -931,17 +930,17 @@ OverviewPage {
               TileText {
                 y: 31
                 text: qsTr ("L1: ") + EnhFmt.formatVBusItem (pvInverterL1Power1, "W")
-                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 2
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL1Power1.valid && (pvInverterL2Power1.valid || pvInverterL3Power1.valid)
 			},
               TileText {
                 y: 47
                 text: qsTr ("L2: ") + EnhFmt.formatVBusItem (pvInverterL2Power1, "W")
-                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 2
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL2Power1.valid
 			},
               TileText {
                 y: 63
                 text: qsTr ("L3: ") + EnhFmt.formatVBusItem (pvInverterL3Power1, "W")
-                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 3
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL3Power1.valid
 			}
         ]
 ////// add power bar graph
@@ -1160,11 +1159,8 @@ OverviewPage {
         interactive: count > 4 ? true : false
         orientation: ListView.Horizontal
 
-        model: TankModel { id: tankModel }
+        model: tanksModel
         delegate: TileTankEnhanced {
-            // Without an intermediate assignment this will trigger a binding loop warning.
-            property variant theService: DBusServices.get(buddy.id)
-            service: theService
             width: tanksColum.tileWidth
             height: root.tanksHeight
             pumpBindPrefix: root.pumpBindPreffix
@@ -1185,6 +1181,7 @@ OverviewPage {
             z: -1
         }
     }
+    ListModel { id: tanksModel }
 
     ListView
     {
@@ -1247,6 +1244,11 @@ OverviewPage {
     {
          switch (service.type)
         {
+//////// add for temp sensors
+		case (service.type === DBusService.DBUS_SERVICE_TANK):
+			tanksModel.append({serviceName: service.name})
+            numberOfTanks++
+            break;;
 //////// add for temp sensors
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
@@ -1317,6 +1319,7 @@ OverviewPage {
     // Detect available services of interest
     function discoverServices()
     {
+        numberOfTanks = 0
         numberOfTemps = 0
         numberOfPvChargers = 0
         numberOfPvInverters = 0

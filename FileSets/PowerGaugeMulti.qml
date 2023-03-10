@@ -95,13 +95,13 @@ Item {
 	// SystemState: Off, Fault
     property bool showGauge: ! (inverterMode <= 0 || inverterMode === 4 || systemState === 0 || systemState === 2 || totalDisplayedPower == 0)
 
-	property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
     property real inverterContinuousPower: inverterContinuousPowerItem.valid ? inverterContinuousPowerItem.value : 0
+	property real inverterCautionPower: inverterCautionPowerItem.valid ? inverterCautionPowerItem.value : 0
 	property real inverterPeakPower: inverterPeakPowerItem.valid ? inverterPeakPowerItem.value : 0
 
-    property real maxInverterDisplayed: inverterPeakPower
-    property real inverterOverload: Math.min (inverterCautionPower, maxInverterDisplayed)
-	property real inverterCaution: Math.min (inverterCautionPower, inverterOverload)
+    property real maxInverterDisplayed: inverterPeakPower * 1.1
+    property real inverterOverload: Math.min (inverterCautionPower, inverterPeakPower)
+	property real inverterCaution: Math.min (inverterContinuousPower, inverterOverload)
 
     property real chargerMaxPower: chargerMaxPowerItem.valid ? chargerMaxPowerItem.value : 0
     property real maxChargerDisplayed: chargerMaxPower * 1.1

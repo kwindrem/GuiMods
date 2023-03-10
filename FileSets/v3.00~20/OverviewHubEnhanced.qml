@@ -164,7 +164,6 @@ OverviewPage {
     VBusItem { id: pvInverterL1Power1; bind: Utils.path(pvInverterPrefix1, "/Ac/L1/Power") }
     VBusItem { id: pvInverterL2Power1; bind: Utils.path(pvInverterPrefix1, "/Ac/L2/Power") }
     VBusItem { id: pvInverterL3Power1; bind: Utils.path(pvInverterPrefix1, "/Ac/L3/Power") }
-	property int pvInverterPhaseCount1: hasAcSolarOnOut ? sys.pvOnAcOut.phaseCount : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1.phaseCount : sys.pvOnAcIn2.phaseCount
     VBusItem { id: pvInverterName1; bind: Utils.path(pvInverterPrefix1, "/CustomName") }
     VBusItem { id: pvInverterPower2; bind: Utils.path(pvInverterPrefix2, "/Ac/Power") }
     VBusItem { id: pvInverterName2; bind: Utils.path(pvInverterPrefix2, "/CustomName") }
@@ -930,17 +929,17 @@ OverviewPage {
               TileText {
                 y: 31
                 text: qsTr ("L1: ") + EnhFmt.formatVBusItem (pvInverterL1Power1, "W")
-                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 2
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL1Power1.valid && (pvInverterL2Power1.valid || pvInverterL3Power1.valid)
 			},
               TileText {
                 y: 47
                 text: qsTr ("L2: ") + EnhFmt.formatVBusItem (pvInverterL2Power1, "W")
-                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 2
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL2Power1.valid
 			},
               TileText {
                 y: 63
                 text: qsTr ("L3: ") + EnhFmt.formatVBusItem (pvInverterL3Power1, "W")
-                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterPhaseCount1 >= 3
+                visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL3Power1.valid
 			}
         ]
 ////// add power bar graph

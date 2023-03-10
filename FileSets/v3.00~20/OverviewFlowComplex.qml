@@ -381,7 +381,7 @@ OverviewPage {
         {
 			bottom: multi.bottom; bottomMargin: 1
             horizontalCenter: multi.horizontalCenter;
-            horizontalCenterOffset: -10
+            horizontalCenterOffset: multiDcConnector.active ? -10 : 0
         }
         visible: wallClock.running
     }
