@@ -75,7 +75,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
     # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/MaxMotorDriveLoad\
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ReplaceInactiveAcIn \
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
@@ -138,7 +138,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
 			{"path":"/FischerPanda0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
 			{"path":"/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
 			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveCharge", "default":0.0}, \
-			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveLoad", "default":0.0} ]' > /dev/null
+			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveLoad", "default":0.0}, \
+			{"path":"/GuiMods/ReplaceInactiveAcIn", "default":0, "min":0, "max":1} ]' > /dev/null
     fi
 
     temp=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowInactiveFlowTiles\

@@ -1,3 +1,16 @@
+v7.17:
+	fixed: flow direction backwards for AC In Loads
+	fixed: PV on Output shows when PV on Input is present not when PV on Output is present
+	fixed: L2 not shown on Multi gauge
+	fixed: Inverter Detail Total Power only shows L1 power
+	show alternator in place of AC input if no AC input
+		(simple flow page and generator overview)
+	show individual leg powers for PV Inverter tile on GuiMods Simple overview
+	swap DC System and PV Charger tile positions on AC and DC coupled overviews
+	center time in Multi tile on AC and DC Coupleed flow pages if an inveter does not exist
+		time is offset to make room for DC connection
+	fixed: Multi gauge not showing proper limits, including no yellow region
+
 v7.16:
 	added v3.00~17
 	fixed: alternator gauge polarity was backwards	

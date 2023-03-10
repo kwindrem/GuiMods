@@ -161,6 +161,14 @@ MbPage {
             enableSpaceBar: true
         }
 
+        MbSwitch
+        {
+            id: replaceInactiveAcIn
+            bind: Utils.path (bindPrefixGuiMods, "/ReplaceInactiveAcIn")
+            name: qsTr ("Replace AC in if inactive")
+            writeAccessLevel: User.AccessUser
+        }
+
         MbSpinBox {
             description: qsTr ("AC Input Limit Preset 1")
 			bind: Utils.path (bindPrefixGuiMods, "/AcCurrentLimit/Preset1")

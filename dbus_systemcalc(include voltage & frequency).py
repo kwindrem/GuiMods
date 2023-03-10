@@ -78,7 +78,7 @@ class SystemCalc:
 				'/Ac/L1/V': dummy,
 				'/Ac/L2/V': dummy,
 				'/Ac/L3/V': dummy,
-				'/Ac/L1/Frequency': dummy,
+				'/Ac/L1/Frequency': dummy, ########## what if there's L2 or L3 but not L1?
 
 				'/Connected': dummy,
 				'/ProductId': dummy,
@@ -122,7 +122,7 @@ class SystemCalc:
 				'/Ac/L1/Voltage': dummy,
 				'/Ac/L2/Voltage': dummy,
 				'/Ac/L3/Voltage': dummy,
-				'/Ac/L1/Frequency': dummy ##### ? may not be present
+				'/Ac/L1/Frequency': dummy ##### ? may not be present  ########## what if there's L2 or L3 but not L1?
 				},
 			'com.victronenergy.genset' : {
 				'/Connected': dummy,
@@ -140,7 +140,7 @@ class SystemCalc:
 				'/Ac/L1/Voltage': dummy,
 				'/Ac/L2/Voltage': dummy,
 				'/Ac/L3/Voltage': dummy,
-				'/Ac/L1/Frequency': dummy, ##### ? may not be present
+				'/Ac/L1/Frequency': dummy, ##### ? may not be present ########## what if there's L2 or L3 but not L1?
 
 				'/StarterVoltage': dummy},
 			'com.victronenergy.settings' : {
@@ -163,7 +163,7 @@ class SystemCalc:
 				'/Ac/Out/L1/V': dummy,
 				'/Ac/Out/L1/I': dummy,
 #### add for GuiMods
-				'/Ac/Out/L1/F': dummy, ##### ? may not be present
+				'/Ac/Out/L1/F': dummy, ##### ? may not be present ########## what if there's L2 or L3 but not L1?
 
 				'/Yield/Power': dummy,
 				'/Soc': dummy},
@@ -184,7 +184,7 @@ class SystemCalc:
 				'/Ac/Out/L1/V': dummy,
 				'/Ac/Out/L1/I': dummy,
 #### add for GuiMods
-				'/Ac/L1/F': dummy,
+				'/Ac/L1/F': dummy, ########## what if there's L2 or L3 but not L1?
 
 				'/Yield/Power': dummy,
 				'/Soc': dummy},
@@ -283,7 +283,7 @@ class SystemCalc:
 			'/Ac/Grid/L1/Voltage': {'gettext': '%.1F A'},
 			'/Ac/Grid/L2/Voltage': {'gettext': '%.1F A'},
 			'/Ac/Grid/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L1/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/Grid/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
 
 			'/Ac/Grid/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Grid/ProductId': {'gettext': '%s'},
@@ -298,7 +298,7 @@ class SystemCalc:
 			'/Ac/Genset/L1/Voltage': {'gettext': '%.1F A'},
 			'/Ac/Genset/L2/Voltage': {'gettext': '%.1F A'},
 			'/Ac/Genset/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L1/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/Genset/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
 
 			'/Ac/Genset/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Genset/ProductId': {'gettext': '%s'},
@@ -314,7 +314,7 @@ class SystemCalc:
 			'/Ac/ConsumptionOnOutput/L1/Voltage': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L2/Voltage': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L1/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/ConsumptionOnOutput/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
 
 			'/Ac/ConsumptionOnInput/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/ConsumptionOnInput/L1/Power': {'gettext': '%.0F W'},
@@ -327,7 +327,7 @@ class SystemCalc:
 			'/Ac/ConsumptionOnInput/L1/Voltage': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L2/Voltage': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L1/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/ConsumptionOnInput/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
 
 			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Consumption/L1/Power': {'gettext': '%.0F W'},
@@ -340,7 +340,7 @@ class SystemCalc:
 			'/Ac/Consumption/L1/Voltage': {'gettext': '%.1F A'},
 			'/Ac/Consumption/L2/Voltage': {'gettext': '%.1F A'},
 			'/Ac/Consumption/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L1/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/Consumption/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
 
 			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Dc/Pv/Power': {'gettext': '%.0F W'},

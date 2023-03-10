@@ -184,13 +184,13 @@ MbPage {
                         text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (voltageL1, " V") }
+                        text: EnhFmt.formatVBusItem (voltageL1, "V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (voltageL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (voltageL2, "V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (voltageL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (voltageL3, "V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -199,14 +199,14 @@ MbPage {
                         text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: useMeter ? EnhFmt.formatVBusItem (currentL1, " A") : calculateCurrent (sys.acInput.powerL1, voltageL1) }
+                        text: useMeter ? EnhFmt.formatVBusItem (currentL1, "A") : calculateCurrent (sys.acInput.powerL1, voltageL1) }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: useMeter ? EnhFmt.formatVBusItem (currentL2, " A") : calculateCurrent (sys.acInput.powerL2, voltageL2);
+                        text: useMeter ? EnhFmt.formatVBusItem (currentL2, "A") : calculateCurrent (sys.acInput.powerL2, voltageL2);
 								visible: phaseCount >= 2 }
                Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-						text: useMeter ? EnhFmt.formatVBusItem (currentL3, " A") : calculateCurrent (sys.acInput.powerL3, voltageL3);
+						text: useMeter ? EnhFmt.formatVBusItem (currentL3, "A") : calculateCurrent (sys.acInput.powerL3, voltageL3);
 								visible: phaseCount >= 3 }
             }
             Row
@@ -216,7 +216,7 @@ MbPage {
                         text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (frequencyL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (frequencyL1, "Hz") }
             }
             Row
             {

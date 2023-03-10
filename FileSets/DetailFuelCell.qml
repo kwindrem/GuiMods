@@ -48,7 +48,7 @@ MbPage
                     text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatVBusItem (sys.fuelCell.power, " W")
+                    text: EnhFmt.formatVBusItem (sys.fuelCell.power, "W")
                 }
                 PowerGauge
                 {

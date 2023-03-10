@@ -46,7 +46,7 @@ OverviewPage {
 	property bool hasPvOnInput: sys.pvOnGrid.power.valid
 	property bool showPvOnInput: (!dcCoupled || !hasAcCharger) && hasPvOnInput
 	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
-    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnInput
+    property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnOutput
 	property bool showPvCharger: sys.pvCharger.power.valid
     property bool showDcSystem: (dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0))
     property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && sys.alternator.power.valid
@@ -100,13 +100,13 @@ OverviewPage {
 	property VBusItem vebusAcPower: VBusItem { bind: [sys.vebusPrefix, "/Ac/ActiveIn/P"] }
 	property double multiAcInputFlow: isMulti ? -noNoise (vebusAcPower) : 0
 	property double pvOnInputFlow: showPvOnInput ? noNoise (sys.pvOnGrid.power) : 0
-	property double loadsOnInputFlow: sys.acInLoad.power.valid ? noNoise (sys.acInLoad.power) : 0
+	property double loadsOnInputFlow: sys.acInLoad.power.valid ? -noNoise (sys.acInLoad.power) : 0
 	property double pvInverterOnAcOutFlow: showPvOnOutput && sys.pvOnAcOut.power.valid ? noNoise (sys.pvOnAcOut.power) : 0
 	property double acOutLoadFlow: sys.acOutLoad.power.valid ? -noNoise (sys.acOutLoad.power) : 0
 
 	property double pvChargerFlow: showPvCharger ? noNoise (sys.pvCharger.power) : 0
 	property double dcSystemFlow: showDcSystem ? -noNoise (sys.dcSystem.power) : 0
-	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
+	property double alternatorFlow: showAlternator ? -noNoise (sys.alternator.power) : 0
 	property double motorDriveFlow: showMotorDrive ? noNoise (motorDrivePowerItem) : 0
 	property double inverterDcFlow: showInverter ? noNoise (sys.vebusDc.power) : 0
 	property double batteryFlow: noNoise (sys.battery.power)
@@ -381,7 +381,7 @@ OverviewPage {
         {
 			bottom: multi.bottom; bottomMargin: 1
             horizontalCenter: multi.horizontalCenter;
-            horizontalCenterOffset: -10
+            horizontalCenterOffset: multiDcConnector.active ? -10 : 0
         }
         visible: wallClock.running
     }
@@ -584,7 +584,7 @@ OverviewPage {
 		anchors
 		{
             left: root.left; leftMargin: 5
-            bottom: dcSystemBox.top; bottomMargin: 5
+            bottom: pvChargerBox.top; bottomMargin: 5
         }
 		values: TileText {
             text: EnhFmt.formatVBusItem (sys.alternator.power)
@@ -626,7 +626,7 @@ OverviewPage {
 		anchors
 		{
             left: root.left; leftMargin: 5
-            bottom: dcSystemBox.top; bottomMargin: 5
+            bottom: pvChargerBox.top; bottomMargin: 5
         }
 		values: TileText {
             text: EnhFmt.formatVBusItem (motorDrivePowerItem)
@@ -666,10 +666,12 @@ OverviewPage {
         opacity: showDcSystem ? 1 : disabledTileOpacity
 		visible: showDcSystem || showInactiveTiles
         title: dcSystemNameItem.valid && dcSystemNameItem.value != "" ? dcSystemNameItem.value : qsTr ("DC System")
-         anchors {
-            left: root.left; leftMargin: 5
-            bottom: parent.bottom; bottomMargin: bottomOffset
-        }
+		anchors
+		{
+			right: acOutputBox.right
+            bottom: parent.bottom
+            bottomMargin: bottomOffset
+		}
 		values: TileText {
             text: EnhFmt.formatVBusItem (sys.dcSystem.power)
             font.pixelSize: 17
@@ -748,9 +750,10 @@ OverviewPage {
         opacity: showWindGen ? 1 : disabledTileOpacity
 		visible: showWindGen || showInactiveTiles
         title: qsTr ("Wind Generator")
-         anchors {
-            right: pvChargerBox.right
-            bottom: pvChargerBox.top; bottomMargin: 5
+		anchors
+		{
+            right: dcSystemBox.right
+            bottom: dcSystemBox.top; bottomMargin: 5
         }
 		values: TileText {
             text: EnhFmt.formatVBusItem (sys.windGenerator.power)
@@ -788,13 +791,11 @@ OverviewPage {
 		height: inOutTileHeight
         opacity: showPvCharger ? 1 : disabledTileOpacity
 		visible: showPvCharger || showInactiveTiles
-		
-		anchors {
-			right: acOutputBox.right
-            bottom: parent.bottom
-            bottomMargin: bottomOffset
-		}
-
+		anchors
+		{
+            left: root.left; leftMargin: 5
+            bottom: parent.bottom; bottomMargin: bottomOffset
+        }
 		values: TileText {
 			y: 12
 			text: EnhFmt.formatVBusItem (sys.pvCharger.power)
@@ -1041,8 +1042,8 @@ OverviewPage {
 		id: dcBus1
 		ballCount: 1
 		path: straight
-		active: root.active && ((showAlternator || showMotorDrive || showDcSystem) || (dcCoupled && showInactiveFlow))
-		value: -Utils.sign (alternatorFlow + motorDriveFlow + dcSystemFlow)
+		active: root.active && ((showAlternator || showMotorDrive || showPvCharger) || (dcCoupled && showInactiveFlow))
+		value: -Utils.sign (alternatorFlow + motorDriveFlow + pvChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1057,8 +1058,8 @@ OverviewPage {
 		id: dcBus2
 		ballCount: 1
 		path: straight
-		active: root.active && ((showAlternator || showMotorDrive || showAcCharger || showDcSystem) || (dcCoupled && showInactiveFlow))
-		value: Utils.sign (alternatorFlow + motorDriveFlow + dcSystemFlow + acChargerFlow)
+		active: root.active && ((showAlternator || showMotorDrive || showAcCharger || showPvCharger) || (dcCoupled && showInactiveFlow))
+		value: Utils.sign (alternatorFlow + motorDriveFlow + pvChargerFlow + acChargerFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1072,8 +1073,8 @@ OverviewPage {
 		id: dcBus3
 		ballCount: 2
 		path: straight
-		active: root.active && ((showInverter || showFuelCell || showWindGen || showPvCharger) || showInactiveFlow)
-		value: -Utils.sign (inverterDcFlow + fuelCellFlow + windGenFlow + pvChargerFlow)
+		active: root.active && ((showInverter || showFuelCell || showWindGen || showDcSystem) || showInactiveFlow)
+		value: -Utils.sign (inverterDcFlow + fuelCellFlow + windGenFlow + dcSystemFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1087,8 +1088,8 @@ OverviewPage {
 		id: dcBus4
 		ballCount: 1
 		path: straight
-		active: root.active && ((showFuelCell || showWindGen || showPvCharger) || showInactiveFlow)
-		value: -Utils.sign (fuelCellFlow + windGenFlow + pvChargerFlow)
+		active: root.active && ((showFuelCell || showWindGen || showDcSystem) || showInactiveFlow)
+		value: -Utils.sign (fuelCellFlow + windGenFlow + dcSystemFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1102,8 +1103,8 @@ OverviewPage {
 		id: dcBus5
 		ballCount: 1
 		path: straight
-		active: root.active && ((showWindGen || showPvCharger) || showInactiveFlow)
-		value: -Utils.sign (windGenFlow + pvChargerFlow)
+		active: root.active && ((showWindGen || showDcSystem) || showInactiveFlow)
+		value: -Utils.sign (windGenFlow + dcSystemFlow)
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1196,11 +1197,11 @@ OverviewPage {
         endPointVisible: false
         anchors
         {
-            left: dcSystemBox.right; leftMargin: -8
+            left: dcSystemBox.left; leftMargin: 8
             top: dcSystemBox.bottom; topMargin: -8
-            right: dcLaneLeft.horizontalCenter
-            rightMargin: +0.5 // makes this line up with others
-            bottom: alternatorConnection.top
+            right: dcLaneRight.horizontalCenter
+            rightMargin: -0.5 // makes this line up with others
+            bottom: windGenConnection.verticalCenter
         }
     }
 
@@ -1255,11 +1256,10 @@ OverviewPage {
 		endPointVisible: false
         anchors
         {
-            left: pvChargerBox.left; leftMargin: 8
+            left: pvChargerBox.right; leftMargin: -8
             top: pvChargerBox.bottom; topMargin: -8
-            right: dcLaneRight.horizontalCenter
-            rightMargin: -0.5 // makes this line up with others
-            bottom: windGenConnection.verticalCenter
+            right: dcLaneLeft.horizontalCenter
+            bottom: alternatorConnection.top
         }
 	}
 
@@ -1455,9 +1455,9 @@ OverviewPage {
 	property variant targetList:
 	[
 		acInputTarget, pvOnInputTarget, acLoadsOnInputTarget,
-		acChargerTarget, alternatorTarget, motorDriveTarget, dcSystemTarget,
+		acChargerTarget, alternatorTarget, motorDriveTarget, pvChargerTarget,
 		multiTarget, batteryTarget,
-		acLoadsOnOutputTarget, pvOnOutputTarget, fuelCellTarget, windGenTarget, pvChargerTarget 
+		acLoadsOnOutputTarget, pvOnOutputTarget, fuelCellTarget, windGenTarget, dcSystemTarget
 	]
 
 	property int selectedTarget: 0

@@ -803,6 +803,7 @@ OverviewPage {
 //////// rewrite to always call addService, removing redundant service type checks
     function discoverServices()
     {
+        numberOfTanks = 0
         numberOfTemps = 0
         numberOfPvChargers = 0
 		veDirectInverterService = ""

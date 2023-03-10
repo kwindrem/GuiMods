@@ -153,6 +153,14 @@ MbPage {
             writeAccessLevel: User.AccessUser
         }
 
+        MbSwitch
+        {
+            id: replaceInactiveAcIn
+            bind: Utils.path (bindPrefixGuiMods, "/ReplaceInactiveAcIn")
+            name: qsTr ("Replace AC in if inactive")
+            writeAccessLevel: User.AccessUser
+        }
+
          MbEditBox {
             id: dcSystemName
             description: qsTr("DC System tile name")

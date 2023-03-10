@@ -121,18 +121,18 @@ MbPage {
                                 total += pOutL1.value - pInL1.value
                                 totalValid = true
                             }
-                            if (pOutL2.vaild && pInL2.valid)
+                            if (pOutL2.valid && pInL2.valid)
                             {
                                 total += pOutL2.value - pInL2.value
                                 totalValid = true
                             }
-                            if (pOutL3.vaild && pInL3.valid)
+                            if (pOutL3.valid && pInL3.valid)
                             {
                                 total += pOutL3.value - pInL3.value
                                 totalValid = true
                             }
                             if (totalValid)
-                                return EnhFmt.formatValue (total, " W")
+                                return EnhFmt.formatValue (total, "W")
                             else
                                 return "--"
                         }                        
@@ -171,13 +171,13 @@ MbPage {
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValueDiff (pOutL1, pInL1, " W") }
+                        text: formatValueDiff (pOutL1, pInL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : formatValueDiff (pOutL2, pInL2, " W"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : formatValueDiff (pOutL2, pInL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: formatValueDiff (pOutL3, pInL3, " W"); visible: phaseCount >= 3 }
+                        text: formatValueDiff (pOutL3, pInL3, "W"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -186,13 +186,13 @@ MbPage {
                         text: qsTr("Input Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (vInL1, " V") }
+                        text: EnhFmt.formatVBusItem (vInL1, "V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (vInL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (vInL2, "V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (vInL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (vInL3, "V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -201,13 +201,13 @@ MbPage {
                         text: qsTr("Output Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (vOutL1, " V") }
+                        text: EnhFmt.formatVBusItem (vOutL1, "V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (vOutL2, " V"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (vOutL2, "V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (vOutL3, " V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (vOutL3, "V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -216,13 +216,13 @@ MbPage {
                         text: qsTr("Input Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (iInL1, " A") }
+                        text: EnhFmt.formatVBusItem (iInL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (iInL2, " A"); visible: phaseCount >= 2 }
+                        text: EnhFmt.formatVBusItem (iInL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (iInL3, " A"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (iInL3, "A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -231,13 +231,13 @@ MbPage {
                         text: qsTr("Output Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (iOutL1, " A") }
+                        text: EnhFmt.formatVBusItem (iOutL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (iOutL2, " A"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (iOutL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (iOutL3, " A"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (iOutL3, "A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -246,10 +246,10 @@ MbPage {
                         text: qsTr("Frequency In / Out") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (fInL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (fInL1, "Hz") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (fOutL1, " Hz") }
+                        text: EnhFmt.formatVBusItem (fOutL1, "Hz") }
             }
             Row
             {
@@ -272,10 +272,10 @@ MbPage {
 				}
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth * 0.3; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (dcPower, " W") }
+                        text: EnhFmt.formatVBusItem (dcPower, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth * 0.3; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (dcCurrent, " A") }
+                        text: EnhFmt.formatVBusItem (dcCurrent, "A") }
             }
             Row
             {
@@ -409,7 +409,7 @@ MbPage {
             break;;
         case DBusService.DBUS_SERVICE_INVERTER:
             numberOfInverters++
-            if (numberOfInverters === 1 && inverterService == "")
+            if (numberOfInverters === 1 && numberOfMultis === 0)
                 inverterService = service.name;
             break;;
         }

@@ -8,6 +8,7 @@
  
 import QtQuick 1.1
 import "utils.js" as Utils
+import "enhancedFormat.js" as EnhFmt
 
 OverviewPage {
 	id: root
@@ -15,6 +16,13 @@ OverviewPage {
 	property string settingsBindPrefix
 	property string bindPrefix
 	property variant sys: theSystem
+//////// added to show alternator in place of inactive genset
+    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
+    VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
+    property bool hasAlternator: true //////////sys.alternator.power.valid
+    property bool showAlternator: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && ! sys.genset.power.valid
+    property bool showAcIn: ! showAlternator     
+    
 	property string icon: "image://theme/overview-generator"
 	property VBusItem state: VBusItem { bind: Utils.path(bindPrefix, "/State") }
 	property VBusItem error: VBusItem { bind: Utils.path(bindPrefix, "/Error") }
@@ -36,7 +44,6 @@ OverviewPage {
     property bool externalOverride: externalOverrideItem.valid && externalOverrideItem.value == 1 && ! errors
     property VBusItem runningState: VBusItem { bind: Utils.path(bindPrefix, "/GeneratorRunningState") }
 
-    property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
     property bool showGauges: showGaugesItem.valid ? showGaugesItem.value === 1 ? true : false : false
 	property bool editMode: autoRunTile.editMode || manualTile.editMode
@@ -303,6 +310,7 @@ OverviewPage {
 		height: 136
 		color: "#82acde"
 		anchors { top: imageTile.bottom; left: parent.left }
+		visible: showAcIn
 		values:
 		[
 			OverviewAcValuesEnhanced { connection: sys.genset },
@@ -330,6 +338,37 @@ OverviewPage {
             maxForwardPowerParameter: ""
             maxReversePowerParameter: ""
             visible: showGauges
+        }
+	}
+//////// added to show alternator in place of AC generator
+	Tile {
+		id: alternatorTile
+		title: qsTr("ALTERNATOR POWER")
+		color: "#157894"
+		anchors.fill: acInTile
+		visible: showAlternator
+		values:
+		[
+			TileText
+			{
+				text: EnhFmt.formatVBusItem (sys.alternator.power, "W")
+				font.pixelSize: 22
+			}
+		]
+////// add power bar graph
+        PowerGauge
+        {
+            id: alternatorGauge
+            width: parent.width
+            height: 12
+            anchors
+            {
+                top: parent.top; topMargin: 20
+                horizontalCenter: parent.horizontalCenter
+            }
+            connection: sys.alternator
+            maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
+            visible: showGauges && showAlternator
         }
 	}
 
