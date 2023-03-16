@@ -1,3 +1,6 @@
+v7.19:
+	add support for v3.00~24
+
 v7.18:
 	fixed: alternator flow backwards GuiMods AC/DC coupled page
 	fixed: NaN displayed in some locaitons (DC System, Battery Detail)

@@ -23,7 +23,7 @@ from logger import setup_logging
 import delegates
 from sc_utils import safeadd as _safeadd, safemax as _safemax
 
-softwareVersion = '2.112'
+softwareVersion = '2.115'
 
 class SystemCalc:
 	STATE_IDLE = 0
@@ -74,12 +74,6 @@ class SystemCalc:
 				'/Ac/Out/L1/I': dummy,
 				'/Ac/Out/L2/I': dummy,
 				'/Ac/Out/L3/I': dummy,
-#### add for GuiMods
-				'/Ac/L1/V': dummy,
-				'/Ac/L2/V': dummy,
-				'/Ac/L3/V': dummy,
-				'/Ac/L1/Frequency': dummy, ########## what if there's L2 or L3 but not L1?
-
 				'/Connected': dummy,
 				'/ProductId': dummy,
 				'/ProductName': dummy,
@@ -117,13 +111,7 @@ class SystemCalc:
 				'/Ac/L3/Power': dummy,
 				'/Ac/L1/Current': dummy,
 				'/Ac/L2/Current': dummy,
-				'/Ac/L3/Current': dummy,
-#### add for GuiMods
-				'/Ac/L1/Voltage': dummy,
-				'/Ac/L2/Voltage': dummy,
-				'/Ac/L3/Voltage': dummy,
-				'/Ac/L1/Frequency': dummy ##### ? may not be present  ########## what if there's L2 or L3 but not L1?
-				},
+				'/Ac/L3/Current': dummy},
 			'com.victronenergy.genset' : {
 				'/Connected': dummy,
 				'/ProductName': dummy,
@@ -136,12 +124,6 @@ class SystemCalc:
 				'/Ac/L1/Current': dummy,
 				'/Ac/L2/Current': dummy,
 				'/Ac/L3/Current': dummy,
-#### add for GuiMods
-				'/Ac/L1/Voltage': dummy,
-				'/Ac/L2/Voltage': dummy,
-				'/Ac/L3/Voltage': dummy,
-				'/Ac/L1/Frequency': dummy, ##### ? may not be present ########## what if there's L2 or L3 but not L1?
-
 				'/StarterVoltage': dummy},
 			'com.victronenergy.settings' : {
 				'/Settings/SystemSetup/AcInput1' : dummy,
@@ -162,9 +144,6 @@ class SystemCalc:
 				'/Ac/Out/L1/S': dummy,
 				'/Ac/Out/L1/V': dummy,
 				'/Ac/Out/L1/I': dummy,
-#### add for GuiMods
-				'/Ac/Out/L1/F': dummy, ##### ? may not be present ########## what if there's L2 or L3 but not L1?
-
 				'/Yield/Power': dummy,
 				'/Soc': dummy},
 			'com.victronenergy.multi': {
@@ -183,9 +162,6 @@ class SystemCalc:
 				'/Ac/Out/L1/P': dummy,
 				'/Ac/Out/L1/V': dummy,
 				'/Ac/Out/L1/I': dummy,
-#### add for GuiMods
-				'/Ac/L1/F': dummy, ########## what if there's L2 or L3 but not L1?
-
 				'/Yield/Power': dummy,
 				'/Soc': dummy},
 			'com.victronenergy.dcsystem': {
@@ -222,14 +198,14 @@ class SystemCalc:
 			delegates.BatteryLife(),
 			delegates.ScheduledCharging(),
 			delegates.SourceTimers(),
-			#delegates.BydCurrentSense(self),
 			delegates.BatteryData(),
 			delegates.Gps(),
 			delegates.AcInputs(),
 			delegates.GensetStartStop(),
 			delegates.SocSync(self),
 			delegates.PvInverters(),
-			delegates.BatteryService(self)]
+			delegates.BatteryService(self),
+			delegates.CanBatterySense()]
 
 		for m in self._modules:
 			for service, paths in m.get_input():
@@ -279,12 +255,6 @@ class SystemCalc:
 			'/Ac/Grid/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/Grid/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
-
 			'/Ac/Grid/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Grid/ProductId': {'gettext': '%s'},
 			'/Ac/Grid/DeviceType': {'gettext': '%s'},
@@ -294,12 +264,6 @@ class SystemCalc:
 			'/Ac/Genset/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Genset/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Genset/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/Genset/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
-
 			'/Ac/Genset/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Genset/ProductId': {'gettext': '%s'},
 			'/Ac/Genset/DeviceType': {'gettext': '%s'},
@@ -310,12 +274,6 @@ class SystemCalc:
 			'/Ac/ConsumptionOnOutput/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/ConsumptionOnOutput/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
-
 			'/Ac/ConsumptionOnInput/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/ConsumptionOnInput/L1/Power': {'gettext': '%.0F W'},
 			'/Ac/ConsumptionOnInput/L2/Power': {'gettext': '%.0F W'},
@@ -323,12 +281,6 @@ class SystemCalc:
 			'/Ac/ConsumptionOnInput/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/ConsumptionOnInput/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
-
 			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Consumption/L1/Power': {'gettext': '%.0F W'},
 			'/Ac/Consumption/L2/Power': {'gettext': '%.0F W'},
@@ -336,12 +288,6 @@ class SystemCalc:
 			'/Ac/Consumption/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Consumption/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Consumption/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/Consumption/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L1/Frequency': {'gettext': '%.1F Hz'}, ########## what if there's L2 or L3 but not L1?
-
 			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Dc/Pv/Power': {'gettext': '%.0F W'},
 			'/Dc/Pv/Current': {'gettext': '%.1F A'},
@@ -1140,6 +1086,7 @@ class SystemCalc:
 			tz = changes.get('Value')
 			if tz is not None:
 				os.environ['TZ'] = tz
+				time.tzset()
 
 	def _device_added(self, service, instance, do_service_change=True):
 		if do_service_change:
