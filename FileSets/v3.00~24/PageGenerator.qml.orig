@@ -51,7 +51,7 @@ MbPage {
 		return "#" + value.toString() + " " + text
 	}
 
-	VisualItemModel {
+	VisibleItemModel {
 		id: _startStopModel
 
 		MbItemValue {
@@ -124,7 +124,7 @@ MbPage {
 				MbPage {
 					id: manualStartPage
 					title: qsTr("Manual start")
-					model: VisualItemModel {
+					model: VisibleItemModel {
 						MbSwitch {
 							id: manualSwitch
 							name: qsTr("Start generator")

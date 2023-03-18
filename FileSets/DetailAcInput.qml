@@ -28,22 +28,12 @@ MbPage {
     property int totalDataWidth: tableColumnWidth * dataColumns
     property int legColumnWidth: phaseCount <= 1 ? totalDataWidth : totalDataWidth / phaseCount
 
-    property int numberOfMultis: 0
-    property int numberOfInverters: 0
-    property string inverterService: ""
-    property bool isMulti: numberOfMultis === 1
-    property bool isInverter: numberOfMultis === 0 && numberOfInverters === 1
-    property int phaseCount: sys.acInput.phaseCount.valid ? sys.acInput.phaseCount.value : 0
+    property int phaseCount: sys.acLoad.phaseCount.valid ? sys.acLoad.phaseCount.value : 0
 
-	property string gridMeterService: ""
-	property string gensetService: ""
-    property string meterService: activeSource.valid && activeSource.value === 2 ? gensetService : gridMeterService
-    property bool useMeter: meterService != ""
-    property string pathPrefix: useMeter ? Utils.path ( meterService, "/Ac/") : Utils.path (inverterService, "/Ac/ActiveIn/")
-    property string voltageSuffix: useMeter ? "/Voltage" : "/V"
-    property string currentSuffix: useMeter ? "/Current" : "/I"
-
-    
+    VBusItem { id: vebusServiceItem; bind: Utils.path(systemPrefix, "/VebusService") }
+    property string inverterService: vebusServiceItem.valid ? vebusServiceItem.value : ""
+    VBusItem { id: splitPhaseL2Passthru; bind: Utils.path(inverterService, "/Ac/State/SplitPhaseL2Passthru") }
+    property bool l1AndL2OutShorted: splitPhaseL2Passthru.valid && splitPhaseL2Passthru.value === 0
 
     property real actualCurrentLimit: 0
     property real newCurrentLimit: 0
@@ -59,7 +49,7 @@ MbPage {
 
 	property bool currentLimitIsAdjustable: currentLimitIsAdjustableItem.valid && currentLimitIsAdjustableItem.value == 1  && currentLimitItem.valid
 
-    Component.onCompleted: { discoverServices(); getActualCurrent () }
+    Component.onCompleted: { getActualCurrent () }
 
     VBusItem
     {
@@ -87,6 +77,7 @@ MbPage {
     VBusItem { id: frequencyL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/F") }
     VBusItem { id: activeSource; bind: Utils.path(systemPrefix, "/Ac/ActiveIn/Source") }
     VBusItem { id: activeInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
+    VBusItem { id: numberOfAcInputs; bind: Utils.path(inverterService, "/Ac/In/NumberOfAcInputs") }
 
     // background
     Rectangle
@@ -127,13 +118,7 @@ MbPage {
                     text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                    text:
-                    {
-                        if (sys.acInput.power.valid)
-                            return sys.acInput.power.value.toFixed (0) + " W"
-                        else
-                            return "--"
-                    }                        
+                    text: EnhFmt.formatVBusItem (sys.acInput.power, "W")
                 }
                 visible: phaseCount >= 2
             }
@@ -150,32 +135,16 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: "" }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L1" }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L2" }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L3"; visible: phaseCount >= 3 }
-                visible: phaseCount >= 2
-            }
-            Row
-            {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInput.powerL1) }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.powerL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInput.powerL2); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.powerL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInput.powerL3); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.powerL3, "W"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -184,13 +153,13 @@ MbPage {
                         text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (voltageL1, "V") }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.voltageL1, "V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (voltageL2, "V"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.voltageL2, "V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (voltageL3, "V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.voltageL3, "V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -199,15 +168,13 @@ MbPage {
                         text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: useMeter ? EnhFmt.formatVBusItem (currentL1, "A") : calculateCurrent (sys.acInput.powerL1, voltageL1) }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.currentL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: useMeter ? EnhFmt.formatVBusItem (currentL2, "A") : calculateCurrent (sys.acInput.powerL2, voltageL2);
-								visible: phaseCount >= 2 }
-               Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.currentL2, "A"); visible: phaseCount >= 2 }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-						text: useMeter ? EnhFmt.formatVBusItem (currentL3, "A") : calculateCurrent (sys.acInput.powerL3, voltageL3);
-								visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.currentL3, "A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -216,7 +183,7 @@ MbPage {
                         text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (frequencyL1, "Hz") }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.frequencyL1, "Hz") }
             }
             Row
             {
@@ -239,8 +206,8 @@ MbPage {
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr("Current values are estimated")
-                        visible: ! useMeter }
+                        text: "L2 values included in L1"
+                        visible: l1AndL2OutShorted }
             }
         }
         Column
@@ -440,46 +407,6 @@ MbPage {
         onDbusServiceFound: addService(service)
     }
 
-    function addService(service)
-    {
-         switch (service.type)
-        {
-        case DBusService.DBUS_SERVICE_MULTI:
-            numberOfMultis++
-            if (numberOfMultis === 1)
-                inverterService = service.name;
-            break;;
-        case DBusService.DBUS_SERVICE_INVERTER:
-            numberOfInverters++
-            if (numberOfInverters === 1 && inverterService == "")
-                inverterService = service.name;
-            break;;
-		case DBusService.DBUS_SERVICE_GRIDMETER:
-            if (gridMeterService === "")
-				gridMeterService = service.name;
-            break;;
-		case DBusService.DBUS_SERVICE_GENSET:
-            if (gensetService === "")
-				gensetService = service.name;
-            break;;
-        }
-    }
-
-    // Detect available services of interest
-    function discoverServices()
-    {
-        numberOfMultis = 0
-        numberOfInverters = 0
-        inverterService = ""
-		gridMeterService = ""
-		gensetService = ""
-        for (var i = 0; i < DBusServices.count; i++)
-        {
-            addService(DBusServices.at(i))
-        }
-    }
-
-
     property variant acSourceName: [qsTr("Not available"), qsTr("Grid"), qsTr("Generator"), qsTr("Shore")]
     function getAcSource()
     {
@@ -495,17 +422,6 @@ MbPage {
             return ""
         return acSourceName[activeSource.value] + " (Input " + input + ")"
     }
-
-    // fake current value from power / voltage
-    // does not consider power factor so this value for current is not really correct
-    function calculateCurrent (powerItem, voltageItem)
-    {
-        if (powerItem.valid && voltageItem.valid && voltageItem.value != 0)
-			return EnhFmt.formatValue (powerItem.value / voltageItem.value, "A")
-        else
-            return "--"
-    }
-
 
 	//// hard key handler
 	//		used to press buttons when touch isn't available

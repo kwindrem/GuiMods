@@ -36,14 +36,12 @@ Item {
 	property alias acInLoad: _acInLoad
 	property alias acOutLoad: _acOutLoad
 	property alias grid: _grid
+    property alias acInput: _activein
 	property alias genset: _genset
 	property VBusItem systemType: VBusItem { bind: Utils.path(systemPrefix, "/SystemType") }
 	property variant acSource: _acSource.value
 
 	property alias pvOnGrid: _pvOnAcIn2
-	property variant acInput: (acSource === acSourceGenset ? _genset :
-							(acSource === acSourceGrid || acSource === acSourceShore ? _grid  :
-							_acUnknown))
 
 	property int batteryStateIdle: 0
 	property int batteryStateCharging: 1
@@ -118,6 +116,7 @@ Item {
 
 	ObjectAcConnection {
 		id: _genset
+        splitPhaseL2PassthruDisabled: _splitPhaseL2Passthru.value === 0
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Genset")
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
@@ -129,8 +128,24 @@ Item {
 		bind: Utils.path(systemPrefix, "/Ac/ActiveIn/Source")
 	}
 
+    /*
+     * Single Multis that can be split-phase reports NrOfPhases of 2
+     * When L2 is disconnected from the input the output L1 and L2
+     * are shorted. This item indicates if L2 is passed through
+     * from AC-in to AC-out.
+     * 1: L2 is being passed through from AC-in to AC-out.
+     * 0: L1 and L2 are shorted together.
+     * invalid: The unit is configured in such way that its L2 output is not used.
+     */
+
+    VBusItem {
+        id: _splitPhaseL2Passthru
+        bind: Utils.path(vebusPrefix, "/Ac/State/SplitPhaseL2Passthru")
+    }
+
 	ObjectAcConnection {
 		id: _grid
+        splitPhaseL2PassthruDisabled: _splitPhaseL2Passthru.value === 0
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Grid")
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
@@ -139,6 +154,8 @@ Item {
 
 	ObjectAcConnection {
 		id: _acLoad
+        splitPhaseL2PassthruDisabled: _splitPhaseL2Passthru.value === 0
+        isAcOutput: true
 		bindPrefix: Utils.path(systemPrefix, "/Ac/Consumption")
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/Out"
@@ -147,11 +164,22 @@ Item {
 
 	ObjectAcConnection {
 		id: _acOutLoad
+        splitPhaseL2PassthruDisabled:_splitPhaseL2Passthru.value === 0
+        isAcOutput: true
 		bindPrefix: Utils.path(systemPrefix, "/Ac/ConsumptionOnOutput")
 	}
 
+    ObjectAcConnection {
+        id: _activein
+        bindPrefix: Utils.path(systemPrefix, "/Ac/ActiveIn")
+//////// modified for VE.Direct inverter support
+        inverterSource: "/Ac/ActiveIn"
+        inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
+    }
+
 	ObjectAcConnection {
 		id: _acInLoad
+        splitPhaseL2PassthruDisabled:_splitPhaseL2Passthru.value === 0
 		bindPrefix: Utils.path(systemPrefix, "/Ac/ConsumptionOnInput")
 	}
 
@@ -196,6 +224,7 @@ Item {
 	property int kilowattThreshold: kwThresholdItem.valid ? kwThresholdItem.value : 1000
 
 //////// add to support VE.Direct inverters
+//////// and grid/genset meters
     Component.onCompleted: discoverServices()
 
     // When new service is found check if is a tank sensor
@@ -212,12 +241,23 @@ Item {
             if (inverterService === "")
                 inverterService = service.name;
             break;;
+		case DBusService.DBUS_SERVICE_GRIDMETER:
+            if (gridMeterService === "")
+				gridMeterService = service.name;
+            break;;
+		case DBusService.DBUS_SERVICE_GENSET:
+            if (gensetService === "")
+				gensetService = service.name;
+            break;;
         }
     }
 
     // Check available services inverter services
     function discoverServices()
     {
+		inverterService = ""
+		gridMeterService = ""
+		gensetService = ""
         for (var i = 0; i < DBusServices.count; i++)
                 addService(DBusServices.at(i))
     }

@@ -29,7 +29,7 @@ OverviewPage {
 	property bool isMulti: vebusService.valid
 	property string veDirectInverterService: ""
 	property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
-	
+
 	VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
 	property bool hasAlternator: sys.alternator.power.valid
 	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && (sys.acSource == 0 || sys.acSource == 240)
@@ -53,10 +53,9 @@ OverviewPage {
 	property int bottomOffset: 45
 	property string settingsBindPreffix: "com.victronenergy.settings"
 	property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
-	property int numberOfTanks: 0
 	property int numberOfTemps: 0
 //////// added/modified for control show/hide gauges, tanks and temps from menus
-	property int tankCount: showTanksEnable ? numberOfTanks : 0
+	property int tankCount: showTanksEnable ? tankModel.rowCount : 0
 	property int tempCount: showTempsEnable ? numberOfTemps : 0
 	property int tankTempCount: tankCount + tempCount
 	property bool showTanks: showTanksEnable ? showStatusBar ? false : tankCount > 0 ? true : false : false
@@ -239,10 +238,11 @@ OverviewPage {
 			useInputCurrentLimit: true
 			maxForwardPowerParameter: ""
 			maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxFeedInPower"
-			show: showGauges && showAcInput
+			visible: showGauges && showAcInput
 		}
 		DetailTarget { id: acInputTarget; detailsPage: "DetailAcInput.qml" }
 	}
+
 
 	//// add alternator if AC input not present
 	OverviewBox {
@@ -338,7 +338,7 @@ OverviewPage {
 				horizontalCenter: parent.horizontalCenter
 			}
 			inverterService: root.inverterService
-			show: showGauges
+			visible: showGauges
 		}
 		DetailTarget { id: multiTarget;  detailsPage: "DetailInverter.qml"; width: 60; height: 60 }
 	}
@@ -362,7 +362,7 @@ OverviewPage {
 			top: multi.top; topMargin: 96
 			horizontalCenter: multi.horizontalCenter
 		}
-		show: wallClock.running
+		visible: wallClock.running
 	}
 
 	OverviewBox {
@@ -396,9 +396,9 @@ OverviewPage {
 			}
 			connection: sys.acLoad
 			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
-			show: showGauges && showAcLoads
+			visible: showGauges && showAcLoads
 		}
-		DetailTarget { id: loadsOnOutputTarget;  detailsPage: "DetailLoadsCombined.qml" }
+		DetailTarget { id: loadsOnOutputTarget;  detailsPage: "DetailLoadsCombined.qml" } //////////////
 	}
 
 	Battery {
@@ -416,7 +416,7 @@ OverviewPage {
 				top: parent.top; topMargin: 52
 				horizontalCenter: parent.horizontalCenter
 			}
-			show: showGauges
+			visible: showGauges
 		}
 
 ////// MODIFIED to show tanks
@@ -496,7 +496,7 @@ OverviewPage {
 			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad"
 			maxReversePowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge"
 			showLabels: true
-			show: showGauges && showDcSystem
+			visible: showGauges && showDcSystem
 
 		}
 		DetailTarget { id: dcSystemTarget;  detailsPage: "DetailDcSystem.qml" }
@@ -678,39 +678,54 @@ OverviewPage {
 				font.pixelSize: 15
 				visible: pvShowDetails && numberOfPvChargers >= 2
 			},
-						MarqueeEnhanced
+			MarqueeEnhanced
 			{
-				y: pvOffset4
-				id: pv4Name
-				// ofset left margin for this row if NOT showing tanks/temps
-				width:
-				{
-					if (pvChargerCompact)
-					{
-						if (! showTanksTemps)
-							return ((parent.width / 2) - 15)
-						else
-							return ((parent.width / 2) - 5)
-					}
-					else
-						return (parent.width - 10)
-				}
-				anchors.left: parent.left; anchors.leftMargin: ( ! showTanksTemps && pvChargerCompact) ? 15 : 5
+				y: pvOffset3
+				id: pv3Name
+				width: pvChargerCompact ? ((parent.width / 2) - 5) : parent.width - 10
+				anchors.left: parent.left; anchors.leftMargin: 5
 				height: 15
-				text: pvName4.valid ? pvName4.value : "pv 4"
+				text: pvName3.valid ? pvName3.value : "pv 3"
 				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
 				fontSize: 15
-				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
+				Connections { target: scrollTimer; onTriggered: pv3Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
+				visible: numberOfPvChargers >= 3 && ! showDcAndAcSolar
 			},
 			TileText {
-				y: pvOffset4 + (pvChargerCompact ? 0 : pvRowSpacing)
-				text: EnhFmt.formatVBusItem (pvPower4, "W")
+				y: pvOffset3 + (pvChargerCompact ? 0 : pvRowSpacing)
+				text: EnhFmt.formatVBusItem (pvPower3, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
 				font.pixelSize: 15
-				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
+				visible: numberOfPvChargers >= 3 && ! showDcAndAcSolar
+			},
+			TileText {
+				y: pvOffset3 + pvRowSpacing * (pvChargerCompact ? 1 : 2)
+				text:
+				{
+					var voltageText, currentText
+					if (root.numberOfPvChargers < 3)
+						return " "
+					else
+					{
+						if (pv3NrTrackers.valid && pv3NrTrackers.value > 1)
+							return qsTr ("multiple trackers")
+						else if (pvVoltage3.valid)
+							voltageText = EnhFmt.formatVBusItem (pvVoltage3, "V")
+						else
+							voltageText = "??V"
+						if (pvCurrent3.valid)
+							currentText = EnhFmt.formatVBusItem (pvCurrent3, "A")
+						else if (pvPower3.valid)
+							currentText =  EnhFmt.formatValue ((pvPower3.value / pvVoltage3.value), "A")
+						else
+							currentText = "??A"
+						return voltageText + " " + currentText
+					}
+				}
+				font.pixelSize: 15
+				visible: pvShowDetails && numberOfPvChargers >= 2
 			},
 			MarqueeEnhanced
 			{
@@ -736,7 +751,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 4 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
 			},
 			TileText {
 				y: pvOffset4 + (pvChargerCompact ? 0 : pvRowSpacing)
@@ -826,7 +841,7 @@ OverviewPage {
 			}
 			connection: sys.pvCharger
 			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"
-			show: showGauges && showDcSolar
+			visible: showGauges && showDcSolar
 		}
 		DetailTarget { id: pvChargerTarget;  detailsPage: "DetailPvCharger.qml" }
 	}
@@ -1141,8 +1156,11 @@ OverviewPage {
 		interactive: count > 4 ? true : false
 		orientation: ListView.Horizontal
 
-		model: tanksModel
+		model: TankModel { id: tankModel }
 		delegate: TileTankEnhanced {
+			// Without an intermediate assignment this will trigger a binding loop warning.
+			property variant theService: DBusServices.get(buddy.id)
+			service: theService
 			width: tanksColum.tileWidth
 			height: root.tanksHeight
 			pumpBindPrefix: root.pumpBindPreffix
@@ -1163,7 +1181,6 @@ OverviewPage {
 			z: -1
 		}
 	}
-	ListModel { id: tanksModel }
 
 	ListView
 	{
@@ -1227,11 +1244,6 @@ OverviewPage {
 		 switch (service.type)
 		{
 //////// add for temp sensors
-		case (service.type === DBusService.DBUS_SERVICE_TANK):
-			tanksModel.append({serviceName: service.name})
-			numberOfTanks++
-			break;;
-//////// add for temp sensors
 		case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
 			numberOfTemps++
 			tempsModel.append({serviceName: service.name})
@@ -1287,7 +1299,7 @@ OverviewPage {
 				tempsModel.append({serviceName: service.name})
 			}
 			break;;
- //////// add for alternator
+//////// add for alternator
 		case DBusService.DBUS_SERVICE_ALTERNATOR:
 			numberOfAlternators++
 			if (numberOfAlternators === 1)
@@ -1301,7 +1313,6 @@ OverviewPage {
 	// Detect available services of interest
 	function discoverServices()
 	{
-		numberOfTanks = 0
 		numberOfTemps = 0
 		numberOfPvChargers = 0
 		numberOfPvInverters = 0
@@ -1319,7 +1330,6 @@ OverviewPage {
 		pvInverterPrefix3 = ""
 		alternatorPrefix1 = ""
 		alternatorPrefix2 = ""
-		tanksModel.clear()
 		tempsModel.clear()
 		for (var i = 0; i < DBusServices.count; i++)
 		{

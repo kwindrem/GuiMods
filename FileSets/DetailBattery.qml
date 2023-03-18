@@ -18,15 +18,16 @@ MbPage
     property color backgroundColor: "#b3b3b3"
 
     property int buttonHeight: 40
-    property int tableColumnWidth: 100
-    property int rowTitleWidth: 160
-    property int tableWidth: rowTitleWidth + tableColumnWidth * 2
-    property int essWidth: tableWidth / 4
+    property int tableColumnWidth: 80
+    property int rowTitleWidth: 120
+    property int tableWidth: rowTitleWidth * 2 + tableColumnWidth * 3
+    property int essWidth3: tableWidth / 3
+    property int essWidth2: tableWidth / 2
     property bool showEssCodes: systemType.valid && systemType.value === "ESS" || systemType.value === "Hub-4"
     property real essDimOpacity: 0.2
 
-    VBusItem { id: timeToGo;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/TimeToGo") }
-    VBusItem { id: consumedAh;  bind: Utils.path("com.victronenergy.system","/Dc/Battery/ConsumedAmphours") }
+    VBusItem { id: timeToGo;  bind: Utils.path(systemPrefix,"/Dc/Battery/TimeToGo") }
+    VBusItem { id: consumedAh;  bind: Utils.path(systemPrefix,"/Dc/Battery/ConsumedAmphours") }
 
     VBusItem { id: systemType; bind: Utils.path(systemPrefix, "/SystemType") }
     VBusItem { id: lowSoc; bind: Utils.path(systemPrefix, "/SystemState/LowSoc") }
@@ -36,6 +37,19 @@ MbPage
     VBusItem { id: dischargeDisabled; bind: Utils.path(systemPrefix, "/SystemState/DischargeDisabled") }
     VBusItem { id: chargeLimited; bind: Utils.path(systemPrefix, "/SystemState/UserChargeLimited") }
     VBusItem { id: dischargeLimited; bind: Utils.path(systemPrefix, "/SystemState/UserDischargeLimited") }
+    VBusItem { id: batteryServiceItem; bind: Utils.path(systemPrefix, "/Dc/Battery/BatteryService") }
+
+	property string batteryService: batteryServiceItem.valid ? batteryServiceItem.value : ""
+	VBusItem { id: batteryCapacityItem; bind: Utils.path(batteryService, "/InstalledCapacity") }
+	property bool showAhRemaining: batteryCapacityItem.valid
+	VBusItem { id: minimumCellVoltageItem; bind: Utils.path(batteryService, "/System/MinCellVoltage") }
+	VBusItem { id: maximumCellVoltageItem; bind: Utils.path(batteryService, "/System/MaxCellVoltage") }
+	property bool showCellVoltages: minimumCellVoltageItem.valid && maximumCellVoltageItem.valid
+	VBusItem { id: chargeLimitItem; bind: Utils.path(batteryService, "/Info/MaxChargeCurrent") }
+	VBusItem { id: dischargeLimitItem; bind: Utils.path(batteryService, "/Info/MaxDischargeCurrent") }
+	property bool showChargeDischargeLimits: chargeLimitItem.valid || dischargeLimitItem.valid
+	property bool chargeDisabled: chargeLimitItem.valid && chargeLimitItem.value == 0
+	property bool dischargeDisabled: dischargeLimitItem.valid && dischargeLimitItem.value == 0
 
     // background
     Rectangle
@@ -54,10 +68,11 @@ MbPage
         spacing: 2
         Row
         {
+			anchors.horizontalCenter: parent.horizontalCenter
             PowerGaugeBattery
             {
                 id: gauge
-                width: tableWidth
+                width: tableWidth * 0.8
                 height: 15
 				endLabelColor: "black"
             }
@@ -70,27 +85,11 @@ MbPage
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: EnhFmt.formatVBusItem (sys.battery.soc) }
-			Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
-        }
-        Row
-        {
-            Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr ("Remaining time") }
-            Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : "" }
-             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
-        }
-        Row
-        {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                     text: qsTr ("State") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                width: tableColumnWidth * 2; horizontalAlignment: Text.AlignHCenter
                 text:
                 {
                     if (sys.battery.power.valid)
@@ -103,11 +102,41 @@ MbPage
                             return qsTr ("Idle")
                     }
                     else
-                        return ""
+                        return "no state"
                 }
             }
+        }
+        Row
+        {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Consumed") }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text: EnhFmt.formatVBusItemAbs (consumedAh, "AH") }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: showAhRemaining ? qsTr ("Remaining") : "" }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter;
+                    text: showAhRemaining ? EnhFmt.formatValue (batteryCapacityItem.value - consumedAh.value, "AH") : ""
+                    
+			}
+        }
+        Row
+        {
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Voltage") }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text: EnhFmt.formatVBusItem (sys.battery.voltage) }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Remaining time") }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text: timeToGo.valid ? TTG.formatTimeToGo (timeToGo) : "" }
         }
        Row
         {
@@ -117,7 +146,22 @@ MbPage
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: EnhFmt.formatVBusItemAbs (sys.battery.power) }
-            Text { id: chargingText; font.pixelSize: 12; font.bold: true; color: "black"
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Current") }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text:
+                    {
+						if (sys.battery.current.vaid)
+							return EnhFmt.formatVBusItem (sys.battery.current, "A")
+						else if (sys.battery.power.valid && sys.battery.voltage.valid)
+							return EnhFmt.formatValueAbs (sys.battery.power.value / sys.battery.voltage.value, "A")
+						else
+							return "---"
+					}
+			}
+			Text { id: chargingText; font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: sys.battery.power.value < 0 ? qsTr ("supplying") : sys.battery.power.value > 0 ? qsTr ("consuming") : "" }
         }
@@ -125,35 +169,38 @@ MbPage
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr ("Voltage") }
+                    text: qsTr ("Min cell voltage") }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: sys.battery.voltage.format(2) }
-             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
+                    text: minimumCellVoltageItem.valid ? minimumCellVoltageItem.value.toFixed (3) + " V" : "" }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Max cell voltage") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter;
+                    text: maximumCellVoltageItem.valid ? maximumCellVoltageItem.value.toFixed (3) + " V" : ""}
+			visible: showCellVoltages
         }
         Row
         {
-            Text { font.pixelSize: 12; font.bold: true; color: "black"
+            Text { font.pixelSize: 12; font.bold: true; color: root.dischargeDisabled ? "red" : "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr ("Current") }
-            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    text: root.dischargeDisabled ? qsTr ("Discharge") : qsTr ("Discharge Limit") }
+            Text { font.pixelSize: 12; font.bold: true; color: root.dischargeDisabled ? "red" : "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatValueAbs (sys.battery.power.value / sys.battery.voltage.value, "A") }
-             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: chargingText.text }
-        }
-        Row
-        {
-            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    text: root.dischargeDisabled ? qsTr ("disabled") : EnhFmt.formatVBusItem (dischargeLimitItem.value, "A")
+			}
+            Text { font.pixelSize: 12; font.bold: true; color: root.chargeDisabled ? "red" : "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr ("Consumed Amp-Hours") }
-            Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatVBusItemAbs (consumedAh, "AH") }
-             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter; text: "" }
+                    text: root.chargeDisabled ? qsTr ("Charge") : qsTr ("Charge Limit") }
+            Text { font.pixelSize: 12; font.bold: true; color: root.chargeDisabled ? "red" : "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter;
+                    text: root.chargeDisabled ? qsTr ("disabled") : EnhFmt.formatVBusItem (chargeLimitItem.value, "A") 
+			}
+			visible: showChargeDischargeLimits
         }
+
+
         Row
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
@@ -164,31 +211,31 @@ MbPage
         Row
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth3; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Low SOC"); visible: showEssCodes; opacity: lowSoc.value === 1 ? 1 : essDimOpacity }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth3; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Slow Charge"); visible: showEssCodes; opacity: slowCharge.value === 1 ? 1 : essDimOpacity }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth * 2; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth3; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Battery Life"); visible: showEssCodes; opacity: batteryLife.value === 1 ? 1 : essDimOpacity}
         }
         Row
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth * 2; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth2; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Charge Disabled"); visible: showEssCodes; opacity: chargeDisabled.value === 1 ? 1 : essDimOpacity }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth * 2; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth2; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Discharge Disabled") ; visible: showEssCodes; opacity: dischargeDisabled.value === 1 ? 1 : essDimOpacity }
         }
         Row
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth * 2; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth2; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Charge Limited"); visible: showEssCodes; opacity: chargeLimited.value === 1 ? 1 : essDimOpacity }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: essWidth * 2; horizontalAlignment: Text.AlignHCenter
+                    width: essWidth2; horizontalAlignment: Text.AlignHCenter
                     text: qsTr ("Discharge Limited") ; visible: showEssCodes; opacity: dischargeLimited.value === 1 ? 1 : essDimOpacity }
         }
     }

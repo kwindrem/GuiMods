@@ -1,5 +1,6 @@
 ////// modified to show voltage, current and frequency in flow overview
 ////// modified to show bar graphs
+//////// modified to use grid or genset meter if present
 // probably doesn't support paralleled Multis/Quatros
 
 import QtQuick 1.1
@@ -8,14 +9,14 @@ import "utils.js" as Utils
 
 QtObject {
 	property string bindPrefix
-    property string inverterService: ""   
+    property string inverterService: ""
     property string inverterSource: ""
 
 	property VBusItem powerL1: VBusItem { bind: Utils.path(bindPrefix, "/L1/Power"); unit: "W"}
 	property VBusItem powerL2: VBusItem { bind: Utils.path(bindPrefix, "/L2/Power"); unit: "W"}
 	property VBusItem powerL3: VBusItem { bind: Utils.path(bindPrefix, "/L3/Power"); unit: "W"}
 	property VBusItem power: VBusItem { unit: "W" }
-////// added for compatibility with v2.80 changes
+    property VBusItem phaseCount: VBusItem { bind: Utils.path(bindPrefix, "/NumberOfPhases") }
     property bool splitPhaseL2PassthruDisabled: false
     property bool isAcOutput: false
     property bool l1AndL2OutShorted: splitPhaseL2PassthruDisabled && isAcOutput

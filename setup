@@ -46,6 +46,7 @@ if [ $scriptAction == 'INSTALL' ] || [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/OverviewAcValuesEnhancedGP.qml"
     restoreActiveFile "$qmlDir/OverviewSolarChargerEnhanced.qml"
     restoreActiveFile "$qmlDir/OverviewSolarInverter.qml"
+    restoreActiveFile "$qmlDir/OverviewGenerator.qml"
 fi
 
 #### installing
@@ -276,6 +277,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/DetailBattery.qml"
     updateActiveFile "$qmlDir/DetailLoadsOnOutput.qml"
     updateActiveFile "$qmlDir/DetailLoadsOnInput.qml"
+    updateActiveFile "$qmlDir/DetailLoadsCombined.qml"
     updateActiveFile "$qmlDir/DetailPvCharger.qml"
     updateActiveFile "$qmlDir/PvChargerRow.qml"
     updateActiveFile "$qmlDir/DetailPvInverter.qml"
@@ -303,7 +305,6 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml"
     updateActiveFile "/opt/victronenergy/gui/qml/DetailFuelCell.qml"
 
-    updateActiveFile "/opt/victronenergy/gui/qml/OverviewGenerator.qml"
     updateActiveFile "/opt/victronenergy/dbus-generator-starter/startstop.py"
     if $thisFileUpdated; then
 		restartGeneratorService=true
@@ -354,6 +355,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/DetailBattery.qml"
     restoreActiveFile "$qmlDir/DetailLoadsOnOutput.qml"
     restoreActiveFile "$qmlDir/DetailLoadsOnInput.qml"
+	restoreActiveFile "$qmlDir/DetailLoadsCombined.qml"
     restoreActiveFile "$qmlDir/DetailPvCharger.qml"
     restoreActiveFile "$qmlDir/PvChargerRow.qml"
 	restoreActiveFile "$qmlDir/DetailAcCharger.qml"
@@ -382,7 +384,6 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
 	restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml"
 	restoreActiveFile "/opt/victronenergy/gui/qml/DetailFuelCell.qml"
 
-    restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGenerator.qml"
     restoreActiveFile "/opt/victronenergy/dbus-generator-starter/startstop.py"
     if $thisFileUpdated; then
 		restartGeneratorService=true

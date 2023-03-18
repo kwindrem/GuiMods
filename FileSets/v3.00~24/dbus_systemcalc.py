@@ -23,7 +23,7 @@ from logger import setup_logging
 import delegates
 from sc_utils import safeadd as _safeadd, safemax as _safemax
 
-softwareVersion = '2.103'
+softwareVersion = '2.115'
 
 class SystemCalc:
 	STATE_IDLE = 0
@@ -44,18 +44,6 @@ class SystemCalc:
 				'/Dc/0/Current': dummy,
 				'/Load/I': dummy,
 				'/FirmwareVersion': dummy},
-			'com.victronenergy.pvinverter': {
-				'/Connected': dummy,
-				'/ProductName': dummy,
-				'/Mgmt/Connection': dummy,
-				'/Ac/L1/Power': dummy,
-				'/Ac/L2/Power': dummy,
-				'/Ac/L3/Power': dummy,
-				'/Ac/L1/Current': dummy,
-				'/Ac/L2/Current': dummy,
-				'/Ac/L3/Current': dummy,
-				'/Position': dummy,
-				'/ProductId': dummy},
 			'com.victronenergy.battery': {
 				'/Connected': dummy,
 				'/ProductName': dummy,
@@ -70,7 +58,8 @@ class SystemCalc:
 				'/TimeToGo': dummy,
 				'/ConsumedAmphours': dummy,
 				'/ProductId': dummy,
-				'/CustomName': dummy},
+				'/CustomName': dummy,
+				'/Info/MaxChargeVoltage': dummy},
 			'com.victronenergy.vebus' : {
 				'/Ac/ActiveIn/ActiveInput': dummy,
 				'/Ac/ActiveIn/L1/P': dummy,
@@ -236,6 +225,7 @@ class SystemCalc:
 			delegates.RelayState(),
 			delegates.BuzzerControl(),
 			delegates.LgCircuitBreakerDetect(),
+			delegates.BatterySoc(self),
 			delegates.Dvcc(self),
 			delegates.BatterySense(self),
 			delegates.BatterySettings(self),
@@ -243,12 +233,14 @@ class SystemCalc:
 			delegates.BatteryLife(),
 			delegates.ScheduledCharging(),
 			delegates.SourceTimers(),
-			#delegates.BydCurrentSense(self),
 			delegates.BatteryData(),
 			delegates.Gps(),
 			delegates.AcInputs(),
 			delegates.GensetStartStop(),
-			delegates.SocSync(self)]
+			delegates.SocSync(self),
+			delegates.PvInverters(),
+			delegates.BatteryService(self),
+			delegates.CanBatterySense()]
 
 		for m in self._modules:
 			for service, paths in m.get_input():
@@ -291,8 +283,6 @@ class SystemCalc:
 			'/ActiveBatteryService', value=None, gettextcallback=self._gettext)
 		self._dbusservice.add_path(
 			'/Dc/Battery/BatteryService', value=None)
-		self._dbusservice.add_path(
-			'/PvInvertersProductIds', value=None)
 		self._summeditems = {
 			'/Ac/Grid/L1/Power': {'gettext': '%.0F W'},
 			'/Ac/Grid/L2/Power': {'gettext': '%.0F W'},
@@ -373,35 +363,12 @@ class SystemCalc:
 			'/Ac/Consumption/L2/Frequency': {'gettext': '%.1F Hz'},
 			'/Ac/Consumption/L3/Frequency': {'gettext': '%.1F Hz'},
 
-			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
-			'/Ac/PvOnOutput/L1/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnOutput/L2/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnOutput/L3/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnOutput/L1/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnOutput/L2/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnOutput/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnOutput/NumberOfPhases': {'gettext': '%.0F W'},
-			'/Ac/PvOnGrid/L1/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnGrid/L2/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnGrid/L3/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnGrid/L1/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnGrid/L2/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnGrid/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnGrid/NumberOfPhases': {'gettext': '%.0F W'},
-			'/Ac/PvOnGenset/L1/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnGenset/L2/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnGenset/L3/Power': {'gettext': '%.0F W'},
-			'/Ac/PvOnGenset/L1/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnGenset/L2/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnGenset/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/PvOnGenset/NumberOfPhases': {'gettext': '%d'},
 			'/Dc/Pv/Power': {'gettext': '%.0F W'},
 			'/Dc/Pv/Current': {'gettext': '%.1F A'},
 			'/Dc/Battery/Voltage': {'gettext': '%.2F V'},
 			'/Dc/Battery/VoltageService': {'gettext': '%s'},
 			'/Dc/Battery/Current': {'gettext': '%.1F A'},
 			'/Dc/Battery/Power': {'gettext': '%.0F W'},
-			'/Dc/Battery/Soc': {'gettext': '%.0F %%'},
 			'/Dc/Battery/State': {'gettext': '%s'},
 			'/Dc/Battery/TimeToGo': {'gettext': '%.0F s'},
 			'/Dc/Battery/ConsumedAmphours': {'gettext': '%.1F Ah'},
@@ -538,9 +505,9 @@ class SystemCalc:
 				(self._settings['batteryservice'], self._batteryservice, newbatteryservice, instance))
 
 			# Battery service has changed. Notify delegates.
+			self._dbusservice['/Dc/Battery/BatteryService'] = self._batteryservice = newbatteryservice
 			for m in self._modules:
 				m.battery_service_changed(auto_selected, self._batteryservice, newbatteryservice)
-			self._dbusservice['/Dc/Battery/BatteryService'] = self._batteryservice = newbatteryservice
 
 	def _autoselect_battery_service(self):
 		# Default setting business logic:
@@ -550,9 +517,13 @@ class SystemCalc:
 		# there, assume this is a hub-2, hub-3 or hub-4 system and use VE.Bus SOC.
 		batteries = self._get_connected_service_list('com.victronenergy.battery')
 
-		# Pick the first battery service
+		# Pick the battery service that has the lowest DeviceInstance, giving
+		# preference to those with a BMS.
 		if len(batteries) > 0:
-			return sorted(batteries)[0]
+			batteries = [
+				(not self._dbusmonitor.seen(s, '/Info/MaxChargeVoltage'), i, s)
+				for s, i in batteries.items()]
+			return sorted(batteries, key=lambda x: x[:2])[0][2]
 
 		# No battery services, and there is a charger in the system. Abandon
 		# hope.
@@ -602,17 +573,6 @@ class SystemCalc:
 
 		return True  # keep timer running
 
-	def _updatepvinverterspidlist(self):
-		# Create list of connected pv inverters id's
-		pvinverters = self._dbusmonitor.get_service_list('com.victronenergy.pvinverter')
-		productids = []
-
-		for pvinverter in pvinverters:
-			pid = self._dbusmonitor.get_value(pvinverter, '/ProductId')
-			if pid is not None and pid not in productids:
-				productids.append(pid)
-		self._dbusservice['/PvInvertersProductIds'] = productids
-
 	def _updatevalues(self):
 		# ==== PREPARATIONS ====
 		newvalues = {}
@@ -634,26 +594,16 @@ class SystemCalc:
 				vebuspower += v * i
 
 		# ==== PVINVERTERS ====
-		pvinverters = self._dbusmonitor.get_service_list('com.victronenergy.pvinverter')
-		pos = {0: '/Ac/PvOnGrid', 1: '/Ac/PvOnOutput', 2: '/Ac/PvOnGenset'}
-		for pvinverter in pvinverters:
-			# Position will be None if PV inverter service has just been removed (after retrieving the
-			# service list).
-			position = pos.get(self._dbusmonitor.get_value(pvinverter, '/Position'))
-			if position is not None:
-				for phase in range(1, 4):
-					power = self._dbusmonitor.get_value(pvinverter, '/Ac/L%s/Power' % phase)
-					if power is not None:
-						path = '%s/L%s/Power' % (position, phase)
-						newvalues[path] = _safeadd(newvalues.get(path), power)
-
-					current = self._dbusmonitor.get_value(pvinverter, '/Ac/L%s/Current' % phase)
-					if current is not None:
-						path = '%s/L%s/Current' % (position, phase)
-						newvalues[path] = _safeadd(newvalues.get(path), current)
-
-		for path in pos.values():
-			self._compute_number_of_phases(path, newvalues)
+		# Work is done in pv-inverter delegate. Ideally all of this should
+		# happen in update_values in the delegate, but these values are
+		# used below in calculating consumption, so until this is less
+		# unwieldy this has to stay here.
+		# TODO this can go away once consumption below no longer relies
+		# on these values, or has moved to its own delegate.
+		newvalues.update(delegates.PvInverters.instance.get_totals())
+		self._compute_number_of_phases('/Ac/PvOnGrid', newvalues)
+		self._compute_number_of_phases('/Ac/PvOnOutput', newvalues)
+		self._compute_number_of_phases('/Ac/PvOnGenset', newvalues)
 
 		# ==== SOLARCHARGERS ====
 		solarchargers = self._dbusmonitor.get_service_list('com.victronenergy.solarcharger')
@@ -721,7 +671,7 @@ class SystemCalc:
 		# ==== ALTERNATOR ====
 		alternators = self._dbusmonitor.get_service_list('com.victronenergy.alternator')
 		for alternator in alternators:
-#### changed for GuiMods
+#### modified for GuiMods
 			# some alternators do not provide a valid power value if not running
 			#	or below a minimum power/current
 			# so fill in a zero power so that the systemcalc power becomes valid
@@ -735,6 +685,7 @@ class SystemCalc:
 				newvalues['/Dc/Alternator/Power'] = p
 			else:
 				newvalues['/Dc/Alternator/Power'] += p
+
 
 #### added for GuiMods
 		# ==== MOTOR DRIVE ====
@@ -807,7 +758,6 @@ class SystemCalc:
 			batteryservicetype = self._batteryservice.split('.')[2]
 			assert batteryservicetype in ('battery', 'vebus', 'inverter', 'multi')
 
-			newvalues['/Dc/Battery/Soc'] = self._dbusmonitor.get_value(self._batteryservice,'/Soc')
 			newvalues['/Dc/Battery/TimeToGo'] = self._dbusmonitor.get_value(self._batteryservice,'/TimeToGo')
 			newvalues['/Dc/Battery/ConsumedAmphours'] = self._dbusmonitor.get_value(self._batteryservice,'/ConsumedAmphours')
 			newvalues['/Dc/Battery/ProductId'] = self._dbusmonitor.get_value(self._batteryservice, '/ProductId')
@@ -940,7 +890,7 @@ class SystemCalc:
 						inverter_power += self._dbusmonitor.get_value(
 							i, '/Dc/0/Voltage', 0) * inverter_current
 					else:
-						inverter_power += self._dbusmonitor.get_value(
+						inverter_power -= self._dbusmonitor.get_value(
 							i, '/Ac/Out/L1/V', 0) * self._dbusmonitor.get_value(
 							i, '/Ac/Out/L1/I', 0)
 				newvalues['/Dc/System/MeasurementType'] = 0 # estimated
@@ -948,12 +898,12 @@ class SystemCalc:
 				# calculated DC power, because it will be individually
 				# displayed. For now, we leave it out so that in the current
 				# version of Venus it does not break user's expectations.
-				#newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power - alternator_power
+				#newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower + inverter_power - battery_power - alternator_power
 #### changed for GuiMods
 				# average DC system power over 3 passes (seconds) to minimize wild swings in displayed value
-				self.dcSystemPower[0] = self.dcSystemPower[1]
-				self.dcSystemPower[1] = self.dcSystemPower[2]
-				self.dcSystemPower[2] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power - motordrive_power
+				self.dcSystemPower[2] = self.dcSystemPower[1]
+				self.dcSystemPower[1] = self.dcSystemPower[0]
+				self.dcSystemPower[0] = dc_pv_power + charger_power + fuelcell_power + vebuspower - inverter_power - battery_power + alternator_power + windgen_power - motordrive_power
 				newvalues['/Dc/System/Power'] = (self.dcSystemPower[0] + self.dcSystemPower[1] + self.dcSystemPower[2]) / 3
 
 		elif self._settings['hasdcsystem'] == 1 and solarchargers_loadoutput_power is not None:
@@ -1171,7 +1121,6 @@ class SystemCalc:
 					for inv in non_vebus_inverters:
 						ac_out = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/P' % phase)
 						i = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/I' % phase)
-
 #### added for GuiMods
 						if voltageOut[phase] == None:
 							voltageOut[phase] = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/V' % phase)
@@ -1232,7 +1181,7 @@ class SystemCalc:
 		with self._dbusservice as sss:
 			for path in self._summeditems.keys():
 				# Why the None? Because we want to invalidate things we don't have anymore.
-				sss[path] = newvalues.get(path, None)
+				sss[path] = newvalues.get(path, None)		
 
 	def _handleservicechange(self):
 		# Update the available battery monitor services, used to populate the dropdown in the settings.
@@ -1263,7 +1212,6 @@ class SystemCalc:
 		self._dbusservice['/AvailableBatteryMeasurements'] = ul
 
 		self._determinebatteryservice()
-		self._updatepvinverterspidlist()
 
 		self._changed = True
 

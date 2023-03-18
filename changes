@@ -1,3 +1,22 @@
+v7.30:
+	fixed: AC loads values missing or incorrect on GuiMods simple flow page
+		this tile only shows AC loads on output
+		if there are only loads on input they would not appear
+		multi-phase systems with no inverter on some phases wold be blank for that leg
+
+v7.20:
+	fixed: cell voltages & remaining AH not showing in Battery Detail (bad merge?)
+
+v7.19:
+	add support for v3.00~24
+
+v7.18:
+	fixed: alternator flow backwards GuiMods AC/DC coupled page
+	fixed: NaN displayed in some locaitons (DC System, Battery Detail)
+	add remaining AH to Battery Detail
+	add max/min cell voltages to Battery Detail
+	add support for v3.00~23
+
 v7.17:
 	fixed: flow direction backwards for AC In Loads
 	fixed: PV on Output shows when PV on Input is present not when PV on Output is present
@@ -10,7 +29,6 @@ v7.17:
 	center time in Multi tile on AC and DC Coupleed flow pages if an inveter does not exist
 		time is offset to make room for DC connection
 	fixed: Multi gauge not showing proper limits, including no yellow region
-
 v7.16:
 	added v3.00~17
 	fixed: alternator gauge polarity was backwards	

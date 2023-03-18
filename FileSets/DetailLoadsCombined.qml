@@ -1,4 +1,4 @@
-////// detail page for displaying non-critical AC output details
+////// detail page for displaying critical AC output details
 ////// pushed from Flow overview
 
 import QtQuick 1.1
@@ -8,8 +8,8 @@ import "enhancedFormat.js" as EnhFmt
 
 MbPage {
 	id: root
-
-    title: "Loads on AC Input Detail"
+ 
+    title: qsTr ("AC Loads detail")
     
     property variant sys: theSystem
     property string systemPrefix: "com.victronenergy.system"
@@ -23,7 +23,7 @@ MbPage {
     property int totalDataWidth: tableColumnWidth * dataColumns
     property int legColumnWidth: phaseCount <= 1 ? totalDataWidth : totalDataWidth / phaseCount
 
-    property int phaseCount: sys.acInLoad.phaseCount.value : 0
+    property int phaseCount: sys.acLoad.phaseCount.valid ? sys.acLoad.phaseCount.value : 0
 
     VBusItem { id: vebusServiceItem; bind: Utils.path(systemPrefix, "/VebusService") }
     property string inverterService: vebusServiceItem.valid ? vebusServiceItem.value : ""
@@ -56,7 +56,7 @@ MbPage {
                     width: rowTitleWidth + totalDataWidth
                     height: 15
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
-                    connection: sys.acInLoad
+                    connection: sys.acLoad
                 }
             }
             Row
@@ -82,7 +82,7 @@ MbPage {
                     text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatVBusItem (sys.acInLoad.power, "W")
+                    text: EnhFmt.formatVBusItem (sys.acLoad.power, "W")
                 }
                 visible: phaseCount >= 2
             }
@@ -93,13 +93,13 @@ MbPage {
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.powerL1, "W") }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.powerL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInLoad.powerL2, "W"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.powerL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.powerL3, "W"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.powerL3, "W"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -108,13 +108,13 @@ MbPage {
                         text: qsTr("Voltage") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.voltageL1, "V") }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.voltageL1, "V") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInLoad.voltageL2, "V"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.voltageL2, "V"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.voltageL3, "V"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.voltageL3, "V"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -123,13 +123,13 @@ MbPage {
                         text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.currentL1, "A") }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.currentL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInLoad.currentL2, "A"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.currentL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.currentL3, "A"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.currentL3, "A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -138,7 +138,7 @@ MbPage {
                         text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acInLoad.frequencyL1, "Hz") }
+                        text: EnhFmt.formatVBusItem (sys.acLoad.frequencyL1, "Hz") }
             }
             Row
             {

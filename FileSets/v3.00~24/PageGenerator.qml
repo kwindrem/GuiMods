@@ -1,3 +1,6 @@
+//// added service interval
+//// changed total time to hours (from varilable format)
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -14,6 +17,22 @@ MbPage {
 	property VBusItem runningTime: VBusItem { bind: Utils.path(startStopBindPrefix, "/Runtime") }
 	property VBusItem historicalData: VBusItem { bind: Utils.path(settingsBindPrefix, "/AccumulatedDaily") }
 	property VBusItem functionEnabled: VBusItem { bind: Utils.path(startStopBindPrefix, "/State") }
+
+//// added service interval
+    VBusItem { id: generatorServiceInterval; bind: Utils.path(settingsBindPrefix, "/ServiceInterval") }
+    VBusItem { id: timeSinceService; bind: Utils.path(settingsBindPrefix, "/TimeSinceService") }
+    property bool serviceIntervalValid: timeSinceService.valid && generatorServiceInterval.valid && generatorServiceInterval.value > 0
+	property bool serviceOverdue: serviceIntervalValid && timeSinceService.value > generatorServiceInterval.value
+
+//// changed total time to hours (from varilable format)
+	function formatTime (time)
+	{
+		if (time >= 3600)
+			return (time / 3600).toFixed(0) + " h"
+		else
+			return (time / 60).toFixed(0) + " m"
+	}
+
 
 	function getState()
 	{
@@ -51,7 +70,7 @@ MbPage {
 		return "#" + value.toString() + " " + text
 	}
 
-	VisualItemModel {
+	VisibleItemModel {
 		id: _startStopModel
 
 		MbItemValue {
@@ -81,15 +100,18 @@ MbPage {
 
 		MbItemValue {
 			description: qsTr("Total run time")
+			show: item.valid
 			item {
 				bind: Utils.path(settingsBindPrefix, "/AccumulatedTotal")
-				text: Utils.secondsToNoSecsString(item.value)
+//// changed total time to hours (from varilable format)
+				text: formatTime (item.value)
 			}
 		}
 
 		MbItemValue {
 			description: qsTr("Accumulated running time since last test run")
 			show: user.accessLevel >= User.AccessService && nextTestRun.show
+			backgroundColor: style.backgroundColorService
 			item {
 				text: Utils.secondsToNoSecsString(item.value)
 				bind: Utils.path(startStopBindPrefix, "/TestRunIntervalRuntime")
@@ -111,6 +133,17 @@ MbPage {
 			}
 		}
 
+//// added service interval
+		MbItemValue {
+			id: serviceTime
+			description: serviceOverdue ? qsTr("Service OVERDUE") : qsTr("Time to next service")
+			show: serviceIntervalValid
+			item
+			{
+				text: formatTime (Math.abs (generatorServiceInterval.value - timeSinceService.value))
+			}
+		}
+
 		MbSwitch {
 			name: qsTr("Auto start functionality")
 			bind: Utils.path(settingsBindPrefix, "/AutoStartEnabled")
@@ -123,7 +156,7 @@ MbPage {
 				MbPage {
 					id: manualStartPage
 					title: qsTr("Manual start")
-					model: VisualItemModel {
+					model: VisibleItemModel {
 						MbSwitch {
 							id: manualSwitch
 							name: qsTr("Start generator")
