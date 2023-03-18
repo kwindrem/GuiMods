@@ -480,7 +480,18 @@ OverviewPage {
 					bottom: parent.bottom; bottomMargin: 0
 				}
 	////// modified to show current
-				text: dcSystemText ()
+				text:
+				{
+					if (showDcSystem)
+					{
+						var current = ""
+						if (sys.dcSystem.power.valid && sys.battery.voltage.valid)
+							current = " " + EnhFmt.formatValue (sys.dcSystem.power.value / sys.battery.voltage.value, "A")
+						return EnhFmt.formatVBusItem (sys.dcSystem.power) + current
+					}
+					else
+						return "--"
+				}
 			}
         ]
         PowerGauge
@@ -502,17 +513,6 @@ OverviewPage {
 
         }
 		DetailTarget { id: dcSystemTarget;  detailsPage: "DetailDcSystem.qml" }
-    }
-
-    function dcSystemText ()
-    {
-        if (showDcSystem)
-        {
-            var current = sys.dcSystem.power.value / sys.battery.voltage.value
-			return EnhFmt.formatVBusItem (sys.dcSystem.power) + " " + EnhFmt.formatValue (current, "A")
-        }
-        else
-            return "--"
     }
 
 	property int pvOffset1: 27

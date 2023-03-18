@@ -1,3 +1,8 @@
+v7.21:
+	more recovery from bad v7.18 beta merge to main
+	fixed: discharge and chrge limits are blank
+	refixed: NaN displayed in GuiMods Simple flow DC System tile
+
 v7.20:
 	fixed: cell voltages & remaining AH not showing in Battery Detail (bad merge?)
 
