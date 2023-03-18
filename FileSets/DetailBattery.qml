@@ -158,7 +158,7 @@ MbPage
 						else if (sys.battery.power.valid && sys.battery.voltage.valid)
 							return EnhFmt.formatValueAbs (sys.battery.power.value / sys.battery.voltage.value, "A")
 						else
-							return "---"
+							return ""
 					}
 			}
 			Text { id: chargingText; font.pixelSize: 12; font.bold: true; color: "black"
@@ -188,14 +188,14 @@ MbPage
                     text: root.dischargeDisabled ? qsTr ("Discharge") : qsTr ("Discharge Limit") }
             Text { font.pixelSize: 12; font.bold: true; color: root.dischargeDisabled ? "red" : "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                    text: root.dischargeDisabled ? qsTr ("disabled") : EnhFmt.formatVBusItem (dischargeLimitItem.value, "A")
+                    text: root.dischargeDisabled ? qsTr ("disabled") : EnhFmt.formatVBusItem (dischargeLimitItem, "A")
 			}
             Text { font.pixelSize: 12; font.bold: true; color: root.chargeDisabled ? "red" : "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                     text: root.chargeDisabled ? qsTr ("Charge") : qsTr ("Charge Limit") }
             Text { font.pixelSize: 12; font.bold: true; color: root.chargeDisabled ? "red" : "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter;
-                    text: root.chargeDisabled ? qsTr ("disabled") : EnhFmt.formatVBusItem (chargeLimitItem.value, "A") 
+                    text: root.chargeDisabled ? qsTr ("disabled") : EnhFmt.formatVBusItem (chargeLimitItem, "A") 
 			}
 			visible: showChargeDischargeLimits
         }
