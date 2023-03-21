@@ -3,6 +3,7 @@ v7.30:
 		this tile only shows AC loads on output
 		if there are only loads on input they would not appear
 		multi-phase systems with no inverter on some phases wold be blank for that leg
+	fixed: Alternator flow is backwards (DC & AC Coupled flow pages)
 
 v7.20:
 	fixed: cell voltages & remaining AH not showing in Battery Detail (bad merge?)

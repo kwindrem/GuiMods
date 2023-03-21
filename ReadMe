@@ -1,10 +1,18 @@
+Recent changes:
+	Incorporte voltage, current and frequency from grid meters
+		addresses systems that have no AC output for example (all loads on inverter input)
+		also allows the actual current to be displayed in all details and overview tiles
+		previously, currents were calculated: I - P / V which isn't accurate due to power factor
+
+	Treat an alternator as a "generator" source
+		for cases where an AC generator or the grid is not avalable
+
+
+
 GuiMods has been revived with combined functionality of the original GuiMods and GuiMods2
 
 GuiMods2 has been decommissioned
 
-Recent changes:
-	Treat an alternator as a "generator" source
-		for cases where an AC generator or the grid is not avalable
 
 The following components have NOT been tested:
     Multi-phase(leg) systems
