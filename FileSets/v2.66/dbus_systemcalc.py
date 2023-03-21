@@ -298,7 +298,7 @@ class SystemCalc:
 			'/Dc/Vebus/Power': {'gettext': '%.0F W'},
 			'/Dc/System/Power': {'gettext': '%.0F W'},
 			'/Ac/ActiveIn/Source': {'gettext': '%s'},
-			'/VebusService': {'gettext': '%s'}
+			'/VebusService': {'gettext': '%s'},
 #### added for GuiMods
 			'/Ac/Grid/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L2/Current': {'gettext': '%.1F A'},
@@ -859,10 +859,10 @@ class SystemCalc:
 						mc = _safeadd(mc, -pvcurrent)
 				newvalues['/Ac/%s/%s/Power' % (device_type, phase)] = p
 #### added for GuiMods
-					newvalues['/Ac/ActiveIn/%s/Current' % (phase,)] = mc
-					if p != None:
-						newvalues['/Ac/ActiveIn/%s/Voltage' % (phase,)] = voltageIn[phase]
-						newvalues['/Ac/ActiveIn/%s/Frequency' % (phase,)] = frequencyIn[phase]
+				newvalues['/Ac/ActiveIn/%s/Current' % (phase,)] = mc
+				if p != None:
+					newvalues['/Ac/ActiveIn/%s/Voltage' % (phase,)] = voltageIn[phase]
+					newvalues['/Ac/ActiveIn/%s/Frequency' % (phase,)] = frequencyIn[phase]
 
 			self._compute_number_of_phases('/Ac/%s' % device_type, newvalues)
 			product_id = None

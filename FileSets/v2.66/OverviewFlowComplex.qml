@@ -107,7 +107,7 @@ OverviewPage {
 
 	property double pvChargerFlow: showPvCharger ? noNoise (sys.pvCharger.power) : 0
 	property double dcSystemFlow: showDcSystem ? -noNoise (sys.dcSystem.power) : 0
-	property double alternatorFlow: showAlternator ? -noNoise (sys.alternator.power) : 0
+	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property double motorDriveFlow: showMotorDrive ? noNoise (motorDrivePowerItem) : 0
 	property double inverterDcFlow: showInverter ? noNoise (sys.vebusDc.power) : 0
 	property double batteryFlow: noNoise (sys.battery.power)
@@ -148,19 +148,19 @@ OverviewPage {
 		height: inOutTileHeight
 		title:
 		{
-			// input 1 is active
-			if (! acActiveInput.valid || acActiveInput.value == 0)
-			{
-				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
-					return qsTr ("AC In 1 Ignored")
-				else
-					return getAcSourceName(sys.acSource)
-			}
 			// input 2 is active
-			else
+			if (! acActiveInput.valid || acActiveInput.value == 1)
 			{
 				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
 					return qsTr ("AC In 2 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
+			// input 1 is active
+			else
+			{
+				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
+					return qsTr ("AC In 1 Ignored")
 				else
 					return getAcSourceName(sys.acSource)
 			}

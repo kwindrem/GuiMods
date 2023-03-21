@@ -1,7 +1,6 @@
 ////// modified to show voltage, current and frequency in flow overview
 ////// modified to show bar graphs
-//////// modified to use grid or genset meter if present
-// probably doesn't support paralleled Multis/Quatros
+////// modified to use grid or genset meter if present
 
 import QtQuick 1.1
 import com.victron.velib 1.0

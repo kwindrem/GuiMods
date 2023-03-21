@@ -190,19 +190,19 @@ OverviewPage {
 		height: showStatusBar ? 100 : 120
 		title:
 		{
-			// input 1 is active
-			if (! acActiveInput.valid || acActiveInput.value == 0)
-			{
-				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
-					return qsTr ("AC In 1 Ignored")
-				else
-					return getAcSourceName(sys.acSource)
-			}
 			// input 2 is active
-			else
+			if (! acActiveInput.valid || acActiveInput.value == 1)
 			{
 				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
 					return qsTr ("AC In 2 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
+			// input 1 is active
+			else
+			{
+				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
+					return qsTr ("AC In 1 Ignored")
 				else
 					return getAcSourceName(sys.acSource)
 			}
@@ -678,40 +678,6 @@ OverviewPage {
 				font.pixelSize: 15
 				visible: pvShowDetails && numberOfPvChargers >= 2
 			},
-						MarqueeEnhanced
-			{
-				y: pvOffset4
-				id: pv4Name
-				// ofset left margin for this row if NOT showing tanks/temps
-				width:
-				{
-					if (pvChargerCompact)
-					{
-						if (! showTanksTemps)
-							return ((parent.width / 2) - 15)
-						else
-							return ((parent.width / 2) - 5)
-					}
-					else
-						return (parent.width - 10)
-				}
-				anchors.left: parent.left; anchors.leftMargin: ( ! showTanksTemps && pvChargerCompact) ? 15 : 5
-				height: 15
-				text: pvName4.valid ? pvName4.value : "pv 4"
-				textHorizontalAlignment: pvChargerCompact ? Text.AlignLeft : Text.AlignHCenter
-				fontSize: 15
-				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
-				scroll: false
-				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
-			},
-			TileText {
-				y: pvOffset4 + (pvChargerCompact ? 0 : pvRowSpacing)
-				text: EnhFmt.formatVBusItem (pvPower4, "W")
-				anchors.right: parent.right; anchors.rightMargin: 5
-				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
-				font.pixelSize: 15
-				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
-			},
 			MarqueeEnhanced
 			{
 				y: pvOffset4
@@ -736,7 +702,7 @@ OverviewPage {
 				fontSize: 15
 				Connections { target: scrollTimer; onTriggered: pv4Name.doScroll() }
 				scroll: false
-				visible: numberOfPvChargers >= 4 && ! hasDcAndAcSolar
+				visible: numberOfPvChargers >= 4 && ! showDcAndAcSolar
 			},
 			TileText {
 				y: pvOffset4 + (pvChargerCompact ? 0 : pvRowSpacing)

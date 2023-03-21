@@ -1,6 +1,6 @@
 ////// modified to show voltage, current and frequency in flow overview
 ////// modified to show bar graphs
-// probably doesn't support paralleled Multis/Quatros
+////// modified to use grid or genset meter if present
 
 import QtQuick 1.1
 import com.victron.velib 1.0
@@ -15,6 +15,7 @@ QtObject {
 	property VBusItem powerL2: VBusItem { bind: Utils.path(bindPrefix, "/L2/Power"); unit: "W"}
 	property VBusItem powerL3: VBusItem { bind: Utils.path(bindPrefix, "/L3/Power"); unit: "W"}
 	property VBusItem power: VBusItem { unit: "W" }
+    property VBusItem phaseCount: VBusItem { bind: Utils.path(bindPrefix, "/NumberOfPhases") }
 ////// added for compatibility with v2.80 changes
     property bool splitPhaseL2PassthruDisabled: false
     property bool isAcOutput: false
