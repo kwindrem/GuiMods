@@ -1,13 +1,12 @@
 Recent changes:
+	The AC input detal now shows voltage and frequency for grid/shore and generator AC inputs
+		in addition to the active input
 	Incorporte voltage, current and frequency from grid meters
 		addresses systems that have no AC output for example (all loads on inverter input)
 		also allows the actual current to be displayed in all details and overview tiles
 		previously, currents were calculated: I - P / V which isn't accurate due to power factor
-
 	Treat an alternator as a "generator" source
 		for cases where an AC generator or the grid is not avalable
-
-
 
 GuiMods has been revived with combined functionality of the original GuiMods and GuiMods2
 
@@ -201,9 +200,14 @@ The PV charger detail provides a system total as a gauge and power number,
 The PV inverter detail provides system totals for grid and output connections
     then lists name, total power, power for each leg and where the inverter is connected (input or output) 
 
-The system does not provide current values for the AC input and output of the system.
-    AC input and output details pages show current values that are calculated based on the power and voltage.
-    With a low power factor, actual current values could be significantly higher those shown.
+The AC input detal page shows information for the active source: per-leg power, current and volage,
+	as well as frequency and input current limit.
+	In addition, voltage and frequency for grid/shore and generator AC inputs is shown
+	to allow monitoring of a generator's voltage and frequency even when on grid power or visa-versa
+	AC meters will populate this information for an input if present.
+	Quattros may report information for both inputs (what information is reported by Quattro is unknown to me)
+	Multis only have one input so only that input will be shown unless AC meters are present.
+	
 
 Configuration
 

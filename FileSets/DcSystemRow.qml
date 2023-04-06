@@ -296,7 +296,7 @@ Row {
 				case DBusService.DBUS_SERVICE_FUELCELL:
 					return qsTr ("Fuel Dell")
 				case DBusService.DBUS_SERVICE_AC_CHARGER:
-					return qsTr ("AC Dharger")
+					return qsTr ("AC Charger")
 				case DBusService.DBUS_SERVICE_DCSYSTEM:
 					return qsTr ("DC System")
 				case DBusService.DBUS_SERVICE_MULTI_RS:

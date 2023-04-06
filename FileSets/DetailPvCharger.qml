@@ -16,8 +16,10 @@ MbPage
     property string systemPrefix: "com.victronenergy.system"
     property color backgroundColor: "#b3b3b3"
 
-    property int tableColumnWidth: 80
+    property int dataColumns: 4
     property int rowTitleWidth: 130
+    property int totalDataWidth: root.width - rowTitleWidth - 20
+    property int tableColumnWidth: totalDataWidth / dataColumns
 
     Component.onCompleted: discoverServices()
 
@@ -43,7 +45,7 @@ MbPage
             {
 				anchors.horizontalCenter: parent.horizontalCenter
 				Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
-                        horizontalAlignment: Text.AlignHCenter
+						width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Total power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
@@ -51,7 +53,7 @@ MbPage
                 PowerGauge
                 {
                     id: gauge
-                    width: (root.width * 0.8) - totalLabel.paintedWidth - tableColumnWidth
+                    width: totalDataWidth - tableColumnWidth
                     height: 15
                     connection: sys.pvCharger
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"

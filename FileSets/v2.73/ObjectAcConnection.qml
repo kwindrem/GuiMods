@@ -32,11 +32,7 @@ QtObject {
     property VBusItem currentL2: VBusItem { bind: Utils.path (bindPrefix, "/L2/Current"); unit: "A"}
     property VBusItem currentL3: VBusItem { bind: Utils.path (bindPrefix, "/L3/Current"); unit: "A"}
 
-    property VBusItem frequencyL1: VBusItem { bind: Utils.path (bindPrefix, "/L1/Frequency"); unit: "Hz"}
-    property VBusItem frequencyL2: VBusItem { bind: Utils.path (bindPrefix, "/L2/Frequency"); unit: "Hz"}
-    property VBusItem frequencyL3: VBusItem { bind: Utils.path (bindPrefix, "/L3/Frequency"); unit: "Hz"}
-	// select one frequency for display
-    property variant frequency: frequencyL1.valid ? frequencyL1 : frequencyL2.valid ? frequencyL2 : frequencyL3
+    property VBusItem frequency: VBusItem { bind: Utils.path (bindPrefix, "/Frequency"); unit: "Hz"}
 
     property VBusItem inCurrentLimit: VBusItem { bind: Utils.path(inverterService, inverterSource, "/CurrentLimit"); unit: "A"}
  ////// end add to show voltage, current and frequency

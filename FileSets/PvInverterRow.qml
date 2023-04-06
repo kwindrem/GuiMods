@@ -51,7 +51,7 @@ Row {
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: EnhFmt.formatVBusItem (pvPowerL3, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
+            width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
             text: 
             {
                 if (position.valid)

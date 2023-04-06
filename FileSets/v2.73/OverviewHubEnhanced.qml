@@ -33,12 +33,11 @@ OverviewPage {
 	VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
 	property bool hasAlternator: sys.alternator.power.valid
 	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && (sys.acSource == 0 || sys.acSource == 240)
-	property bool showAcInput: isMulti && ! replaceAcIn || showAllTiles
+	property bool showAcInput: ((isMulti || sys.acInput.power.valid) && ! replaceAcIn) || showAllTiles
 	property bool showAlternator: !showAcInput && hasAlternator
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
-	property bool showAcLoads: isMulti || veDirectInverterService != ""
-	property bool hasDcSystem: hasDcSys.value > 0 && sys.dcSystem.power.valid
-	property bool showDcSystem: hasDcSystem || showAllTiles || showInactiveTiles
+	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
+	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -174,7 +173,7 @@ OverviewPage {
 	VBusItem { id: ignoreAcInput2; bind: Utils.path(inverterService, "/Ac/State/IgnoreAcIn2") }
 	VBusItem { id: acActiveInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
 
-	VBusItem { id: hasDcSys; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
+	VBusItem { id: hasDcSystemItem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
 	Component.onCompleted: { discoverServices(); showHelp () }
 
@@ -457,7 +456,7 @@ OverviewPage {
 		width: multi.width + 20
 		height: 45
 		opacity: showDcSystem ? 1 : disabledTileOpacity
-		visible: showDcSystem
+		visible: showDcSystem || showInactiveTiles
 		title: dcSystemNameItem.valid && dcSystemNameItem.value != "" ? dcSystemNameItem.value : qsTr ("DC System")
 
 		anchors {
@@ -947,7 +946,7 @@ OverviewPage {
 
 	OverviewConnection {
 		id: pvInverterToMulti
-		ballCount: 4
+		ballCount: 3
 		path: corner
 		active: root.active && showAcSolar
 		value: Utils.sign(noNoise(sys.pvOnAcOut.power) + noNoise(sys.pvOnAcIn1.power) + noNoise(sys.pvOnAcIn2.power))
@@ -972,7 +971,7 @@ OverviewPage {
 	OverviewConnection
 	{
 		id: dcBus2
-		ballCount: 3
+		ballCount: 2
 		path: straight
 		active: root.active
 		value: -Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.vebusDc.power))
@@ -1061,7 +1060,7 @@ OverviewPage {
 		id: batteryToDcSystem
 		ballCount: 2
 		path: straight
-		active: root.active && ( hasDcSystem || showAllTiles )
+		active: root.active && showDcSystem
 		value: flow(sys.dcSystem.power)
 
 		anchors {

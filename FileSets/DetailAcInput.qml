@@ -22,13 +22,15 @@ MbPage {
     property color backgroundColor: "#b3b3b3"
 
     property int buttonHeight: 40
-    property int tableColumnWidth: 80
-    property int rowTitleWidth: 100
-    property int dataColumns: 3
-    property int totalDataWidth: tableColumnWidth * dataColumns
-    property int legColumnWidth: phaseCount <= 1 ? totalDataWidth : totalDataWidth / phaseCount
 
-    property int phaseCount: sys.acLoad.phaseCount.valid ? sys.acLoad.phaseCount.value : 0
+    property int dataColumns: 4
+    property int rowTitleWidth: 100
+    property int totalDataWidth: 340 - rowTitleWidth
+    property int tableColumnWidth: totalDataWidth / dataColumns
+    
+    property int legColumnWidth: phaseCount <= 1 ? tableColumnWidth * 3 : tableColumnWidth * 3 / phaseCount
+
+    property int phaseCount: sys.acInput.phaseCount.valid ? sys.acInput.phaseCount.value : 0
 
     VBusItem { id: vebusServiceItem; bind: Utils.path(systemPrefix, "/VebusService") }
     property string inverterService: vebusServiceItem.valid ? vebusServiceItem.value : ""
@@ -48,7 +50,7 @@ MbPage {
     property real acLimitPreset4: acLimitPreset4Item.valid ? acLimitPreset4Item.value : 0
 
 	property bool currentLimitIsAdjustable: currentLimitIsAdjustableItem.valid && currentLimitIsAdjustableItem.value == 1  && currentLimitItem.valid
-
+	
     Component.onCompleted: { getActualCurrent () }
 
     VBusItem
@@ -65,19 +67,18 @@ MbPage {
         onValueChanged: getActualCurrent ()
         onValidChanged: getActualCurrent ()
     }
-
-    VBusItem { id: voltageL1; bind: Utils.path(pathPrefix, "L1", voltageSuffix) }
-    VBusItem { id: voltageL2; bind: Utils.path(pathPrefix, "L2", voltageSuffix) }
-    VBusItem { id: voltageL3; bind: Utils.path(pathPrefix, "L3", voltageSuffix) }
-
-    VBusItem { id: currentL1; bind: Utils.path (pathPrefix, "L1", currentSuffix) }
-    VBusItem { id: currentL2; bind: Utils.path (pathPrefix, "L2", currentSuffix) }
-    VBusItem { id: currentL3; bind: Utils.path (pathPrefix, "L3", currentSuffix) }
-
-    VBusItem { id: frequencyL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/F") }
-    VBusItem { id: activeSource; bind: Utils.path(systemPrefix, "/Ac/ActiveIn/Source") }
-    VBusItem { id: activeInput; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
+    VBusItem { id: activeInputItem; bind: Utils.path(inverterService, "/Ac/ActiveIn/ActiveInput") }
     VBusItem { id: numberOfAcInputs; bind: Utils.path(inverterService, "/Ac/In/NumberOfAcInputs") }
+    VBusItem { id: activeSourceItem; bind: Utils.path(systemPrefix, "/Ac/ActiveIn/Source") }
+    VBusItem { id: acIn1sourceItem; bind: Utils.path(settingsPrefix, "/Settings/SystemSetup/AcInput1") }
+    VBusItem { id: acIn2sourceItem; bind: Utils.path(settingsPrefix, "/Settings/SystemSetup/AcInput2") }
+	property int activeSource: activeSourceItem.valid ? activeSourceItem.value : 0
+	property int acIn1source: acIn1sourceItem.valid ? acIn1sourceItem.value : 0
+	property int acIn2source: acIn2sourceItem.valid ? acIn2sourceItem.value : 0
+    property int activeInput: activeInputItem.valid && activeInputItem.value == 1 ? 2 : 1
+    property bool hasTwoInputs: numberOfAcInputs.valid && numberOfAcInputs.value == 2
+
+    property variant acSourceName: [qsTr("---"), qsTr("Grid"), qsTr("Generator"), qsTr("Shore")]
 
     // background
     Rectangle
@@ -100,10 +101,17 @@ MbPage {
             spacing: 2
             Row
             {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr("Total Power") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text: EnhFmt.formatVBusItem (sys.acInput.power, "W")
+                }
                 PowerGauge
                 {
                     id: gauge
-                    width: rowTitleWidth + totalDataWidth
+                    width: totalDataWidth - tableColumnWidth
                     height: 15
                     connection: sys.acInput
 					useInputCurrentLimit: true
@@ -114,22 +122,38 @@ MbPage {
             Row
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr("Total Power") }
+                        width: rowTitleWidth + tableColumnWidth; horizontalAlignment: Text.AlignRight
+                        text: qsTr("Active Source") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatVBusItem (sys.acInput.power, "W")
-                }
-                visible: phaseCount >= 2
+                        width: totalDataWidth - tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text:
+						{
+							if (activeSource == 240)
+								return quTr ("no input")
+							else if (hasTwoInputs)
+								return acSourceName[activeSource] + " (AC in " + activeInput + ")"
+							else
+								return acSourceName[activeSource]
+						}
+				}
             }
             Row
             {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: qsTr("Source") }
+                        text: qsTr("") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: getAcSource (sys.acSource) }
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L1" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L2"; visible: phaseCount >= 2 }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L3"; visible: phaseCount >= 3 }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr ("Freq") }
             }
             Row
             {
@@ -138,28 +162,31 @@ MbPage {
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.powerL1, "W") }
+                        text: EnhFmt.formatVBusItem (sys.acInput.powerL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.powerL2, "W"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.powerL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.powerL3, "W"); visible: phaseCount >= 3 }
+                        text: EnhFmt.formatVBusItem (sys.acInput.powerL3, "W"); visible: phaseCount >= 3 }
             }
             Row
             {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: qsTr("Voltage") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.voltageL1, "V") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.voltageL2, "V"); visible: phaseCount >= 2 }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.voltageL3, "V"); visible: phaseCount >= 3 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                        text: qsTr("Voltage / Freq") }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.acInput.voltageL1, "V") }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.voltageL2, "V"); visible: phaseCount >= 2 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.acInput.voltageL3, "V"); visible: phaseCount >= 3 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.acInput.frequency, "Hz") }
             }
             Row
             {
@@ -168,22 +195,13 @@ MbPage {
                         text: qsTr("Current") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.currentL1, "A") }
+                        text: EnhFmt.formatVBusItem (sys.acInput.currentL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acLoad.currentL2, "A"); visible: phaseCount >= 2 }
+                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.currentL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.currentL3, "A"); visible: phaseCount >= 3 }
-            }
-            Row
-            {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                        text: qsTr("Frequency") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.acLoad.frequencyL1, "Hz") }
+                        text: EnhFmt.formatVBusItem (sys.acInput.currentL3, "A"); visible: phaseCount >= 3 }
             }
             Row
             {
@@ -208,6 +226,79 @@ MbPage {
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L2 values included in L1"
                         visible: l1AndL2OutShorted }
+            }
+            Row
+            {
+                 Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Avaliable Sources") }
+			}
+            Row
+            {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                        text: qsTr("") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L1" }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L2"; visible: phaseCount >= 2 }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: "L3"; visible: phaseCount >= 3 }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr ("Freq") }
+            }
+            Row
+            {
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: 20; horizontalAlignment: Text.AlignHCenter
+						text: activeSource == 1 || activeSource == 3 ? ">" : "" }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: rowTitleWidth - 20; horizontalAlignment: Text.AlignRight
+						text:
+						{
+							if (acIn1source == 3 || acIn2source == 3)
+								return acSourceName[3]
+							else
+								return acSourceName[1]
+						}
+				}
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.grid.voltageL1, "V") }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.grid.voltageL2, "V"); visible: phaseCount >= 2 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.grid.voltageL3, "V"); visible: phaseCount >= 3 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.grid.frequency, "Hz") }
+            }
+            Row
+            {
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: 20; horizontalAlignment: Text.AlignHCenter
+						text: activeSource == 2 ? ">" : "" }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: rowTitleWidth - 20; horizontalAlignment: Text.AlignRight
+						text: acSourceName[2] }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.genset.voltageL1, "V") }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.genset.voltageL2, "V"); visible: phaseCount >= 2 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.genset.voltageL3, "V"); visible: phaseCount >= 3 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text: EnhFmt.formatVBusItem (sys.genset.frequency, "Hz") }
             }
         }
         Column
@@ -405,22 +496,6 @@ MbPage {
     {
         target: DBusServices
         onDbusServiceFound: addService(service)
-    }
-
-    property variant acSourceName: [qsTr("Not available"), qsTr("Grid"), qsTr("Generator"), qsTr("Shore")]
-    function getAcSource()
-    {
-        var input
-        if (activeInput.valid)
-            input = (activeInput.value + 1).toFixed (0)
-        else
-            input = '-'
-
-        if (!activeSource.valid)
-            return qsTr("AC Input")
-        if (activeSource.value === 240)
-            return ""
-        return acSourceName[activeSource.value] + " (Input " + input + ")"
     }
 
 	//// hard key handler

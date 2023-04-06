@@ -18,10 +18,10 @@ MbPage {
 	property int fontPixelSize: 18
     property color backgroundColor: "#b3b3b3"
 
-    property int tableColumnWidth: 60
-    property int rowTitleWidth: 130
     property int dataColumns: 3
-    property int totalDataWidth: tableColumnWidth * dataColumns
+    property int rowTitleWidth: 130
+    property int totalDataWidth: root.width - rowTitleWidth - 20
+    property int tableColumnWidth: totalDataWidth / dataColumns
     property int legColumnWidth: phaseCount <= 1 ? totalDataWidth : totalDataWidth / phaseCount
 
     property int phaseCount: outputLoad.phaseCount.valid ? outputLoad.phaseCount.value : 0
@@ -55,10 +55,17 @@ MbPage {
             spacing: 2
             Row
             {
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr("Total Power") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                    text: EnhFmt.formatVBusItem (outputLoad.power, "W")
+                }
                 PowerGauge
                 {
                     id: gauge
-                    width: rowTitleWidth + totalDataWidth
+                    width: totalDataWidth - tableColumnWidth
                     height: 15
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/AcOutputMaxPower"
                     connection: outputLoad
@@ -74,22 +81,10 @@ MbPage {
                         text: "L1" }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L2" }
+                        text: "L2"; visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L3"; visible: phaseCount >= 3 }
-                visible: phaseCount >= 2
-            }
-            Row
-            {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: qsTr("Total Power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                    width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                    text: EnhFmt.formatVBusItem (outputLoad.power, "W")
-                }
-                visible: phaseCount >= 2
             }
             Row
             {
@@ -143,7 +138,7 @@ MbPage {
                         text: qsTr("Frequency") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (outputLoad.frequencyL1, "Hz") }
+                        text: EnhFmt.formatVBusItem (outputLoad.frequency, "Hz") }
             }
             Row
             {

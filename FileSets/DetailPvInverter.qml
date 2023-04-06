@@ -16,8 +16,11 @@ MbPage
     property string systemPrefix: "com.victronenergy.system"
     property color backgroundColor: "#b3b3b3"
 
-    property int tableColumnWidth: 60
+    property int dataColumns: 4
     property int rowTitleWidth: 130
+    // gauge and "conneciton column use title width too"
+    property int totalDataWidth: root.width - (rowTitleWidth * 2) - 10
+    property int tableColumnWidth: totalDataWidth / dataColumns
 
     Component.onCompleted: discoverServices()
 
@@ -56,9 +59,6 @@ MbPage
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L3" }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr(" ") }
             }
             Row
             {
@@ -80,7 +80,7 @@ MbPage
                 PowerGauge
                 {
                     id: pvGridGauge
-                    width: tableColumnWidth * 1.3
+                    width: rowTitleWidth
                     height: 15
                     connection: sys.pvOnGrid
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
@@ -107,7 +107,7 @@ MbPage
                 PowerGauge
                 {
                     id: pvAcOutGauge
-                    width: tableColumnWidth * 1.3
+                    width: rowTitleWidth
                     height: 15
                     connection: sys.pvOnAcOut
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
@@ -139,7 +139,7 @@ MbPage
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L3" }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth * 1.3; horizontalAlignment: Text.AlignHCenter
+                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Connection") }
             }
         }

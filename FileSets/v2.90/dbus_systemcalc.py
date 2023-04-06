@@ -300,21 +300,6 @@ class SystemCalc:
 			'/Ac/Grid/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/Grid/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L1/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Grid/L2/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Grid/L3/Frequency': {'gettext': '%.1F Hz'},
-#### added for GuiMods
-			'/Ac/Genset/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L1/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Genset/L2/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Genset/L3/Frequency': {'gettext': '%.1F Hz'},
-
 			'/Ac/Grid/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Grid/ProductId': {'gettext': '%s'},
 			'/Ac/Grid/DeviceType': {'gettext': '%s'},
@@ -334,14 +319,6 @@ class SystemCalc:
 			'/Ac/ConsumptionOnOutput/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/ConsumptionOnOutput/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L1/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ConsumptionOnOutput/L2/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ConsumptionOnOutput/L3/Frequency': {'gettext': '%.1F Hz'},
-
 			'/Ac/ConsumptionOnInput/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/ConsumptionOnInput/L1/Power': {'gettext': '%.0F W'},
 			'/Ac/ConsumptionOnInput/L2/Power': {'gettext': '%.0F W'},
@@ -349,14 +326,6 @@ class SystemCalc:
 			'/Ac/ConsumptionOnInput/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/ConsumptionOnInput/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L1/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ConsumptionOnInput/L2/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ConsumptionOnInput/L3/Frequency': {'gettext': '%.1F Hz'},
-
 			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/Consumption/L1/Power': {'gettext': '%.0F W'},
 			'/Ac/Consumption/L2/Power': {'gettext': '%.0F W'},
@@ -364,14 +333,6 @@ class SystemCalc:
 			'/Ac/Consumption/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Consumption/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Consumption/L3/Current': {'gettext': '%.1F A'},
-#### added for GuiMods
-			'/Ac/Consumption/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L1/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Consumption/L2/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Consumption/L3/Frequency': {'gettext': '%.1F Hz'},
-
 			'/Ac/Consumption/NumberOfPhases': {'gettext': '%.0F W'},
 			'/Ac/PvOnOutput/L1/Power': {'gettext': '%.0F W'},
 			'/Ac/PvOnOutput/L2/Power': {'gettext': '%.0F W'},
@@ -408,10 +369,6 @@ class SystemCalc:
 			'/Dc/Charger/Power': {'gettext': '%.0F %%'},
 			'/Dc/FuelCell/Power': {'gettext': '%.0F %%'},
 			'/Dc/Alternator/Power': {'gettext': '%.0F W'},
-#### added for GuiMods
-			'/Dc/WindGenerator/Power': {'gettext': '%.0F W'},
-			'/Dc/MotorDrive/Power': {'gettext': '%.0F W'},
-
 			'/Dc/Vebus/Current': {'gettext': '%.1F A'},
 			'/Dc/Vebus/Power': {'gettext': '%.0F W'},
 			'/Dc/System/Power': {'gettext': '%.0F W'},
@@ -423,17 +380,34 @@ class SystemCalc:
 			'/Ac/ActiveIn/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ActiveIn/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ActiveIn/L3/Current': {'gettext': '%.1F A'},
+			'/Ac/ActiveIn/NumberOfPhases': {'gettext': '%d'},
 #### added for GuiMods
+			'/Dc/WindGenerator/Power': {'gettext': '%.0F W'},
+			'/Dc/MotorDrive/Power': {'gettext': '%.0F W'},
+			'/Ac/Grid/L1/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Grid/L2/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Grid/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Grid/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/Genset/L1/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Genset/L2/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Genset/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Genset/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/ConsumptionOnOutput/L1/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnOutput/L2/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnOutput/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnOutput/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/ConsumptionOnInput/L1/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnInput/L2/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnInput/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnInput/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/Consumption/L1/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Consumption/L2/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Consumption/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Consumption/Frequency': {'gettext': '%.1F A'},
 			'/Ac/ActiveIn/L1/Voltage': {'gettext': '%.1F A'},
 			'/Ac/ActiveIn/L2/Voltage': {'gettext': '%.1F A'},
 			'/Ac/ActiveIn/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ActiveIn/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ActiveIn/L1/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ActiveIn/L2/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ActiveIn/L3/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/ActiveIn/NumberOfPhases': {'gettext': '%d'},
-
-			'/Ac/ActiveIn/NumberOfPhases': {'gettext': '%d'},
+			'/Ac/ActiveIn/Frequency': {'gettext': '%.1F Hz'},
 		}
 
 		for m in self._modules:
@@ -1020,8 +994,8 @@ class SystemCalc:
 #### added for GuiMods
 		voltageIn = { "L1" : None, "L2" : None, "L3" : None }
 		voltageOut = { "L1" : None, "L2" : None, "L3" : None }
-		frequencyIn = { "L1" : None, "L2" : None, "L3" : None }
-		frequencyOut = { "L1" : None, "L2" : None, "L3" : None }
+		frequencyIn = None
+		frequencyOut = None
 
 		for device_type, em, _types in (('Grid', grid_meter, (1, 3)), ('Genset', genset_meter, (2,))):
 			# If a grid meter is present we use values from it. If not, we look at the multi. If it has
@@ -1041,8 +1015,8 @@ class SystemCalc:
 #### added for GuiMods
 					if voltageIn[phase] == None:
 						voltageIn[phase] = self._dbusmonitor.get_value(em.service, '/Ac/%s/Voltage' % phase)
-					if frequencyIn[phase] == None:
-						frequencyIn[phase] = self._dbusmonitor.get_value(em.service, '/Ac/%s/Frequency' % phase)
+					if frequencyIn == None:
+						frequencyIn = self._dbusmonitor.get_value(em.service, '/Ac/%s/Frequency' % phase)
 
 					# Compute consumption between energy meter and multi (meter power - multi AC in) and
 					# add an optional PV inverter on input to the mix.
@@ -1056,8 +1030,8 @@ class SystemCalc:
 #### added for GuiMods
 								if voltageIn[phase] == None:
 									voltageIn[phase] = self._dbusmonitor.get_value(em.service, '/Ac/ActiveIn/%s/V' % phase)
-								if frequencyIn[phase] == None:
-									frequencyIn[phase] = self._dbusmonitor.get_value(em.service, '/Ac/ActiveIn/%s/F' % phase)
+								if frequencyIn == None:
+									frequencyIn = self._dbusmonitor.get_value(em.service, '/Ac/ActiveIn/%s/F' % phase)
 
 							except TypeError:
 								pass
@@ -1068,8 +1042,8 @@ class SystemCalc:
 #### added for GuiMods
 								if voltageIn[phase] == None:
 									voltageIn[phase] = self._dbusmonitor.get_value(em.service, '/Ac/In/%d/%s/V' % (active_input+1, phase))
-								if frequencyIn[phase] == None:
-									frequencyIn[phase] = self._dbusmonitor.get_value(em.service, '/Ac/In/%d/%s/F' % (active_input+1, phase))
+								if frequencyIn == None:
+									frequencyIn = self._dbusmonitor.get_value(em.service, '/Ac/In/%d/%s/F' % (active_input+1, phase))
 
 							except TypeError:
 								pass
@@ -1091,10 +1065,10 @@ class SystemCalc:
 #### added for GuiMods
 							if voltageIn[phase] == None:
 								voltageIn[phase] = self._dbusmonitor.get_value(multi_path, '/Ac/ActiveIn/%s/V' % phase)
-							if frequencyIn[phase] == None:
+							if frequencyIn == None:
 								freq = self._dbusmonitor.get_value(multi_path, '/Ac/ActiveIn/%s/F' % phase)
 								if freq != None:
-									frequencyIn[phase] = freq
+									frequencyIn = freq
 
 						elif non_vebus_inverter is not None and active_input in (0, 1):
 							p = self._dbusmonitor.get_value(non_vebus_inverter, '/Ac/In/%d/%s/P' % (active_input + 1, phase))
@@ -1102,8 +1076,8 @@ class SystemCalc:
 #### added for GuiMods
 							if voltageIn[phase] == None:
 								voltageIn[phase] = self._dbusmonitor.get_value(non_vebus_inverter, '/Ac/In/%d/%s/V' % (active_input + 1, phase))
-							if frequencyIn[phase] == None:
-								frequencyIn[phase] = self._dbusmonitor.get_value(non_vebus_inverter, '/Ac/In/%d/%s/F' % (active_input + 1, phase))
+							if frequencyIn == None:
+								frequencyIn = self._dbusmonitor.get_value(non_vebus_inverter, '/Ac/In/%d/%s/F' % (active_input + 1, phase))
 
 							if p is not None:
 								consumption[phase] = _safeadd(0, consumption[phase])
@@ -1122,7 +1096,7 @@ class SystemCalc:
 #### added for GuiMods
 				if p != None:
 					newvalues['/Ac/%s/%s/Voltage' % (device_type, phase)] = voltageIn[phase]
-					newvalues['/Ac/%s/%s/Frequency' % (device_type, phase)] = frequencyIn[phase]
+					newvalues['/Ac/%s/Frequency' % (device_type)] = frequencyIn
 
 				if ac_in_guess in _types:
 					newvalues['/Ac/ActiveIn/%s/Power' % (phase,)] = p
@@ -1130,8 +1104,7 @@ class SystemCalc:
 #### added for GuiMods
 					if p != None:
 						newvalues['/Ac/ActiveIn/%s/Voltage' % (phase,)] = voltageIn[phase]
-						newvalues['/Ac/ActiveIn/%s/Frequency' % (phase,)] = frequencyIn[phase]
-
+						newvalues['/Ac/ActiveIn/Frequency'] = frequencyIn
 
 			self._compute_number_of_phases('/Ac/%s' % device_type, newvalues)
 			self._compute_number_of_phases('/Ac/ActiveIn', newvalues)
@@ -1165,8 +1138,8 @@ class SystemCalc:
 #### added for GuiMods
 				if voltageOut[phase] == None:
 					voltageOut[phase] = newvalues.get('/Ac/PvOnOutput/%s/Voltage' % phase)
-				if frequencyOut[phase] == None:
-					frequencyOut[phase] = newvalues.get('/Ac/PvOnOutput/%s/Frequency' % phase)
+				if frequencyOut == None:
+					frequencyOut = newvalues.get('/Ac/PvOnOutput/%s/Frequency' % phase)
 
 				if multi_path is None:
 					for inv in non_vebus_inverters:
@@ -1175,8 +1148,8 @@ class SystemCalc:
 #### added for GuiMods
 						if voltageOut[phase] == None:
 							voltageOut[phase] = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/V' % phase)
-						if frequencyOut[phase] == None:
-							frequencyOut[phase] = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/F' % phase)
+						if frequencyOut == None:
+							frequencyOut = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/F' % phase)
 
 						# Some models don't show power, try apparent power,
 						# else calculate it
@@ -1197,8 +1170,8 @@ class SystemCalc:
 #### added for GuiMods
 					if voltageOut[phase] == None:
 						voltageOut[phase] = self._dbusmonitor.get_value(multi_path, '/Ac/Out/%s/V' % phase)
-					if frequencyOut[phase] == None:
-						frequencyOut[phase] = self._dbusmonitor.get_value(multi_path, '/Ac/Out/%s/F' % phase)
+					if frequencyOut == None:
+						frequencyOut = self._dbusmonitor.get_value(multi_path, '/Ac/Out/%s/F' % phase)
 				c = _safemax(0, c)
 				a = _safemax(0, a)
 			newvalues['/Ac/ConsumptionOnOutput/%s/Power' % phase] = c
@@ -1214,12 +1187,14 @@ class SystemCalc:
 				newvalues['/Ac/Consumption/%s/Voltage' % phase] = voltageOut[phase]
 			elif voltageIn[phase] != None:
 				newvalues['/Ac/Consumption/%s/Voltage' % phase] = voltageIn[phase]
-			newvalues['/Ac/ConsumptionOnOutput/%s/Frequency' % phase] = frequencyOut[phase]
-			newvalues['/Ac/ConsumptionOnInput/%s/Frequency' % phase] = frequencyIn[phase]
-			if frequencyOut[phase] != None:
-				newvalues['/Ac/Consumption/%s/Frequency' % phase] = frequencyOut[phase]
-			elif frequencyIn[phase] != None:
-				newvalues['/Ac/Consumption/%s/Frequency' % phase] = frequencyIn[phase]
+			if frequencyIn != None:
+				newvalues['/Ac/ConsumptionOnInput/Frequency'] = frequencyIn
+			if frequencyOut != None:
+				newvalues['/Ac/ConsumptionOnOutput/Frequency'] = frequencyOut
+			if frequencyOut != None:
+				newvalues['/Ac/Consumption/Frequency'] = frequencyOut
+			elif frequencyIn != None:
+				newvalues['/Ac/Consumption/Frequency'] = frequencyIn
 
 		self._compute_number_of_phases('/Ac/Consumption', newvalues)
 		self._compute_number_of_phases('/Ac/ConsumptionOnOutput', newvalues)

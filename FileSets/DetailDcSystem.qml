@@ -172,7 +172,7 @@ MbPage
 			id: otherDevicesTextRow
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: root.width; horizontalAlignment: Text.AlignHCenter
-					text: qsTr ("other DC devices not shown on overview page") }
+					text: qsTr ("other DC devices") }
 		}
 		Row
 		{
@@ -257,9 +257,8 @@ MbPage
 				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
             break;;
 		case DBusService.DBUS_SERVICE_INVERTER:
-			// skip if this the FIRST one unless a main Multi exists
-			//	NOTE: the first one may not be THE system inverter but not sure how to figure that out exactly
-			if (numberOfInverters > 0 || systemMultiItem.valid)
+			// skip the main Multi
+			if (! systemMultiItem.valid || service.name != systemMultiItem.value)
 				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
 			numberOfInverters++
             break;;
@@ -268,9 +267,7 @@ MbPage
 		case DBusService.DBUS_SERVICE_AC_CHARGER:
         case DBusService.DBUS_SERVICE_FUELCELL:
         case DBusService.DBUS_SERVICE_MOTOR_DRIVE:
-			// skip if tile present in flow (flow == DC Coupled)
-			if (flowOverview != 2)
-				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+			otherModel.append ( {serviceName: service.name, serviceType: service.type } )
 			break;;
 
         case DBusService.DBUS_SERVICE_DCSYSTEM:
@@ -280,7 +277,7 @@ MbPage
         case DBusService.DBUS_SERVICE_DCSOURCE:
 			root.tempServiceName = service.name
 			// wind generator shown on DC and AC coupled overviews
-			if (monitorMode != -8 || flowOverview < 2 )
+			if (monitorMode != -8 )
 				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
 			break;
         case DBusService.DBUS_SERVICE_DCLOAD:
