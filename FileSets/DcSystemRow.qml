@@ -24,9 +24,15 @@ Row {
     property int stateColumnWidth: 0
     property int temperatureColumnWidth: 0
     property int rpmColumnWidth: 0
+    property int outputColumnWidth: 0
+
+	// instance allows multiple outputs or subunits to be displayed separately
+	// instance is normally 0 for subunits attached to the system battery
+	// other instances are not included in system totals by systemcalc
+    property int realInstance: 0
 
 	property string speedParam: "/Speed"
-	property string temperatureParam: "/Dc/0/Temperature"
+	property string temperatureParam: "/Dc/" + realInstance + "/Temperature"
 
 
     Component.onCompleted:
@@ -56,6 +62,10 @@ Row {
 			speedParam = "/Motor/RPM"
 			temperatureParam = "/Motor/Temperature"
 		}
+		if (instance)
+			realInstance = instance
+		else
+			realInstance = 0
 	}
 
 
@@ -64,9 +74,9 @@ Row {
 
     VBusItem { id: customNameItem; bind: Utils.path(serviceName, "/CustomName") }
     VBusItem { id: productNameItem; bind: Utils.path(serviceName, "/ProductName") }
-	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/0/Power") }
-	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/0/Voltage") }
-	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/0/Current") }
+	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/" + realInstance + "Power") }
+	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/" + realInstance + "Voltage") }
+	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/" + realInstance + "Current") }
 	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, "temperatureParam") }
 	VBusItem { id: stateItem; bind: Utils.path (serviceName, "/State") }
 	VBusItem { id: rpmItem; bind: Utils.path (serviceName, speedParam) }
@@ -96,7 +106,9 @@ Row {
         height: parent.height
         text:
         {
-            if (customNameItem.valid && customNameItem.value != "")
+			if (realInstance > 0) // show only for first instance
+				return ""
+            else if (customNameItem.valid && customNameItem.value != "")
 				return customNameItem.value
 			else if (productNameItem.valid)
 				return productNameItem.value
@@ -118,7 +130,7 @@ Row {
 		id: device
         width: deviceColumnWidth
         height: parent.height
-		text: formatDeviceType ()
+		text: realInstance == 0 ? formatDeviceType () : " " // show only for first instance
         fontSize: 12
         textColor: "black"
         bold: true
@@ -132,13 +144,16 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: directionColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatDirection ()
+            text: realInstance == 0 ? formatDirection () : " " // show only for first instance
             visible: directionColumnWidth > 0 }
+    Text { font.pixelSize: 12; font.bold: true; color: "black"
+            width: outputColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text: (root.realInstance + 1).toString()
+            visible: outputColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
             text:
             {
-return "1234 W"
 				if (dbusPowerItem.valid)
 					return formatValue (dbusPowerItem.value, "W")
 				else if (dbusVoltageItem.valid && dbusCurrentItem.valid)
@@ -169,7 +184,7 @@ return "1234 W"
         id: state
         width: stateColumnWidth
         height: parent.height
-        text: formatState ()
+        text: realInstance == 0 ? formatState () : "" // show state only for first instance
         fontSize: 12
         textColor: "black"
         bold: true
@@ -185,7 +200,7 @@ return "1234 W"
             width: temperatureColumnWidth; horizontalAlignment: Text.AlignHCenter
             text:
             {
-				if (! dbusTemperatureItem.valid)
+				if (! dbusTemperatureItem.valid || realInstance == 0) // show only for first instance
 					return ""
                 else if (tempScale == 2)
                     return ((dbusTemperatureItem.value * 9 / 5) + 32).toFixed (1) + " °F"
@@ -197,7 +212,7 @@ return "1234 W"
 
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: rpmColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: rpmItem.valid ? rpmItem.value : ""
+            text: rpmItem.valid && realInstance == 0 ? rpmItem.value : "" // show rpm only for first instance
             visible: rpmColumnWidth > 0 }
 
 
@@ -249,7 +264,7 @@ return "1234 W"
 	function formatState ()
 	{
 		if ( ! stateItem.valid)
-			return "---"
+			return ""
 		if (isBattery)
 		{
 			switch (stateItem.value)

@@ -18,10 +18,13 @@ MbPage
 
     property int tableColumnWidth: 80
     property int nameColumnWidth: 130
-    property int powerColumnWidth: tableColumnWidth
-    property int currentColumnWidth: tableColumnWidth
-    property int voltageColumnWidth: tableColumnWidth
+    property int outputColumnWidth: 60
+    property int powerColumnWidth: 60
+    property int currentColumnWidth: 60
+    property int voltageColumnWidth: 60
     property int stateColumnWidth: tableColumnWidth
+
+	property bool multipleOutputWaring: false
 
     Component.onCompleted: discoverServices()
 
@@ -73,6 +76,9 @@ MbPage
                         width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Name") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: outputColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Output") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
@@ -85,41 +91,50 @@ MbPage
                         width: stateColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("State") }
             }
+
+			// table of available AC chargers
+			ListView
+			{
+				id: theTable
+
+				width: tableHeaderRow.width
+				height: root.height - 100
+				interactive: true
+
+				model: dcModel
+				delegate: DcSystemRow
+				{
+					width: theTable.width
+					nameColumnWidth: root.nameColumnWidth
+					outputColumnWidth: root.outputColumnWidth
+					powerColumnWidth: root.powerColumnWidth
+					voltageColumnWidth: root.voltageColumnWidth
+					currentColumnWidth: root.currentColumnWidth
+					stateColumnWidth: root.stateColumnWidth
+					Connections
+					{
+						target: scrollTimer
+						onTriggered: doScroll()
+					}
+				}
+			}
+            // vertical spacer
+            Row { Text { font.pixelSize: 12; width: nameColumnWidth; text: "" } }
+			Row
+			{
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: tableHeaderRow.width; horizontalAlignment: Text.AlignHCenter
+					text: qsTr ("only #1 output is included in system totals")
+					visible: multipleOutputWaring
+				}
+				
+			}
         }
     }
 
-    // table of available AC chargers
-    ListView
-    {
-        id: theTable
-
-        anchors
-        {
-            top: root.top; topMargin: 60
-            horizontalCenter: root.horizontalCenter
-        }
-        width: tableHeaderRow.width
-        height: root.height - 60
-        interactive: true
-
-        model: dcModel
-        delegate: DcSystemRow
-        {
-            width: theTable.width
-            nameColumnWidth: root.nameColumnWidth
-			powerColumnWidth: root.powerColumnWidth
-			voltageColumnWidth: root.voltageColumnWidth
-			currentColumnWidth: root.currentColumnWidth
-			stateColumnWidth: root.stateColumnWidth
-            Connections
-            {
-                target: scrollTimer
-                onTriggered: doScroll()
-            }
-        }
-    }
 
     ListModel { id: dcModel }
+
 
     // Synchronise name text scroll start
     Timer
@@ -130,12 +145,24 @@ MbPage
         running: root.active
     }
 
+	VBusItem { id: numberOfOutputsItem;  bind: Utils.path(serviceName,"/NrOfOutputs") }
+	property string serviceName: ""
+	property int numberOfOutputs: 1
+
     function addService(service)
     {
         switch (service.type)
         {
         case DBusService.DBUS_SERVICE_AC_CHARGER:
-			dcModel.append ( {serviceName: service.name, serviceType: service.type} )
+			serviceName = service.name
+            if ( numberOfOutputsItem.valid)
+				numberOfOutputs = numberOfOutputsItem.value
+			else
+				numberOfOutputs = 1
+			if (numberOfOutputs > 1)
+				multipleOutputWaring = true
+			for (var instance = 0; instance < numberOfOutputs; instance++ )
+				dcModel.append ( {serviceName: service.name, serviceType: service.type, instance: instance} )
             break;;
         }
     }
@@ -144,6 +171,7 @@ MbPage
     function discoverServices()
     {
 		dcModel.clear()
+		multipleOutputWaring = false
         for (var i = 0; i < DBusServices.count; i++)
         {
             addService(DBusServices.at(i))
