@@ -17,8 +17,12 @@ MbPage
     property string systemPrefix: "com.victronenergy.system"
     property color backgroundColor: "#b3b3b3"
 
-    property int tableColumnWidth: 80
-    property int rowTitleWidth: 130
+    property int nameColumnWidth: 100
+    property int deviceColumnWidth: 100
+    property int directionColumnWidth: 75
+    property int powerColumnWidth: 60
+    property int currentColumnWidth: 60
+    property int stateColumnWidth: 75
 
 
 	property int systemRows: Math.min (systemModel.count, 1)
@@ -80,15 +84,16 @@ MbPage
 			id: totalPowerRow
 			anchors.horizontalCenter: parent.horizontalCenter
 			Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
-					horizontalAlignment: Text.AlignHCenter
+					horizontalAlignment: Text.AlignRight
+					width: 150
 					text: dcSystemIsEstimated ? qsTr("DC System power (est)") : qsTr("DC System power") }
 			Text { id: totalPower; font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: 80; horizontalAlignment: Text.AlignHCenter
 				text: EnhFmt.formatVBusItemAbs (sys.dcSystem.power) }
 			PowerGauge
 			{
 				id: gauge
-				width: (root.width * 0.9) - totalLabel.paintedWidth - totalPower.width
+				width: (root.width * 0.9) - totalLabel.width - totalPower.width
 				height: 15
 				showLabels: true
 				endLabelColor: "black"
@@ -102,7 +107,7 @@ MbPage
 			id: spacer1
 			anchors.horizontalCenter: parent.horizontalCenter
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: "" }
 			visible: totalTableRows < 8
 		}
@@ -111,13 +116,13 @@ MbPage
 			id: systemTableTitleRow
 			anchors.horizontalCenter: parent.horizontalCenter
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Name") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: directionColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Direction") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Power") }
 		}
 		Row {
@@ -140,10 +145,11 @@ MbPage
 			model: systemModel
 			delegate: DcSystemRow
 			{
-				tableColumnWidth: root.tableColumnWidth
-				rowTitleWidth: root.rowTitleWidth
 				width: systemTable.width
-				showDirection: true
+				nameColumnWidth: root.nameColumnWidth
+				directionColumnWidth: root.directionColumnWidth
+				powerColumnWidth: root.powerColumnWidth
+				////currentColumnWidth: root.currentColumnWidth
 				Connections
 				{
 					target: scrollTimer
@@ -156,7 +162,7 @@ MbPage
 			id: spacer2
 			anchors.horizontalCenter: parent.horizontalCenter
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: "" }
 			visible: totalTableRows < 9
 		}
@@ -165,7 +171,7 @@ MbPage
 			id: separatorLine
 			color: "black"
 			anchors.horizontalCenter: parent.horizontalCenter
-			width: otherTable.width
+			width: otherTableTitleRow.width
 			height: 2
 		}
 		Row {
@@ -177,20 +183,24 @@ MbPage
 		Row
 		{
 			id: otherTableTitleRow
+			anchors.horizontalCenter: parent.horizontalCenter
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+					width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Name") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: deviceColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Device") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: directionColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Direction") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Power") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					width: currentColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Current") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: stateColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("State") }
 		}
 		// table of other DC sources and loads
@@ -206,12 +216,13 @@ MbPage
 			model: otherModel
 			delegate: DcSystemRow
 			{
-				tableColumnWidth: root.tableColumnWidth
-				rowTitleWidth: root.rowTitleWidth
 				width: otherTable.width
-				showDevice: true
-				showDirection: true
-				showState: true
+				nameColumnWidth: root.nameColumnWidth
+				deviceColumnWidth: root.deviceColumnWidth
+				directionColumnWidth: root.directionColumnWidth
+				powerColumnWidth: root.powerColumnWidth
+				currentColumnWidth: root.currentColumnWidth
+				stateColumnWidth: root.stateColumnWidth
 				Connections
 				{
 					target: scrollTimer
@@ -229,7 +240,7 @@ MbPage
     Timer
     {
         id: scrollTimer
-        interval: 5000
+        interval: 10000
         repeat: true
         running: root.active
     }

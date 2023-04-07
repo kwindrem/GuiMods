@@ -16,9 +16,12 @@ MbPage
     property string systemPrefix: "com.victronenergy.system"
     property color backgroundColor: "#b3b3b3"
 
-    property int rowTitleWidth: 130
+    property int nameColumnWidth: 130
     property int tableColumnWidth: 80
-    property int totalDataWidth: tableColumnWidth * 4
+    property int powerColumnWidth: tableColumnWidth
+    property int stateColumnWidth: tableColumnWidth
+    property int temperatureColumnWidth: tableColumnWidth
+    property int rpmColumnWidth: tableColumnWidth
 
     Component.onCompleted: discoverServices()
 
@@ -46,39 +49,39 @@ MbPage
                 Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
                     horizontalAlignment: Text.AlignRight
                     text: qsTr("Total Power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                Text { id: totalPower; font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: EnhFmt.formatVBusItem (sys.alternator.power, "W")
                 }
                 PowerGauge
                 {
                     id: gauge
-                    width: (root.width * 0.8) - totalLabel.paintedWidth - tableColumnWidth
+					width: (root.width * 0.9) - totalLabel.width - totalPower.width
                     height: 15
                     connection: sys.alternator
 					maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAlternatorPower"
                 }
 			}
             // vertical spacer
-            Row { Text { font.pixelSize: 12; width: rowTitleWidth; text: "" } }
+            Row { Text { font.pixelSize: 12; width: nameColumnWidth; text: "" } }
             Row
             {
                 id: tableHeaderRow
 				anchors.horizontalCenter: parent.horizontalCenter
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+                        width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Name") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: stateColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("State") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: temperatureColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Temperature") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: rpmColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("RPM") }
             }
         }
@@ -101,12 +104,12 @@ MbPage
         model: dcModel
         delegate: DcSystemRow
         {
-            tableColumnWidth: root.tableColumnWidth
-            rowTitleWidth: root.rowTitleWidth
             width: theTable.width
-			showState: true
-            showTemperature: true
-            showRpm: true
+            nameColumnWidth: root.nameColumnWidth
+			powerColumnWidth: root.powerColumnWidth
+			stateColumnWidth: root.stateColumnWidth
+			temperatureColumnWidth: root.temperatureColumnWidth
+			rpmColumnWidth: root.rpmColumnWidth
             Connections
             {
                 target: scrollTimer

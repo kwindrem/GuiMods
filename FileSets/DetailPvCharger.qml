@@ -45,15 +45,15 @@ MbPage
             {
 				anchors.horizontalCenter: parent.horizontalCenter
 				Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
-						width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+						width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                         text: qsTr("Total power") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                Text { id: totalPower; font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: EnhFmt.formatVBusItem (sys.pvCharger.power) }                        
                 PowerGauge
                 {
                     id: gauge
-                    width: totalDataWidth - tableColumnWidth
+					width: (root.width * 0.9) - totalLabel.width - totalPower.width
                     height: 15
                     connection: sys.pvCharger
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvChargerMaxPower"

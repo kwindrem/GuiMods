@@ -16,9 +16,12 @@ MbPage
     property string systemPrefix: "com.victronenergy.system"
     property color backgroundColor: "#b3b3b3"
 
-    property int rowTitleWidth: 130
     property int tableColumnWidth: 80
-    property int totalDataWidth: tableColumnWidth * 2
+    property int nameColumnWidth: 130
+    property int powerColumnWidth: tableColumnWidth
+    property int currentColumnWidth: tableColumnWidth
+    property int voltageColumnWidth: tableColumnWidth
+    property int stateColumnWidth: tableColumnWidth
 
     Component.onCompleted: discoverServices()
 
@@ -44,7 +47,7 @@ MbPage
             {
 				anchors.horizontalCenter: parent.horizontalCenter
                 Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
-                    horizontalAlignment: Text.AlignHCenter
+                    horizontalAlignment: Text.AlignRight
                     text: qsTr("Total Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
@@ -53,7 +56,7 @@ MbPage
                 PowerGauge
                 {
                     id: gauge
-                    width: (root.width * 0.8) - totalLabel.paintedWidth - tableColumnWidth
+                    width: (root.width * 0.9) - nameColumnWidth - tableColumnWidth
                     height: 15
                     connection: sys.acCharger
                     reversePower: true
@@ -61,19 +64,25 @@ MbPage
                 }
 			}
             // vertical spacer
-            Row { Text { font.pixelSize: 12; width: rowTitleWidth; text: "" } }
+            Row { Text { font.pixelSize: 12; width: nameColumnWidth; text: "" } }
             Row
             {
                 id: tableHeaderRow
 				anchors.horizontalCenter: parent.horizontalCenter
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+                        width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Name") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Power") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        width: voltageColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Voltage") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: currentColumnWidth; horizontalAlignment: Text.AlignHCenter
+                        text: qsTr("Current") }
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
+                        width: stateColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("State") }
             }
         }
@@ -96,10 +105,12 @@ MbPage
         model: dcModel
         delegate: DcSystemRow
         {
-            tableColumnWidth: root.tableColumnWidth
-            rowTitleWidth: root.rowTitleWidth
             width: theTable.width
-			showState: true
+            nameColumnWidth: root.nameColumnWidth
+			powerColumnWidth: root.powerColumnWidth
+			voltageColumnWidth: root.voltageColumnWidth
+			currentColumnWidth: root.currentColumnWidth
+			stateColumnWidth: root.stateColumnWidth
             Connections
             {
                 target: scrollTimer
