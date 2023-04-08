@@ -62,7 +62,7 @@ Row {
 			speedParam = "/Motor/RPM"
 			temperatureParam = "/Motor/Temperature"
 		}
-		if (instance)
+		if (root.instance !== undefined)
 			realInstance = instance
 		else
 			realInstance = 0
@@ -74,9 +74,9 @@ Row {
 
     VBusItem { id: customNameItem; bind: Utils.path(serviceName, "/CustomName") }
     VBusItem { id: productNameItem; bind: Utils.path(serviceName, "/ProductName") }
-	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/" + realInstance + "Power") }
-	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/" + realInstance + "Voltage") }
-	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/" + realInstance + "Current") }
+	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Power") }
+	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Voltage") }
+	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Current") }
 	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, "temperatureParam") }
 	VBusItem { id: stateItem; bind: Utils.path (serviceName, "/State") }
 	VBusItem { id: rpmItem; bind: Utils.path (serviceName, speedParam) }
@@ -222,7 +222,7 @@ Row {
         if (item.valid)
         {
 			value = item.value
-			if (showDirection && value < 0)
+			if (directionColumnWidth > 0 && value < 0)
 				value = -value
 
 			return EnhFmt.formatValue (value, unit)
@@ -235,7 +235,7 @@ Row {
 
     function formatValue (value, unit)
     {
-		if (showDirection && value < 0)
+		if (directionColumnWidth > 0 && value < 0)
 			value = -value
 
 		return EnhFmt.formatValue (value, unit)

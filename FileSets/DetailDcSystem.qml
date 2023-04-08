@@ -22,6 +22,7 @@ MbPage
     property int directionColumnWidth: 75
     property int powerColumnWidth: 60
     property int currentColumnWidth: 60
+    property int voltageColumnWidth: 60
     property int stateColumnWidth: 75
 
 
@@ -124,6 +125,12 @@ MbPage
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: qsTr("Power") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: voltageColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Voltage") }
+			Text { font.pixelSize: 12; font.bold: true; color: "black"
+					width: currentColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: qsTr("Current") }
 		}
 		Row {
 			id: noSystemDevicesRow
@@ -149,7 +156,8 @@ MbPage
 				nameColumnWidth: root.nameColumnWidth
 				directionColumnWidth: root.directionColumnWidth
 				powerColumnWidth: root.powerColumnWidth
-				////currentColumnWidth: root.currentColumnWidth
+				currentColumnWidth: root.currentColumnWidth
+				voltageColumnWidth: root.voltageColumnWidth
 				Connections
 				{
 					target: scrollTimer
