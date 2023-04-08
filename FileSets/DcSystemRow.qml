@@ -62,7 +62,7 @@ Row {
 			speedParam = "/Motor/RPM"
 			temperatureParam = "/Motor/Temperature"
 		}
-		if (root.instance !== undefined)
+		if (instance !== undefined)
 			realInstance = instance
 		else
 			realInstance = 0
@@ -157,7 +157,7 @@ Row {
 				if (dbusPowerItem.valid)
 					return formatValue (dbusPowerItem.value, "W")
 				else if (dbusVoltageItem.valid && dbusCurrentItem.valid)
-					return formatValue (dbusVoltageItem.value * dbusCurrentItem.value)
+					return formatValue (dbusVoltageItem.value * dbusCurrentItem.value, "W")
 				else
 					return ""
 			}

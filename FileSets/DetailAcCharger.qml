@@ -155,14 +155,14 @@ MbPage
         {
         case DBusService.DBUS_SERVICE_AC_CHARGER:
 			serviceName = service.name
-            if ( numberOfOutputsItem.valid)
+            if ( numberOfOutputsItem.valid )
 				numberOfOutputs = numberOfOutputsItem.value
 			else
 				numberOfOutputs = 1
 			if (numberOfOutputs > 1)
 				multipleOutputWaring = true
-			for (var instance = 0; instance < numberOfOutputs; instance++ )
-				dcModel.append ( {serviceName: service.name, serviceType: service.type, instance: instance} )
+			for (var i = 0; i < numberOfOutputs; i++ )
+				dcModel.append ( { serviceName: service.name, serviceType: service.type, instance: i } )
             break;;
         }
     }
