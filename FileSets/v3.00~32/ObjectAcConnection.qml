@@ -1,7 +1,6 @@
 ////// modified to show voltage, current and frequency in flow overview
 ////// modified to show bar graphs
-//////// modified to use grid or genset meter if present
-// probably doesn't support paralleled Multis/Quatros
+////// modified to use grid or genset meter if present
 
 import QtQuick 1.1
 import com.victron.velib 1.0
@@ -9,14 +8,8 @@ import "utils.js" as Utils
 
 QtObject {
 	property string bindPrefix
-    property string inverterService: ""   
+    property string inverterService: ""
     property string inverterSource: ""
-    property string meterService: ""
-    property bool useMeter: meterService != ""
-    property string pathPrefix: useMeter ? Utils.path ( meterService, "/Ac/") : Utils.path (inverterService, inverterSource, "/")
-    property string voltageSuffix: useMeter ? "/Voltage" : "/V"
-    property string currentSuffix: useMeter ? "/Current" : "/I"
-    
 
 	property VBusItem powerL1: VBusItem { bind: Utils.path(bindPrefix, "/L1/Power"); unit: "W"}
 	property VBusItem powerL2: VBusItem { bind: Utils.path(bindPrefix, "/L2/Power"); unit: "W"}
@@ -30,15 +23,15 @@ QtObject {
     property VBusItem inverterState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State" ) }
  
  ////// add to show voltage, current, frequency and bar graphs and use grid/genset meter
-    property VBusItem voltageL1: VBusItem { bind: Utils.path (pathPrefix, "L1", voltageSuffix); unit: "V"}
-    property VBusItem voltageL2: VBusItem { bind: Utils.path (pathPrefix, "L2", voltageSuffix); unit: "V"}
-    property VBusItem voltageL3: VBusItem { bind: Utils.path (pathPrefix, "L3", voltageSuffix); unit: "V"}
+    property VBusItem voltageL1: VBusItem { bind: Utils.path (bindPrefix, "/L1/Voltage"); unit: "V"}
+    property VBusItem voltageL2: VBusItem { bind: Utils.path (bindPrefix, "/L2/Voltage"); unit: "V"}
+    property VBusItem voltageL3: VBusItem { bind: Utils.path (bindPrefix, "/L3/Voltage"); unit: "V"}
 
-    property VBusItem currentL1: VBusItem { bind: Utils.path (pathPrefix, "L1", currentSuffix); unit: "A"}
-    property VBusItem currentL2: VBusItem { bind: Utils.path (pathPrefix, "L2", currentSuffix); unit: "A"}
-    property VBusItem currentL3: VBusItem { bind: Utils.path (pathPrefix, "L3", currentSuffix); unit: "A"}
+    property VBusItem currentL1: VBusItem { bind: Utils.path (bindPrefix, "/L1/Current"); unit: "A"}
+    property VBusItem currentL2: VBusItem { bind: Utils.path (bindPrefix, "/L2/Current"); unit: "A"}
+    property VBusItem currentL3: VBusItem { bind: Utils.path (bindPrefix, "/L3/Current"); unit: "A"}
 
-    property VBusItem frequencyL1: VBusItem { bind: Utils.path (inverterService, inverterSource, "/L1/F"); unit: "Hz"}
+    property VBusItem frequency: VBusItem { bind: Utils.path (bindPrefix, "/Frequency"); unit: "Hz"}
 
     property VBusItem inCurrentLimit: VBusItem { bind: Utils.path(inverterService, inverterSource, "/CurrentLimit"); unit: "A"}
  ////// end add to show voltage, current and frequency

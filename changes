@@ -1,3 +1,21 @@
+v7.30:
+	fixed: AC loads values missing or incorrect on GuiMods simple flow page
+		this tile only shows AC loads on output
+		if there are only loads on input they would not appear
+		multi-phase systems with no inverter on some phases wold be blank for that leg
+	fixed: Alternator flow is backwards (DC & AC Coupled flow pages)
+	added all source info to AC input page
+		voltages and frequency are shown for both grid (aka shore) and generator
+		inputs regardless of which one is in use
+		info is collected from eitehr AC meters assigned to grid or generator
+		or from a Quattro's two AC inputs
+		Multis only have one input which is always active so
+		the info at the bottom of the page is redundant.
+	fixed: AC in/out tiles not always appearing when system does not include inverter/charger
+	fixed: DC System tile sometimes appears when it should not
+	"other DC devices" list - no longer depends on which flow overview is active
+		DC/AC coupled flow can show tiles from eitehr DC or AC depending on what is present
+
 v7.21:
 	more recovery from bad v7.18 beta merge to main
 	fixed: discharge and chrge limits are blank

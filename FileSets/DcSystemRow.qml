@@ -13,16 +13,26 @@ Row {
 	property bool useMonitorMode: false
 	property bool positivePowerIsConsuming: false
 
-	// passed from parent
-	property bool showDevice: false
-	property bool showDirection: false
-	property bool showState: false
-	property bool showTemperature: false
-	property bool showRpm: false
-	property bool showVoltage: false
-	property bool showCurrent: false
+	// column widths - passed from parent
+	// caller can omit widths for columns that should not show or set the width to 0
+    property int nameColumnWidth: 0
+    property int deviceColumnWidth: 0
+    property int directionColumnWidth: 0
+    property int powerColumnWidth: 0
+    property int voltageColumnWidth: 0
+    property int currentColumnWidth: 0
+    property int stateColumnWidth: 0
+    property int temperatureColumnWidth: 0
+    property int rpmColumnWidth: 0
+    property int outputColumnWidth: 0
+
+	// instance allows multiple outputs or subunits to be displayed separately
+	// instance is normally 0 for subunits attached to the system battery
+	// other instances are not included in system totals by systemcalc
+    property int realInstance: 0
+
 	property string speedParam: "/Speed"
-	property string temperatureParam: "/Dc/0/Temperature"
+	property string temperatureParam: "/Dc/" + realInstance + "/Temperature"
 
 
     Component.onCompleted:
@@ -52,32 +62,29 @@ Row {
 			speedParam = "/Motor/RPM"
 			temperatureParam = "/Motor/Temperature"
 		}
+		if (instance !== undefined)
+			realInstance = instance
+		else
+			realInstance = 0
 	}
 
-    // uses the same sizes as DetailsDcSystem page
-    property int tableColumnWidth: 0
-    property int rowTitleWidth: 0
 
 	VBusItem { id: monitorModeItem; bind: Utils.path(serviceName, "/Settings/MonitorMode") }
 	property int monitorMode: monitorModeItem.valid ? monitorModeItem.value : 0
 
     VBusItem { id: customNameItem; bind: Utils.path(serviceName, "/CustomName") }
     VBusItem { id: productNameItem; bind: Utils.path(serviceName, "/ProductName") }
-	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/0/Power") }
-	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/0/Voltage") }
-	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/0/Current") }
-	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, "/Dc/0/Temperature") }
-	VBusItem { id: stateItem; bind: Utils.path (serviceName, temperatureParam) }
+	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Power") }
+	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Voltage") }
+	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Current") }
+	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, "temperatureParam") }
+	VBusItem { id: stateItem; bind: Utils.path (serviceName, "/State") }
 	VBusItem { id: rpmItem; bind: Utils.path (serviceName, speedParam) }
 
 	// use system temperature scale if it exists (v2.90 onward) - otherwise use the GuiMods version
     property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
     property VBusItem guiModsTempScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/TemperatureScale" }
     property int tempScale: systemScaleItem.valid ? systemScaleItem.value == "fahrenheit" ? 2 : 1 : guiModsTempScaleItem.valid ? guiModsTempScaleItem.value : 1
-
-
-
-    property string rowName: customNameItem.valid && customNameItem.value != "" ? customNameItem.value : productNameItem.valid ? productNameItem.value : ""
 
 	SystemStateShort
 	{
@@ -88,14 +95,26 @@ Row {
     function doScroll()
     {
         name.doScroll()
+		device.doScroll()
+        state.doScroll()
     }
 
     MarqueeEnhanced
     {
         id: name
-        width: rowTitleWidth
+        width: nameColumnWidth
         height: parent.height
-        text: rowName
+        text:
+        {
+			if (realInstance > 0) // show only for first instance
+				return ""
+            else if (customNameItem.valid && customNameItem.value != "")
+				return customNameItem.value
+			else if (productNameItem.valid)
+				return productNameItem.value
+			else
+				return ""
+		}
         fontSize: 12
         textColor: "black"
         bold: true
@@ -106,60 +125,95 @@ Row {
             verticalCenter: parent.verticalCenter
         }
     }
+    MarqueeEnhanced
+    {
+		id: device
+        width: deviceColumnWidth
+        height: parent.height
+		text: realInstance == 0 ? formatDeviceType () : " " // show only for first instance
+        fontSize: 12
+        textColor: "black"
+        bold: true
+        textHorizontalAlignment: Text.AlignHCenter
+        scroll: false
+        anchors
+        {
+            verticalCenter: parent.verticalCenter
+        }
+		visible: deviceColumnWidth > 0
+    }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatDeviceType ()
-            visible: showDevice }
+            width: directionColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text: realInstance == 0 ? formatDirection () : " " // show only for first instance
+            visible: directionColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatDirection ()
-            visible: showDirection }
+            width: outputColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text: (root.realInstance + 1).toString()
+            visible: outputColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatItem (dbusPowerItem, "W") }
+            width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text:
+            {
+				if (dbusPowerItem.valid)
+					return formatValue (dbusPowerItem.value, "W")
+				else if (dbusVoltageItem.valid && dbusCurrentItem.valid)
+					return formatValue (dbusVoltageItem.value * dbusCurrentItem.value, "W")
+				else
+					return ""
+			}
+            visible: powerColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+            width: voltageColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: formatItem (dbusVoltageItem, "V")
-            visible: showVoltage }
+            visible: voltageColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: formatItem (dbusCurrentItem, "A")
-            visible: showCurrent }
+            width: currentColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text:
+            {
+				if (dbusCurrentItem.valid)
+					return formatValue (dbusCurrentItem.value, "A")
+				else if (dbusVoltageItem.valid && dbusPowerItem.valid)
+					return formatValue (dbusPowerItem.value / dbusVoltageItem.value, "A")
+				else
+					return ""
+			}
+            visible: currentColumnWidth > 0
+	}
     MarqueeEnhanced
     {
         id: state
-        width: tableColumnWidth
+        width: stateColumnWidth
         height: parent.height
-        text: formatState ()
+        text: realInstance == 0 ? formatState () : "" // show state only for first instance
         fontSize: 12
         textColor: "black"
         bold: true
         textHorizontalAlignment: Text.AlignHCenter
         scroll: false
-        visible: showState
+        visible: stateColumnWidth > 0
         anchors
         {
             verticalCenter: parent.verticalCenter
         }
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+            width: temperatureColumnWidth; horizontalAlignment: Text.AlignHCenter
             text:
             {
-				if (! dbusTemperatureItem.valid)
+				if (! dbusTemperatureItem.valid || realInstance == 0) // show only for first instance
 					return ""
                 else if (tempScale == 2)
                     return ((dbusTemperatureItem.value * 9 / 5) + 32).toFixed (1) + " °F"
                 else
                     return dbusTemperatureItem.value.toFixed (1) + " °C"
 			}
-			visible: showTemperature }
+			visible: temperatureColumnWidth > 0 }
 
 
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: rpmItem.valid ? rpmItem.value : ""
-            visible: showRpm }
+            width: rpmColumnWidth; horizontalAlignment: Text.AlignHCenter
+            text: rpmItem.valid && realInstance == 0 ? rpmItem.value : "" // show rpm only for first instance
+            visible: rpmColumnWidth > 0 }
 
 
     function formatItem (item, unit)
@@ -168,8 +222,8 @@ Row {
         if (item.valid)
         {
 			value = item.value
-			if (showDirection && value < 0)
-				power = -power
+			if (directionColumnWidth > 0 && value < 0)
+				value = -value
 
 			return EnhFmt.formatValue (value, unit)
 		}
@@ -179,10 +233,18 @@ Row {
 		}
 	}
 
+    function formatValue (value, unit)
+    {
+		if (directionColumnWidth > 0 && value < 0)
+			value = -value
+
+		return EnhFmt.formatValue (value, unit)
+	}
+
 	// show no direction if power is small
 	function formatDirection ()
 	{
-        var power
+       var power
         if (dbusPowerItem.valid)
         {
             power = dbusPowerItem.value
@@ -253,7 +315,7 @@ Row {
 				case -1:
 					return qsTr ("Source")
 				case -2:
-					return qsTr ("AC Charger")
+					return qsTr ("AC charger")
 				case -3:
 					return qsTr ("DC-DC charger")
 				case -4:
@@ -296,7 +358,7 @@ Row {
 				case DBusService.DBUS_SERVICE_FUELCELL:
 					return qsTr ("Fuel Dell")
 				case DBusService.DBUS_SERVICE_AC_CHARGER:
-					return qsTr ("AC Dharger")
+					return qsTr ("AC Charger")
 				case DBusService.DBUS_SERVICE_DCSYSTEM:
 					return qsTr ("DC System")
 				case DBusService.DBUS_SERVICE_MULTI_RS:

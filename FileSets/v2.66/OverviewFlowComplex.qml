@@ -39,8 +39,8 @@ OverviewPage {
     property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
     property bool showInverter: inverterService != "" || showAllTiles
-    property bool showLoadsOnOutput: showInverter || showAllTiles
-    property bool showAcInput: isMulti || showPvOnInput || showAllTiles
+    property bool showLoadsOnOutput: showInverter || outputLoad.power.valid
+    property bool showAcInput: isMulti || sys.acInput.power.valid || showAllTiles
 	property bool hasLoadsOnInput: showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)
     property bool showLoadsOnInput: !dcCoupled && hasLoadsOnInput
 	property bool hasPvOnInput: sys.pvOnGrid.power.valid
@@ -48,7 +48,7 @@ OverviewPage {
 	property bool hasPvOnOutput: sys.pvOnAcOut.power.valid
     property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnOutput
 	property bool showPvCharger: sys.pvCharger.power.valid
-    property bool showDcSystem: (dcSystemCalculated || (showDcSystemItem.valid && showDcSystemItem.value > 0))
+    property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
     property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && sys.alternator.power.valid
 	property bool hasFuelCell: sys.fuelCell.power.valid
     property bool showFuelCell: (dcCoupled || !hasPvOnOutput) && hasFuelCell
@@ -89,10 +89,7 @@ OverviewPage {
     VBusItem { id: showTempsItem; bind: Utils.path(guiModsPrefix, "/ShowEnhancedFlowOverviewTemps") }
     property bool showTempsEnable: showTempsItem.valid ? showTempsItem.value === 1 ? true : false : false
 
-    VBusItem { id: dcSystemMeasrurementItem; bind: Utils.path(systemPrefix, "Dc/System/MeasurementType") }
-    property bool dcSystemCalculated: dcSystemMeasrurementItem.valid && dcSystemMeasrurementItem.value == 1
-    
-	VBusItem { id: showDcSystemItem;  bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
+	VBusItem { id: hasDcSystemItem;  bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
     VBusItem { id: timeFormatItem; bind: Utils.path(guiModsPrefix, "/TimeFormat") }
     property string timeFormat: getTimeFormat ()
@@ -107,7 +104,7 @@ OverviewPage {
 
 	property double pvChargerFlow: showPvCharger ? noNoise (sys.pvCharger.power) : 0
 	property double dcSystemFlow: showDcSystem ? -noNoise (sys.dcSystem.power) : 0
-	property double alternatorFlow: showAlternator ? -noNoise (sys.alternator.power) : 0
+	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property double motorDriveFlow: showMotorDrive ? noNoise (motorDrivePowerItem) : 0
 	property double inverterDcFlow: showInverter ? noNoise (sys.vebusDc.power) : 0
 	property double batteryFlow: noNoise (sys.battery.power)
@@ -148,19 +145,19 @@ OverviewPage {
 		height: inOutTileHeight
 		title:
 		{
-			// input 1 is active
-			if (! acActiveInput.valid || acActiveInput.value == 0)
-			{
-				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
-					return qsTr ("AC In 1 Ignored")
-				else
-					return getAcSourceName(sys.acSource)
-			}
 			// input 2 is active
-			else
+			if (! acActiveInput.valid || acActiveInput.value == 1)
 			{
 				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
 					return qsTr ("AC In 2 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
+			// input 1 is active
+			else
+			{
+				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
+					return qsTr ("AC In 1 Ignored")
 				else
 					return getAcSourceName(sys.acSource)
 			}

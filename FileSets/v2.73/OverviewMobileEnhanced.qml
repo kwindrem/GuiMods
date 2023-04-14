@@ -460,9 +460,6 @@ OverviewPage {
 		height: root.acTileHeight
 		color: "#82acde"
 //////// add voltage and current
-		VBusItem { id: inVoltage; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/V") }
-		VBusItem { id: inCurrent; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/I") }
-		VBusItem { id: inFrequency; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/F") }
 		VBusItem { id: currentLimit; bind: Utils.path(inverterService, "/Ac/ActiveIn/CurrentLimit") }
 		values: [
 			TileText {
@@ -474,7 +471,7 @@ OverviewPage {
 //////// add voltage and current
 			TileText {
 				visible: isMulti
-				text: EnhFmt.formatVBusItem (inVoltage, "V") + "  " + EnhFmt.formatVBusItem (inCurrent, "A") + "  " + EnhFmt.formatVBusItem (inFrequency, "Hz")
+				text: EnhFmt.formatVBusItem (sys.acInput.voltageL1, "V") + "  " + EnhFmt.formatVBusItem (sys.acInput.currentL1, "A") + "  " + EnhFmt.formatVBusItem (sys.acInput.frequency, "Hz")
 			},
 			TileText
 			{

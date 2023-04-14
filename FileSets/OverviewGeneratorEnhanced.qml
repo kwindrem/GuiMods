@@ -19,7 +19,7 @@ OverviewPage {
 //////// added to show alternator in place of inactive genset
     property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
     VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
-    property bool hasAlternator: true //////////sys.alternator.power.valid
+    property bool hasAlternator: sys.alternator.power.valid
     property bool showAlternator: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && ! sys.genset.power.valid
     property bool showAcIn: ! showAlternator     
     

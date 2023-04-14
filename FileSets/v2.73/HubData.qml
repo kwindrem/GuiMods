@@ -122,8 +122,6 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
-//////// add for genset meter
-		meterService: root.gensetService
 	}
 
 	VBusItem {
@@ -137,8 +135,6 @@ Item {
 //////// modified for VE.Direct inverter support
         inverterSource: "/Ac/ActiveIn"
         inverterService: sys.vebusPrefix != "" ? sys.vebusPrefix : root.inverterService
-//////// add for grid meter
-		meterService: root.gridMeterService
 	}
 
 	ObjectAcConnection {
