@@ -19,3 +19,4 @@
 /opt/victronenergy/dbus-generator-starter/dbus_generator.py
 /opt/victronenergy/gui/qml/PageGenerator.qml
 /opt/victronenergy/gui/qml/PageSettingsGenerator.qml
+/opt/victronenergy/gui/qml/TileDigIn.qml

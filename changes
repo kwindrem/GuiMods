@@ -1,3 +1,7 @@
+v7.32:
+	fixed: 5th PV charger values at top of the tile
+	fixed: TanksTempsDigIn overview shows Ext transfer switch as Unknown
+
 v7.31:
 	fixed: AC input detail current limit buttons off screen
 	fixed: AC output detail not displayed

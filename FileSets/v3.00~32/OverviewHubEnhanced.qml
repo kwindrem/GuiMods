@@ -776,7 +776,7 @@ OverviewPage {
 				visible: numberOfPvChargers >= 5 && pvChargerRows >= 5 && ! showDcAndAcSolar
 			},
 			TileText {
-				y: pvOffset5 + pvChargerCompact ? 0 : pvRowSpacing
+				y: pvOffset5 + (pvChargerCompact ? 0 : pvRowSpacing)
 				text: EnhFmt.formatVBusItem (pvPower5, "W")
 				anchors.right: parent.right; anchors.rightMargin: 5
 				horizontalAlignment: pvChargerCompact ? Text.AlignRight : Text.AlignHCenter
