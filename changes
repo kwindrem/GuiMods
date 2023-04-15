@@ -1,3 +1,7 @@
+v7.31:
+	fixed: AC input detail current limit buttons off screen
+	fixed: AC output detail not displayed
+
 v7.30:
 	fixed: AC loads values missing or incorrect on GuiMods simple flow page
 		this tile only shows AC loads on output

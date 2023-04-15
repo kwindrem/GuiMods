@@ -53,7 +53,7 @@ MbPage {
                 Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                     text: qsTr("Total Power") }
-                Text { id: totalPower; ffont.pixelSize: 12; font.bold: true; color: "black"
+                Text { id: totalPower; font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: EnhFmt.formatVBusItem (sys.acLoad.power, "W")
                 }

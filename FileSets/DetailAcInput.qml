@@ -101,17 +101,17 @@ MbPage {
             spacing: 2
             Row
             {
-                Text { id: totalLabel; font.pixelSize: 12; font.bold: true; color: "black"
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
                     text: qsTr("Total Power") }
-                Text { id: totalPower; font.pixelSize: 12; font.bold: true; color: "black"
+                Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: EnhFmt.formatVBusItem (sys.acInput.power, "W")
                 }
                 PowerGauge
                 {
                     id: gauge
-					width: (root.width * 0.9) - totalLabel.width - totalPower.width
+					width: totalDataWidth - tableColumnWidth
                     height: 15
                     connection: sys.acInput
 					useInputCurrentLimit: true
