@@ -1,7 +1,17 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
-#### added service interval dbus settings
+#### GuiMods
+#### This file has been modified to allow the generator running state derived from the generator digital input
+####	or the genset AC input
+#### If the incoming generator state changes, the manual start state is updated
+#### time accumulation is suspended when the generator is not running
+#### A switch in the generator settings menucontrols whethter the incoming state affects manual start or time accumulaiton
+#### It is now possible to start the generator manually and have it stop automatically based on the preset conditions
+####	for automaitc start / stop
+#### A service interval timer was added so the accumulated run time does not need to be reset,
+####	providing total run time for the generator
+#### Search for #### GuiMods to find changes
 
 from dbus.mainloop.glib import DBusGMainLoop
 import dbus
@@ -35,8 +45,10 @@ class Generator(object):
 		commondbustree = {
 			'com.victronenergy.settings': {
 				'/Settings/System/TimeZone': dummy,
-				'/Settings/System/AcInput1': dummy,
-				'/Settings/System/AcInput2': dummy,
+#### GuiMods - paths are not correct in stock files
+				'/Settings/SystemSetup/AcInput1': dummy,
+				'/Settings/SystemSetup/AcInput2': dummy,
+
 				'/Settings/Relay/Polarity': dummy
 				},
 			'com.victronenergy.battery': {
@@ -79,7 +91,10 @@ class Generator(object):
 				'/VebusService': dummy,
 				'/Dc/Battery/Voltage': dummy,
 				'/Dc/Battery/Current': dummy,
-				'/Dc/Battery/Soc': dummy
+				'/Dc/Battery/Soc': dummy,
+#### GuiMods
+				'/Ac/Genset/Frequency': dummy,
+				'/Ac/In/NumberOfAcInputs': dummy
 				}
 			}
 
@@ -89,8 +104,10 @@ class Generator(object):
 			'batterymeasurement': ['/Settings/{0}/Service', '', 0, 0],
 			'accumulateddaily': ['/Settings/{0}/AccumulatedDaily', '', 0, 0, True],
 			'accumulatedtotal': ['/Settings/{0}/AccumulatedTotal', 0, 0, 0, True],
-#### added service interval
+#### GuiMods
 			'timeSinceService': ['/Settings/{0}/TimeSinceService', 0, 0, 0, True],
+			'linkManualStartToExternal': ['/Settings/{0}/LinkToExternalStatus', 0, 0, 0, True],
+
 			'batterymeasurement': ['/Settings/{0}/BatteryService', 'default', 0, 0],
 			'minimumruntime': ['/Settings/{0}/MinimumRuntime', 0, 0, 86400],  # minutes
 			'stoponac1enabled': ['/Settings/{0}/StopWhenAc1Available', 0, 0, 10],

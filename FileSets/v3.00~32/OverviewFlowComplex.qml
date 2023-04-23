@@ -665,7 +665,7 @@ OverviewPage {
         title: dcSystemNameItem.valid && dcSystemNameItem.value != "" ? dcSystemNameItem.value : qsTr ("DC System")
 		anchors
 		{
-			right: acOutputBox.right
+			right: root.right; rightMargin: 5
             bottom: parent.bottom
             bottomMargin: bottomOffset
 		}

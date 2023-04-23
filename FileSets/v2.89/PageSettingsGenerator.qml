@@ -1,4 +1,6 @@
-//// addd service interval and reset
+//// GuiMods
+////	addd service interval and reset
+////	added link to external state enable
 
 import QtQuick 1.1
 import com.victron.velib 1.0
@@ -33,6 +35,8 @@ MbPage {
 		}
 
 		MbSwitch {
+//// GuiMods
+			id: detectGeneratorAtAcIn
 			property bool generatorIsSet: acIn1Source.value === 2 || acIn2Source.value === 2
 			name: qsTr("Detect generator at AC input")
 			bind: Utils.path(settingsBindPrefix, "/Alarms/NoGeneratorAtAcIn")
@@ -58,6 +62,13 @@ MbPage {
 				id: acIn2Source
 				bind: "com.victronenergy.settings/Settings/SystemSetup/AcInput2"
 			}
+		}
+
+//// GuiMods
+		MbSwitch {
+			name: qsTr("Link to external state")
+			bind: Utils.path(settingsBindPrefix, "/LinkToExternalStatus")
+			enabled: detectGeneratorAtAcIn.enabled
 		}
 
 		MbSwitch {
@@ -129,7 +140,7 @@ MbPage {
 			}
 		}
 
-//// addd service interval and reset
+//// GuiMods
 		MbEditBox
 		{
 			id: serviceInterval

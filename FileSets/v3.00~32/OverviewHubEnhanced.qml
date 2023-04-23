@@ -66,6 +66,8 @@ OverviewPage {
 	property bool compact: showTanks && showTemps && tankTempCount > 4
 	property int tanksHeight: compact ? 22 : 45
 
+	property int leftTileCount: (showAcInput ? 1 : 0) + (showAlternator ? 1 : 0) + (showAlternator ? 1 : 0)
+
 //////// add for PV CHARGER voltage and current
 	property string pvChargerPrefix1: ""
 	property string pvChargerPrefix2: ""

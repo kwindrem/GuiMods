@@ -30,6 +30,42 @@ ListView {
 	Keys.onSpacePressed: { startTile.edit(false); event.accepted = true }
 
 	VisualItemModel {
+		TileSpinBox {
+			id: timerTile
+			title: qsTr("STOP TIMER")
+			width: root.width
+			height: editMode ? Math.max (contentHeight + 2, tileHeight) : 0
+			readOnly: manualRunActive
+			enabled: editMode
+			focus: editMode
+			visible: editMode
+			unit: ""
+			stepSize: 60
+			max: 86340
+			// negative value indicates manual start / auto stop
+			// only allowed if auto start is enabled
+			min: autoStartEnabled ? -60 : 0
+			color: startTile.color
+			description: localValue > 0 ? qsTr("Run for:") : localValue < 0 ? qsTr ("Run until:") :""
+			extraDescription: autoStartEnabled && localValue > 0 ? qsTr("Generator will continue running if other conditions are reached") : ""
+			bind: Utils.path(root.bindPrefix, "/ManualStartTimer")
+			buttonColor: "#e02e1c"
+
+			onAccepted: { root.startCountdown = true }
+
+			function format(val)
+			{
+				if (!isNaN(val)) {
+					if (val > 0)
+						return Utils.secondsToNoSecsString(val);
+					if (val < 0)
+						return qsTr ("all auto stop\nconditions\nare met")
+					else
+						return qsTr("Stop manually")
+				}
+				return val
+			}
+		}
 		id: tileModel
 		Tile {
 			id: startTile
@@ -44,7 +80,8 @@ ListView {
 			height: root.startCountdown ? contentHeight : tileHeight
 			readOnly: !manualStart.valid
 			color: mouseArea.containsMouse ? "#f08b80" : "#e74c3c"
-			show: !timerTile.editMode
+			focus: !editMode
+			visible: !editMode
 
 			function edit(isMouse)
 			{
@@ -87,7 +124,7 @@ ListView {
 						else if (root.startCountdown)
 							return qsTr ("CANCEL")
 						else if (buttonState)
-								return qsTr("STOP")
+							return qsTr("STOP")
 						else
 							return qsTr("START")
 					}
@@ -119,42 +156,11 @@ ListView {
 				}
 			]
 		}
-		TileSpinBox {
-			id: timerTile
-			title: qsTr("STOP TIMER")
-			width: root.width
-			height: Math.max (contentHeight + 2, tileHeight * 2)
-			readOnly: manualRunActive
-			enabled: !readOnly
-			unit: ""
-			stepSize: 60
-			max: 86340
-			min: 0
-			focus: editMode
-			show: editMode
-			color: startTile.color
-			description: qsTr("Run for:")
-			extraDescription: autoStartEnabled ? qsTr("Generator will continue running if other conditions are reached") : ""
-			bind: Utils.path(root.bindPrefix, "/ManualStartTimer")
-			buttonColor: "#e02e1c"
-
-			onAccepted: { root.startCountdown = true }
-
-			function format(val)
-			{
-				if (!isNaN(val)) {
-					if (val > 0)
-						return Utils.secondsToNoSecsString(val);
-					else
-						return qsTr("Stop manually")
-				}
-				return val
-			}
-		}
 	}
 	function cancel() {
 		if (timerTile.editMode) {
 			timerTile.cancel()
+			root.activeFocus = true
 		}
 	}
 

@@ -1,3 +1,8 @@
+v7.40:
+	add generator AC input detection to running/stopped display and link manual start
+	add switch to enable/disable external generator state to manual start/stop
+	added generator start manually / stop automatically mode
+
 v7.32:
 	fixed: 5th PV charger values at top of the tile
 	fixed: TanksTempsDigIn overview shows Ext transfer switch as Unknown

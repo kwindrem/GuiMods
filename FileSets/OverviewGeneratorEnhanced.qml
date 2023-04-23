@@ -249,7 +249,9 @@ OverviewPage {
 				text:
 				{
 					var message
-					if (externalOverride)
+					if (!root.state.valid)
+						message = ""
+					else if (externalOverride)
 						message = qsTr("External Override - stopped")
 					else if (runningBy.value == 0)
 						message = qsTr ("Stopped")

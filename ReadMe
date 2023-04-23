@@ -1,4 +1,8 @@
 Recent changes:
+	Add generator AC input detection to running/stoped display and link to manual start
+	Add switch to enable/disable external generator state to manual start/stop
+	Added generator start manually / stop automatically mode
+
 	The AC input detal now shows voltage and frequency for grid/shore and generator AC inputs
 		in addition to the active input
 	Incorporte voltage, current and frequency from grid meters
@@ -112,6 +116,8 @@ This package provides the following modifications to the VenusOS GUI:
 			It functions exactly like the manual start/stop button.
 			Because two buttons share the hard buttons, up and down buttons are used to select
 				which function will be controlled by the center button.
+		In the Manual Start popup, scrolling down from Start manually selects a mode which
+			will start the generator manually and stop it when all auto stop conditions are satisfied
 
 		Status and test run tiles have been combined and now includes current run time as well as
 			time until a timed manual run expires.
@@ -403,6 +409,60 @@ Configuration
 	Max Motor Drive load power is the maximum power expected from all motor drives when they are consuming power
 
 	Max Motor Drive charge power is the maximum power expected from all motor drives when they are generating power
+
+Generator enhancements:
+	A digital may be programmed to communicate generator running state to the GX device
+	Pulling that digital input low signals the generator is running.
+	Releasing the input so it floats high signals the generator is not running.
+
+	If no digital input is programmed, the AC input for the generator 
+		will be used to deternine generator running state
+
+	A Quattro has two AC inputs with one typically connected to a generator.
+
+	A MultiPlus has only one AC input and it will typically be switched between grid/Shore and generator.
+	If this is the case, there will be no generator running state available when on grid/shore power.
+	In this case, it is best to use the digital input to signal generator is running.
+	An alternative would be to install an energy meter on the generator output.
+	This will provide generator AC status at all times even if the Multi is fed by grid power.
+	
+	Running / Stopped status appears in the generator icon in the Generator Overview screen if
+		the GX device can detect it. Otherwise, nothing is added to the icon.
+		Note that this differs from the Running and stopped indication in the Status tile.
+		That information shows whath the GX device told the generator to do (run or stop),
+		not what it is actually doing.
+
+	If "Link to external state" in / Settings / Generator start/stop / Settings is on,
+		a change in the running state received FROM the generator will synchoniize the Manual Start state
+		to the status from the generator.
+		This accommodates a situation where the generator might be started from somewhere else.
+		
+		Note: Link to external state is off by default. Previous versions of GuiMods (and GeneratorConnetor)
+			did not have this switch and the digital input was always incorporated in the generator logic.
+
+		If an auto run condtion exists but the generator reports it is not running, "External Override"
+		is shown in the status area of the Generator Overview. This might happen if the generator fails
+		to start or if the generator control is switched to local and not responding to the GX device's
+		generator start relay.
+
+	Link to external state should not be confused with "Detect generator at AC input".
+	The latter enables a generator is not running alarm visible on VRM (and other places possibly).
+
+	Manual start / auto stop
+		It is possible to start the generator manually, but allow the auto start/stop logic
+		to stop the generator when all stop conditions are satisfied.
+		For example, of the SOC is programmed to start the generator an say 30% and stop at 90%,
+			and if the current SOC is 60%, the generator will not start if auto start/stop is enabled.
+			If the manual start/auto stop mode is triggered, the generator WILL start and run until
+			the battery reaches 90%.
+		
+		Manual start/auto stop is initiated by first enabling auto start,
+		then selecting Manual Start and scrolling DOWN below Start manually.
+		"Run until: all auto stop conditions are met" is shown in the tile.
+		Accepting this stop condition will trigger the event.
+		
+		Note that if all automatic stop conditions are currently satisfied, the generat will not be started.
+		That is, if the battery is at 95% in the above example, the generator will NOT start.
 
 Installation:
 

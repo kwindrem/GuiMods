@@ -510,6 +510,7 @@ OverviewPage {
 
 		}
 		DetailTarget { id: dcSystemTarget;  detailsPage: "DetailDcSystem.qml" }
+	}
 
 	property int pvOffset1: 27
 	property int pvRowSpacing: 16
