@@ -25,7 +25,7 @@ ListView {
 
 	Keys.onSpacePressed: { startTile.edit(false); event.accepted = true }
 
-	VisualItemModel {
+	VisibleItemModel {
 		id: tileModel
 		Tile {
 			id: startTile

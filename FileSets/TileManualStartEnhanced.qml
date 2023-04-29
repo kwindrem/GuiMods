@@ -29,7 +29,7 @@ ListView {
 
 	Keys.onSpacePressed: { startTile.edit(false); event.accepted = true }
 
-	VisualItemModel {
+	VisibleItemModel {
 		TileSpinBox {
 			id: timerTile
 			title: qsTr("STOP TIMER")

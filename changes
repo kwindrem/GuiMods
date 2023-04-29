@@ -1,3 +1,6 @@
+v7.42:
+	add support for v3.00~37 (generator warm-up / cool-down)
+
 v7.41:
 	fixed bad file set (v3.00~32) - might install
 

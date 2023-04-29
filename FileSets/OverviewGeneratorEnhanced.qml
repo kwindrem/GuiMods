@@ -117,6 +117,10 @@ OverviewPage {
 				return qsTr("Error")
 			}
 		}
+		else if (state.value === 2)
+			return qsTr("Warm-up")
+		else if (state.value === 3)
+			return qsTr("Cool-down")
 		else
 		{
 			var condition = ""

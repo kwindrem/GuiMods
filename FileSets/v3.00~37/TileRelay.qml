@@ -63,6 +63,11 @@ Tile {
     }
     VBusItem
     {
+        id: generatorStateItem
+        bind: Utils.path("com.victronenergy.generator.startstop0" , "/State")
+    }
+    VBusItem
+    {
         id: generatorConditionItem
         bind: Utils.path("com.victronenergy.generator.startstop0" , "/RunningByConditionCode")
     }
@@ -150,6 +155,12 @@ Tile {
 					{
 						if (generatorExternalOverrideItem.valid && generatorExternalOverrideItem.value == 1)
 							return qsTr ("External override - stopped")
+						else if (!generatorStateItem.valid)
+							return qsTr ("Error")
+						else if (generatorStateItem.value == 2)
+							return qsTr("Warm-up")
+						else if (generatorStateItem.value == 3)
+							return qsTr("Cool-down")
 						else if (generatorConditionItem.valid)
 						{
 							switch (generatorConditionItem.value)
