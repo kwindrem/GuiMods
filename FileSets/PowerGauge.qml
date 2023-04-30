@@ -152,11 +152,11 @@ Item {
         width: phaseCount >= 1 ? calculateBar1width () : 0
         height: barHeight
         clip: true
-        color: bar1color
+        color: root.bar1color
         anchors
         {
             top: root.top; topMargin: firstBarVertPos
-            left: root.left; leftMargin: bar1offset
+            left: root.left; leftMargin: root.bar1offset
 
         }
         visible: showGauge && phaseCount >= 1
@@ -167,11 +167,11 @@ Item {
         width: phaseCount >= 2 ? calculateBar2width () : 0
         height: barHeight
         clip: true
-        color: bar2color
+        color: root.bar2color
         anchors
         {
             top: root.top; topMargin: firstBarVertPos + barSpacing
-            left: root.left; leftMargin: bar2offset
+            left: root.left; leftMargin: root.bar2offset
         }
         visible: showGauge && phaseCount >= 2
     }
@@ -181,11 +181,11 @@ Item {
         width: phaseCount >= 3 ? calculateBar3width () : 0
         height: barHeight
         clip: true
-        color: bar3color
+        color: root.bar3color
         anchors
         {
             top: root.top; topMargin: firstBarVertPos + barSpacing * 2
-            left: root.left; leftMargin: bar3offset
+            left: root.left; leftMargin: root.bar3offset
         }
         visible: showGauge && phaseCount >= 3
     }
@@ -220,18 +220,18 @@ Item {
         if (reversePower)
 			currentValue = -currentValue
 
-        bar1color = getBarColor (currentValue)
+        root.bar1color = getBarColor (currentValue)
         barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
         // left of bar is at 0 point
         if (barWidth >= 0)
         {
-            bar1offset = zeroOffset
+			root.bar1offset = zeroOffset
             return barWidth
         }
         // RIGHT of bar is at 0 point
         else
         {
-            bar1offset = zeroOffset + barWidth
+            root.bar1offset = zeroOffset + barWidth
             return -barWidth
         }
     }
@@ -241,18 +241,18 @@ Item {
         currentValue = root.connection.powerL2.valid ? root.connection.powerL2.value : 0
         if (reversePower)
 			currentValue = -currentValue
-        bar2color = getBarColor (currentValue)
+		root.bar2color = getBarColor (currentValue)
         barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
         // left of bar is at 0 point
         if (barWidth >= 0)
         {
-            bar2offset = zeroOffset
+			root.bar2offset = zeroOffset
             return barWidth
         }
         // RIGHT of bar is at 0 point
         else
         {
-            bar2offset = zeroOffset + barWidth
+			root.bar2offset = zeroOffset + barWidth
             return -barWidth
         }
     }
@@ -262,18 +262,18 @@ Item {
         currentValue = root.connection.powerL3.valid ? root.connection.powerL3.value : 0
         if (reversePower)
 			currentValue = -currentValue
-        bar3color = getBarColor (currentValue)
+		root.bar3color = getBarColor (currentValue)
         barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
         // left of bar is at 0 point
         if (barWidth >= 0)
         {
-            bar3offset = zeroOffset
+			root.bar3offset = zeroOffset
             return barWidth
         }
         // RIGHT of bar is at 0 point
         else
         {
-            bar3offset = zeroOffset + barWidth
+			root.bar3offset = zeroOffset + barWidth
             return -barWidth
         }
     }

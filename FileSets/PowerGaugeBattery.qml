@@ -174,14 +174,14 @@ Item {
     Rectangle
     {
         id: chargingBar
-        width: showGauge ? barWidth : 0 ////////////////////////////////
+        width: showGauge ? root.barWidth : 0
         height: barHeight
         clip: true
         color: barColor
         anchors
         {
             verticalCenter: root.verticalCenter
-            left: root.left; leftMargin: barOffset
+            left: root.left; leftMargin: root.barOffset
         }
         visible: showGauge
     }
@@ -217,8 +217,8 @@ Item {
                 barColor = "yellow"
             else
                 barColor = "green"
-            barOffset = zeroOffset
-            barWidth = current * scaleFactor
+            root.barOffset = zeroOffset
+            root.barWidth = current * scaleFactor
         }
         else
          {
@@ -228,8 +228,8 @@ Item {
                 barColor = "yellow"
             else
                 barColor = "green"
-            barWidth = -current * scaleFactor
-            barOffset = zeroOffset - barWidth
+            root.barWidth = -current * scaleFactor
+            root.barOffset = zeroOffset - root.barWidth
         }
     }
 }

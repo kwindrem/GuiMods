@@ -102,7 +102,7 @@ OverviewPage {
 	function stateDescription()
 	{
 		if (!state.valid)
-			return qsTr ("Generator not connected")
+			return qsTr ("")
 		else if (state.value === 10)
 		{
 			switch(error.value)
@@ -117,10 +117,6 @@ OverviewPage {
 				return qsTr("Error")
 			}
 		}
-		else if (state.value === 2)
-			return qsTr("Warm-up")
-		else if (state.value === 3)
-			return qsTr("Cool-down")
 		else
 		{
 			var condition = ""
@@ -188,6 +184,8 @@ OverviewPage {
 
 	function getNextTestRun()
 	{
+		if ( ! root.state.valid)
+			return ""
 		if (!nextTestRun.value)
 			return qsTr("No test run programmed")
 
@@ -252,18 +250,27 @@ OverviewPage {
                 color: externalOverride ? "yellow" : "white"
 				text:
 				{
+					var runPrefix
 					var message
+					if ( ! root.state.valid)
+						return qsTr ("Generator not connected")
+					else if (root.state.value === 2)
+						runPrefix = qsTr("Warming up for ")
+					else
+						runPrefix = qsTr ("Running for ")
 					if (!root.state.valid)
 						message = ""
 					else if (externalOverride)
 						message = qsTr("External Override - stopped")
+					else if (root.state.value === 3)
+						message = qsTr("Cool-down")
 					else if (runningBy.value == 0)
 						message = qsTr ("Stopped")
 					else if ( ! runningTime.valid)
-						message = qsTr ("Running for ??")
+						message = runPrefix + "??"
 					else
 					{
-						message =  qsTr ("Running for ") + formatTime (runningTime.value) 
+						message = runPrefix + formatTime (runningTime.value) 
 						if (manualTimer.valid && manualTimer.value > 0)
 							message += qsTr ("  ends in ") + formatTime (manualTimer.value)
 					}

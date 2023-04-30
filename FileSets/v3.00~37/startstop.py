@@ -11,6 +11,8 @@
 ####	for automaitc start / stop
 #### A service interval timer was added so the accumulated run time does not need to be reset,
 ####	providing total run time for the generator
+#### warm-up and cool-down periods have been modified in order to work well with an external transfer switch
+####	selecting grid or generator ahead of a MultiPlus input.
 #### Search for #### GuiMods to find changes
 
 # Function
@@ -259,6 +261,7 @@ class StartStop(object):
 	_driver = None
 	def __init__(self, instance):
 #### GuiMods
+		self._currentTime = 0
 		self._last_update_mtime = 0
 		self._accumulatedRunTime = 0
 		self._digitalInputTypeObject = None
@@ -283,8 +286,11 @@ class StartStop(object):
 		self._testrun_soc_retries = 0
 		self._last_counters_check = 0
 
-		self._starttime = 0
-		self._stoptime = 0 # Used for cooldown
+#### GuiMods warm-up / cool-down
+		self._warmUpEndTime = 0
+		self._coolDownEndTime = 0
+		self._acIsIgnored = False
+
 		self._manualstarttimer = 0
 		self._last_runtime_update = 0
 		self._timer_runnning = 0
@@ -486,6 +492,9 @@ class StartStop(object):
 	def tick(self):
 		if not self._enabled:
 			return
+#### GuiMods warm-up / cool-down
+		self._currentTime = self._get_monotonic_seconds ()
+
 		self._check_remote_status()
 #### GuiMods
 		self._linkToExternalState = self._settings['linkManualStartToExternal'] == 1
@@ -493,6 +502,22 @@ class StartStop(object):
 
 		self._evaluate_startstop_conditions()
 		self._detect_generator_at_acinput()
+		
+#### GuiMods warm-up / cool-down
+		# shed load in warm-up and cool-down if on generator
+		# note that external transfer switch might change the state of on generator
+		# so this needs to be checked and load adjusted every pass
+		if self._dbusservice['/State'] in (States.WARMUP, States.COOLDOWN) and self._ac1_is_generator:
+			if not self._acIsIgnored:
+				self.log_info ("shedding load")
+				self._set_ignore_ac1(True)
+				self._acIsIgnored = True
+		# restore load if previously shed or not currently on generator
+		else:
+			if self._acIsIgnored:
+				self.log_info ("restoring load")
+				self._set_ignore_ac1(False)
+				self._acIsIgnored = False
 
 	def _evaluate_startstop_conditions(self):
 		if self.get_error() != Errors.NONE:
@@ -1027,23 +1052,41 @@ class StartStop(object):
 		# already running. When differs, the RunningByCondition is updated
 		running = state in (States.WARMUP, States.COOLDOWN, States.RUNNING)
 		if not (running and remote_running): # STOPPED, ERROR
-			if not (self._ac1_is_generator and self._settings['warmuptime'] > 0):
-				self._dbusservice['/State'] = States.RUNNING
-			else:
-				self._set_ignore_ac1(True) # Remove load while warming up
-				self._dbusservice['/State'] = States.WARMUP
-			self._update_remote_switch()
-			self._starttime = monotonic_time.monotonic_time().to_seconds_double()
+#### GuiMods warm-up / cool-down
 			self.log_info('Starting generator by %s condition' % condition)
+			# if there is a warmup time specified, always go through warm-up state
+			#	regardless of AC input in use
+			warmUpPeriod = self._settings['warmuptime']
+			if warmUpPeriod > 0:
+				self._warmUpEndTime = self._currentTime + warmUpPeriod
+				self.log_info ("starting warm-up")
+				self._dbusservice['/State'] = States.WARMUP
+				self._acIsIgnored = False
+			# no warm-up go directly to running
+			else:
+				self._dbusservice['/State'] = States.RUNNING
+				self._warmUpEndTime = 0
+
+			self._coolDownEndTime = 0
+
+			self._update_remote_switch()
 		else: # WARMUP, COOLDOWN, RUNNING
-			if state == States.WARMUP:
-				if monotonic_time.monotonic_time().to_seconds_double() - self._starttime > self._settings['warmuptime']:
-					self._set_ignore_ac1(False) # Release load onto Generator
-					self._dbusservice['/State'] = States.RUNNING
-			elif state == States.COOLDOWN:
+			if state == States.COOLDOWN:
 				# Start request during cool-down run, go back to RUNNING
-					self._set_ignore_ac1(False) # Put load back onto Generator
-					self._dbusservice['/State'] = States.RUNNING
+				self._dbusservice['/State'] = States.RUNNING
+				self.log_info ("abprting cool-down - returning to running")
+
+		# these checks are done for each tick () whle generator is running
+		if state == States.WARMUP:
+			if self._currentTime > self._warmUpEndTime:
+				self.log_info ("warm-up complete")
+				self._dbusservice['/State'] = States.RUNNING
+		# update cool down end time while running and generator has the load
+		# this is done because ac1_is_generator may change by an external transfer switch
+		#	and the input type changed by the ExtTransferSwitch service
+		elif state == States.RUNNING and not self._acIsIgnored and self._ac1_is_generator:
+			self._coolDownEndTime = self._currentTime + self._settings['cooldowntime']
+#### end GuiMods
 
 			# Update the RunningByCondition
 			if self._dbusservice['/RunningByCondition'] != condition:
@@ -1053,34 +1096,36 @@ class StartStop(object):
 		self._dbusservice['/RunningByCondition'] = condition
 		self._dbusservice['/RunningByConditionCode'] = RunningConditions.lookup(condition)
 
+
+
 	def _stop_generator(self):
 		state = self._dbusservice['/State']
 		remote_running = self._get_remote_switch_state()
 		running = state in (States.WARMUP, States.COOLDOWN, States.RUNNING)
 
 		if running or remote_running:
-			if self._ac1_is_generator and self._settings['cooldowntime'] > 0:
-				if state == States.RUNNING:
+#### GuiMods warm-up / cool-down
+			# run for cool-down period before stopping
+			# cooldown end time is updated while generator is running
+			#	and generator feeds Multi AC input (done in start_generator)
+			if self._currentTime < self._coolDownEndTime:
+				if state != States.COOLDOWN:
 					self._dbusservice['/State'] = States.COOLDOWN
-					self._stoptime = monotonic_time.monotonic_time().to_seconds_double()
-					self._set_ignore_ac1(True) # Remove load from Generator
-					return
-				elif state == States.COOLDOWN:
-					if monotonic_time.monotonic_time().to_seconds_double() - \
-							self._stoptime <= self._settings['cooldowntime']:
-						return # Don't stop engine yet
+					self.log_info ("starting cool-down")
+				return
 
-			# When we arrive here, a stop command was given during warmup, the
-			# cooldown timer expired, no cooldown was configured, or the
-			# generator is not on AC-in-1. Stop immediately.
+			# When we arrive here, a stop command was given and cool-down period has elapesed
+			if state == States.COOLDOWN:
+				self.log_info ("cool-down complete")
 			self._dbusservice['/State'] = States.STOPPED
 			self._update_remote_switch()
-			self._set_ignore_ac1(False)
+#### end GuiMods warm-up / cool-down
+
 			self.log_info('Stopping generator that was running by %s condition' %
 						str(self._dbusservice['/RunningByCondition']))
 			self._dbusservice['/RunningByCondition'] = ''
 			self._dbusservice['/RunningByConditionCode'] = RunningConditions.Stopped
-#### GuiMods
+
 			self._accumulateRunTime ()
 
 			self._starttime = 0
@@ -1266,8 +1311,6 @@ class StartStop(object):
 
 	def _accumulateRunTime (self):
 
-		mtime = monotonic_time.monotonic_time().to_seconds_double()
-
 		# grab running state from dBus once, use it many timed below
 
 		if self._dbusservice['/State'] in (States.RUNNING, States.WARMUP, States.COOLDOWN):
@@ -1280,7 +1323,7 @@ class StartStop(object):
 			accumuateTime = True
 			# start new accumulation if not done prevously
 			if self._last_accumulate_time == 0:
-				self._last_accumulate_time = mtime
+				self._last_accumulate_time = self._currentTime
 
 			# if link to external state is enabled, don't accumulate time if running state is stopped (accumulate if R or ?)
 			if self._linkToExternalState:
@@ -1299,15 +1342,15 @@ class StartStop(object):
 
 		# accumulate run time if we passed all the tests above
 		if accumuateTime:
-			self._accumulatedRunTime += mtime - self._last_accumulate_time
-		self._last_accumulate_time = mtime
+			self._accumulatedRunTime += self._currentTime - self._last_accumulate_time
+		self._last_accumulate_time = self._currentTime
 
 		# dbus and settings updates trigger time-intensive processing so only do this once every 60 seconds
 		doUpdate = False
 		if internalRun:
-			if mtime - self._last_update_mtime >= 60:
+			if self._currentTime - self._last_update_mtime >= 60:
 				doUpdate = True
-				self._last_update_mtime = mtime
+				self._last_update_mtime = self._currentTime
 		# it is also done one last time when state is no longer RUNNING
 		elif self._last_update_mtime != 0:
 			doUpdate = True

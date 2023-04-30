@@ -1,3 +1,6 @@
+v7.43:
+	make warm-up/cool-down work with ExtTransferSwitch
+
 v7.42:
 	add support for v3.00~37 (generator warm-up / cool-down)
 

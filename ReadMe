@@ -1,4 +1,6 @@
 Recent changes:
+	Added support for generator warm-up and cool-down when using ExtTransferSwitch
+
 	Add generator AC input detection to running/stoped display and link to manual start
 	Add switch to enable/disable external generator state to manual start/stop
 	Added generator start manually / stop automatically mode

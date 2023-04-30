@@ -190,42 +190,42 @@ Item {
     Rectangle
     {
         id: bar1
-        width: bar1width
+        width: root.bar1width
         height: barHeight
         clip: true
-        color: bar1color
+        color: root.bar1color
         anchors
         {
             top: root.top; topMargin: firstBarVertPos
-            left: root.left; leftMargin: bar1offset
+            left: root.left; leftMargin: root.bar1offset
         }
         visible: showGauge && phaseCount >= 1
     }
     Rectangle
     {
         id: bar2
-        width: bar2width
+        width: root.bar2width
         height: barHeight
         clip: true
-        color: bar2color
+        color: root.bar2color
         anchors
         {
             top: root.top; topMargin: firstBarVertPos + barSpacing
-            left: root.left; leftMargin: bar2offset
+            left: root.left; leftMargin: root.bar2offset
         }
         visible: showGauge && phaseCount >= 2
     }
     Rectangle
     {
         id: bar3
-        width: bar3width
+        width: root.bar3width
         height: barHeight
         clip: true
-        color: bar3color
+        color: root.bar3color
         anchors
         {
             top: root.top; topMargin: firstBarVertPos + barSpacing * 2
-            left: root.left; leftMargin: bar3offset
+            left: root.left; leftMargin: root.bar3offset
         }
         visible: showGauge && phaseCount >= 3
     }
@@ -252,25 +252,25 @@ Item {
         if (phaseCount >= 1 && pOutL1.valid && pInL1.valid)
         {
             power = pOutL1.value - pInL1.value
-			bar1color = getBarColor (power)
+			root.bar1color = getBarColor (power)
 			barWidth = Math.min ( Math.max (power, -maxChargerDisplayed), maxInverterDisplayed) * scaleFactor
 			// left of bar is at 0 point
 			if (barWidth >= 0)
 			{
-				bar1width = barWidth
-				bar1offset = zeroOffset
+				root.bar1width = barWidth
+				root.bar1offset = zeroOffset
 			}
 			// RIGHT of bar is at 0 point
 			else
 			{
-				bar1width = -barWidth
-				bar1offset = zeroOffset + barWidth
+				root.bar1width = -barWidth
+				root.bar1offset = zeroOffset + barWidth
 			}
         }
         else
         {
-            bar1width = 0
-            bar1offset = zeroOffset
+            root.bar1width = 0
+            root.bar1offset = zeroOffset
 		}
     }
     function calculateBar2 ()
@@ -279,25 +279,25 @@ Item {
         if (phaseCount >= 2 && pOutL2.valid && pInL2.valid)
         {
             power = pOutL2.value - pInL2.value
-			bar2color = getBarColor (power)
+			root.bar2color = getBarColor (power)
 			barWidth = Math.min ( Math.max (power, -maxChargerDisplayed), maxInverterDisplayed) * scaleFactor
 			// left of bar is at 0 point
 			if (barWidth >= 0)
 			{
-				bar2width = barWidth
-				bar2offset = zeroOffset
+				root.bar2width = barWidth
+				root.bar2offset = zeroOffset
 			}
 			// RIGHT of bar is at 0 point
 			else
 			{
-				bar2width = -barWidth
-				bar2offset = zeroOffset + barWidth
+				root.bar2width = -barWidth
+				root.bar2offset = zeroOffset + barWidth
 			}
         }
         else
         {
-            bar2width = 0
-            bar2offset = zeroOffset
+            root.bar2width = 0
+            root.bar2offset = zeroOffset
 		}
     }
     function calculateBar3 ()
@@ -306,25 +306,25 @@ Item {
         if (phaseCount >= 3 && pOutL3.valid && pInL3.valid)
         {
             power = pOutL3.value - pInL3.value
-			bar3color = getBarColor (power)
+			root.bar3color = getBarColor (power)
 			barWidth = Math.min ( Math.max (power, -maxChargerDisplayed), maxInverterDisplayed) * scaleFactor
 			// left of bar is at 0 point
 			if (barWidth >= 0)
 			{
-				bar3width = barWidth
-				bar3offset = zeroOffset
+				root.bar3width = barWidth
+				root.bar3offset = zeroOffset
 			}
 			// RIGHT of bar is at 0 point
 			else
 			{
-				bar3width = -barWidth
-				bar3offset = zeroOffset + barWidth
+				root.bar3width = -barWidth
+				root.bar3offset = zeroOffset + barWidth
 			}
         }
         else
         {
-            bar3width = 0
-            bar3offset = zeroOffset
+            root.bar3width = 0
+            root.bar3offset = zeroOffset
 		}
     }
 
