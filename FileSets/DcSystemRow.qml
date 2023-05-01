@@ -77,7 +77,7 @@ Row {
 	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Power") }
 	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Voltage") }
 	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Current") }
-	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, "temperatureParam") }
+	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, temperatureParam) }
 	VBusItem { id: stateItem; bind: Utils.path (serviceName, "/State") }
 	VBusItem { id: rpmItem; bind: Utils.path (serviceName, speedParam) }
 
