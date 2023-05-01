@@ -489,6 +489,7 @@ class StartStop(object):
 	def log_info(self, msg):
 		logging.info(self._name + ': %s' % msg)
 
+
 	def tick(self):
 		if not self._enabled:
 			return
@@ -504,10 +505,12 @@ class StartStop(object):
 		self._detect_generator_at_acinput()
 		
 #### GuiMods warm-up / cool-down
+		state = self._dbusservice['/State']
+		running = state in (States.WARMUP, States.COOLDOWN, States.RUNNING)
 		# shed load in warm-up and cool-down if on generator
 		# note that external transfer switch might change the state of on generator
 		# so this needs to be checked and load adjusted every pass
-		if self._dbusservice['/State'] in (States.WARMUP, States.COOLDOWN) and self._ac1_is_generator:
+		if state in (States.WARMUP, States.COOLDOWN) and self._ac1_is_generator:
 			if not self._acIsIgnored:
 				self.log_info ("shedding load")
 				self._set_ignore_ac1(True)
@@ -518,6 +521,13 @@ class StartStop(object):
 				self.log_info ("restoring load")
 				self._set_ignore_ac1(False)
 				self._acIsIgnored = False
+
+		# update cool down end time while running and generator has the load
+		# this is done because ac1_is_generator may change by an external transfer switch
+		#	and the input type changed by the ExtTransferSwitch service
+		if running and not self._acIsIgnored and self._ac1_is_generator:
+			self._coolDownEndTime = self._currentTime + self._settings['cooldowntime']
+
 
 	def _evaluate_startstop_conditions(self):
 		if self.get_error() != Errors.NONE:
@@ -1081,11 +1091,6 @@ class StartStop(object):
 			if self._currentTime > self._warmUpEndTime:
 				self.log_info ("warm-up complete")
 				self._dbusservice['/State'] = States.RUNNING
-		# update cool down end time while running and generator has the load
-		# this is done because ac1_is_generator may change by an external transfer switch
-		#	and the input type changed by the ExtTransferSwitch service
-		elif state == States.RUNNING and not self._acIsIgnored and self._ac1_is_generator:
-			self._coolDownEndTime = self._currentTime + self._settings['cooldowntime']
 #### end GuiMods
 
 			# Update the RunningByCondition

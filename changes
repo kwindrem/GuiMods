@@ -1,3 +1,6 @@
+v7.44:
+	fixed: generator overview is white screen for Venus OS prior to v3.00~14
+
 v7.43:
 	make warm-up/cool-down work with ExtTransferSwitch
 

@@ -316,6 +316,17 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
     updateActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
 
+	# revert to VisualItemModel if before v3.00~14 (v3.00~14 uses VisibleItemModel)
+	versionStringToNumber "v3.00~14"
+	if (( $venusVersionNumber < $versionNumber )); then
+		logMessage "replacing VisibleItemModel with VisualItemModel"
+		fileList="$qmlDir/TileAutoRunEnhanced.qml"
+		fileList+=" $qmlDir/TileManualStartEnhanced.qml"
+		for file in $fileList ; do
+			sed -i -e 's/VisibleItemModel/VisualItemModel/' "$file"
+		done
+		restartGui=true
+	fi
 
     # cleanup from older versions
     restoreActiveFile "$qmlDir/PageSettingsGuiModsVersions.qml"
