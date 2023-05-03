@@ -1,3 +1,6 @@
+v7.46:
+	fixed: generator warm-up / cool-down not working
+
 v7.45:
 	fixed: alternator temperature not displayed in Alternator detail
 

@@ -493,6 +493,7 @@ class StartStop(object):
 	def tick(self):
 		if not self._enabled:
 			return
+
 #### GuiMods warm-up / cool-down
 		self._currentTime = self._get_monotonic_seconds ()
 
@@ -1083,8 +1084,8 @@ class StartStop(object):
 		else: # WARMUP, COOLDOWN, RUNNING
 			if state == States.COOLDOWN:
 				# Start request during cool-down run, go back to RUNNING
-				self._dbusservice['/State'] = States.RUNNING
 				self.log_info ("abprting cool-down - returning to running")
+				self._dbusservice['/State'] = States.RUNNING
 
 		# these checks are done for each tick () whle generator is running
 		if state == States.WARMUP:

@@ -76,7 +76,10 @@ class Generator(object):
 				'/Dc/0/Current': dummy,
 				'/Dc/1/Voltage': dummy,
 				'/Dc/1/Current': dummy,
-				'/Soc': dummy
+				'/Soc': dummy,
+				'/Ac/State/AcIn1Available': dummy,
+				'/Ac/State/AcIn2Available': dummy,
+				'/Ac/Control/IgnoreAcIn1': dummy
 				},
 			'com.victronenergy.system': {
 				'/Ac/ConsumptionOnInput/L1/Power': dummy,
@@ -110,7 +113,7 @@ class Generator(object):
 
 			'batterymeasurement': ['/Settings/{0}/BatteryService', 'default', 0, 0],
 			'minimumruntime': ['/Settings/{0}/MinimumRuntime', 0, 0, 86400],  # minutes
-			'stoponac1enabled': ['/Settings/{0}/StopWhenAc1Available', 0, 0, 10],
+			'stoponac1enabled': ['/Settings/{0}/StopWhenAc1Available', 0, 0, 1],
 			'stoponac2enabled': ['/Settings/{0}/StopWhenAc2Available', 0, 0, 1],
 			# On permanent loss of communication: 0 = Stop, 1 = Start, 2 = keep running
 			'onlosscommunication': ['/Settings/{0}/OnLossCommunication', 0, 0, 2],
