@@ -289,7 +289,10 @@ class StartStop(object):
 #### GuiMods warm-up / cool-down
 		self._warmUpEndTime = 0
 		self._coolDownEndTime = 0
-		self._acIsIgnored = False
+		self._ac1isIgnored = False
+		self._ac2isIgnored = False
+		self._acInIsGenerator = False
+		self._generatorAcInput = 0
 
 		self._manualstarttimer = 0
 		self._last_runtime_update = 0
@@ -413,6 +416,8 @@ class StartStop(object):
 		if self._settings['cooldowntime'] > 0 or \
 				self._settings['warmuptime'] > 0:
 			self._set_ignore_ac1(False)
+# GuiMods warm-up / cool-down
+			self._set_ignore_ac2(False)
 		self._enabled = True
 
 	def disable(self):
@@ -494,6 +499,21 @@ class StartStop(object):
 		if not self._enabled:
 			return
 
+#GuiMods
+		# determine which AC input is connected to the generator
+		try:
+			if self._dbusmonitor.get_value ('com.victronenergy.settings', '/Settings/SystemSetup/AcInput1') == 2:
+				self._generatorAcInput = 1
+			elif self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/In/NumberOfAcInputs') >= 2 \
+					and self._dbusmonitor.get_value ('com.victronenergy.settings', '/Settings/SystemSetup/AcInput2') == 2:
+				self._generatorAcInput = 2
+			# no generator input found
+			else:
+				self._generatorAcInput = 0
+		except:
+			self._generatorAcInput = 0
+
+
 #### GuiMods warm-up / cool-down
 		self._currentTime = self._get_monotonic_seconds ()
 
@@ -508,26 +528,22 @@ class StartStop(object):
 #### GuiMods warm-up / cool-down
 		state = self._dbusservice['/State']
 		running = state in (States.WARMUP, States.COOLDOWN, States.RUNNING)
-		# shed load in warm-up and cool-down if on generator
+
+		# shed load for active generator input in warm-up and cool-down
 		# note that external transfer switch might change the state of on generator
 		# so this needs to be checked and load adjusted every pass
-		if state in (States.WARMUP, States.COOLDOWN) and self._ac1_is_generator:
-			if not self._acIsIgnored:
-				self.log_info ("shedding load")
-				self._set_ignore_ac1(True)
-				self._acIsIgnored = True
-		# restore load if previously shed or not currently on generator
+		# restore load for sources no longer in use or if state is not in warm-up/cool-down
+		if state in (States.WARMUP, States.COOLDOWN):
+			self._ignore_ac (True)
 		else:
-			if self._acIsIgnored:
-				self.log_info ("restoring load")
-				self._set_ignore_ac1(False)
-				self._acIsIgnored = False
+			self._ignore_ac (False)
 
 		# update cool down end time while running and generator has the load
-		# this is done because ac1_is_generator may change by an external transfer switch
+		# this is done because acInIsGenerator may change by an external transfer switch
 		#	and the input type changed by the ExtTransferSwitch service
-		if running and not self._acIsIgnored and self._ac1_is_generator:
+		if running and not self._ac1isIgnored and self._acInIsGenerator:
 			self._coolDownEndTime = self._currentTime + self._settings['cooldowntime']
+#### end GuiMods warm-up / cool-down
 
 
 	def _evaluate_startstop_conditions(self):
@@ -645,6 +661,8 @@ class StartStop(object):
 
 		# Path not supported, skip evaluation
 		if activein_state == None:
+#### GuiMods warm-up / cool-down
+			self._acInIsGenerator = False
 			return
 
 		# Sources 0 = Not available, 1 = Grid, 2 = Generator, 3 = Shore
@@ -653,7 +671,11 @@ class StartStop(object):
 		# Not connected = 0, connected = 1
 		activein_connected = activein_state == 1
 
+#### GuiMods warm-up / cool-down
+		self._acInIsGenerator = False
 		if generator_acsource and activein_connected:
+#### GuiMods warm-up / cool-down
+			self._acInIsGenerator = True
 			if self._acpower_inverter_input['unabletostart']:
 				self.log_info('Generator detected at inverter AC input, alarm removed')
 			self._reset_acpower_inverter_input()
@@ -1072,7 +1094,7 @@ class StartStop(object):
 				self._warmUpEndTime = self._currentTime + warmUpPeriod
 				self.log_info ("starting warm-up")
 				self._dbusservice['/State'] = States.WARMUP
-				self._acIsIgnored = False
+				self._ac1isIgnored = False
 			# no warm-up go directly to running
 			else:
 				self._dbusservice['/State'] = States.RUNNING
@@ -1092,7 +1114,7 @@ class StartStop(object):
 			if self._currentTime > self._warmUpEndTime:
 				self.log_info ("warm-up complete")
 				self._dbusservice['/State'] = States.RUNNING
-#### end GuiMods
+#### end GuiMods warm-up / cool-down
 
 			# Update the RunningByCondition
 			if self._dbusservice['/RunningByCondition'] != condition:
@@ -1140,20 +1162,50 @@ class StartStop(object):
 			self._manualstarttimer = 0
 			self._last_runtime_update = 0
 
-	@property
-	def _ac1_is_generator(self):
-		return self._dbusmonitor.get_value('com.victronenergy.settings',
-			'/Settings/SystemSetup/AcInput1') == 2 and \
-			self._dbusmonitor.get_value('com.victronenergy.settings',
-			'/Settings/SystemSetup/AcInput2') != 2
+
+
+
+
+	# This is here so the Multi/Quattro can be told to disconnect AC-in,
+	# so that we can do warm-up and cool-down.  We will gleefully ignore
+	# the lack of a Multi or support for this, because if support isn't
+	# there, then nothing bad happens.
+#### GuiMods warm-up / cool-down
+	# there may be two AC inputs (Quattro), so insure onlly one is in ignore
+
+	def _ignore_ac (self, state):
+			state1 = False
+			state2 = False
+			if self._generatorAcInput == 1:
+				state1 = state
+			elif self._generatorAcInput == 2:
+				state2 = state
+
+			if state1 != self._ac1isIgnored:
+				if state1:
+					self.log_info ("shedding load - AC input 1")
+				else:
+					self.log_info ("restoring load - AC input 1")
+				self._set_ignore_ac1 (state1)
+				self._ac1isIgnored = state1
+
+			if state2 != self._ac2isIgnored:
+				if state2:
+					self.log_info ("shedding load - AC input 2")
+				else:
+					self.log_info ("restoring load - AC input 2")
+				self._set_ignore_ac2 (state2)
+				self._ac2isIgnored = state2
+
 
 	def _set_ignore_ac1(self, ignore):
-		# This is here so the Multi/Quattro can be told to disconnect AC-in,
-		# so that we can do warm-up and cool-down.  We will gleefully ignore
-		# the lack of a Multi or support for this, because if support isn't
-		# there, then nothing bad happens.
 		if self._vebusservice is not None:
 			self._dbusmonitor.set_value_async(self._vebusservice, '/Ac/Control/IgnoreAcIn1', dbus.Int32(ignore, variant_level=1))
+
+#### GuiMods warm-up / cool-down
+	def _set_ignore_ac2(self, ignore):
+		if self._vebusservice is not None:
+			self._dbusmonitor.set_value_async(self._vebusservice, '/Ac/Control/IgnoreAcIn2', dbus.Int32(ignore, variant_level=1))
 
 	def _update_remote_switch(self):
 		# Engine should be started in these states
@@ -1253,19 +1305,15 @@ class StartStop(object):
 					inputState = 'S'
 			# otherwise use generator AC input to determine running state
 			else:
-				if self._dbusmonitor.get_value ('com.victronenergy.settings', '/Settings/SystemSetup/AcInput1', default_value = 0) == 2:
-					useAcIn = 1
-				elif self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/In/NumberOfAcInputs', default_value = 0 ) >= 2 \
-						and self._dbusmonitor.get_value ('com.victronenergy.settings', '/Settings/SystemSetup/AcInput2', default_value = 0) == 2:
-					useAcIn = 2
-				else:
-					useAcIn = 0
 				# use frequency as the test for generator running
-				if useAcIn > 0: 
-					if self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/Genset/Frequency', default_value = 0) > 20:
-						inputState = 'R'
-					else:
-						inputState = 'S'
+				if self._generatorAcInput > 0: 
+					try:
+						if self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/Genset/Frequency') > 20:
+							inputState = 'R'
+						else:
+							inputState = 'S'
+					except:
+						inputState = '?'
 
 			# update /GeneratorRunningState
 			if inputState != self._lastState:
@@ -1331,10 +1379,11 @@ class StartStop(object):
 			if self._last_accumulate_time == 0:
 				self._last_accumulate_time = self._currentTime
 
-			# if link to external state is enabled, don't accumulate time if running state is stopped (accumulate if R or ?)
+			# if link to external state is enabled, don't accumulate time if running state is stopped
+			#	(accumulate if R or ?)
 			if self._linkToExternalState:
 				try:
-					if self._dbusservice['/GeneratorRunningState'] == "S":
+					if self._dbusservice['/GeneratorRunningState'] == 'S':
 						accumuateTime = False
 			
 				# if no Forwarder service, allow accumulation

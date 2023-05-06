@@ -1,3 +1,7 @@
+v7.47:
+	add support for v3.00~39
+	add support for generator on AC iput 2
+
 v7.46:
 	fixed: generator warm-up / cool-down not working
 
