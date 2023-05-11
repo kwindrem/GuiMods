@@ -14,6 +14,7 @@
 /opt/victronenergy/gui/qml/OverviewTanksTempsDigInputs.qml
 /opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py
 /opt/victronenergy/gui/qml/OverviewFlowComplex.qml
+/opt/victronenergy/gui/qml/OverviewGeneratorEnhanced.qml
 /opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml
 /opt/victronenergy/dbus-generator-starter/startstop.py
 /opt/victronenergy/dbus-generator-starter/dbus_generator.py

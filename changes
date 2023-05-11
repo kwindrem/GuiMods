@@ -1,3 +1,7 @@
+v7.48:
+	fixed: alternator temperature missing
+	add support for v3.00~41
+
 v7.47:
 	add support for v3.00~39
 	add support for generator on AC iput 2
