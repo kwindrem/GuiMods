@@ -16,7 +16,7 @@ QtObject {
 	property int fontPixelSize: 16
 
 	property string borderColor: darkMode.value == 0 ? "#ddd" : "#4b4b4b"
-	property string backgroundColor: darkMode.value == 0 ? (isCurrentItem ? '#4790d0' : 'transparent') : (isCurrentItem ? '#234468' : '#303030')
+	property string backgroundColor: isCurrentItem ? (darkMode.value == 0 ? '#4790d0' : '#234468') : 'transparent'
 	property string backgroundColorService: darkMode.value == 0 ? (isCurrentItem ? "#2969a1" : '#ffe9b7') : (isCurrentItem ? "#234468" : '#7f745b')
 	property string backgroundColorComponent: borderColor
 
