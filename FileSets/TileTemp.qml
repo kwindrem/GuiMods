@@ -9,6 +9,8 @@ import "tanksensor.js" as TankSensor
 Tile {
 	id: root
 
+	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+
 	property string bindPrefix: serviceName
 	property string alarmBase: Utils.path ("com.victronenergy.temprelay/Sensor/", serviceName.split(".")[3])
 	property VBusItem alarmEnabledItem: VBusItem { bind: Utils.path ( alarmBase, "/Enabled" ) }
@@ -52,8 +54,8 @@ Tile {
 
     property variant tempNames: [qsTr("Battery"), qsTr("Fridge"), qsTr("Generic")]
     property string tempName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : temperatureTypeItem.valid ? tempNames [temperatureTypeItem.value] : isBatteryTemperature ? "Battery" : "TEMP"
-    property variant tempColors: ["#4aa3df", "#1abc9c", "#F39C12"]
-    property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : isBatteryTemperature ? "#4aa3df" :"#7f8c8d"
+    property variant tempColors: darkMode.value == 0 ? ["#4aa3df", "#1abc9c", "#F39C12"] : ["#25516f", "#0d5e4e", "#794e09"]
+    property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : isBatteryTemperature ? (darkMode.value == 0 ? "#4aa3df" : "#25516f") : (darkMode.value == 0 ? "#7f8c8d" : "#3f4646")
 
 	// compact puts name on same line as temp/humidity
 	//	otherwise name is in title and value on separate line
@@ -92,7 +94,7 @@ Tile {
 			id: valueTextFixed
 			height: nameTextFixed.height
             text:
-            {   
+            {
                 if (root.temperature == -99)
                     return "--"
                 else if (tempScale == 2)

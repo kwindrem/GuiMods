@@ -1,5 +1,3 @@
-////// use v2.71 version to overcome a problem showing/hiding title
-
 import QtQuick 1.1
 
 Rectangle {

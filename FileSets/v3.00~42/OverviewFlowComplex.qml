@@ -8,10 +8,11 @@ import "enhancedFormat.js" as EnhFmt
 
 OverviewPage {
 	id: root
-  
-    VBusItem { id: flowOverviewItem; bind: Utils.path(settingsPrefix, "/Settings/GuiMods/FlowOverview") }
+
+    property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	VBusItem { id: flowOverviewItem; bind: Utils.path(settingsPrefix, "/Settings/GuiMods/FlowOverview") }
 	property bool dcCoupled: flowOverviewItem.valid && flowOverviewItem.value == 2
- 
+
     VBusItem { id: showInactiveTilesItem; bind: Utils.path(guiModsPrefix, "/ShowInactiveFlowTiles") }
     property real disabledTileOpacity: (showInactiveTiles && showInactiveTilesItem.value === 1) ? 0.3 : 1
     property bool showInactiveTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value >= 1
@@ -22,7 +23,7 @@ OverviewPage {
 	property string settingsPrefix: "com.victronenergy.settings"
     property color detailColor: "#b3b3b3"
 	property real laneWidth: (root.width - inOutTileWidth * 2 - battery.width) / 3
- 
+
     property int inOutTileHeight: (root.height - topOffset - bottomOffset - 3 * 5) / 4
     property int inOutTileWidth: 145
     VBusItem { id: timeToGo;  bind: Utils.path(systemPrefix, "/Dc/Battery/TimeToGo") }
@@ -31,7 +32,7 @@ OverviewPage {
     property bool isMulti: vebusService.valid
     property string veDirectInverterService: ""
     property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
-    
+
     property bool combineAcLoads: dcCoupled || _combineAcLoads.valid && _combineAcLoads.value === 1
     property variant outputLoad: combineAcLoads ? sys.acLoad : sys.acOutLoad
 
@@ -113,7 +114,7 @@ OverviewPage {
 
     VBusItem { id: showBatteryTempItem; bind: Utils.path(guiModsPrefix, "/ShowBatteryTempOnFlows") }
     property bool showBatteryTemp: showBatteryTempItem.valid && showBatteryTempItem.value == 1
-    
+
 
     function getTimeFormat ()
     {
@@ -126,7 +127,7 @@ OverviewPage {
     }
 
     Component.onCompleted:
-    { 
+    {
 		discoverServices ()
 		showHelp ()
 	}
@@ -135,7 +136,7 @@ OverviewPage {
 
     VBusItem { id: loadsOnInputItem; bind: "com.victronenergy.settings/Settings/GuiMods/ShowEnhancedFlowLoadsOnInput" }
     VBusItem { id: _combineAcLoads; bind: "com.victronenergy.settings/Settings/GuiMods/EnhancedFlowCombineLoads" }
- 
+
 	OverviewBox {
 		id: acInBox
         opacity: showAcInput ? 1 : disabledTileOpacity
@@ -161,8 +162,8 @@ OverviewPage {
 					return getAcSourceName(sys.acSource)
 			}
 		}
-		titleColor: "#E74c3c"
-		color: "#C0392B"
+		titleColor: darkMode.value == 0 ? "#E74c3c" : "#73261E"
+		color: darkMode.value == 0 ? "#C0392B" : "#601C15"
 		anchors {
 			top: root.top; topMargin: topOffset
 			left: parent.left; leftMargin: 5
@@ -204,8 +205,8 @@ OverviewPage {
 	OverviewBox
 	{
 		id: pvInverterOnInput
-		titleColor: "#F4B350"
-		color: "#F39C12"
+		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
+		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
 		title: qsTr("PV on Input")
 		width: inOutTileWidth
 		height: inOutTileHeight
@@ -235,7 +236,7 @@ OverviewPage {
             visible: showPvOnInput
 		}
 		anchors {
-			top: acInBox.bottom 
+			top: acInBox.bottom
 			topMargin: 5
 			left: acInBox.left
 		}
@@ -259,8 +260,8 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadOnInputBox
 		title: qsTr("AC In Loads")
-		color: "#27AE60"
-		titleColor: "#2ECC71"
+		color: darkMode.value == 0 ? "#27AE60" : "#135730"
+		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showLoadsOnInput ? 1 : disabledTileOpacity
@@ -298,9 +299,9 @@ OverviewPage {
 
 	OverviewBox {
 		id: acOutputBox
-		title: combineAcLoads ? qsTr ("AC Loads") : qsTr ("AC Out Loads") 
-		color: "#27AE60"
-		titleColor: "#2ECC71"
+		title: combineAcLoads ? qsTr ("AC Loads") : qsTr ("AC Out Loads")
+		color: darkMode.value == 0 ? "#27AE60" : "#135730"
+		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showLoadsOnOutput ? 1 : disabledTileOpacity
@@ -310,13 +311,13 @@ OverviewPage {
 			top: root.top; topMargin: topOffset
 		}
 
- 		values: TileText {
+        values: TileText {
 			y: 13
 			text: EnhFmt.formatVBusItem (outputLoad.power)
 			font.pixelSize: 17
             visible: showLoadsOnOutput
 		}
-       PowerGauge
+        PowerGauge
         {
             id: acOutLoadGauge
             width: parent.width
@@ -472,8 +473,8 @@ OverviewPage {
 	OverviewBox
 	{
 		id: pvInverterOnAcOut
-		titleColor: "#F4B350"
-		color: "#F39C12"
+		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
+		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
 		title: qsTr("PV on Output")
 		width: inOutTileWidth
 		height: inOutTileHeight
@@ -528,9 +529,9 @@ OverviewPage {
     OverviewBox
     {
         id: acChargerBox
- 		title: qsTr ("AC Charger") 
-		color: "#157894"
-		titleColor: "#419FB9"
+        title: qsTr ("AC Charger")
+		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
+		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAcCharger ? 1 : disabledTileOpacity
@@ -571,9 +572,9 @@ OverviewPage {
     OverviewBox
     {
         id: alternatorBox
- 		title: qsTr ("Alternator") 
-		color: "#157894"
-		titleColor: "#419FB9"
+        title: qsTr ("Alternator")
+		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
+		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAlternator ? 1 : disabledTileOpacity
@@ -613,9 +614,9 @@ OverviewPage {
     OverviewBox
     {
         id: motorDriveBox
- 		title: qsTr ("Motor Drive") 
-		color: "#157894"
-		titleColor: "#419FB9"
+        title: qsTr ("Motor Drive")
+		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
+		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showMotorDrive ? 1 : disabledTileOpacity
@@ -700,14 +701,14 @@ OverviewPage {
 
     OverviewBox {
         id: fuelCellBox
-		color: "#157894"
-		titleColor: "#419FB9"
+		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
+		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showFuelCell ? 1 : disabledTileOpacity
 		visible: showFuelCell || (showInactiveTiles && dcCoupled)
         title: qsTr ("Fuel Cell")
-         anchors {
+        anchors {
             left: windGenBox.left
             bottom: windGenBox.top; bottomMargin: 5
         }
@@ -740,8 +741,8 @@ OverviewPage {
 
     OverviewBox {
         id: windGenBox
-		color: "#157894"
-		titleColor: "#419FB9"
+		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
+		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showWindGen ? 1 : disabledTileOpacity
@@ -782,8 +783,8 @@ OverviewPage {
     OverviewBox {
 		id: pvChargerBox
 		title: qsTr("PV Charger")
-        titleColor: "#F4B350"
-        color: "#F39C12"
+		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
+		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showPvCharger ? 1 : disabledTileOpacity
@@ -972,7 +973,7 @@ OverviewPage {
 		id: multiAcOutConnection
 
 		ballCount: 1
-		path: straight  
+		path: straight
 		active: root.active && ((showLoadsOnOutput || showPvOnOutput) || (!dcCoupled && showInactiveFlow))
 		value: -Utils.sign (acOutLoadFlow + pvInverterOnAcOutFlow)
 		endPointVisible: false
@@ -1372,7 +1373,7 @@ OverviewPage {
 
     function addService(service)
     {
-         switch (service.type)
+        switch (service.type)
         {
         case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
             numberOfTemps++
@@ -1399,7 +1400,7 @@ OverviewPage {
 				tempsModel.append({serviceName: service.name})
 			}
             break;;
-       }
+        }
     }
 
     // Detect available services of interest

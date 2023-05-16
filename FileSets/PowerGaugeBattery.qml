@@ -7,12 +7,14 @@ import com.victron.velib 1.0
 Item {
 	id: root
 
+	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+
     property variant endLabelFontSize: 16
     property color endLabelBackgroundColor: "transparent"
 
-    property int barHeight: Math.max (height / 2, 2)    
+    property int barHeight: Math.max (height / 2, 2)
     property color barColor: "black"
-    
+
     property real chargeOverload: maxCharge.valid ? maxCharge.value : 0
     property real chargeCaution: chargeOverload
     property real maxChargeDisplayed: chargeOverload * 1.1
@@ -27,7 +29,7 @@ Item {
     property real barWidth
     property real barOffset
     property color endLabelColor: "white"
-    
+
 	Component.onCompleted: calculateBarWidth ()
 
     VBusItem
@@ -74,7 +76,7 @@ Item {
         visible: showGauge
     }
     // charge end label
- 	Rectangle
+    Rectangle
 	{
 		anchors.fill: chargeText
 		color: endLabelBackgroundColor
@@ -101,7 +103,7 @@ Item {
         width: showGauge ? scaleFactor * (maxDischargeDisplayed - dischargeOverload) : 0
         height: root.height
         clip: true
-        color: "#ffb3b3"
+        color: darkMode.value == 0 ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -116,7 +118,7 @@ Item {
         width: showGauge ? scaleFactor * (dischargeOverload - dischargeCaution) : 0
         height: root.height
         clip: true
-        color: "#bbbb00"
+        color: darkMode.value == 0 ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
         {
@@ -131,7 +133,7 @@ Item {
         width: showGauge ? scaleFactor * (dischargeCaution + chargeCaution) : 0
         height: root.height
         clip: true
-        color: "#99ff99"
+        color: darkMode.value == 0 ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
         {
@@ -146,7 +148,7 @@ Item {
         width: showGauge ? scaleFactor * (chargeOverload - chargeCaution) : 0
         height: root.height
         clip: true
-        color: "#bbbb00"
+        color: darkMode.value == 0 ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
         {
@@ -161,7 +163,7 @@ Item {
         width: showGauge ? scaleFactor * (maxChargeDisplayed - chargeOverload) : 0
         height: root.height
         clip: true
-        color: "#ffb3b3"
+        color: darkMode.value == 0 ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -202,32 +204,32 @@ Item {
             leftMargin: zeroOffset
         }
     }
-    
+
     function calculateBarWidth ()
     {
         var current = batteryCurrent.valid ? batteryCurrent.value : 0
-    
+
         current = Math.min ( Math.max (current, -maxDischargeDisplayed), maxChargeDisplayed)
-    
+
         if (current >= 0)
         {
             if (current > chargeOverload)
-                barColor = "red"
+                barColor = darkMode.value == 0 ? "#ff0000" : "#bf0000"
             else if (current > chargeCaution)
-                barColor = "yellow"
+                barColor = darkMode.value == 0 ? "#ffff00" : "#bfbf00"
             else
-                barColor = "green"
+                barColor = darkMode.value == 0 ? "#008000" : "#006000"
             root.barOffset = zeroOffset
             root.barWidth = current * scaleFactor
         }
         else
-         {
+        {
             if (current < -dischargeOverload)
-                barColor = "red"
+                barColor = darkMode.value == 0 ? "#ff0000" : "#bf0000"
             else if (current < -dischargeCaution)
-                barColor = "yellow"
+                barColor = darkMode.value == 0 ? "#ffff00" : "#bfbf00"
             else
-                barColor = "green"
+                barColor = darkMode.value == 0 ? "#008000" : "#006000"
             root.barWidth = -current * scaleFactor
             root.barOffset = zeroOffset - root.barWidth
         }

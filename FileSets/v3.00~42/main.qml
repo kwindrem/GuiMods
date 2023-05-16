@@ -49,6 +49,23 @@ PageStackWindow {
         onValueChanged: selectHubOverview ()
     }
 
+    VBusItem
+    {
+        id: darkMode
+        bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
+        //onValueChanged: selectHubOverview ()
+    }
+
+	// set background for darkmode (by githubm.com/mr-manuel)
+	Rectangle {
+		anchors
+		{
+			fill: parent
+		}
+		color: darkMode.value == 0 ? "transparent" : "#202020"
+		z: -1
+	}
+
     // base a new hub selection on the hub type and the enhanced flow overview flag
     function selectHubOverview ()
     {
@@ -463,9 +480,9 @@ PageStackWindow {
 	function replaceOverview(oldPage, newPage)
 	{
 		for (var i = 0; i < overviewModel.count; i++)
-        {      
+        {
 			if (overviewModel.get(i).pageSource === oldPage)
-            {         
+            {
 				overviewModel.get(i).pageSource = newPage
                 return
             }

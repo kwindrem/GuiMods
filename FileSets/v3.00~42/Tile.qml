@@ -1,5 +1,3 @@
-////// use v2.71 version to overcome a problem showing/hiding title
-
 import QtQuick 1.1
 
 Rectangle {
@@ -19,7 +17,7 @@ Rectangle {
 	property bool editMode: false
 	property bool isCurrentItem: ListView.isCurrentItem
 	property int contentHeight: column.y + column.height
-	// property bool show // a non patched qt needs this, but cannot hide the Item
+	property bool show: true
 
 	Text {
 		id: titleField

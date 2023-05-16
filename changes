@@ -1,3 +1,6 @@
+v7.50:
+	add dark mode
+
 v7.49:
 	add support for v3.00~42 (includes generator on AC 2)
 
@@ -90,7 +93,7 @@ v7.17:
 	fixed: Multi gauge not showing proper limits, including no yellow region
 v7.16:
 	added v3.00~17
-	fixed: alternator gauge polarity was backwards	
+	fixed: alternator gauge polarity was backwards
 
 v7.15:
 	fixed: systemcalc crash in v2.90-2.93 (no devices shown on GUI)
@@ -272,7 +275,7 @@ v5.29:
 	added humidity to temps tiles
 	added DC System detail
 	added details and gauges to Mobile Overview
-	
+
 alternator, etc (DC sources) development on hold
 v5.28~6:
 	switched from /Mode to /State for battery State in DC System detail page

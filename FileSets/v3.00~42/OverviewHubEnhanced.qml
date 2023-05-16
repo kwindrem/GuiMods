@@ -25,6 +25,7 @@ OverviewPage {
 
 	property string systemPrefix: "com.victronenergy.system"
 	property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
+	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
 	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
 	property bool isMulti: vebusService.valid
 	property string veDirectInverterService: ""
@@ -81,7 +82,7 @@ OverviewPage {
 	property int pvRowsPerCharger: Math.max ( 1, Math.min (pvChargerRows / numberOfPvChargers, 3))
 	property bool pvChargerCompact: pvRowsPerCharger < 3 ? true : false
 	property bool pvShowDetails: pvRowsPerCharger >= 2 ? true : false
-	
+
 //////// add for PV INVERTER power
 	property string pvInverterPrefix1: ""
 	property string pvInverterPrefix2: ""
@@ -183,8 +184,8 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
-		titleColor: "#E74c3c"
-		color: "#C0392B"
+		titleColor: darkMode.value == 0 ? "#E74c3c" : "#73261E"
+		color: darkMode.value == 0 ? "#C0392B" : "#601C15"
 		opacity: showAcInput ? 1 : disabledTileOpacity
 		visible: showAcInput || showInactiveTiles
 		width: 148
@@ -249,9 +250,9 @@ OverviewPage {
 	//// add alternator if AC input not present
 	OverviewBox {
 		id: alternatorBox
- 		title: qsTr ("Alternator") 
-		color: "#157894"
-		titleColor: "#419FB9"
+		title: qsTr ("Alternator")
+		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
+		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
 		opacity: showAlternator ? 1 : disabledTileOpacity
 		visible: showAlternator || showInactiveTiles && ! acInBox.visible
 		width: 148
@@ -372,8 +373,8 @@ OverviewPage {
 		visible: showAcLoads || showInactiveTiles
 		opacity: showAcLoads ? 1 : disabledTileOpacity
 		title: qsTr("AC Loads")
-		color: "#27AE60"
-		titleColor: "#2ECC71"
+		color: darkMode.value == 0 ? "#27AE60" : "#135730"
+		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
 		width: 148
 		height: showStatusBar ? 80 : 102
 
@@ -528,8 +529,8 @@ OverviewPage {
 	OverviewBox {
 		id: pvChargerBox
 		title: qsTr("PV Charger")
-		titleColor: "#F4B350"
-		color: "#F39C12"
+		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
+		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
 		visible: hasDcSolar || showInactiveTiles
 		opacity: hasDcSolar ? 1 : disabledTileOpacity
 
@@ -563,7 +564,7 @@ OverviewPage {
 		}
 
 //////// modified to add power for individual PV charger info
-		values: 
+		values:
 		[
 			TileText {
 				y: 8
@@ -807,7 +808,7 @@ OverviewPage {
 				font.pixelSize: 15
 				visible: numberOfPvChargers >= 6 && pvChargerRows >= 6 && ! showDcAndAcSolar
 			},
-  			MarqueeEnhanced
+			MarqueeEnhanced
 			{
 				y: pvOffset7
 				id: pv7Name
@@ -852,8 +853,8 @@ OverviewPage {
 	OverviewBox {
 		id: pvInverter
 		title: qsTr("PV Inverter")
-		titleColor: "#F4B350"
-		color: "#F39C12"
+		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
+		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
 		visible: hasAcSolar || showInactiveTiles
 		opacity: hasAcSolar ? 1 : disabledTileOpacity
 
@@ -926,17 +927,17 @@ OverviewPage {
 				font.pixelSize: 15
 				visible: !showDcAndAcSolar && numberOfPvInverters >=3 && ! showTanksTemps
 			},
-			  TileText {
+			TileText {
 				y: 31
 				text: qsTr ("L1: ") + EnhFmt.formatVBusItem (pvInverterL1Power1, "W")
 				visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL1Power1.valid && (pvInverterL2Power1.valid || pvInverterL3Power1.valid)
 			},
-			  TileText {
+			TileText {
 				y: 47
 				text: qsTr ("L2: ") + EnhFmt.formatVBusItem (pvInverterL2Power1, "W")
 				visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL2Power1.valid
 			},
-			  TileText {
+			TileText {
 				y: 63
 				text: qsTr ("L3: ") + EnhFmt.formatVBusItem (pvInverterL3Power1, "W")
 				visible: !showDcAndAcSolar && numberOfPvInverters == 1 && pvInverterL3Power1.valid
@@ -1243,7 +1244,7 @@ OverviewPage {
 
 	function addService(service)
 	{
-		 switch (service.type)
+		switch (service.type)
 		{
 //////// add for temp sensors
 		case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
@@ -1348,7 +1349,7 @@ OverviewPage {
 		color: "white"
 		width: multi.width
 		height: 32
-		opacity: 0.7
+		opacity: darkMode.value == 0 ? 0.7 : 0.85
 		anchors
 		{
 			top: multi.bottom; topMargin: 1
@@ -1378,7 +1379,7 @@ OverviewPage {
 	[
 		acInputTarget, alternatorTarget, batteryTarget,
 		multiTarget, dcSystemTarget,
-		loadsOnOutputTarget, pvInverterTarget, pvChargerTarget 
+		loadsOnOutputTarget, pvInverterTarget, pvChargerTarget
 	]
 
 	property int selectedTarget: 0
