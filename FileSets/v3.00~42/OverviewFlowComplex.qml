@@ -9,7 +9,10 @@ import "enhancedFormat.js" as EnhFmt
 OverviewPage {
 	id: root
 
-    property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	VBusItem { id: flowOverviewItem; bind: Utils.path(settingsPrefix, "/Settings/GuiMods/FlowOverview") }
 	property bool dcCoupled: flowOverviewItem.valid && flowOverviewItem.value == 2
 
@@ -162,8 +165,8 @@ OverviewPage {
 					return getAcSourceName(sys.acSource)
 			}
 		}
-		titleColor: darkMode.value == 0 ? "#E74c3c" : "#73261E"
-		color: darkMode.value == 0 ? "#C0392B" : "#601C15"
+		titleColor: !darkMode ? "#E74c3c" : "#73261E"
+		color: !darkMode ? "#C0392B" : "#601C15"
 		anchors {
 			top: root.top; topMargin: topOffset
 			left: parent.left; leftMargin: 5
@@ -205,8 +208,8 @@ OverviewPage {
 	OverviewBox
 	{
 		id: pvInverterOnInput
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 		title: qsTr("PV on Input")
 		width: inOutTileWidth
 		height: inOutTileHeight
@@ -260,8 +263,8 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadOnInputBox
 		title: qsTr("AC In Loads")
-		color: darkMode.value == 0 ? "#27AE60" : "#135730"
-		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
+		color: !darkMode ? "#27AE60" : "#135730"
+		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showLoadsOnInput ? 1 : disabledTileOpacity
@@ -300,8 +303,8 @@ OverviewPage {
 	OverviewBox {
 		id: acOutputBox
 		title: combineAcLoads ? qsTr ("AC Loads") : qsTr ("AC Out Loads")
-		color: darkMode.value == 0 ? "#27AE60" : "#135730"
-		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
+		color: !darkMode ? "#27AE60" : "#135730"
+		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showLoadsOnOutput ? 1 : disabledTileOpacity
@@ -473,8 +476,8 @@ OverviewPage {
 	OverviewBox
 	{
 		id: pvInverterOnAcOut
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 		title: qsTr("PV on Output")
 		width: inOutTileWidth
 		height: inOutTileHeight
@@ -530,8 +533,8 @@ OverviewPage {
     {
         id: acChargerBox
         title: qsTr ("AC Charger")
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAcCharger ? 1 : disabledTileOpacity
@@ -573,8 +576,8 @@ OverviewPage {
     {
         id: alternatorBox
         title: qsTr ("Alternator")
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showAlternator ? 1 : disabledTileOpacity
@@ -615,8 +618,8 @@ OverviewPage {
     {
         id: motorDriveBox
         title: qsTr ("Motor Drive")
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
 		width: inOutTileWidth
         opacity: showMotorDrive ? 1 : disabledTileOpacity
@@ -701,8 +704,8 @@ OverviewPage {
 
     OverviewBox {
         id: fuelCellBox
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showFuelCell ? 1 : disabledTileOpacity
@@ -741,8 +744,8 @@ OverviewPage {
 
     OverviewBox {
         id: windGenBox
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
         width: inOutTileWidth
         height: inOutTileHeight
         opacity: showWindGen ? 1 : disabledTileOpacity
@@ -783,8 +786,8 @@ OverviewPage {
     OverviewBox {
 		id: pvChargerBox
 		title: qsTr("PV Charger")
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 		width: inOutTileWidth
 		height: inOutTileHeight
         opacity: showPvCharger ? 1 : disabledTileOpacity

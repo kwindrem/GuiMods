@@ -3,7 +3,10 @@ import QtQuick 1.1
 Item {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	default property alias values: blueSolarChargerBox.values
 	property alias title: blueSolarChargerBox.title
 	property bool showChargerIcon: true
@@ -24,8 +27,8 @@ Item {
 
 		height: root.height
 		title: qsTr("PV Power")
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 
 		anchors {
 			bottom: root.bottom

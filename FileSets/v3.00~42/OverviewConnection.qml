@@ -22,7 +22,9 @@ import QtQuick 1.1
 Item {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	property Path path: emptyPath
 
@@ -39,9 +41,9 @@ Item {
 
 	property bool active
 	property int ballCount: 4
-	property color ballColor: darkMode.value == 0 ? "#4789d0" : "#386ca5"
+	property color ballColor: !darkMode ? "#4789d0" : "#386ca5"
 	property real ballDiameter: lineWidth * 2 + 1
-	property color lineColor: darkMode.value == 0 ? "#4789d0" : "#386ca5"
+	property color lineColor: !darkMode ? "#4789d0" : "#386ca5"
 	property int lineWidth: 3
 	property int value
 	property bool startPointVisible: true

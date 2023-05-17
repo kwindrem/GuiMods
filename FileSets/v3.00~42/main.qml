@@ -49,20 +49,17 @@ PageStackWindow {
         onValueChanged: selectHubOverview ()
     }
 
-    VBusItem
-    {
-        id: darkMode
-        bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
-        //onValueChanged: selectHubOverview ()
-    }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
-	// set background for darkmode (by githubm.com/mr-manuel)
+////// GuiMods — DarkMode
 	Rectangle {
 		anchors
 		{
 			fill: parent
 		}
-		color: darkMode.value == 0 ? "transparent" : "#202020"
+		color: !darkMode ? "transparent" : "#202020"
 		z: -1
 	}
 

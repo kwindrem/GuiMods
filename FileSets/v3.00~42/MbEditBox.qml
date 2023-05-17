@@ -7,7 +7,10 @@ MbItem {
 	cornerMark: !readonly && !editMode
 	height: expanded.y + expanded.height + 1
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	property alias maximumLength: ti.maximumLength
 	property variant tmpValue
 	property string matchString: "0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()-_=+[]{}\;:|/.,<>?"
@@ -241,10 +244,10 @@ MbItem {
 
 		MbBackgroundRect {
 			id: greytag
-			color: darkMode.value == 0 ? (editMode ? "#fff": "#ddd") : (editMode ? "#747474": "#4b4b4b")
+			color: !darkMode ? (editMode ? "#fff": "#ddd") : (editMode ? "#747474": "#4b4b4b")
 			width: ti.width + 2 * style.marginDefault
 			height: ti.height + 6
-			border.color: darkMode.value == 0 ? "#ddd" : "#4b4b4b"
+			border.color: !darkMode ? "#ddd" : "#4b4b4b"
 			border.width: editMode ? 1 : 0
 			anchors.centerIn: ti
 		}
@@ -274,7 +277,7 @@ MbItem {
 				topMargin: (defaultHeight - height) / 2
 			}
 
-			color: darkMode.value == 0 ? "#000000" : "#fdfdfd"
+			color: !darkMode ? "#000000" : "#fdfdfd"
 
 			text: editMode ? _editText : item.text
 			// When editing the it is nice to have a fix with font, so when changing

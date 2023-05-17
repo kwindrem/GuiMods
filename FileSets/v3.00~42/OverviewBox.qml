@@ -3,16 +3,18 @@ import QtQuick 1.1
 SvgRectangle {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	radius: 6
 	width: 110
 	height: 110
-	color: darkMode.value == 0 ? "#16a185" : "#0B5042"
+	color: !darkMode ? "#16a185" : "#0B5042"
 	clip: true // hides an off by one pixel offset
 
 	property string title
-	property string titleColor: darkMode.value == 0 ? "#1abc9c" : "#136050"
+	property string titleColor: !darkMode ? "#1abc9c" : "#136050"
 	property alias values: _values.children
 
 	SvgRectangle {
@@ -33,7 +35,7 @@ SvgRectangle {
 		Text {
 			text: title
 			font {pixelSize: 14; bold: true}
-			color: darkMode.value == 0 ? "white" : "#e1e1e1"
+			color: !darkMode ? "white" : "#e1e1e1"
 			anchors.centerIn: parent
 		}
 	}

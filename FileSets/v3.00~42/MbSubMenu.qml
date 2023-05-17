@@ -6,7 +6,9 @@ MbItem {
 	id: root
 	width: pageStack ? pageStack.currentPage.width : 0
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	property string description
 	property VBusItem item: VBusItem {}
@@ -61,6 +63,6 @@ MbItem {
 			right: root.right; rightMargin: style.marginDefault
 			verticalCenter: parent.verticalCenter
 		}
-		iconId: root.iconId ? root.iconId + (root.ListView.isCurrentItem || darkMode.value ? "-active" : "") : ""
+		iconId: root.iconId ? root.iconId + (root.ListView.isCurrentItem || darkMode ? "-active" : "") : ""
 	}
 }

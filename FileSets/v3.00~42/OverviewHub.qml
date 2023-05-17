@@ -4,7 +4,10 @@ import "utils.js" as Utils
 OverviewPage {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	property variant sys: theSystem
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
@@ -22,8 +25,8 @@ OverviewPage {
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title: getAcSourceName(sys.acSource)
-		titleColor: darkMode.value == 0 ? "#E74c3c" : "#73261E"
-		color: darkMode.value == 0 ? "#C0392B" : "#601C15"
+		titleColor: !darkMode ? "#E74c3c" : "#73261E"
+		color: !darkMode ? "#C0392B" : "#601C15"
 
 		anchors {
 			top: multi.top
@@ -55,8 +58,8 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadBox
 		title: qsTr("AC Loads")
-		color: darkMode.value == 0 ? "#27AE60" : "#135730"
-		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
+		color: !darkMode ? "#27AE60" : "#135730"
+		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: 148
 		height: showStatusBar ? 100 : 120
 

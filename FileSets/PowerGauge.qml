@@ -8,7 +8,9 @@ import com.victron.velib 1.0
 Item {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
     property variant connection
 
@@ -108,7 +110,7 @@ Item {
         width: showGauge ? scaleFactor * (maxReverseDisplayed - maxReverseLimit) : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#ffb3b3" : "#bf8686"
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -123,7 +125,7 @@ Item {
         width: showGauge ? scaleFactor * (maxForwardLimit + maxReverseLimit) : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#99ff99" : "#73bf73"
+        color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
         {
@@ -138,7 +140,7 @@ Item {
         width: showGauge ? scaleFactor * (maxForwardDisplayed - maxForwardLimit) : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#ffb3b3" : "#bf8686"
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -283,8 +285,8 @@ Item {
     function getBarColor (currentValue)
     {
         if (currentValue > maxForwardLimit || currentValue < -maxReverseLimit)
-            return darkMode.value == 0 ? "#ff0000" : "#bf0000"
+            return !darkMode ? "#ff0000" : "#bf0000"
         else
-            return darkMode.value == 0 ? "#008000" : "#006000"
+            return !darkMode ? "#008000" : "#006000"
     }
 }

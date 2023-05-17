@@ -3,7 +3,9 @@ import QtQuick 1.1
 MbEditBox {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	property string format: "yyyy-MM-dd hh:mm"
 	property bool utc: false
@@ -14,7 +16,7 @@ MbEditBox {
 	overwriteMode: true
 	numericOnlyLayout: true
 	upDownText: qsTr("Select number")
-	textInput.color: editMode ? (vePlatform.secondsFromString(_editText, format) !== -1 ? (darkMode.value == 0 ? "#000000" : "#fdfdfd") : "red") : (darkMode.value == 0 ? "#000000" : "#fdfdfd")
+	textInput.color: editMode ? (vePlatform.secondsFromString(_editText, format) !== -1 ? (!darkMode ? "#000000" : "#fdfdfd") : "red") : (!darkMode ? "#000000" : "#fdfdfd")
 
 	// note: overwritten by MbEditBoxTime!
 	function getTimeSeconds(str) {

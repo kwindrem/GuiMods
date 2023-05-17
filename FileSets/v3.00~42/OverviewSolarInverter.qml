@@ -3,7 +3,10 @@ import QtQuick 1.1
 Rectangle {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	default property alias values: pvInverterBox.values
 	property alias title: pvInverterBox.title
 	property bool showInverterIcon: true
@@ -25,8 +28,8 @@ Rectangle {
 
 		height: root.height
 		title: qsTr("PV Power")
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 
 		anchors {
 			bottom: parent.bottom

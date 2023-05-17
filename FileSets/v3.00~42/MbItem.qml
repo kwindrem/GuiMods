@@ -12,8 +12,11 @@ Item {
 	id: root
 	width: (parent ? parent.width : 0)
 	height: defaultHeight
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
 	property bool show: user.accessLevel >= showAccessLevel
+
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	property int defaultHeight: style.itemHeight
 
@@ -105,7 +108,7 @@ Item {
 	MbIcon {
 		id: cornerMarkIcon
 
-		iconId: "icon-items-corner" + (root.ListView.isCurrentItem || darkMode.value ? "-active" : "")
+		iconId: "icon-items-corner" + (root.ListView.isCurrentItem || darkMode ? "-active" : "")
 		visible: cornerMark
 		anchors {
 			right: parent.right; rightMargin: 1

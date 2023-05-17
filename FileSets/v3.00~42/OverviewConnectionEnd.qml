@@ -5,7 +5,10 @@ import QtQuick 1.1
 Item {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	property real radius: 5.5
 	property alias color: ball.color
 	property int connectionSize: 7
@@ -16,7 +19,7 @@ Item {
 		id: connection
 
 		transformOrigin: Item.Left
-		color: darkMode.value == 0 ? "white" : "#202020"
+		color: !darkMode ? "white" : "#202020"
 		width: root.radius + connectionLength
 		height: connectionSize
 		anchors {
@@ -28,13 +31,13 @@ Item {
 	Circle {
 		id: ball
 		radius: root.radius
-		color: darkMode.value == 0 ? "#4789d0" : "#386ca5"
+		color: !darkMode ? "#4789d0" : "#386ca5"
 		x: -radius
 		y: -radius
 
 		border {
 			width: 2
-			color: darkMode.value == 0 ? "white" : "#202020"
+			color: !darkMode ? "white" : "#202020"
 		}
 	}
 }

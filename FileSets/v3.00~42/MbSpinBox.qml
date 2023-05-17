@@ -6,7 +6,9 @@ MbItem {
 	id: root
 	cornerMark: !readOnly && !spinbox.enabled
 
-	property VBusItem darkmode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	property string description
 	property bool readOnly: !userHasWriteAccess
@@ -73,10 +75,10 @@ MbItem {
 
 		MbBackgroundRect {
 			id: graytag
-			color: darkMode.value == 0 ? (!spinbox.enabled ? "#ddd": "#fff") : (!spinbox.enabled ? "#4b4b4b": "#747474")
+			color: !darkMode ? (!spinbox.enabled ? "#ddd": "#fff") : (!spinbox.enabled ? "#4b4b4b": "#747474")
 			height: spinbox.height + 6
 			width:  spinbox.width  + unit.width + 10
-			border.color: darkMode.value == 0 ? "#ddd" : "#4b4b4b"
+			border.color: !darkMode ? "#ddd" : "#4b4b4b"
 			border.width: spinbox.enabled ? 1 : 0
 			anchors {
 				right: parent.right; rightMargin: style.marginDefault

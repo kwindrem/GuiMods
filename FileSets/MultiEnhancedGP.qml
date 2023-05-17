@@ -11,6 +11,20 @@ MbIcon {
 		width: 126
 		height: 110.5
 
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
+    SvgRectangle
+    {
+        id:inverterForeground
+        width: 126
+		height: 110.5
+        radius: 3
+        color: "#000000"
+        opacity: !darkMode ? 0 : 0.35
+    }
+
 	property string systemPrefix: "com.victronenergy.system"
 	property VBusItem systemState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State") }
 
@@ -48,7 +62,7 @@ MbIcon {
         horizontalAlignment: Text.AlignHCenter
         width: 10
         wrapMode: Text.WrapAnywhere
-        color: "white"
+        color: !darkMode ? "white" : "#e1e1e1"
         font {pixelSize: 14; bold: true}
         text: inverterModeText ()
         lineHeightMode: Text.FixedHeight
@@ -144,7 +158,7 @@ MbIcon {
 			top: multi.top; topMargin: 4
 		}
 		horizontalAlignment: Text.AlignHCenter
-		color: "white"
+        color: !darkMode ? "white" : "#e1e1e1"
 ////// modified to show power bar graphs
 		font {pixelSize: 14; bold: true}
 		text: inverterService != "" ? vebusState.text : "---"
@@ -155,4 +169,3 @@ MbIcon {
 		}
 	}
 }
-

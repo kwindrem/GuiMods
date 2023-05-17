@@ -8,7 +8,9 @@ import com.victron.velib 1.0
 Item {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
     property string inverterService: ""
     property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
@@ -135,7 +137,7 @@ Item {
         width: visible ? (maxChargerDisplayed - chargerMaxPower) * scaleFactor : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#ffb3b3" : "#bf8686"
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -150,7 +152,7 @@ Item {
         width: visible ? (inverterCaution + chargerMaxPower) * scaleFactor : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#99ff99" : "#73bf73"
+        color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
         {
@@ -165,7 +167,7 @@ Item {
         width: visible ? (inverterOverload - inverterCaution) * scaleFactor : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#bbbb00" : "#8c8c00"
+        color: !darkMode ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
         {
@@ -180,7 +182,7 @@ Item {
         width: visible ? (maxInverterDisplayed - inverterOverload) * scaleFactor : 0
         height: root.height
         clip: true
-        color: darkMode.value == 0 ? "#ffb3b3" : "#bf8686"
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -333,11 +335,11 @@ Item {
     function getBarColor (power)
     {
         if (power > inverterOverload || power < -chargerMaxPower)
-            return darkMode.value == 0 ? "#ff0000" : "#bf0000"
+            return !darkMode ? "#ff0000" : "#bf0000"
         else if (power > inverterCaution)
-            return darkMode.value == 0 ? "#ffff00" : "#bfbf00"
+            return !darkMode ? "#ffff00" : "#bfbf00"
         else
-            return darkMode.value == 0 ? "#008000" : "#006000"
+            return !darkMode ? "#008000" : "#006000"
     }
 
 	function calculateAllBars ()

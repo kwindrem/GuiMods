@@ -28,6 +28,7 @@
 /opt/victronenergy/gui/qml/MbSpinBox.qml
 /opt/victronenergy/gui/qml/MbStyle.qml
 /opt/victronenergy/gui/qml/MbSubMenu.qml
+/opt/victronenergy/gui/qml/Multi.qml
 /opt/victronenergy/gui/qml/OverviewBox.qml
 /opt/victronenergy/gui/qml/OverviewConnection.qml
 /opt/victronenergy/gui/qml/OverviewConnectionEnd.qml
@@ -35,6 +36,8 @@
 /opt/victronenergy/gui/qml/OverviewHub.qml
 /opt/victronenergy/gui/qml/OverviewSolarCharger.qml
 /opt/victronenergy/gui/qml/OverviewSolarInverter.qml
+/opt/victronenergy/gui/qml/OverviewTankDelegate.qml
+/opt/victronenergy/gui/qml/OverviewTanks.qml
 /opt/victronenergy/gui/qml/Tile.qml
 /opt/victronenergy/gui/qml/TileText.qml
 /var/www/venus/styling/styles.css

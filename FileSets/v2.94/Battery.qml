@@ -6,10 +6,13 @@ Item {
 	width: 145
 	height: 101
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	property real soc: 80
-	property string color: darkMode.value == 0 ? "#4789d0" : "#234468"
-	property string emptyColor: darkMode.value == 0 ? "#1abc9c" : "#0d5e4e"
+	property string color: !darkMode ? "#4789d0" : "#234468"
+	property string emptyColor: !darkMode ? "#1abc9c" : "#0d5e4e"
 	property alias values: _values.children
 
 	SvgRectangle {
@@ -39,7 +42,7 @@ Item {
 		id: background
 
 		// NOTE: to remove the bottom of the terminals
-		border {width: 2; color: darkMode.value == 0 ? "white" : "#202020"}
+		border {width: 2; color: !darkMode ? "white" : "#202020"}
 		height: root.height - leftTerminal.height
 		width: root.width
 		y: leftTerminal.height - 1
@@ -64,7 +67,7 @@ Item {
 			height: parent.height
 			width: parent.width * 0.7
 			anchors.centerIn: parent
-			color: darkMode.value == 0 ? "#ffffff" : "#202020"
+			color: !darkMode ? "#ffffff" : "#202020"
 			opacity: 0.06
 		}
 	}
@@ -93,7 +96,7 @@ Item {
 		font.pixelSize: 13; font.bold: true
 		anchors.centerIn: leftTerminal
 		anchors.verticalCenterOffset: 12
-		color: darkMode.value == 0 ? "#fff" : "#e1e1e1"
+		color: !darkMode ? "#fff" : "#e1e1e1"
 	}
 
 	Text {
@@ -101,7 +104,7 @@ Item {
 		font.pixelSize: 13; font.bold: true
 		anchors.centerIn: rightTerminal
 		anchors.verticalCenterOffset: 12
-		color: darkMode.value == 0 ? "#fff" : "#e1e1e1"
+		color: !darkMode ? "#fff" : "#e1e1e1"
 	}
 
 	Item {

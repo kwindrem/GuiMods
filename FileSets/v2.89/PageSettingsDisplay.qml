@@ -53,6 +53,8 @@ MbPage {
 			]
 		}
 
+
+////// GuiMods — DarkMode
 		MbSwitch
 		{
 			id: enableDarkMode

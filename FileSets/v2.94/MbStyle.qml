@@ -4,7 +4,9 @@ import QtQuick 1.1
  * common style properties
  */
 QtObject {
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	property bool isCurrentItem
 
@@ -15,19 +17,19 @@ QtObject {
 	property string fontFamily: "DejaVu Sans Condensed"
 	property int fontPixelSize: 16
 
-	property string borderColor: darkMode.value == 0 ? "#ddd" : "#4b4b4b"
-	property string backgroundColor: isCurrentItem ? (darkMode.value == 0 ? '#4790d0' : '#234468') : 'transparent'
-	property string backgroundColorService: darkMode.value == 0 ? (isCurrentItem ? "#2969a1" : '#ffe9b7') : (isCurrentItem ? "#234468" : '#7f745b')
+	property string borderColor: !darkMode ? "#ddd" : "#4b4b4b"
+	property string backgroundColor: isCurrentItem ? (!darkMode ? '#4790d0' : '#234468') : 'transparent'
+	property string backgroundColorService: !darkMode ? (isCurrentItem ? "#2969a1" : '#ffe9b7') : (isCurrentItem ? "#234468" : '#7f745b')
 	property string backgroundColorComponent: borderColor
 
 	// Text mainly used for description etc.
-	property string textColor: darkMode.value == 0 ? "#000000" : "#fdfdfd"
-	property string textColorSelected: darkMode.value == 0 ? "#FFFFFF" : "#fdfdfd"
+	property string textColor: !darkMode ? "#000000" : "#fdfdfd"
+	property string textColorSelected: !darkMode ? "#FFFFFF" : "#fdfdfd"
 
 	// Color typically used for values
-	property string valueColor: darkMode.value == 0 ? "#333333" : "#fdfdfd"
+	property string valueColor: !darkMode ? "#333333" : "#fdfdfd"
 	property int valueHorizontalAlignment: Text.AlignRight
-	property string color2: darkMode.value == 0 ? "#333333" : "#fdfdfd"
+	property string color2: !darkMode ? "#333333" : "#fdfdfd"
 
 	property int marginDefault: 8
 	// margin between MbItem border and components for bottom / top

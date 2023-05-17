@@ -4,7 +4,10 @@ import "utils.js" as Utils
 OverviewPage {
 	id: root
 
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	property variant sys: theSystem
 	property bool hasAcOutSystem: _hasAcOutSystem.value === 1
 
@@ -21,8 +24,8 @@ OverviewPage {
 		width: 148
 		height: 100
 		title: getAcSourceName(sys.acSource)
-		titleColor: darkMode.value == 0 ? "#E74c3c" : "#73261E"
-		color: darkMode.value == 0 ? "#C0392B" : "#601C15"
+		titleColor: !darkMode ? "#E74c3c" : "#73261E"
+		color: !darkMode ? "#C0392B" : "#601C15"
 		anchors {
 			top: root.top; topMargin: 1
 			left: parent.left; leftMargin: 5
@@ -45,8 +48,8 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadBox
 		title: qsTr("AC Loads")
-		color: darkMode.value == 0 ? "#27AE60" : "#135730"
-		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
+		color: !darkMode ? "#27AE60" : "#135730"
+		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: 148
 		height: 100
 
@@ -64,8 +67,8 @@ OverviewPage {
 	OverviewBox {
 		id: acOutputBox
 		title: qsTr("Critical Loads")
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: 100
 		width: 148
 		visible: hasAcOutSystem

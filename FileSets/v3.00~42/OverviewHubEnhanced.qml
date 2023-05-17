@@ -25,7 +25,11 @@ OverviewPage {
 
 	property string systemPrefix: "com.victronenergy.system"
 	property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
-	property VBusItem darkMode: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
 	property bool isMulti: vebusService.valid
 	property string veDirectInverterService: ""
@@ -184,8 +188,8 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
-		titleColor: darkMode.value == 0 ? "#E74c3c" : "#73261E"
-		color: darkMode.value == 0 ? "#C0392B" : "#601C15"
+		titleColor: !darkMode ? "#E74c3c" : "#73261E"
+		color: !darkMode ? "#C0392B" : "#601C15"
 		opacity: showAcInput ? 1 : disabledTileOpacity
 		visible: showAcInput || showInactiveTiles
 		width: 148
@@ -251,8 +255,8 @@ OverviewPage {
 	OverviewBox {
 		id: alternatorBox
 		title: qsTr ("Alternator")
-		color: darkMode.value == 0 ? "#157894" : "#0a3c4a"
-		titleColor: darkMode.value == 0 ? "#419FB9" : "#204f5c"
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		opacity: showAlternator ? 1 : disabledTileOpacity
 		visible: showAlternator || showInactiveTiles && ! acInBox.visible
 		width: 148
@@ -373,8 +377,8 @@ OverviewPage {
 		visible: showAcLoads || showInactiveTiles
 		opacity: showAcLoads ? 1 : disabledTileOpacity
 		title: qsTr("AC Loads")
-		color: darkMode.value == 0 ? "#27AE60" : "#135730"
-		titleColor: darkMode.value == 0 ? "#2ECC71" : "#176638"
+		color: !darkMode ? "#27AE60" : "#135730"
+		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: 148
 		height: showStatusBar ? 80 : 102
 
@@ -529,8 +533,8 @@ OverviewPage {
 	OverviewBox {
 		id: pvChargerBox
 		title: qsTr("PV Charger")
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 		visible: hasDcSolar || showInactiveTiles
 		opacity: hasDcSolar ? 1 : disabledTileOpacity
 
@@ -853,8 +857,8 @@ OverviewPage {
 	OverviewBox {
 		id: pvInverter
 		title: qsTr("PV Inverter")
-		titleColor: darkMode.value == 0 ? "#F4B350" : "#7A5928"
-		color: darkMode.value == 0 ? "#F39C12" : "#794E09"
+		titleColor: !darkMode ? "#F4B350" : "#7A5928"
+		color: !darkMode ? "#F39C12" : "#794E09"
 		visible: hasAcSolar || showInactiveTiles
 		opacity: hasAcSolar ? 1 : disabledTileOpacity
 
@@ -1349,7 +1353,7 @@ OverviewPage {
 		color: "white"
 		width: multi.width
 		height: 32
-		opacity: darkMode.value == 0 ? 0.7 : 0.85
+		opacity: !darkMode ? 0.7 : 0.85
 		anchors
 		{
 			top: multi.bottom; topMargin: 1
