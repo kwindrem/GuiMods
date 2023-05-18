@@ -110,6 +110,7 @@ Item {
         width: showGauge ? scaleFactor * (maxReverseDisplayed - maxReverseLimit) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
@@ -125,6 +126,7 @@ Item {
         width: showGauge ? scaleFactor * (maxForwardLimit + maxReverseLimit) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
@@ -140,6 +142,7 @@ Item {
         width: showGauge ? scaleFactor * (maxForwardDisplayed - maxForwardLimit) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
@@ -285,8 +288,10 @@ Item {
     function getBarColor (currentValue)
     {
         if (currentValue > maxForwardLimit || currentValue < -maxReverseLimit)
+////// GuiMods — DarkMode
             return !darkMode ? "#ff0000" : "#bf0000"
         else
+////// GuiMods — DarkMode
             return !darkMode ? "#008000" : "#006000"
     }
 }

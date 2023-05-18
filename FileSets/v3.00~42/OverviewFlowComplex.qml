@@ -165,6 +165,7 @@ OverviewPage {
 					return getAcSourceName(sys.acSource)
 			}
 		}
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#E74c3c" : "#73261E"
 		color: !darkMode ? "#C0392B" : "#601C15"
 		anchors {
@@ -208,6 +209,7 @@ OverviewPage {
 	OverviewBox
 	{
 		id: pvInverterOnInput
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 		color: !darkMode ? "#F39C12" : "#794E09"
 		title: qsTr("PV on Input")
@@ -263,6 +265,7 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadOnInputBox
 		title: qsTr("AC In Loads")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#27AE60" : "#135730"
 		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: inOutTileWidth
@@ -303,6 +306,7 @@ OverviewPage {
 	OverviewBox {
 		id: acOutputBox
 		title: combineAcLoads ? qsTr ("AC Loads") : qsTr ("AC Out Loads")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#27AE60" : "#135730"
 		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		height: inOutTileHeight
@@ -476,6 +480,7 @@ OverviewPage {
 	OverviewBox
 	{
 		id: pvInverterOnAcOut
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 		color: !darkMode ? "#F39C12" : "#794E09"
 		title: qsTr("PV on Output")
@@ -533,6 +538,7 @@ OverviewPage {
     {
         id: acChargerBox
         title: qsTr ("AC Charger")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#157894" : "#0a3c4a"
 		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
@@ -576,6 +582,7 @@ OverviewPage {
     {
         id: alternatorBox
         title: qsTr ("Alternator")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#157894" : "#0a3c4a"
 		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
@@ -618,6 +625,7 @@ OverviewPage {
     {
         id: motorDriveBox
         title: qsTr ("Motor Drive")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#157894" : "#0a3c4a"
 		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: inOutTileHeight
@@ -704,6 +712,7 @@ OverviewPage {
 
     OverviewBox {
         id: fuelCellBox
+////// GuiMods — DarkMode
 		color: !darkMode ? "#157894" : "#0a3c4a"
 		titleColor: !darkMode ? "#419FB9" : "#204f5c"
         width: inOutTileWidth
@@ -744,6 +753,7 @@ OverviewPage {
 
     OverviewBox {
         id: windGenBox
+////// GuiMods — DarkMode
 		color: !darkMode ? "#157894" : "#0a3c4a"
 		titleColor: !darkMode ? "#419FB9" : "#204f5c"
         width: inOutTileWidth
@@ -786,6 +796,7 @@ OverviewPage {
     OverviewBox {
 		id: pvChargerBox
 		title: qsTr("PV Charger")
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 		color: !darkMode ? "#F39C12" : "#794E09"
 		width: inOutTileWidth

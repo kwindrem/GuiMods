@@ -24,6 +24,7 @@ OverviewPage {
 		width: 148
 		height: 100
 		title: getAcSourceName(sys.acSource)
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#E74c3c" : "#73261E"
 		color: !darkMode ? "#C0392B" : "#601C15"
 		anchors {
@@ -48,6 +49,7 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadBox
 		title: qsTr("AC Loads")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#27AE60" : "#135730"
 		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: 148
@@ -67,6 +69,7 @@ OverviewPage {
 	OverviewBox {
 		id: acOutputBox
 		title: qsTr("Critical Loads")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#157894" : "#0a3c4a"
 		titleColor: !darkMode ? "#419FB9" : "#204f5c"
 		height: 100

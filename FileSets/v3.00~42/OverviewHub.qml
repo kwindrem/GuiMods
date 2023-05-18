@@ -25,6 +25,7 @@ OverviewPage {
 		width: 148
 		height: showStatusBar ? 100 : 120
 		title: getAcSourceName(sys.acSource)
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#E74c3c" : "#73261E"
 		color: !darkMode ? "#C0392B" : "#601C15"
 
@@ -58,6 +59,7 @@ OverviewPage {
 	OverviewBox {
 		id: acLoadBox
 		title: qsTr("AC Loads")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#27AE60" : "#135730"
 		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: 148

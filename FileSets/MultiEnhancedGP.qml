@@ -62,6 +62,7 @@ MbIcon {
         horizontalAlignment: Text.AlignHCenter
         width: 10
         wrapMode: Text.WrapAnywhere
+////// GuiMods — DarkMode
         color: !darkMode ? "white" : "#e1e1e1"
         font {pixelSize: 14; bold: true}
         text: inverterModeText ()
@@ -158,6 +159,7 @@ MbIcon {
 			top: multi.top; topMargin: 4
 		}
 		horizontalAlignment: Text.AlignHCenter
+////// GuiMods — DarkMode
         color: !darkMode ? "white" : "#e1e1e1"
 ////// modified to show power bar graphs
 		font {pixelSize: 14; bold: true}

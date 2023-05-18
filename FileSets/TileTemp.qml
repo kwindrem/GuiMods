@@ -56,6 +56,7 @@ Tile {
 
     property variant tempNames: [qsTr("Battery"), qsTr("Fridge"), qsTr("Generic")]
     property string tempName: customNameItem.valid && customNameItem.value !== "" ? customNameItem.value : temperatureTypeItem.valid ? tempNames [temperatureTypeItem.value] : isBatteryTemperature ? "Battery" : "TEMP"
+////// GuiMods — DarkMode
     property variant tempColors: !darkMode ? ["#4aa3df", "#1abc9c", "#F39C12"] : ["#25516f", "#0d5e4e", "#794e09"]
     property color tempColor: temperatureTypeItem.valid ? tempColors [temperatureTypeItem.value] : isBatteryTemperature ? (!darkMode ? "#4aa3df" : "#25516f") : (!darkMode ? "#7f8c8d" : "#3f4646")
 

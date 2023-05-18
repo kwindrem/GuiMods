@@ -75,9 +75,11 @@ MbItem {
 
 		MbBackgroundRect {
 			id: graytag
+////// GuiMods — DarkMode
 			color: !darkMode ? (!spinbox.enabled ? "#ddd": "#fff") : (!spinbox.enabled ? "#4b4b4b": "#747474")
 			height: spinbox.height + 6
 			width:  spinbox.width  + unit.width + 10
+////// GuiMods — DarkMode
 			border.color: !darkMode ? "#ddd" : "#4b4b4b"
 			border.width: spinbox.enabled ? 1 : 0
 			anchors {

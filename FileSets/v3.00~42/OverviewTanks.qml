@@ -39,6 +39,7 @@ OverviewPage {
 
 	Text {
 		text: qsTr("No tanks found")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#ffffff" : "#e1e1e1"
 		font.pixelSize: 25
 		anchors.centerIn: parent
@@ -67,9 +68,11 @@ OverviewPage {
 			text: fluidName
 			height: 25
 			font.pixelSize: 16
+////// GuiMods — DarkMode
 			opacity: ListView.isCurrentItem ? 1 : (!darkMode ? 0.3 : 0.5)
 			verticalAlignment: Text.AlignVCenter
 			scale: ListView.isCurrentItem ? 1.25 : 1
+////// GuiMods — DarkMode
 			color: !darkMode ? "#ffffff" : "#e1e1e1"
 
 			Behavior on scale {
@@ -89,6 +92,7 @@ OverviewPage {
 			y: 25
 			transform: Rotation { origin.x: 0; origin.y: 0; angle: -90}
 			gradient: Gradient {
+////// GuiMods — DarkMode
 				GradientStop { position: 0.7; color: !darkMode ? "white" : "#202020" }
 				GradientStop { position: 1; color: "transparent" }
 			}
@@ -100,6 +104,7 @@ OverviewPage {
 			x: parent.width
 			transform: Rotation { origin.x: 0; origin.y: 0; angle: 90}
 			gradient: Gradient {
+////// GuiMods — DarkMode
 				GradientStop { position: 0.7; color: !darkMode ? "white" : "#202020" }
 				GradientStop { position: 1; color: "transparent" }
 			}
@@ -107,6 +112,7 @@ OverviewPage {
 
 		// touch buttons for selecting a tank type
 		MbIcon {
+////// GuiMods — DarkMode
 			iconId: darkMode ? "icon-toolbar-enter" : "icon-toolbar-enter-active"
 			rotation: 180
 			anchors {
@@ -123,6 +129,7 @@ OverviewPage {
 		}
 
 		MbIcon {
+////// GuiMods — DarkMode
 			iconId: darkMode ? "icon-toolbar-enter" : "icon-toolbar-enter-active"
 			anchors {
 				right: parent.right; rightMargin: 40

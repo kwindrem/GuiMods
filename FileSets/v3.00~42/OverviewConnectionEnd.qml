@@ -19,6 +19,7 @@ Item {
 		id: connection
 
 		transformOrigin: Item.Left
+////// GuiMods — DarkMode
 		color: !darkMode ? "white" : "#202020"
 		width: root.radius + connectionLength
 		height: connectionSize
@@ -31,12 +32,14 @@ Item {
 	Circle {
 		id: ball
 		radius: root.radius
+////// GuiMods — DarkMode
 		color: !darkMode ? "#4789d0" : "#386ca5"
 		x: -radius
 		y: -radius
 
 		border {
 			width: 2
+////// GuiMods — DarkMode
 			color: !darkMode ? "white" : "#202020"
 		}
 	}

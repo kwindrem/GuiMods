@@ -6,6 +6,7 @@ Text {
 	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	font.pixelSize: 14
+////// GuiMods — DarkMode
 	color: !darkMode ? "white" : "#e1e1e1"
 	width: parent.width
 	horizontalAlignment: Text.AlignHCenter

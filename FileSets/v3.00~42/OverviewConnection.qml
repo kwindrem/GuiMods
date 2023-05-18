@@ -41,8 +41,10 @@ Item {
 
 	property bool active
 	property int ballCount: 4
+////// GuiMods — DarkMode
 	property color ballColor: !darkMode ? "#4789d0" : "#386ca5"
 	property real ballDiameter: lineWidth * 2 + 1
+////// GuiMods — DarkMode
 	property color lineColor: !darkMode ? "#4789d0" : "#386ca5"
 	property int lineWidth: 3
 	property int value

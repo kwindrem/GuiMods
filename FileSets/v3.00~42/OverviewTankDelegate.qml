@@ -38,6 +38,7 @@ Item {
 		border { color: info.color; width: 2 }
 		width: root.width
 		height: root.height * 0.72
+////// GuiMods — DarkMode
 		color: !darkMode ? "white" : "#c0c0c0"
 
 		SvgRectangle {
@@ -97,6 +98,7 @@ Item {
 	Text {
 		id: _tankName
 		text: service.description
+////// GuiMods — DarkMode
 		color: !darkMode ? "#ffffff" : "#e1e1e1"
 		width: parent.width + (parent.width < 50 ? 4 : 13)
 		horizontalAlignment: Text.AlignHCenter

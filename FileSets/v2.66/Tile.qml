@@ -11,6 +11,7 @@ Rectangle {
 
 	color: "#009ec6"
 	border.width: 2
+////// GuiMods — DarkMode
 	border.color: !darkMode ? "#fff" : "#202020"
 	clip: true
 
@@ -27,6 +28,7 @@ Rectangle {
 		id: titleField
 		font.pixelSize: 13
 		text: title
+////// GuiMods — DarkMode
 		color: !darkMode ? "white" : "#ddd"
 		height: text === "" ? 0 : paintedHeight
 		anchors {
@@ -40,6 +42,7 @@ Rectangle {
 		width: parent.width - 10
 		height: 1
 		visible: title !== ""
+////// GuiMods — DarkMode
 		color: !darkMode ? "white" : "#ddd"
 		anchors {
 			top: titleField.bottom

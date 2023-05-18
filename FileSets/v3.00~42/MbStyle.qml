@@ -24,10 +24,12 @@ QtObject {
 	property string backgroundColorComponent: borderColor
 
 	// Text mainly used for description etc.
+////// GuiMods — DarkMode
 	property string textColor: !darkMode ? "#000000" : "#fdfdfd"
 	property string textColorSelected: !darkMode ? "#FFFFFF" : "#fdfdfd"
 
 	// Color typically used for values
+////// GuiMods — DarkMode
 	property string valueColor: !darkMode ? "#333333" : "#fdfdfd"
 	property int valueHorizontalAlignment: Text.AlignRight
 	property string color2: !darkMode ? "#333333" : "#fdfdfd"

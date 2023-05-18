@@ -27,6 +27,7 @@ Item {
 
 		height: root.height
 		title: qsTr("PV Power")
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 		color: !darkMode ? "#F39C12" : "#794E09"
 

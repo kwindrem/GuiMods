@@ -137,6 +137,7 @@ Item {
         width: visible ? (maxChargerDisplayed - chargerMaxPower) * scaleFactor : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
@@ -152,6 +153,7 @@ Item {
         width: visible ? (inverterCaution + chargerMaxPower) * scaleFactor : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
@@ -167,6 +169,7 @@ Item {
         width: visible ? (inverterOverload - inverterCaution) * scaleFactor : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
@@ -182,6 +185,7 @@ Item {
         width: visible ? (maxInverterDisplayed - inverterOverload) * scaleFactor : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
@@ -335,10 +339,13 @@ Item {
     function getBarColor (power)
     {
         if (power > inverterOverload || power < -chargerMaxPower)
+////// GuiMods — DarkMode
             return !darkMode ? "#ff0000" : "#bf0000"
         else if (power > inverterCaution)
+////// GuiMods — DarkMode
             return !darkMode ? "#ffff00" : "#bfbf00"
         else
+////// GuiMods — DarkMode
             return !darkMode ? "#008000" : "#006000"
     }
 

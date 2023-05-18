@@ -16,6 +16,7 @@ MbEditBox {
 	overwriteMode: true
 	numericOnlyLayout: true
 	upDownText: qsTr("Select number")
+////// GuiMods — DarkMode
 	textInput.color: editMode ? (vePlatform.secondsFromString(_editText, format) !== -1 ? (!darkMode ? "#000000" : "#fdfdfd") : "red") : (!darkMode ? "#000000" : "#fdfdfd")
 
 	// note: overwritten by MbEditBoxTime!

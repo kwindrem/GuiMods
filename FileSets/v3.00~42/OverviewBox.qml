@@ -10,10 +10,12 @@ SvgRectangle {
 	radius: 6
 	width: 110
 	height: 110
+////// GuiMods — DarkMode
 	color: !darkMode ? "#16a185" : "#0B5042"
 	clip: true // hides an off by one pixel offset
 
 	property string title
+////// GuiMods — DarkMode
 	property string titleColor: !darkMode ? "#1abc9c" : "#136050"
 	property alias values: _values.children
 
@@ -35,6 +37,7 @@ SvgRectangle {
 		Text {
 			text: title
 			font {pixelSize: 14; bold: true}
+////// GuiMods — DarkMode
 			color: !darkMode ? "white" : "#e1e1e1"
 			anchors.centerIn: parent
 		}

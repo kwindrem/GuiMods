@@ -63,6 +63,7 @@ MbItem {
 			right: root.right; rightMargin: style.marginDefault
 			verticalCenter: parent.verticalCenter
 		}
+////// GuiMods — DarkMode
 		iconId: root.iconId ? root.iconId + (root.ListView.isCurrentItem || darkMode ? "-active" : "") : ""
 	}
 }

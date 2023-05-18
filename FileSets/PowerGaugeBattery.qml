@@ -105,6 +105,7 @@ Item {
         width: showGauge ? scaleFactor * (maxDischargeDisplayed - dischargeOverload) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
@@ -120,6 +121,7 @@ Item {
         width: showGauge ? scaleFactor * (dischargeOverload - dischargeCaution) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
@@ -135,6 +137,7 @@ Item {
         width: showGauge ? scaleFactor * (dischargeCaution + chargeCaution) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
@@ -150,6 +153,7 @@ Item {
         width: showGauge ? scaleFactor * (chargeOverload - chargeCaution) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
@@ -165,6 +169,7 @@ Item {
         width: showGauge ? scaleFactor * (maxChargeDisplayed - chargeOverload) : 0
         height: root.height
         clip: true
+////// GuiMods — DarkMode
         color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
@@ -216,10 +221,13 @@ Item {
         if (current >= 0)
         {
             if (current > chargeOverload)
+////// GuiMods — DarkMode
                 barColor = !darkMode ? "#ff0000" : "#bf0000"
             else if (current > chargeCaution)
+////// GuiMods — DarkMode
                 barColor = !darkMode ? "#ffff00" : "#bfbf00"
             else
+////// GuiMods — DarkMode
                 barColor = !darkMode ? "#008000" : "#006000"
             root.barOffset = zeroOffset
             root.barWidth = current * scaleFactor
@@ -227,10 +235,13 @@ Item {
         else
         {
             if (current < -dischargeOverload)
+////// GuiMods — DarkMode
                 barColor = !darkMode ? "#ff0000" : "#bf0000"
             else if (current < -dischargeCaution)
+////// GuiMods — DarkMode
                 barColor = !darkMode ? "#ffff00" : "#bfbf00"
             else
+////// GuiMods — DarkMode
                 barColor = !darkMode ? "#008000" : "#006000"
             root.barWidth = -current * scaleFactor
             root.barOffset = zeroOffset - root.barWidth

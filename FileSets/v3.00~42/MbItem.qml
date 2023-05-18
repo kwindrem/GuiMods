@@ -108,6 +108,7 @@ Item {
 	MbIcon {
 		id: cornerMarkIcon
 
+////// GuiMods — DarkMode
 		iconId: "icon-items-corner" + (root.ListView.isCurrentItem || darkMode ? "-active" : "")
 		visible: cornerMark
 		anchors {

@@ -17,16 +17,19 @@ QtObject {
 	property string fontFamily: "DejaVu Sans Condensed"
 	property int fontPixelSize: 16
 
+////// GuiMods — DarkMode
 	property string borderColor: !darkMode ? "#ddd" : "#4b4b4b"
 	property string backgroundColor: isCurrentItem ? (!darkMode ? '#4790d0' : '#234468') : 'transparent'
 	property string backgroundColorService: !darkMode ? (isCurrentItem ? "#2969a1" : '#ffe9b7') : (isCurrentItem ? "#234468" : '#7f745b')
 	property string backgroundColorComponent: borderColor
 
 	// Text mainly used for description etc.
+////// GuiMods — DarkMode
 	property string textColor: !darkMode ? "#000000" : "#fdfdfd"
 	property string textColorSelected: !darkMode ? "#FFFFFF" : "#fdfdfd"
 
 	// Color typically used for values
+////// GuiMods — DarkMode
 	property string valueColor: !darkMode ? "#333333" : "#fdfdfd"
 	property int valueHorizontalAlignment: Text.AlignRight
 	property string color2: !darkMode ? "#333333" : "#fdfdfd"

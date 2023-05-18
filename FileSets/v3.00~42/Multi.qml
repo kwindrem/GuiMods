@@ -17,6 +17,7 @@ MbIcon {
 		height: multi.height
         radius: 3
         color: "#000000"
+////// GuiMods — DarkMode
         opacity: !darkMode ? 0 : 0.35
     }
 
@@ -81,6 +82,7 @@ MbIcon {
 			top: multi.top; topMargin: 8
 		}
 		horizontalAlignment: Text.AlignHCenter
+////// GuiMods — DarkMode
         color: !darkMode ? "white" : "#e1e1e1"
 		font {pixelSize: 16; bold: true}
 		text: vebusState.text

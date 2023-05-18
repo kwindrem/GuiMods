@@ -244,9 +244,11 @@ MbItem {
 
 		MbBackgroundRect {
 			id: greytag
+////// GuiMods — DarkMode
 			color: !darkMode ? (editMode ? "#fff": "#ddd") : (editMode ? "#747474": "#4b4b4b")
 			width: ti.width + 2 * style.marginDefault
 			height: ti.height + 6
+////// GuiMods — DarkMode
 			border.color: !darkMode ? "#ddd" : "#4b4b4b"
 			border.width: editMode ? 1 : 0
 			anchors.centerIn: ti
@@ -277,6 +279,7 @@ MbItem {
 				topMargin: (defaultHeight - height) / 2
 			}
 
+////// GuiMods — DarkMode
 			color: !darkMode ? "#000000" : "#fdfdfd"
 
 			text: editMode ? _editText : item.text

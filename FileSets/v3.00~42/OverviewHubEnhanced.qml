@@ -188,6 +188,7 @@ OverviewPage {
 
 	OverviewBox {
 		id: acInBox
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#E74c3c" : "#73261E"
 		color: !darkMode ? "#C0392B" : "#601C15"
 		opacity: showAcInput ? 1 : disabledTileOpacity
@@ -377,6 +378,7 @@ OverviewPage {
 		visible: showAcLoads || showInactiveTiles
 		opacity: showAcLoads ? 1 : disabledTileOpacity
 		title: qsTr("AC Loads")
+////// GuiMods — DarkMode
 		color: !darkMode ? "#27AE60" : "#135730"
 		titleColor: !darkMode ? "#2ECC71" : "#176638"
 		width: 148
@@ -533,6 +535,7 @@ OverviewPage {
 	OverviewBox {
 		id: pvChargerBox
 		title: qsTr("PV Charger")
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 		color: !darkMode ? "#F39C12" : "#794E09"
 		visible: hasDcSolar || showInactiveTiles
@@ -857,6 +860,7 @@ OverviewPage {
 	OverviewBox {
 		id: pvInverter
 		title: qsTr("PV Inverter")
+////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 		color: !darkMode ? "#F39C12" : "#794E09"
 		visible: hasAcSolar || showInactiveTiles
@@ -1353,6 +1357,7 @@ OverviewPage {
 		color: "white"
 		width: multi.width
 		height: 32
+////// GuiMods — DarkMode
 		opacity: !darkMode ? 0.7 : 0.85
 		anchors
 		{
