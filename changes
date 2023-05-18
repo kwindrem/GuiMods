@@ -1,3 +1,6 @@
+v7.50:
+	bad merge of alternator temperature missing
+
 v7.49:
 	add support for v3.00~42 (includes generator on AC 2)
 

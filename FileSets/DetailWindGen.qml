@@ -140,7 +140,7 @@ MbPage
 			root.tempServiceName = service.name
         	// just wind gen
 			if (monitorMode.valid && monitorMode.value == -8) 
-				dcModel.append ( {serviceName: service.name, serviceType: service.type } )
+				dcModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
             break;;
         }
     }
