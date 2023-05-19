@@ -8,7 +8,18 @@ import "enhancedFormat.js" as EnhFmt
 Row {
 	id: root
 
+//	parameters passed in .append:
+//		serviceName
+//		serviceType
+//		instance
+
+//	instance is a zero-based number indicitng the main (0)
+//		or sub-unit (1, etc)
+//	each instance is appended separately and the row content
+//		is differnet for instance 0 than for other instances
+
 	property bool isBattery: false
+	property bool isMotorDrive: false
 	property string direction: ""
 	property bool useMonitorMode: false
 	property bool positivePowerIsConsuming: false
@@ -26,14 +37,7 @@ Row {
     property int rpmColumnWidth: 0
     property int outputColumnWidth: 0
 
-	// instance allows multiple outputs or subunits to be displayed separately
-	// instance is normally 0 for subunits attached to the system battery
-	// other instances are not included in system totals by systemcalc
-    property int realInstance: 0
-
 	property string speedParam: "/Speed"
-	property string temperatureParam: "/Dc/" + realInstance + "/Temperature"
-
 
     Component.onCompleted:
     {
@@ -60,12 +64,8 @@ Row {
 		{
 			positivePowerIsConsuming = true
 			speedParam = "/Motor/RPM"
-			temperatureParam = "/Motor/Temperature"
+			isMotorDrive = true
 		}
-		if (instance !== undefined)
-			realInstance = instance
-		else
-			realInstance = 0
 	}
 
 
@@ -74,10 +74,10 @@ Row {
 
     VBusItem { id: customNameItem; bind: Utils.path(serviceName, "/CustomName") }
     VBusItem { id: productNameItem; bind: Utils.path(serviceName, "/ProductName") }
-	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Power") }
-	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Voltage") }
-	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/", realInstance, "/Current") }
-	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, temperatureParam) }
+	VBusItem { id: dbusPowerItem; bind: Utils.path (serviceName, "/Dc/", instance, "/Power") }
+	VBusItem { id: dbusVoltageItem; bind: Utils.path (serviceName, "/Dc/", instance, "/Voltage") }
+	VBusItem { id: dbusCurrentItem; bind: Utils.path (serviceName, "/Dc/", instance, "/Current") }
+	VBusItem { id: dbusTemperatureItem; bind: Utils.path (serviceName, isMotorDrive ? "/Motor/Temperature" : "/Dc/" + instance + "/Temperature") }
 	VBusItem { id: stateItem; bind: Utils.path (serviceName, "/State") }
 	VBusItem { id: rpmItem; bind: Utils.path (serviceName, speedParam) }
 
@@ -106,7 +106,7 @@ Row {
         height: parent.height
         text:
         {
-			if (realInstance > 0) // show only for first instance
+			if (instance > 0) // show only for first instance
 				return ""
             else if (customNameItem.valid && customNameItem.value != "")
 				return customNameItem.value
@@ -130,7 +130,7 @@ Row {
 		id: device
         width: deviceColumnWidth
         height: parent.height
-		text: realInstance == 0 ? formatDeviceType () : " " // show only for first instance
+		text: instance == 0 ? formatDeviceType () : " " // show only for first instance
         fontSize: 12
         textColor: "black"
         bold: true
@@ -144,11 +144,11 @@ Row {
     }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: directionColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: realInstance == 0 ? formatDirection () : " " // show only for first instance
+            text: instance == 0 ? formatDirection () : " " // show only for first instance
             visible: directionColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: outputColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: (root.realInstance + 1).toString()
+            text: (root.instance + 1).toString()
             visible: outputColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
@@ -184,7 +184,7 @@ Row {
         id: state
         width: stateColumnWidth
         height: parent.height
-        text: realInstance == 0 ? formatState () : "" // show state only for first instance
+        text: instance == 0 ? formatState () : "" // show state only for first instance
         fontSize: 12
         textColor: "black"
         bold: true
@@ -200,7 +200,7 @@ Row {
             width: temperatureColumnWidth; horizontalAlignment: Text.AlignHCenter
             text:
             {
-				if (! dbusTemperatureItem.valid || realInstance == 0) // show only for first instance
+				if (! dbusTemperatureItem.valid || instance == 0) // show only for first instance
 					return ""
                 else if (tempScale == 2)
                     return ((dbusTemperatureItem.value * 9 / 5) + 32).toFixed (1) + " °F"
@@ -212,7 +212,7 @@ Row {
 
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: rpmColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: rpmItem.valid && realInstance == 0 ? rpmItem.value : "" // show rpm only for first instance
+            text: rpmItem.valid && instance == 0 ? rpmItem.value : "" // show rpm only for first instance
             visible: rpmColumnWidth > 0 }
 
 
