@@ -134,7 +134,7 @@ MbPage
         switch (service.type)
         {
         case DBusService.DBUS_SERVICE_ALTERNATOR:
-			dcModel.append ( {serviceName: service.name, serviceType: service.type } )
+			dcModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
             break;;
         }
     }

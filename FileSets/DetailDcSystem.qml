@@ -267,18 +267,18 @@ MbPage
 		case DBusService.DBUS_SERVICE_BATTERY:
 			// skip THE system battery
 			if (! systemBatteryItem.valid || service.name != systemBatteryItem.value)
-				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+				otherModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
             break;;
 
 		case DBusService.DBUS_SERVICE_MULTI:
 			// skip THE main Multi
 			if (! systemMultiItem.valid || service.name != systemMultiItem.value)
-				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+				otherModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
             break;;
 		case DBusService.DBUS_SERVICE_INVERTER:
 			// skip the main Multi
 			if (! systemMultiItem.valid || service.name != systemMultiItem.value)
-				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+				otherModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
 			numberOfInverters++
             break;;
 
@@ -286,21 +286,21 @@ MbPage
 		case DBusService.DBUS_SERVICE_AC_CHARGER:
         case DBusService.DBUS_SERVICE_FUELCELL:
         case DBusService.DBUS_SERVICE_MOTOR_DRIVE:
-			otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+			otherModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
 			break;;
 
         case DBusService.DBUS_SERVICE_DCSYSTEM:
-			systemModel.append ( {serviceName: service.name, serviceType: service.type } )
+			systemModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
             break;;
 
         case DBusService.DBUS_SERVICE_DCSOURCE:
 			root.tempServiceName = service.name
 			// wind generator shown on DC and AC coupled overviews
 			if (monitorMode != -8 )
-				otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+				otherModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
 			break;
         case DBusService.DBUS_SERVICE_DCLOAD:
-			otherModel.append ( {serviceName: service.name, serviceType: service.type } )
+			otherModel.append ( {serviceName: service.name, serviceType: service.type, instance: 0 } )
             break;;
         }
     }
