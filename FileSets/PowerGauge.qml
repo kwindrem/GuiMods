@@ -8,6 +8,10 @@ import com.victron.velib 1.0
 Item {
 	id: root
 
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
     property variant connection
 
     property bool reversePower: false
@@ -51,7 +55,7 @@ Item {
     property real bar1offset
     property real bar2offset
     property real bar3offset
-    
+
     property color bar1color: "black"
     property color bar2color: "black"
     property color bar3color: "black"
@@ -79,13 +83,13 @@ Item {
         visible: showLeftLabel
     }
     // right end label
- 	Rectangle
+    Rectangle
 	{
 		anchors.fill: rightLabelText
 		color: endLabelBackgroundColor
         visible: showRightLabel
 	}
-   TileText
+    TileText
     {
 		id: rightLabelText
         text: "C"
@@ -106,7 +110,8 @@ Item {
         width: showGauge ? scaleFactor * (maxReverseDisplayed - maxReverseLimit) : 0
         height: root.height
         clip: true
-        color: "#ffb3b3"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -121,7 +126,8 @@ Item {
         width: showGauge ? scaleFactor * (maxForwardLimit + maxReverseLimit) : 0
         height: root.height
         clip: true
-        color: "#99ff99"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
         {
@@ -136,7 +142,8 @@ Item {
         width: showGauge ? scaleFactor * (maxForwardDisplayed - maxForwardLimit) : 0
         height: root.height
         clip: true
-        color: "#ffb3b3"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -281,8 +288,10 @@ Item {
     function getBarColor (currentValue)
     {
         if (currentValue > maxForwardLimit || currentValue < -maxReverseLimit)
-            return "red"
+////// GuiMods — DarkMode
+            return !darkMode ? "#ff0000" : "#bf0000"
         else
-            return "green"
+////// GuiMods — DarkMode
+            return !darkMode ? "#008000" : "#006000"
     }
 }

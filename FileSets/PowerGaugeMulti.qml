@@ -8,6 +8,10 @@ import com.victron.velib 1.0
 Item {
 	id: root
 
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
     property string inverterService: ""
     property VBusItem inverterModeItem: VBusItem { bind: Utils.path(inverterService, "/Mode" ) }
     VBusItem
@@ -17,37 +21,37 @@ Item {
     }
 
     VBusItem
-    { 
+    {
         id: pInL1; bind: Utils.path(inverterService, "/Ac/ActiveIn/L1/P")
         onValidChanged: calculateBar1 ()
         onValueChanged: calculateBar1 ()
     }
     VBusItem
-    { 
+    {
         id: pInL2; bind: Utils.path(inverterService, "/Ac/ActiveIn/L2/P")
         onValidChanged: calculateBar2 ()
         onValueChanged: calculateBar2 ()
     }
     VBusItem
-    { 
+    {
         id: pInL3; bind: Utils.path(inverterService, "/Ac/ActiveIn/L3/P")
         onValidChanged: calculateBar3 ()
         onValueChanged: calculateBar3 ()
     }
     VBusItem
-    { 
+    {
         id: pOutL1; bind: Utils.path(inverterService, "/Ac/Out/L1/P")
         onValidChanged: calculateBar1 ()
         onValueChanged: calculateBar1 ()
     }
     VBusItem
-    { 
+    {
         id: pOutL2; bind: Utils.path(inverterService, "/Ac/Out/L2/P")
         onValidChanged: calculateBar2 ()
         onValueChanged: calculateBar2 ()
     }
     VBusItem
-    { 
+    {
         id: pOutL3; bind: Utils.path(inverterService, "/Ac/Out/L3/P")
         onValidChanged: calculateBar3 ()
         onValueChanged: calculateBar3 ()
@@ -133,7 +137,8 @@ Item {
         width: visible ? (maxChargerDisplayed - chargerMaxPower) * scaleFactor : 0
         height: root.height
         clip: true
-        color: "#ffb3b3"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -148,7 +153,8 @@ Item {
         width: visible ? (inverterCaution + chargerMaxPower) * scaleFactor : 0
         height: root.height
         clip: true
-        color: "#99ff99"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#99ff99" : "#73bf73"
         visible: showGauge
         anchors
         {
@@ -163,7 +169,8 @@ Item {
         width: visible ? (inverterOverload - inverterCaution) * scaleFactor : 0
         height: root.height
         clip: true
-        color: "#bbbb00"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#bbbb00" : "#8c8c00"
         visible: showGauge
         anchors
         {
@@ -178,7 +185,8 @@ Item {
         width: visible ? (maxInverterDisplayed - inverterOverload) * scaleFactor : 0
         height: root.height
         clip: true
-        color: "#ffb3b3"
+////// GuiMods — DarkMode
+        color: !darkMode ? "#ffb3b3" : "#bf8686"
         visible: showGauge
         anchors
         {
@@ -331,11 +339,14 @@ Item {
     function getBarColor (power)
     {
         if (power > inverterOverload || power < -chargerMaxPower)
-            return "red"
+////// GuiMods — DarkMode
+            return !darkMode ? "#ff0000" : "#bf0000"
         else if (power > inverterCaution)
-            return "yellow"
+////// GuiMods — DarkMode
+            return !darkMode ? "#ffff00" : "#bfbf00"
         else
-            return "green"
+////// GuiMods — DarkMode
+            return !darkMode ? "#008000" : "#006000"
     }
 
 	function calculateAllBars ()

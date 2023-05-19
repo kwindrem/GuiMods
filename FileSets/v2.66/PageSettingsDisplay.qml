@@ -53,6 +53,15 @@ MbPage {
 			]
 		}
 
+////// GuiMods — DarkMode
+		MbSwitch
+		{
+			id: enableDarkMode
+			bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
+			name: qsTr ("Dark Mode")
+			writeAccessLevel: User.AccessUser
+		}
+
 		MbSwitch {
 			bind: Utils.path(bindPrefix, "/MobileOverview")
 			name: qsTr("Show boat & motorhome overview")

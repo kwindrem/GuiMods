@@ -17,6 +17,7 @@ MbPage {
 
 	model: VisibleItemModel
     {
+
         MbSwitch
         {
             id: showTileOverview
@@ -238,7 +239,7 @@ MbPage {
             ]
             writeAccessLevel: User.AccessUser
         }
-        
+
         MbSpinBox {
             description: qsTr ("Watt / Kilowatt threshold")
 			item

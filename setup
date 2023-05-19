@@ -16,7 +16,7 @@ qmlDir=/opt/victronenergy/gui/qml
 
 #### following lines incorporate SetupHelper utilities into this script
 # Refer to the SetupHelper ReadMe file for details.
-    
+
 source "/data/SetupHelper/CommonResources"
 
 #### end of lines to include SetupHelper
@@ -75,77 +75,80 @@ if [ $scriptAction == 'INSTALL' ] ; then
     # create dbus Settings if they haven't been set previously
     # if one setting exists, assume they are all there
     # NOTE: if new settings are added in the future, change test for that one
-    # to avoid creating that new parameter !!!!
-    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ReplaceInactiveAcIn \
+    # to avoid NOT creating that new parameter !!!!
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/DarkMode \
                 com.victronenergy.BusItem.GetValue &> /dev/null
     if (( $? != 0 )); then
         logMessage "creating GuiMods Settings"
-        dbus -y com.victronenergy.settings /Settings AddSettings\
-            '%[{"path": "/GuiMods/GaugeLimits/PeakPower", "default":0.0},\
-            {"path":"/GuiMods/GaugeLimits/CautionPower", "default":0.0},\
-            {"path":"/GuiMods/GaugeLimits/ContiuousPower", "default":0.0},\
-            {"path":"/GuiMods/GaugeLimits/AcOutputMaxPower", "default":0.0},\
-            {"path":"/GuiMods/GaugeLimits/PvChargerMaxPower", "default":0.0},\
-            {"path":"/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":0.0},\
-            {"path":"/GuiMods/AcCurrentLimit/Preset1", "default":10},\
-            {"path":"/GuiMods/AcCurrentLimit/Preset2", "default":20},\
-            {"path":"/GuiMods/AcCurrentLimit/Preset3", "default":30},\
-            {"path":"/GuiMods/AcCurrentLimit/Preset4", "default":50},\
-            {"path":"/GuiMods/TemperatureScale", "default":1},\
-            {"path":"/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/UseEnhancedMobileOverview", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/UseEnhancedFlowOverview", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/ShowEnhancedFlowLoadsOnInput", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/EnhancedFlowCombineLoads", "default":0, "min":0, "max":1},\
-            {"path":"/GuiMods/ShowGauges", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/ShowTileOverview", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/MoveSettings", "default":1, "min":0, "max":1},\
-            {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}, \
-            {"path":"/GuiMods/ShowInactiveFlowTiles", "default":0}, \
-            {"path":"/GuiMods/ShowTanksTempsDigIn", "default":0, "min":0, "max":1}, \
-            {"path":"/GuiMods/FlowOverview", "default":1, "min":0, "max":3}, \
-			{"path":"/GuiMods/CustomDcSystemName", "default":""}, \
-            {"path":"/GuiMods/TimeFormat", "default":1}, \
-            {"path": "/Relay/0/CustomName", "default":""},\
-            {"path": "/Relay/0/Show", "default":1, "min":0, "max":1},\
-            {"path": "/Relay/1/CustomName", "default":""},\
-            {"path": "/Relay/1/Show", "default":1, "min":0, "max":1},\
-            {"path": "/Relay/2/CustomName", "default":""},\
-            {"path": "/Relay/2/Show", "default":1, "min":0, "max":1},\
-            {"path": "/Relay/3/CustomName", "default":""},\
-            {"path": "/Relay/3/Show", "default":1, "min":0, "max":1},\
-            {"path": "/Relay/4/CustomName", "default":""},\
-            {"path": "/Relay/4/Show", "default":1, "min":0, "max":1},\
-            {"path": "/Relay/5/CustomName", "default":""},\
-            {"path": "/Relay/5/Show", "default":1, "min":0, "max":1}, \
-            {"path":"/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/PvOnGridMaxPower", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/PvOnOutputMaxPower", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/MaxChargerPower", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/MaxFeedInPower", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/DcSystemMaxLoad", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/DcSystemMaxCharge", "default":0.0}, \
-            {"path":"/GuiMods/GaugeLimits/MaxAlternatorPower", "default":0.0}, \
-			{"path":"/GuiMods/GaugeLimits/MaxWindGenPower", "default":0.0}, \
-			{"path":"/GuiMods/GaugeLimits/MaxAcChargerPower", "default":0.0}, \
-			{"path":"/GuiMods/UseEnhancedGeneratorOverview", "default":1.0}, \
-			{"path":"/GuiMods/GaugeLimits/MaxFuelCellPower", "default":0.0}, \
-			{"path":"/GuiMods/ShowBatteryTempOnFlows", "default":1, "min":0, "max":1}, \
-			{"path":"/GuiMods/KilowattThreshold", "default":1000, "min":1000, "max":10000}, \
-			{"path":"/GuiMods/TankBarFormat", "default":0, "min":0, "max":2}, \
-			{"path":"/FischerPanda0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
-			{"path":"/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
-			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveCharge", "default":0.0}, \
-			{"path":"/GuiMods/GaugeLimits/MaxMotorDriveLoad", "default":0.0}, \
-			{"path":"/GuiMods/ReplaceInactiveAcIn", "default":0, "min":0, "max":1} ]' > /dev/null
+        dbus -y com.victronenergy.settings /Settings AddSettings \
+            '%[ \
+                {"path":"/GuiMods/GaugeLimits/PeakPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/CautionPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/ContiuousPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/AcOutputMaxPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/PvChargerMaxPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":0.0}, \
+                {"path":"/GuiMods/AcCurrentLimit/Preset1", "default":10}, \
+                {"path":"/GuiMods/AcCurrentLimit/Preset2", "default":20}, \
+                {"path":"/GuiMods/AcCurrentLimit/Preset3", "default":30}, \
+                {"path":"/GuiMods/AcCurrentLimit/Preset4", "default":50}, \
+                {"path":"/GuiMods/TemperatureScale", "default":1}, \
+                {"path":"/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/UseEnhancedMobileOverview", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/UseEnhancedFlowOverview", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowEnhancedFlowLoadsOnInput", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/EnhancedFlowCombineLoads", "default":0, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowGauges", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowTileOverview", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/MoveSettings", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/ShowInactiveFlowTiles", "default":0}, \
+                {"path":"/GuiMods/ShowTanksTempsDigIn", "default":0, "min":0, "max":1}, \
+                {"path":"/GuiMods/FlowOverview", "default":1, "min":0, "max":3}, \
+                {"path":"/GuiMods/CustomDcSystemName", "default":""}, \
+                {"path":"/GuiMods/TimeFormat", "default":1}, \
+                {"path":"/Relay/0/CustomName", "default":""}, \
+                {"path":"/Relay/0/Show", "default":1, "min":0, "max":1}, \
+                {"path":"/Relay/1/CustomName", "default":""}, \
+                {"path":"/Relay/1/Show", "default":1, "min":0, "max":1}, \
+                {"path":"/Relay/2/CustomName", "default":""}, \
+                {"path":"/Relay/2/Show", "default":1, "min":0, "max":1}, \
+                {"path":"/Relay/3/CustomName", "default":""}, \
+                {"path":"/Relay/3/Show", "default":1, "min":0, "max":1}, \
+                {"path":"/Relay/4/CustomName", "default":""}, \
+                {"path":"/Relay/4/Show", "default":1, "min":0, "max":1}, \
+                {"path":"/Relay/5/CustomName", "default":""}, \
+                {"path":"/Relay/5/Show", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/PvOnGridMaxPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/PvOnOutputMaxPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxChargerPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxFeedInPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/DcSystemMaxLoad", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/DcSystemMaxCharge", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxAlternatorPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxWindGenPower", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxAcChargerPower", "default":0.0}, \
+                {"path":"/GuiMods/UseEnhancedGeneratorOverview", "default":1.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxFuelCellPower", "default":0.0}, \
+                {"path":"/GuiMods/ShowBatteryTempOnFlows", "default":1, "min":0, "max":1}, \
+                {"path":"/GuiMods/KilowattThreshold", "default":1000, "min":1000, "max":10000}, \
+                {"path":"/GuiMods/TankBarFormat", "default":0, "min":0, "max":2}, \
+                {"path":"/FischerPanda0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
+                {"path":"/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000}, \
+                {"path":"/GuiMods/GaugeLimits/MaxMotorDriveCharge", "default":0.0}, \
+                {"path":"/GuiMods/GaugeLimits/MaxMotorDriveLoad", "default":0.0}, \
+                {"path":"/GuiMods/ReplaceInactiveAcIn", "default":0, "min":0, "max":1}, \
+                {"path":"/GuiMods/DarkMode", "default":0, "min":0, "max":1} \
+            ]' > /dev/null
     fi
 
-    temp=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowInactiveFlowTiles\
+    temp=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/ShowInactiveFlowTiles \
                 com.victronenergy.BusItem.GetMax)
-	temp=$(echo $temp| awk '{print $3}')
+	temp=$(echo $temp | awk '{print $3}')
 	if (( $temp != 0)); then
 		removeDbusSettings "GuiMods/ShowInactiveFlowTiles"
 		logMessage "creating ShowInactiveFlowTiles without limits"
@@ -162,7 +165,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
                 || [ -f "$setupOptionsDir/hideTileOverview" ] \
                 || [ -f "$setupOptionsDir/enhancedFlow" ]; then
             logMessage "moving setup options to GuiMods2 Settings"
-            
+
             if [ -f "$setupOptionsDir/useEnhancedOverview" ]; then
                 setSetting 1 /Settings/GuiMods/UseEnhancedMobileOverview
             else
@@ -187,7 +190,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
                     setSetting acCurrentLimitPreset2 /Settings/GuiMods/AcCurrentLimit/Preset2
                     setSetting acCurrentLimitPreset3 /Settings/GuiMods/AcCurrentLimit/Preset3
                     setSetting acCurrentLimitPreset4 /Settings/GuiMods/AcCurrentLimit/Preset4
-                else 
+                else
                     moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset1
                     moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset2
                     moveSetting "" /Settings/InverterLimits/AcCurrentLimit/Preset1 /Settings/GuiMods/AcCurrentLimit/Preset3
@@ -195,19 +198,19 @@ if [ $scriptAction == 'INSTALL' ] ; then
                 fi
 
                 # copy DVCC max battery charge current to gauge Settings if gauge setting is 0
-                maxCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent\
+                maxCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent \
                     com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
-                dvccCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/SystemSetup/MaxChargeCurrent\
+                dvccCharge=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings /Settings/SystemSetup/MaxChargeCurrent \
                     com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
                 if [ ! -z $maxCharge ] && [ $maxCharge == 0 ] && [ ! -z $dvccCharge ]; then
                         dbus -y com.victronenergy.settings /Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent SetValue $dvccCharge > /dev/null
                 fi
-            
+
             else
                 dbus -y com.victronenergy.settings /Settings/GuiMods/UseEnhancedFlowOverview SetValue 0 > /dev/null
             fi
- 
-             # remove unused setup options (now in Settings)
+
+            # remove unused setup options (now in Settings)
             rm -f "$setupOptionsDir/useEnhancedOverview"
             rm -f "$setupOptionsDir/enhancedFlow"
             rm -f "$setupOptionsDir/hideTileOverview"
@@ -223,23 +226,23 @@ if [ $scriptAction == 'INSTALL' ] ; then
             rm -f "$setupOptionsDir/temperatureScale"
             rm -f "$setupOptionsDir/acCurrentLimitPresets"
 
-             # remove old Settings
-            removeDbusSettings  "InverterLimits/PeakPower", "InverterLimits/ContiuousPower",\
-                                "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit",\
-                                "SystemSetup/MaxDischargeCurrent",\
-                                "InverterLimits/AcCurrentLimit/Preset1", "InverterLimits/AcCurrentLimit/Preset2",\
-                                "InverterLimits/AcCurrentLimit/Preset3", "InverterLimits/AcCurrentLimit/Preset4",\
+            # remove old Settings
+            removeDbusSettings  "InverterLimits/PeakPower", "InverterLimits/ContiuousPower", \
+                                "InverterLimits/CautionPower", "InverterLimits/OutputPowerLimit", \
+                                "SystemSetup/MaxDischargeCurrent", \
+                                "InverterLimits/AcCurrentLimit/Preset1", "InverterLimits/AcCurrentLimit/Preset2", \
+                                "InverterLimits/AcCurrentLimit/Preset3", "InverterLimits/AcCurrentLimit/Preset4", \
                                 "PvCharger/MaxPower"
 
         fi
     fi
-    
+
     # GuiMods2 was just uninstalled, so switch to the grid parallel overview so user sees same screen as with GuiMods2
     if $activateGridParallelOverview ; then
         logMessage "GuiMods is replacing GuiMods2 - enable grid paraellel overview in GuiMods"
         setSetting 1 "/Settings/GuiMods/UseEnhancedGridParallelFlowOverview"
     fi
-    
+
     # remove GuiMods2 from packageList - if it's reistalled, it will ba added back
     # but we want to skip any checks for GuiMods including from packageInstaller
     if [ -f "$packageListFile" ] && [ $(grep -c "GuiMods2" "$packageListFile") != 0 ]; then
@@ -315,6 +318,30 @@ if [ $scriptAction == 'INSTALL' ] ; then
     fi
     updateActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
     updateActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
+
+    # only used for darkmode | start
+    # can be removed, when Victron launches new UI with darkmode
+    updateActiveFile "$qmlDir/Battery.qml"
+    updateActiveFile "$qmlDir/MbEditBox.qml"
+    updateActiveFile "$qmlDir/MbEditBoxDateTime.qml"
+    updateActiveFile "$qmlDir/MbItem.qml"
+    updateActiveFile "$qmlDir/MbSpinBox.qml"
+    updateActiveFile "$qmlDir/MbStyle.qml"
+    updateActiveFile "$qmlDir/MbSubMenu.qml"
+    updateActiveFile "$qmlDir/Multi.qml"
+    updateActiveFile "$qmlDir/OverviewBox.qml"
+    updateActiveFile "$qmlDir/OverviewConnection.qml"
+    updateActiveFile "$qmlDir/OverviewConnectionEnd.qml"
+    updateActiveFile "$qmlDir/OverviewGridParallel.qml"
+    updateActiveFile "$qmlDir/OverviewHub.qml"
+    updateActiveFile "$qmlDir/OverviewSolarCharger.qml"
+    updateActiveFile "$qmlDir/OverviewSolarInverter.qml"
+    updateActiveFile "$qmlDir/OverviewTankDelegate.qml"
+    updateActiveFile "$qmlDir/OverviewTanks.qml"
+    updateActiveFile "$qmlDir/Tile.qml"
+    updateActiveFile "$qmlDir/TileText.qml"
+    updateActiveFile "/var/www/venus/styling/styles.css"
+    # only used for darkmode | end
 
 	# revert to VisualItemModel if before v3.00~14 (v3.00~14 uses VisibleItemModel)
 	versionStringToNumber "v3.00~14"
@@ -406,6 +433,30 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
 	restoreActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
 	restoreActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
     logMessage "++ setup: Uninstalled GeneratorConnector"
+
+    # only used for darkmode | start
+    # can be removed, when Victron launches new UI with darkmode
+    restoreActiveFile "$qmlDir/Battery.qml"
+    restoreActiveFile "$qmlDir/MbEditBox.qml"
+    restoreActiveFile "$qmlDir/MbEditBoxDateTime.qml"
+    restoreActiveFile "$qmlDir/MbItem.qml"
+    restoreActiveFile "$qmlDir/MbSpinBox.qml"
+    restoreActiveFile "$qmlDir/MbStyle.qml"
+    restoreActiveFile "$qmlDir/MbSubMenu.qml"
+    restoreActiveFile "$qmlDir/Multi.qml"
+    restoreActiveFile "$qmlDir/OverviewBox.qml"
+    restoreActiveFile "$qmlDir/OverviewConnection.qml"
+    restoreActiveFile "$qmlDir/OverviewConnectionEnd.qml"
+    restoreActiveFile "$qmlDir/OverviewGridParallel.qml"
+    restoreActiveFile "$qmlDir/OverviewHub.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarCharger.qml"
+    restoreActiveFile "$qmlDir/OverviewSolarInverter.qml"
+    restoreActiveFile "$qmlDir/OverviewTankDelegate.qml"
+    restoreActiveFile "$qmlDir/OverviewTanks.qml"
+    restoreActiveFile "$qmlDir/Tile.qml"
+    restoreActiveFile "$qmlDir/TileText.qml"
+    restoreActiveFile "/var/www/venus/styling/styles.css"
+    # only used for darkmode | end
 
     logMessage "++ $packageName uninstalled"
 fi

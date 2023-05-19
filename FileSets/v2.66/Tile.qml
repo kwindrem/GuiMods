@@ -5,9 +5,14 @@ import QtQuick 1.1
 Rectangle {
 	id: root
 
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
 	color: "#009ec6"
 	border.width: 2
-	border.color: "#fff"
+////// GuiMods — DarkMode
+	border.color: !darkMode ? "#fff" : "#202020"
 	clip: true
 
 	property string title
@@ -23,7 +28,8 @@ Rectangle {
 		id: titleField
 		font.pixelSize: 13
 		text: title
-		color: "white"
+////// GuiMods — DarkMode
+		color: !darkMode ? "white" : "#ddd"
 		height: text === "" ? 0 : paintedHeight
 		anchors {
 			top: parent.top; topMargin: 5
@@ -36,7 +42,8 @@ Rectangle {
 		width: parent.width - 10
 		height: 1
 		visible: title !== ""
-		color: "white"
+////// GuiMods — DarkMode
+		color: !darkMode ? "white" : "#ddd"
 		anchors {
 			top: titleField.bottom
 			left: titleField.left
