@@ -50,6 +50,13 @@ MbPage
 	property bool showChargeDischargeLimits: chargeLimitItem.valid || dischargeLimitItem.valid
 	property bool chargeDisabled: chargeLimitItem.valid && chargeLimitItem.value == 0
 	property bool dischargeDisabled: dischargeLimitItem.valid && dischargeLimitItem.value == 0
+	VBusItem { id: auxVoltageItem; bind: Utils.path(batteryService, "/Dc/1/Voltage") }
+	VBusItem { id: temperatureItem; bind: Utils.path(batteryService, "/Dc/0/Temperature") }
+	// use system temperature scale if it exists (v2.90 onward) - otherwise use the GuiMods version
+    property VBusItem systemScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/System/Units/Temperature" }
+    property VBusItem guiModsTempScaleItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/TemperatureScale" }
+    property int tempScale: systemScaleItem.valid ? systemScaleItem.value == "fahrenheit" ? 2 : 1 : guiModsTempScaleItem.valid ? guiModsTempScaleItem.value : 1
+
 
     // background
     Rectangle
@@ -165,6 +172,30 @@ MbPage
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: sys.battery.power.value < 0 ? qsTr ("supplying") : sys.battery.power.value > 0 ? qsTr ("consuming") : "" }
         }
+        Row
+        {
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Aux Voltage")}
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+					text: EnhFmt.formatVBusItem (auxVoltageItem, "V") }
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: rowTitleWidth; horizontalAlignment: Text.AlignRight
+                    text: qsTr ("Temperature")}
+            Text { font.pixelSize: 12; font.bold: true; color: "black"
+                    width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
+				text:
+				{
+					if (! temperatureItem.valid )
+						return ""
+					else if (tempScale == 2)
+						return ((temperatureItem.value * 9 / 5) + 32).toFixed (1) + " °F"
+					else
+						return temperatureItem.value.toFixed (1) + " °C"
+				}
+			}
+		}
         Row
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"

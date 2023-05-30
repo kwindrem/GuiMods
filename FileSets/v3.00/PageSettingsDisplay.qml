@@ -1,4 +1,5 @@
 //////// modified to add GuiMods controls
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -7,7 +8,7 @@ MbPage {
 	id: root
 	property string bindPrefix: "com.victronenergy.settings/Settings/Gui"
 
-	model: VisualItemModel {
+	model: VisibleItemModel {
 		MbSwitch {
 			id: autoBrightness
 			name: qsTr("Adaptive brightness")
@@ -56,8 +57,8 @@ MbPage {
 ////// GuiMods — DarkMode
 		MbSwitch
 		{
-			id: enableDarkMode
-			bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
+			id: colorScheme
+			bind: "com.victronenergy.settings/Settings/Gui/ColorScheme"
 			name: qsTr ("Dark Mode")
 			writeAccessLevel: User.AccessUser
 		}
@@ -68,6 +69,11 @@ MbPage {
 			// When enabled set OverviewMobile as default overview
 			onClicked: if (checked) defaultOverview.setValue("OverviewMobile")
 			VBusItem { id: defaultOverview; bind: "com.victronenergy.settings/Settings/Gui/DefaultOverview" }
+		}
+
+		MbSwitch {
+			bind: Utils.path(bindPrefix, "/TanksOverview")
+			name: qsTr("Show tanks overview")
 		}
 
 //////// add Gui Mods menu
@@ -84,21 +90,34 @@ MbPage {
 			description: qsTr("Language")
 			writeAccessLevel: User.AccessUser
 			bind: Utils.path(bindPrefix, "/Language")
+			// NOTE: do make sure application.cpp returns the correct fontForLanguage.
+			// The current font might not be able to display these values / the default
+			// font might not be contain the characters required for the selected language.
 			possibleValues: [
-				MbOption { description: "English"; value: "en" },
-				MbOption { description: "Čeština"; value: "cs" },
-				MbOption { description: "Deutsch"; value: "de" },
-				MbOption { description: "Español"; value: "es" },
-				MbOption { description: "Français"; value: "fr" },
-				MbOption { description: "Italiano"; value: "it" },
-				MbOption { description: "Nederlands"; value: "nl" },
-				MbOption { description: "Русский"; value: "ru" },
-				MbOption { description: "Română"; value: "ro" },
-				MbOption { description: "Svenska"; value: "se" },
-				MbOption { description: "Türkçe"; value: "tr" },
-				MbOption { description: "中文"; value: "zh" },
-				MbOption { description: "العربية"; value: "ar" }
+				MbOptionLang { description: "English"; value: "en" },
+				MbOptionLang { description: "Čeština"; value: "cs" },
+				MbOptionLang { description: "Dansk"; value: "da" },
+				MbOptionLang { description: "Deutsch"; value: "de" },
+				MbOptionLang { description: "Español"; value: "es" },
+				MbOptionLang { description: "Français"; value: "fr" },
+				MbOptionLang { description: "Italiano"; value: "it" },
+				MbOptionLang { description: "Nederlands"; value: "nl" },
+				MbOptionLang { description: "Русский"; value: "ru" },
+				MbOptionLang { description: "Română"; value: "ro" },
+				MbOptionLang { description: "Svenska"; value: "se" },
+				MbOptionLang { description: "Türkçe"; value: "tr" },
+				MbOptionLang { description: "中文"; value: "zh" },
+				MbOptionLang { description: "العربية"; value: "ar" }
 			]
+		}
+
+		MbSubMenu {
+			description: qsTr("Units")
+			subpage: Component {
+				PageSettingsDisplayUnits {
+					title: qsTr("Units")
+				}
+			}
 		}
 	}
 }

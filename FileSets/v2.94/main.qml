@@ -294,76 +294,111 @@ PageStackWindow {
 		id: mbTools
 		height: parent.height
 
-		Item {
-			anchors.verticalCenter: parent.verticalCenter
-			anchors.left: mbTools.left
-			height: mbTools.height
-			width: 200
+//// GuiMods - DarkMode
+		Row
+		{
+			spacing: 0
+			anchors.fill: parent
+			Item {
+				id: pagesItem
+				anchors.verticalCenter: parent.verticalCenter
+				height: mbTools.height
+				width: 170
 
-			MouseArea {
-				anchors.fill: parent
-				onClicked: {
-					if (pageStack.currentPage)
-						pageStack.currentPage.toolbarHandler.leftAction(true)
+				MouseArea {
+					anchors.fill: parent
+					onClicked: {
+						if (pageStack.currentPage)
+							pageStack.currentPage.toolbarHandler.leftAction(true)
+					}
+				}
+
+				Row {
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.horizontalCenter: parent.horizontalCenter
+
+					MbIcon {
+						anchors.verticalCenter: parent.verticalCenter
+						iconId: pageStack.currentPage ? pageStack.currentPage.leftIcon : ""
+					}
+
+					Text {
+						anchors.verticalCenter: parent.verticalCenter
+						text: pageStack.currentPage ? pageStack.currentPage.leftText : ""
+						color: "white"
+						font.bold: true
+						font.pixelSize: 16
+					}
 				}
 			}
 
-			Row {
-				anchors.centerIn: parent
+			Item {
+				anchors.verticalCenter: parent.verticalCenter
+				height: mbTools.height
+				width: mbTools.width - pagesItem.width - menusItem.width - centerScrollIndicator.width
 
-				MbIcon {
-					anchors.verticalCenter: parent.verticalCenter
-					iconId: pageStack.currentPage ? pageStack.currentPage.leftIcon : ""
+				MouseArea
+				{
+					anchors.fill: parent
+					onClicked:
+					{
+						if (darkModeItem.valid)
+							darkModeItem.setValue (! darkMode)
+					}
 				}
 
-				Text {
-					anchors.verticalCenter: parent.verticalCenter
-					text: pageStack.currentPage ? pageStack.currentPage.leftText : ""
+				Text
+				{
+					anchors.fill: parent
+					horizontalAlignment: Text.AlignHCenter
+					text: qsTr ("change to") + "\n" + (darkMode ? qsTr ("Light mode") : qsTr ("Dark mode"))
 					color: "white"
 					font.bold: true
-					font.pixelSize: 16
+					font.pixelSize: 12
+					visible: darkModeItem.valid
 				}
 			}
-		}
-
-		MbIcon {
-			id: centerScrollIndicator
-
-			anchors {
-				horizontalCenter: parent.horizontalCenter
-				verticalCenter: mbTools.verticalCenter
-			}
-			iconId: pageStack.currentPage ? pageStack.currentPage.scrollIndicator : ""
-		}
-
-		Item {
-			anchors.verticalCenter: parent.verticalCenter
-			height: mbTools.height
-			anchors.right: mbTools.right
-			width: 200
-
-			MouseArea {
-				anchors.fill: parent
-				onClicked: {
-					if (pageStack.currentPage)
-						pageStack.currentPage.toolbarHandler.rightAction(true)
-				}
-			}
-
-			Row {
-				anchors.centerIn: parent
-
+			Item
+			{
+				id: centerScrollIndicator
+				anchors.verticalCenter: parent.verticalCenter
+				height: mbTools.height
+				width: 20
 				MbIcon {
-					iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
 					anchors.verticalCenter: parent.verticalCenter
+					iconId: pageStack.currentPage ? pageStack.currentPage.scrollIndicator : ""
+				}
+			}
+
+			Item {
+				id: menusItem
+				anchors.verticalCenter: parent.verticalCenter
+				height: mbTools.height
+				width: pagesItem.width
+
+				MouseArea {
+					anchors.fill: parent
+					onClicked: {
+						if (pageStack.currentPage)
+							pageStack.currentPage.toolbarHandler.rightAction(true)
+					}
 				}
 
-				Text {
-					text: pageStack.currentPage ? pageStack.currentPage.rightText : ""
-					anchors.verticalCenter: parent.verticalCenter
-					color: "white"
-					font.bold: true
-					font.pixelSize: 16
+				Row {
+					anchors.centerIn: parent
+
+					MbIcon {
+						iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
+						anchors.verticalCenter: parent.verticalCenter
+					}
+
+					Text {
+						text: pageStack.currentPage ? pageStack.currentPage.rightText : ""
+						anchors.verticalCenter: parent.verticalCenter
+						color: "white"
+						font.bold: true
+						font.pixelSize: 16
+					}
 				}
 			}
 		}

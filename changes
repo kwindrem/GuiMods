@@ -1,9 +1,11 @@
-v7.51:
-	bad merge of alternator temperature missing	
-
-v7.50:
+v7.60:
 	add dark mode
-	bad merge of alternator temperature missing
+	add aux voltage and temperature to battery detail
+	removed file sets for older versions (first compatible now v2.73)
+	add v3.00 file set
+
+v7.50/v7.51:
+	bad merge of alternator temperature missing	
 
 v7.49:
 	add support for v3.00~42 (includes generator on AC 2)

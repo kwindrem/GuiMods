@@ -1,4 +1,6 @@
 Recent changes:
+	Added dark mode
+
 	Added support for generator warm-up and cool-down when using ExtTransferSwitch
 
 	Add generator AC input detection to running/stoped display and link to manual start
@@ -23,6 +25,11 @@ The following components have NOT been tested:
     Multi-phase(leg) systems
 
 This package provides the following modifications to the VenusOS GUI:
+	A "dark mode" for all overviews and menu pages
+		A toggle in the Display & Languages menu switches between light mode and dark mode
+		In addition, a touch area is available in the tool bar for the same switch.
+		Note that this can not be accessed via the CCGX hard buttons or those on the remote console.
+
 	A simple "flow" overview:
 		This overview provides the tiles for AC in and out, inverter, battery, Solar (PV) charger
 			and in some cases PV inverters.
