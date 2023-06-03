@@ -99,7 +99,7 @@ Item {
 		id: _tankName
 		text: service.description
 ////// GuiMods — DarkMode
-		color: !darkMode ? "#ffffff" : "#e1e1e1"
+		color: !darkMode ? "black" : "#e1e1e1"
 		width: parent.width + (parent.width < 50 ? 4 : 13)
 		horizontalAlignment: Text.AlignHCenter
 		wrapMode: Text.WrapAtWordBoundaryOrAnywhere

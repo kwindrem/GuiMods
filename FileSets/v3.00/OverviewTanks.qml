@@ -73,7 +73,7 @@ OverviewPage {
 			verticalAlignment: Text.AlignVCenter
 			scale: ListView.isCurrentItem ? 1.25 : 1
 ////// GuiMods — DarkMode
-			color: !darkMode ? "#ffffff" : "#e1e1e1"
+			color: !darkMode ? "black" : "#e1e1e1"
 
 			Behavior on scale {
 				NumberAnimation { duration: 150 }

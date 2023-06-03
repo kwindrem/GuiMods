@@ -596,7 +596,7 @@ class StartStop(object):
 		self._accumulateRunTime ()
 
 #### GuiMods
-		# A negative /ManualStartTimer is used by the GUI signal the generator should start now
+		# A negative /ManualStartTimer is used by the GUI to signal the generator should start now
 		#	but stop when all auto stop conditions have been met
 		# so we skip manual start evaluation if this is the case
 		#	and set a flag for use below to ignore auto start conditions

@@ -1,3 +1,6 @@
+v7.61:
+	fixed: tank names not showing in Tanks Overview in light mode
+
 v7.60:
 	add dark mode
 	add aux voltage and temperature to battery detail
