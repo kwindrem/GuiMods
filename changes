@@ -1,3 +1,6 @@
+v7.62:
+	add support for v3.10~2
+
 v7.61:
 	fixed: tank names not showing in Tanks Overview in light mode
 

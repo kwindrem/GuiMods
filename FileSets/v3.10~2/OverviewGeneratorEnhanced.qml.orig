@@ -93,6 +93,15 @@ MbPage {
 		}
 
 		MbItemValue {
+			description: qsTr("Time to service")
+			show: item.valid
+			item {
+				bind: Utils.path(startStopBindPrefix, "/ServiceCounter")
+				text: qsTr("%1h").arg((item.value / 60 / 60).toFixed(0))
+			}
+		}
+
+		MbItemValue {
 			description: qsTr("Accumulated running time since last test run")
 			show: user.accessLevel >= User.AccessService && nextTestRun.show
 			backgroundColor: style.backgroundColorService
@@ -119,7 +128,7 @@ MbPage {
 
 		MbSwitch {
 			name: qsTr("Auto start functionality")
-			bind: Utils.path(settingsBindPrefix, "/AutoStartEnabled")
+			bind: Utils.path(startStopBindPrefix, "/AutoStartEnabled")
 			show: allowDisableAutostart
 		}
 

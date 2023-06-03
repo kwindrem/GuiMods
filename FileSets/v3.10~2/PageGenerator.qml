@@ -1,3 +1,5 @@
+//// changed total time to hours (from varilable format)
+
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils
@@ -13,6 +15,16 @@ MbPage {
 	property VBusItem generatorState: VBusItem { bind: Utils.path(startStopBindPrefix, "/State") }
 	property VBusItem runningTime: VBusItem { bind: Utils.path(startStopBindPrefix, "/Runtime") }
 	property VBusItem historicalData: VBusItem { bind: Utils.path(settingsBindPrefix, "/AccumulatedDaily") }
+
+//// changed total time to hours (from varilable format)
+	function formatTime (time)
+	{
+		if (time >= 3600)
+			return (time / 3600).toFixed(0) + " h"
+		else
+			return (time / 60).toFixed(0) + " m"
+	}
+
 
 	function getState()
 	{
@@ -86,9 +98,20 @@ MbPage {
 
 		MbItemValue {
 			description: qsTr("Total run time")
+			show: item.valid
 			item {
 				bind: Utils.path(settingsBindPrefix, "/AccumulatedTotal")
-				text: Utils.secondsToNoSecsString(item.value)
+//// changed total time to hours (from varilable format)
+				text: formatTime (item.value)
+			}
+		}
+
+		MbItemValue {
+			description: qsTr("Time to service")
+			show: item.valid
+			item {
+				bind: Utils.path(startStopBindPrefix, "/ServiceCounter")
+				text: qsTr("%1h").arg((item.value / 60 / 60).toFixed(0))
 			}
 		}
 
@@ -119,7 +142,7 @@ MbPage {
 
 		MbSwitch {
 			name: qsTr("Auto start functionality")
-			bind: Utils.path(settingsBindPrefix, "/AutoStartEnabled")
+			bind: Utils.path(startStopBindPrefix, "/AutoStartEnabled")
 			show: allowDisableAutostart
 		}
 
