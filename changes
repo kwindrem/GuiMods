@@ -1,3 +1,6 @@
+v7.63:
+	fixed: temp not showing for alternator
+
 v7.62:
 	add support for v3.10~2
 

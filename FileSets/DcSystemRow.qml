@@ -200,7 +200,7 @@ Row {
             width: temperatureColumnWidth; horizontalAlignment: Text.AlignHCenter
             text:
             {
-				if (! dbusTemperatureItem.valid || instance == 0) // show only for first instance
+				if (! dbusTemperatureItem.valid || instance != 0) // show only for first instance
 					return ""
                 else if (tempScale == 2)
                     return ((dbusTemperatureItem.value * 9 / 5) + 32).toFixed (1) + " °F"
