@@ -134,12 +134,13 @@ MbPage
         switch (service.type)
         {
         case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
+        case DBusService.DBUS_SERVICE_MULTI_RS:
 			serviceName = service.name
 			// for single tracker create a single charger row with tracker instance -1
             if ( ! numberOfTrackers.valid || numberOfTrackers.value == 1)
 				pvChargerModel.append ( {serviceName: service.name, tracker: -1} )
 			// create a separate charger row for each tracker
-			else
+			else if (numberOfTrackers.value > 1)
 			{
 				var tracker
 				pvChargerModel.append ( {serviceName: service.name, tracker: 0} )

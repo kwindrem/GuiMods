@@ -1217,6 +1217,7 @@ OverviewPage {
 
 //////// add for PV CHARGER voltage and current display
 		case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
+		case DBusService.DBUS_SERVICE_MULTI_RS:
 			numberOfPvChargers++
 			if (numberOfPvChargers === 1)
 				pvChargerPrefix1 = service.name;

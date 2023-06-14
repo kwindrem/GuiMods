@@ -1,3 +1,6 @@
+v7.64:
+	fixed: Multi RS not showing up in PV Charger tile or detail page
+
 v7.63:
 	fixed: temp not showing for alternator
 
