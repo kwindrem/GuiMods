@@ -1,3 +1,7 @@
+v7.65:
+	fixed: VE.Direct inverters not added to DC system power calcs properly
+	added support for v3.10~9
+
 v7.64:
 	fixed: Multi RS not showing up in PV Charger tile or detail page
 
