@@ -1,3 +1,6 @@
+v7.66:
+	fixed: generator cool-down not working
+
 v7.65:
 	fixed: VE.Direct inverters not added to DC system power calcs properly
 	added support for v3.10~9
