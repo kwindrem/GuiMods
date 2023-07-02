@@ -1,3 +1,7 @@
+v7.67
+	fixed: link to generator external state required AC in to be generator
+	add support for v3.10~11
+
 v7.66:
 	fixed: generator cool-down not working
 

@@ -35,7 +35,7 @@ MbPage {
     VBusItem { id: vebusServiceItem; bind: Utils.path(systemPrefix, "/VebusService") }
     property string inverterService: vebusServiceItem.valid ? vebusServiceItem.value : ""
     VBusItem { id: splitPhaseL2Passthru; bind: Utils.path(inverterService, "/Ac/State/SplitPhaseL2Passthru") }
-    property bool l1AndL2OutShorted: splitPhaseL2Passthru.valid && splitPhaseL2Passthru.value === 0
+    property bool splitPhasePassthruDisabled: splitPhaseL2Passthru.valid && splitPhaseL2Passthru.value === 0
 
     property real actualCurrentLimit: 0
     property real newCurrentLimit: 0
@@ -165,7 +165,7 @@ MbPage {
                         text: EnhFmt.formatVBusItem (sys.acInput.powerL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.powerL2, "W"); visible: phaseCount >= 2 }
+                        text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.powerL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: EnhFmt.formatVBusItem (sys.acInput.powerL3, "W"); visible: phaseCount >= 3 }
@@ -180,7 +180,7 @@ MbPage {
 						text: EnhFmt.formatVBusItem (sys.acInput.voltageL1, "V") }
 				Text { font.pixelSize: 12; font.bold: true; color: "black"
 						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-						text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.voltageL2, "V"); visible: phaseCount >= 2 }
+						text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.voltageL2, "V"); visible: phaseCount >= 2 }
 				Text { font.pixelSize: 12; font.bold: true; color: "black"
 						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
 						text: EnhFmt.formatVBusItem (sys.acInput.voltageL3, "V"); visible: phaseCount >= 3 }
@@ -198,7 +198,7 @@ MbPage {
                         text: EnhFmt.formatVBusItem (sys.acInput.currentL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.currentL2, "A"); visible: phaseCount >= 2 }
+                        text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (sys.acInput.currentL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: EnhFmt.formatVBusItem (sys.acInput.currentL3, "A"); visible: phaseCount >= 3 }
@@ -225,7 +225,7 @@ MbPage {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L2 values included in L1"
-                        visible: l1AndL2OutShorted }
+                        visible: splitPhasePassthruDisabled }
             }
             Row
             {
@@ -271,7 +271,7 @@ MbPage {
 						text: EnhFmt.formatVBusItem (sys.grid.voltageL1, "V") }
 				Text { font.pixelSize: 12; font.bold: true; color: "black"
 						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-						text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.grid.voltageL2, "V"); visible: phaseCount >= 2 }
+						text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (sys.grid.voltageL2, "V"); visible: phaseCount >= 2 }
 				Text { font.pixelSize: 12; font.bold: true; color: "black"
 						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
 						text: EnhFmt.formatVBusItem (sys.grid.voltageL3, "V"); visible: phaseCount >= 3 }
@@ -292,7 +292,7 @@ MbPage {
 						text: EnhFmt.formatVBusItem (sys.genset.voltageL1, "V") }
 				Text { font.pixelSize: 12; font.bold: true; color: "black"
 						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-						text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (sys.genset.voltageL2, "V"); visible: phaseCount >= 2 }
+						text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (sys.genset.voltageL2, "V"); visible: phaseCount >= 2 }
 				Text { font.pixelSize: 12; font.bold: true; color: "black"
 						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
 						text: EnhFmt.formatVBusItem (sys.genset.voltageL3, "V"); visible: phaseCount >= 3 }

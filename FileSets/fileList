@@ -41,3 +41,9 @@
 /opt/victronenergy/gui/qml/Tile.qml
 /opt/victronenergy/gui/qml/TileText.qml
 /var/www/venus/styling/styles.css
+/opt/victronenergy/gui/qml/DetailAcInput.qml
+/opt/victronenergy/gui/qml/DetailLoadsCombined.qml
+/opt/victronenergy/gui/qml/DetailLoadsOnInput.qml
+/opt/victronenergy/gui/qml/DetailLoadsOnOutput.qml
+/opt/victronenergy/gui/qml/PowerGauge.qml
+/opt/victronenergy/gui/qml/DetailInverter.qml

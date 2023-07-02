@@ -74,7 +74,7 @@ MbPage {
     VBusItem { id: splitPhaseL2Passthru; bind: Utils.path(inverterService, "/Ac/State/SplitPhaseL2Passthru") }
     VBusItem { id: phaseCountItem; bind: Utils.path(inverterService, "/Ac/NumberOfPhases") }
 
-    property bool l1AndL2OutShorted: splitPhaseL2Passthru.valid && splitPhaseL2Passthru.value === 0
+    property bool splitPhasePassthruDisabled: splitPhaseL2Passthru.valid && splitPhaseL2Passthru.value === 0
     property int phaseCount: phaseCountItem.valid ? phaseCountItem.value : 0
 
     // background
@@ -174,7 +174,7 @@ MbPage {
                         text: formatValueDiff (pOutL1, pInL1, "W") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : formatValueDiff (pOutL2, pInL2, "W"); visible: phaseCount >= 2 }
+                        text: splitPhasePassthruDisabled ? "< < <" : formatValueDiff (pOutL2, pInL2, "W"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValueDiff (pOutL3, pInL3, "W"); visible: phaseCount >= 3 }
@@ -234,7 +234,7 @@ MbPage {
                         text: EnhFmt.formatVBusItem (iOutL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: l1AndL2OutShorted ? "< < <" : EnhFmt.formatVBusItem (iOutL2, "A"); visible: phaseCount >= 2 }
+                        text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (iOutL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: EnhFmt.formatVBusItem (iOutL3, "A"); visible: phaseCount >= 3 }
@@ -282,7 +282,7 @@ MbPage {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr ("L2 Output values included in L1")
-                        visible: l1AndL2OutShorted
+                        visible: splitPhasePassthruDisabled
 					}
             }
         }

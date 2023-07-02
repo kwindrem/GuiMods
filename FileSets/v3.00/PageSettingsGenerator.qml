@@ -85,9 +85,13 @@ MbPage {
 		}
 //// GuiMods
 		MbSwitch {
-			name: qsTr("Link to external state")
+			name: qsTr("Link to external running state")
 			bind: Utils.path(settingsBindPrefix, "/LinkToExternalStatus")
-			enabled: detectGeneratorAtAcIn.enabled
+			onClicked:
+			{
+				if (!checked)
+					toast.createToast(qsTr("Manual run will be synchronized with the generaror 'is running digital input' or AC input"), 10000, "icon-info-active")
+			}
 		}
 
 		MbSwitch {
