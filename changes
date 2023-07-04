@@ -1,3 +1,6 @@
+v7.68:
+	add post-cool-down delay to allow generator to stop before restoring AC input
+
 v7.67
 	fixed: link to generator external state required AC in to be generator
 	add support for v3.10~11
