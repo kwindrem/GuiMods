@@ -924,8 +924,8 @@ OverviewPage {
 		value: flow(sys.acInput ? sys.acInput.power : 0)
 
 		anchors {
-			left: acInBox.right; leftMargin: -10; top: multi.verticalCenter;
-			right: multi.left; rightMargin: -10; bottom: multi.verticalCenter
+			left: acInBox.right; leftMargin: -10
+			right: multi.left; rightMargin: -10; bottom: acInBox.bottom; bottomMargin: 25
 		}
 	}
 
@@ -938,9 +938,8 @@ OverviewPage {
 
 		anchors {
 			left: multi.right; leftMargin: -10;
-			top: multi.verticalCenter
 			right: acLoadBox.left; rightMargin: -10
-			bottom: multi.verticalCenter
+			bottom: acLoadBox.bottom; bottomMargin: 8
 		}
 	}
 

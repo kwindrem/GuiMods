@@ -1,3 +1,6 @@
+v7.71:
+	improved AC tile fit for 2 and 3 phase systems
+
 v7.70:
 	fixed dark mode hotkeys on small screens
 	added support for v3.10~12
