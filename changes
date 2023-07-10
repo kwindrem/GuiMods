@@ -1,3 +1,7 @@
+v7.70:
+	fixed dark mode hotkeys on small screens
+	added support for v3.10~12
+
 v7.69:
     fixed: dark mode on small devices #164
 

@@ -1174,7 +1174,7 @@ class StartStop(object):
 #### GuiMods warm-up / cool-down
 			# run for cool-down period before stopping
 			# cooldown end time is updated while generator is running
-			#	and generator feeds Multi AC input (done in start_generator)
+			#	and generator feeds Multi AC input
 			if self._currentTime < self._coolDownEndTime:
 				if state != States.COOLDOWN:
 					self._dbusservice['/State'] = States.COOLDOWN
