@@ -1,3 +1,6 @@
+v7.69:
+    fixed: dark mode on small devices #164
+
 v7.68:
 	add post-cool-down delay to allow generator to stop before restoring AC input
 
@@ -31,7 +34,7 @@ v7.60:
 	add v3.00 file set
 
 v7.50/v7.51:
-	bad merge of alternator temperature missing	
+	bad merge of alternator temperature missing
 
 v7.49:
 	add support for v3.00~42 (includes generator on AC 2)

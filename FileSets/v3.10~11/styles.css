@@ -10977,7 +10977,8 @@ body.map-none.embedded #vrm-tabs li.active {
 Dark mode (start)
 ****************************************************************************************************************************************/
 @media (prefers-color-scheme: dark) {
-  body {
+  body,
+  .remote-console-rotate-message-container {
     /*background-color: #1b1b1b;*/
     background-color: #101010;
     color: #e6e5e1;
@@ -10994,7 +10995,10 @@ Dark mode (start)
     background-color: #234868;
   }
 
-  .remote-console-controls-title, .remote-console-controls-subtitle {
+  .remote-console-controls-title,
+  .remote-console-controls-subtitle,
+  .remote-console-logged-in .remote-console-controls-title,
+  .remote-console-logged-in .remote-console-controls-subtitle {
     color: #f3f2ee;
   }
 
@@ -11019,6 +11023,20 @@ Dark mode (start)
   .remote-console-display-inner {
     border: 1px solid #4b4b4b;
   }
+
+  @media screen and (max-width: 795px) {
+    .remote-console-logged-in .remote-console-controls-container {
+      background-color: #234868;
+    }
+
+    .remote-console-controls-title,
+    .remote-console-controls-subtitle,
+    .remote-console-logged-in .remote-console-controls-title,
+    .remote-console-logged-in .remote-console-controls-subtitle {
+      color: #f3f2ee;
+    }
+  }
+
 }
 /****************************************************************************************************************************************
 Dark mode (end)
