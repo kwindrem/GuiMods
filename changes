@@ -1,3 +1,6 @@
+v7.76:
+	fixed: generator "External Override" displayed even if LinkToExternalStatus not active
+
 v7.75:
 	add support for v3.10~21
 

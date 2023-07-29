@@ -267,6 +267,7 @@ class StartStop(object):
 	_driver = None
 	def __init__(self, instance):
 #### GuiMods
+		logging.info ("GuiMods version of startstop.py")
 		self._currentTime = 0
 		self._last_update_mtime = 0
 		self._accumulatedRunTime = 0
@@ -1439,7 +1440,7 @@ class StartStop(object):
 						self._dbusservice['/ManualStart'] = 0
 
 			# update /ExternalOverride
-			if inputState == "S"\
+			if inputState == "S" and self._linkToExternalState \
 					and self._dbusservice['/RunningByConditionCode'] != RunningConditions.Stopped:
 				if self._externalOverrideDelay > 5:
 					self._externalOverride = True

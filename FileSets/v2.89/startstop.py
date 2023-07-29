@@ -1130,7 +1130,7 @@ class StartStop(object):
 						self._dbusservice['/ManualStart'] = 0
 
 			# update /ExternalOverride
-			if inputState == "S"\
+			if inputState == "S" and self._linkToExternalState \
 					and self._dbusservice['/RunningByConditionCode'] != RunningConditions.Stopped:
 				if self._externalOverrideDelay > 5:
 					self._externalOverride = True
