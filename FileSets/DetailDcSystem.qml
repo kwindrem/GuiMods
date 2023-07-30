@@ -26,7 +26,7 @@ MbPage
     property int stateColumnWidth: 75
 
 
-	property int systemRows: Math.min (systemModel.count, 1)
+	property int systemRows: Math.max (systemModel.count, 1)
 	property int otherRows: otherModel.count
 	property int totalTableRows: systemRows + otherRows
 
@@ -106,8 +106,9 @@ MbPage
 		Row
 		{
 			id: spacer1
+			height: 5
 			anchors.horizontalCenter: parent.horizontalCenter
-			Text { font.pixelSize: 12; font.bold: true; color: "black"
+			Text { font.pixelSize: 5; font.bold: true; color: "black"
 					width: nameColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: "" }
 			visible: totalTableRows < 8
@@ -146,7 +147,7 @@ MbPage
 
 			anchors.horizontalCenter: systemTableTitleRow.horizontalCenter
 			width: systemTableTitleRow.width
-			height: 35 // adjusted later when rows are added to the two tables
+			height: 10 // adjusted later when rows are added to the two tables
 			interactive: true
 			clip: true
 			model: systemModel

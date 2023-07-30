@@ -1245,11 +1245,16 @@ class StartStop(object):
 				return
 
 			# When we arrive here, a stop command was given and cool-down period has elapesed
+			# Stop the engine, but if we're coming from cooldown, delay another
+			# while in the STOPPING state before reactivating AC-in.
 			if state == States.COOLDOWN:
 				self.log_info ("starting post cool-down")
 				# delay restoring load to give generator a chance to stop
 				self._postCoolDownEndTime = self._currentTime + WAIT_FOR_ENGINE_STOP
 				self._dbusservice['/State'] = States.STOPPING
+				self._update_remote_switch() # Stop engine
+				self.log_info('Stopping generator that was running by %s condition' %
+							str(self._dbusservice['/RunningByCondition']))
 				return
 				
 			# Wait for engine stop
@@ -1258,14 +1263,15 @@ class StartStop(object):
 					return
 				else:
 					self.log_info ("post cool-down delay complete")
-#### end GuiMods warm-up / cool-down
 
 			# All other possibilities are handled now. Cooldown is over or not
 			# configured and we waited for the generator to shut down.
+			if state != States.STOPPING:
+				self._update_remote_switch()
+				self.log_info('Stopping generator that was running by %s condition' %
+							str(self._dbusservice['/RunningByCondition']))
+#### end GuiMods warm-up / cool-down
 			self._dbusservice['/State'] = States.STOPPED
-			self._update_remote_switch()
-			self.log_info('Stopping generator that was running by %s condition' %
-						str(self._dbusservice['/RunningByCondition']))
 			self._dbusservice['/RunningByCondition'] = ''
 			self._dbusservice['/RunningByConditionCode'] = RunningConditions.Stopped
 			self._update_accumulated_time()
@@ -1374,6 +1380,7 @@ class StartStop(object):
 
 	def _processGeneratorRunDetection (self):
 		TheBus = dbus.SystemBus()
+		generatorState = self._dbusservice['/State']
 		try:
 			# current input service is no longer valid
 			# search for a new one only every 10 seconds to avoid unnecessary processing
@@ -1431,17 +1438,15 @@ class StartStop(object):
 
 				# forward input state changes to /ManualStart
 				if self._linkToExternalState:
-					if inputState == "R"\
-							and self._dbusservice['/RunningByConditionCode'] == RunningConditions.Stopped:
+					if inputState == "R" and generatorState == States.STOPPED:
 						self.log_info ("generator was started externally - syncing ManualStart state")
 						self._dbusservice['/ManualStart'] = 1
-					elif inputState == "S" and self._dbusservice['/ManualStart'] == 1:
+					elif inputState == "S" and self._dbusservice['/ManualStart'] == 1 and generatorState == States.RUNNING:
 						self.log_info ("generator was stopped externally - syncing ManualStart state")
 						self._dbusservice['/ManualStart'] = 0
 
 			# update /ExternalOverride
-			if inputState == "S" and self._linkToExternalState \
-					and self._dbusservice['/RunningByConditionCode'] != RunningConditions.Stopped:
+			if inputState == "S" and self._linkToExternalState and generatorState == States.RUNNING:
 				if self._externalOverrideDelay > 5:
 					self._externalOverride = True
 				else:
@@ -1477,7 +1482,7 @@ class StartStop(object):
 
 		# grab running state from dBus once, use it many timed below
 
-		if self._dbusservice['/State'] in (States.RUNNING, States.WARMUP, States.COOLDOWN, States.STOPPING):
+		if self._dbusservice['/State'] in (States.RUNNING, States.WARMUP, States.COOLDOWN, States.STOPPING): ##########
 			internalRun = True
 		else:
 			internalRun = False
@@ -1521,7 +1526,6 @@ class StartStop(object):
 			doUpdate = True
 
 		if doUpdate:
-			self._dbusservice['/Runtime'] = int(self._accumulatedRunTime)
 			self._update_accumulated_time()
 
 		# stopped - clear the current time accumulator
@@ -1529,4 +1533,6 @@ class StartStop(object):
 			self._last_update_mtime = 0 
 			self._accumulatedRunTime = 0
 			self._last_accumulate_time = 0 
+
+		self._dbusservice['/Runtime'] = int(self._accumulatedRunTime)
 #### end GuiMods

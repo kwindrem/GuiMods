@@ -1,3 +1,8 @@
+v7.77:
+	fixed: generator /Runtime not always set to 0 at end of run
+	fixed: generator running through post cool-down period
+	fixed: DC System Detail system table limited to one visible row
+
 v7.76:
 	fixed: generator "External Override" displayed even if LinkToExternalStatus not active
 

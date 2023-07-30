@@ -994,7 +994,6 @@ class StartStop:
 			self._accumulateRunTime ()
 
 			self._starttime = 0
-			self._dbusservice['/Runtime'] = 0
 			self._dbusservice['/ManualStartTimer'] = 0
 			self._manualstarttimer = 0
 			self._last_runtime_update = 0
@@ -1054,6 +1053,7 @@ class StartStop:
 
 	def _processGeneratorRunDetection (self):
 		TheBus = dbus.SystemBus()
+		generatorState = self._dbusservice['/State']
 		try:
 			# current input service is no longer valid
 			# search for a new one only every 10 seconds to avoid unnecessary processing
@@ -1070,11 +1070,11 @@ class StartStop:
  
 				# found new service - get objects for use later
 				if newInputService != "":
-					logging.info ("Found generator digital input service at %s", newInputService)
+					self.log_info ("Found generator digital input service at %s" % newInputService)
 					self._generatorInputStateObject = TheBus.get_object(newInputService, '/State')
 				else:
 					if self._generatorInputStateObject != None:
-						logging.info ("Generator digital input service NOT found")
+						self.log_info ("Generator digital input service NOT found")
 					self._generatorInputStateObject = None
 					self._digitalInputTypeObject = None
 					self._searchDelay = 0 # start delay timer
@@ -1095,19 +1095,15 @@ class StartStop:
 					inputState = 'S'
 			# otherwise use generator AC input to determine running state
 			else:
-				if self._dbusmonitor.get_value ('com.victronenergy.settings', '/Settings/SystemSetup/AcInput1', default_value = 0) == 2:
-					useAcIn = 1
-				elif self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/In/NumberOfAcInputs', default_value = 0 ) >= 2 \
-						and self._dbusmonitor.get_value ('com.victronenergy.settings', '/Settings/SystemSetup/AcInput2', default_value = 0) == 2:
-					useAcIn = 2
-				else:
-					useAcIn = 0
 				# use frequency as the test for generator running
-				if useAcIn > 0: 
-					if self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/Genset/Frequency', default_value = 0) > 20:
-						inputState = 'R'
-					else:
-						inputState = 'S'
+				if self._generatorAcInput > 0: 
+					try:
+						if self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/Genset/Frequency') > 20:
+							inputState = 'R'
+						else:
+							inputState = 'S'
+					except:
+						inputState = '?'
 
 			# update /GeneratorRunningState
 			if inputState != self._lastState:
@@ -1115,17 +1111,15 @@ class StartStop:
 
 				# forward input state changes to /ManualStart
 				if self._linkToExternalState:
-					if inputState == "R"\
-							and self._dbusservice['/RunningByConditionCode'] == RunningConditions.Stopped:
-						logging.info ("generator was started externally - syncing ManualStart state")
+					if inputState == "R" and generatorState == States.STOPPED:
+						self.log_info ("generator was started externally - syncing ManualStart state")
 						self._dbusservice['/ManualStart'] = 1
-					elif inputState == "S" and self._dbusservice['/ManualStart'] == 1:
-						logging.info ("generator was stopped externally - syncing ManualStart state")
+					elif inputState == "S" and self._dbusservice['/ManualStart'] == 1 and generatorState == States.RUNNING:
+						self.log_info ("generator was stopped externally - syncing ManualStart state")
 						self._dbusservice['/ManualStart'] = 0
 
 			# update /ExternalOverride
-			if inputState == "S" and self._linkToExternalState \
-					and self._dbusservice['/RunningByConditionCode'] != RunningConditions.Stopped:
+			if inputState == "S" and self._linkToExternalState and generatorState == States.RUNNING:
 				if self._externalOverrideDelay > 5:
 					self._externalOverride = True
 				else:
@@ -1139,7 +1133,7 @@ class StartStop:
 				self._lastExternalOverride = self._externalOverride
 
 		except dbus.DBusException:
-			logging.info ("dbus exception - generator digital input no longer valid")
+			self.log_info ("dbus exception - generator digital input no longer valid")
 			self._generatorInputStateObject = None
 			self._digitalInputTypeObject = None
 			inputState = 0
@@ -1206,7 +1200,6 @@ class StartStop:
 			doUpdate = True
 
 		if doUpdate:
-			self._dbusservice['/Runtime'] = int(self._accumulatedRunTime)
 			self._update_accumulated_time()
 
 		# stopped - clear the current time accumulator
@@ -1214,3 +1207,5 @@ class StartStop:
 			self._last_update_mtime = 0 
 			self._accumulatedRunTime = 0
 			self._last_accumulate_time = 0 
+
+		self._dbusservice['/Runtime'] = int(self._accumulatedRunTime)
