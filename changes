@@ -1,3 +1,6 @@
+v7.78:
+	fixed: AC Charger detail shows output as NaN
+
 v7.77:
 	fixed: generator /Runtime not always set to 0 at end of run
 	fixed: generator running through post cool-down period

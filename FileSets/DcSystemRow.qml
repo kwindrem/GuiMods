@@ -148,7 +148,7 @@ Row {
             visible: directionColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: outputColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: (root.instance + 1).toString()
+            text: (instance + 1).toString()
             visible: outputColumnWidth > 0 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: powerColumnWidth; horizontalAlignment: Text.AlignHCenter
