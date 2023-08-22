@@ -1,3 +1,6 @@
+v7.79:
+	add support for v3.10~30
+
 v7.78:
 	fixed: AC Charger detail shows output as NaN
 
