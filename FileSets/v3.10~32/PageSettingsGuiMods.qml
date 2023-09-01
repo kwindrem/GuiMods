@@ -15,7 +15,7 @@ MbPage {
 	property bool showComplexParams: flowOverview.item.valid && flowOverview.item.value >= 2
 	property bool showAcCoupledParams: flowOverview.item.valid && flowOverview.item.value == 3
 
-	model: VisualItemModel
+	model: VisibleItemModel
     {
         MbSwitch
         {
@@ -158,6 +158,14 @@ MbPage {
             item.bind: Utils.path (bindPrefixGuiMods, "/CustomDcSystemName")
             maximumLength: 32
             enableSpaceBar: true
+        }
+
+        MbSwitch
+        {
+            id: replaceInactiveAcIn
+            bind: Utils.path (bindPrefixGuiMods, "/ReplaceInactiveAcIn")
+            name: qsTr ("Replace AC in if inactive")
+            writeAccessLevel: User.AccessUser
         }
 
         MbSpinBox {

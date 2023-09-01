@@ -1093,17 +1093,6 @@ class StartStop:
 					inputState = 'R'
 				elif inputState == 11:
 					inputState = 'S'
-			# otherwise use generator AC input to determine running state
-			else:
-				# use frequency as the test for generator running
-				if self._generatorAcInput > 0: 
-					try:
-						if self._dbusmonitor.get_value (SYSTEM_SERVICE, '/Ac/Genset/Frequency') > 20:
-							inputState = 'R'
-						else:
-							inputState = 'S'
-					except:
-						inputState = '?'
 
 			# update /GeneratorRunningState
 			if inputState != self._lastState:

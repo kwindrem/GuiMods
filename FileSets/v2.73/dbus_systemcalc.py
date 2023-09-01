@@ -304,38 +304,44 @@ class SystemCalc:
 			'/Ac/Grid/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Grid/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/Grid/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Grid/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Grid/L1/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Grid/L2/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Grid/L3/Voltage': {'gettext': '%.1F V'},
 			'/Ac/Grid/Frequency': {'gettext': '%.1F Hz'},
 			'/Ac/Genset/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/Genset/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/Genset/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/Genset/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Genset/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Genset/L1/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Genset/L2/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Genset/L3/Voltage': {'gettext': '%.1F V'},
 			'/Ac/Genset/Frequency': {'gettext': '%.1F Hz'},
 			'/Ac/ConsumptionOnOutput/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnOutput/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnOutput/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnOutput/L1/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ConsumptionOnOutput/L2/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ConsumptionOnOutput/L3/Voltage': {'gettext': '%.1F V'},
 			'/Ac/ConsumptionOnOutput/Frequency': {'gettext': '%.1F Hz'},
 			'/Ac/ConsumptionOnInput/L1/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L2/Current': {'gettext': '%.1F A'},
 			'/Ac/ConsumptionOnInput/L3/Current': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ConsumptionOnInput/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/ConsumptionOnInput/L1/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ConsumptionOnInput/L2/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ConsumptionOnInput/L3/Voltage': {'gettext': '%.1F V'},
 			'/Ac/ConsumptionOnInput/Frequency': {'gettext': '%.1F Hz'},
-			'/Ac/Consumption/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/L3/Voltage': {'gettext': '%.1F A'},
-			'/Ac/Consumption/Frequency': {'gettext': '%.1F A'},
-			'/Ac/ActiveIn/L1/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ActiveIn/L2/Voltage': {'gettext': '%.1F A'},
-			'/Ac/ActiveIn/L3/Voltage': {'gettext': '%.1F A'},
+			'/Ac/Consumption/L1/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Consumption/L2/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Consumption/L3/Voltage': {'gettext': '%.1F V'},
+			'/Ac/Consumption/L1/Current': {'gettext': '%.1F A'},
+			'/Ac/Consumption/L2/Current': {'gettext': '%.1F A'},
+			'/Ac/Consumption/L3/Current': {'gettext': '%.1F A'},
+			'/Ac/Consumption/Frequency': {'gettext': '%.1F Hz'},
+			'/Ac/ActiveIn/L1/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ActiveIn/L2/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ActiveIn/L3/Voltage': {'gettext': '%.1F V'},
+			'/Ac/ActiveIn/L1/Current': {'gettext': '%.1F A'},
+			'/Ac/ActiveIn/L2/Current': {'gettext': '%.1F A'},
+			'/Ac/ActiveIn/L3/Current': {'gettext': '%.1F A'},
 			'/Ac/ActiveIn/Frequency': {'gettext': '%.1F Hz'},
 		}
 
@@ -859,11 +865,12 @@ class SystemCalc:
 #### added for GuiMods
 						mc = _safeadd(mc, -pvcurrent)
 				newvalues['/Ac/%s/%s/Power' % (device_type, phase)] = p
-#### added for GuiMods #############
+#### added for GuiMods
 				newvalues['/Ac/%s/%s/Current' % (device_type, phase)] = mc
 				if p != None:
 					newvalues['/Ac/%s/%s/Voltage' % (device_type, phase)] = voltageIn[phase]
 					newvalues['/Ac/%s/Frequency' % (device_type)] = frequencyIn
+
 			self._compute_number_of_phases('/Ac/%s' % device_type, newvalues)
 			product_id = None
 			device_type_id = None
@@ -904,7 +911,6 @@ class SystemCalc:
 							voltageOut[phase] = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/V' % phase)
 						if frequencyOut == None:
 							frequencyOut = self._dbusmonitor.get_value(inv, '/Ac/Out/%s/F' % phase)
-
 
 						# Some models don't show power, calculate it
 						if ac_out is None:

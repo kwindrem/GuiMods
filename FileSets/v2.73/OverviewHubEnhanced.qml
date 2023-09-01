@@ -439,7 +439,8 @@ OverviewPage {
 				font.pixelSize: 6
 			}
 			TileText {
-				text: sys.battery.voltage.format(2) + "   " + sys.battery.current.format(1)
+                text: EnhFmt.formatVBusItem (sys.battery.voltage, "V  ", 2)
+						+ EnhFmt.formatVBusItem (sys.battery.current, "A")
 			}
 			TileText {
 				text: timeToGo.valid ? qsTr ("Remain: ") + TTG.formatTimeToGo (timeToGo) : qsTr (" ")

@@ -1,4 +1,14 @@
-v7.81:
+v8.0:
+	add renewable energy control in Inverter Detail page
+	fixed: renewable battery icon not shown on AC and DC coupled flow overviews
+	add additinal file sets for older Venus OS versions
+	integrate with new SetupHelper (v5.0)
+	added support for all released Venus OS versions from v2.70 on
+	added support for v3.00~32 which includes fast updates for older grid meters
+		fast updates in v3.00 released version are only for newer grid meters
+	add support for v3.10~33
+
+v7.81/v7.80 (v7.80 had wrong package version!):
 	add support for v3.10~32
 
 v7.79:

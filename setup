@@ -341,6 +341,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
     updateActiveFile "$qmlDir/Tile.qml"
     updateActiveFile "$qmlDir/TileText.qml"
     updateActiveFile "/var/www/venus/styling/styles.css"
+    updateActiveFile "/opt/victronenergy/themes/ccgx/images/overview-renewable-light.svg"
     # only used for darkmode | end
 
 	# revert to VisualItemModel if before v3.00~14 (v3.00~14 uses VisibleItemModel)
@@ -456,6 +457,7 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     restoreActiveFile "$qmlDir/Tile.qml"
     restoreActiveFile "$qmlDir/TileText.qml"
     restoreActiveFile "/var/www/venus/styling/styles.css"
+	restoreActiveFile "/opt/victronenergy/themes/ccgx/images/overview-renewable-light.svg"
     # only used for darkmode | end
 
     logMessage "++ $packageName uninstalled"

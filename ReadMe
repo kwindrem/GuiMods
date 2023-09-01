@@ -1,4 +1,6 @@
 Recent changes:
+	Added conrol over grid/renewable energy priority to inverter detail
+
 	Added dark mode
 
 	Added support for generator warm-up and cool-down when using ExtTransferSwitch
@@ -207,6 +209,13 @@ Details pages repeat the associated gauge(s) and provide more detail for that ar
 Where possible, voltage, current and frequency for each leg of the system are shown in a table.
 The Inverter detail includes inverter mode selection:
     On, Off, Inverter only, Charger only, Eco.
+    Charger priority: Grid / Renewable
+        When enavled in the Multi/Quattro, the charger priority buttons appear in the Inverter detail page.
+        Renewable allows solar and wind power to charge the batteries, essentially ignoring the grid
+          until a low battery voltage threshold is reached. The grid is then used to bring the battery to 100% SOC.
+        If Grid is pressed, batteries are charged immediately via the grid (and other charging sources).
+            When 100% SOC is reached, the system returns to Renewable priority
+
 The AC input detail includes a set of buttons to set the input current limit.
 
 The PV charger detail provides a system total as a gauge and power number,
