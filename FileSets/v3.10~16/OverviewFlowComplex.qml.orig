@@ -19,7 +19,7 @@ OverviewPage {
 
 		width: 148
 		height: 100
-		title: sys.remoteGeneratorSelected.value === 1 ? getAcSourceName(2) : getAcSourceName(sys.acSource)
+		title: getAcSourceName(sys.acSource)
 		titleColor: "#E74c3c"
 		color: "#C0392B"
 		anchors {
@@ -32,7 +32,7 @@ OverviewPage {
 		}
 
 		MbIcon {
-			iconId: sys.remoteGeneratorSelected.value === 1 ? getAcSourceIcon(2) : getAcSourceIcon(sys.acSource)
+			iconId: getAcSourceIcon(sys.acSource)
 			anchors {
 				bottom: parent.bottom
 				left: parent.left; leftMargin: 2
@@ -102,9 +102,6 @@ OverviewPage {
 		id: battery
 
 		soc: sys.battery.soc.valid ? sys.battery.soc.value : 0
-		preferRenewable: sys.preferRenewableEnergy.valid
-		preferRenewableOverride: sys.preferRenewableEnergy.value === 0
-		preferRenewableOverrideGenset: sys.remoteGeneratorSelected.value === 1 || sys.acSource.value === 2
 		height: pvInverterOnGrid.visible ? 81 : 101
 		width: 145
 

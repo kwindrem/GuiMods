@@ -1,3 +1,6 @@
+v8.01:
+	fixed: blank AC/DC coupled overview
+
 v8.0:
 	add renewable energy control in Inverter Detail page
 	fixed: renewable battery icon not shown on AC and DC coupled flow overviews
