@@ -1,1 +1,1 @@
-../v3.10~33/DetailLoadsOnOutput.qml
+../v3.10~36/DetailLoadsOnOutput.qml

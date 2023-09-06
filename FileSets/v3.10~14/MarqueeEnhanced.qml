@@ -1,1 +1,1 @@
-../v3.10~33/MarqueeEnhanced.qml
+../v3.10~36/MarqueeEnhanced.qml

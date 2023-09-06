@@ -1,3 +1,6 @@
+v8.02:
+	add support for v3.10~36
+
 v8.01:
 	fixed: blank AC/DC coupled overview
 
