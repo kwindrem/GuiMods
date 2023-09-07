@@ -1,3 +1,8 @@
+v8.03: (pending)
+	revert back to AC input type (from RemoteGeneratorSelected) starting in v3.10~36
+	add support for v3.10~37
+	use same Battery tile on Simple and DC/AC coupled flow diagrams
+	rearrange renewable energy battery icons
 v8.02:
 	add support for v3.10~36
 
