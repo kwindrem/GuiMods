@@ -1,3 +1,6 @@
+v8.04:
+	fixed: blank screen for some v3.10 beta versions
+
 v8.03:
 	revert back to AC input type (from RemoteGeneratorSelected) starting in v3.10~36
 	add support for v3.10~37

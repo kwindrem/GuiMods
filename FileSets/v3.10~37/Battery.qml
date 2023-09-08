@@ -14,9 +14,14 @@ Item {
 	property string emptyColor: !darkMode ? "#1abc9c" : "#0d5e4e"
 
 	property alias values: _values.children
-	property bool preferRenewable: sys.preferRenewableEnergy.valid
-	property bool renewableOverride: preferRenewable
+	property bool renewablePreferred: sys.preferRenewableEnergy.valid
+	property bool renewableOverride: renewablePreferred
 			&& (sys.preferRenewableEnergy.value === 0 || sys.acSource == 2)
+
+	//// dummies for backward compatiblity - not actually used - values grabbed from sys. directly
+	property bool preferRenewable: false
+	property bool preferRenewableOverride: false
+	property bool preferRenewableOverrideGenset: false
 
 
 	SvgRectangle {
@@ -100,7 +105,7 @@ Item {
 	Rectangle {
 		height: 30
 		width: 25
-		visible: preferRenewable
+		visible: renewablePreferred
 		color: renewableOverride ? "#b84b00" : "transparent"
 		clip: true
 		anchors {
