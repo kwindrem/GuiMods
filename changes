@@ -1,3 +1,6 @@
+v8.05:
+	add support for v3.10~38
+
 v8.04:
 	fixed: blank screen for some v3.10 beta versions
 
