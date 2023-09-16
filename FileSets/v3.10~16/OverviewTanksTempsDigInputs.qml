@@ -1,1 +1,1 @@
-../v3.10~38/OverviewTanksTempsDigInputs.qml
+../v3.10/OverviewTanksTempsDigInputs.qml

@@ -1,1 +1,1 @@
-../v3.10~38/PageGenerator.qml
+../v3.10/PageGenerator.qml

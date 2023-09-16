@@ -1,1 +1,1 @@
-../v3.10~38/MbEditBox.qml
+../v3.10/MbEditBox.qml

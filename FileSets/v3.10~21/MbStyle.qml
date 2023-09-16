@@ -1,1 +1,1 @@
-../v3.10~38/MbStyle.qml
+../v3.10/MbStyle.qml

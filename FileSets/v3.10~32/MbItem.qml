@@ -1,1 +1,1 @@
-../v3.10~38/MbItem.qml
+../v3.10/MbItem.qml

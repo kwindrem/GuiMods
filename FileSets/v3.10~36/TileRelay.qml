@@ -1,1 +1,1 @@
-../v3.10~38/TileRelay.qml
+../v3.10/TileRelay.qml

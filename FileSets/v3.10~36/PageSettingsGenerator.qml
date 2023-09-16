@@ -1,1 +1,1 @@
-../v3.10~38/PageSettingsGenerator.qml
+../v3.10/PageSettingsGenerator.qml

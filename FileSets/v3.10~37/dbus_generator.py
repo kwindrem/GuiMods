@@ -1,1 +1,1 @@
-../v3.10~38/dbus_generator.py
+../v3.10/dbus_generator.py

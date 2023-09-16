@@ -1,1 +1,1 @@
-../v3.10~38/PageMain.qml
+../v3.10/PageMain.qml
