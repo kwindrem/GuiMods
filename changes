@@ -1,3 +1,7 @@
+v8.09:
+	fixed: Generator overview blank screen
+	add support for v3.20~5
+
 v8.08:
 	add support for v3.20~4
 
