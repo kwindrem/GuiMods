@@ -1360,7 +1360,8 @@ class StartStop(object):
 					if inputState == "R" and generatorState == States.STOPPED:
 						self.log_info ("generator was started externally - syncing ManualStart state")
 						self._dbusservice['/ManualStart'] = 1
-					elif inputState == "S" and self._dbusservice['/ManualStart'] == 1 and generatorState == States.RUNNING:
+					elif inputState == "S" and self._dbusservice['/ManualStart'] == 1 \
+							and generatorState in (States.RUNNING, States.WARMUP, States.COOLDOWN):
 						self.log_info ("generator was stopped externally - syncing ManualStart state")
 						self._dbusservice['/ManualStart'] = 0
 
