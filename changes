@@ -1,4 +1,7 @@
-v 8.10:
+v8.11:
+	fixed: generator relay does not always open
+
+v8.10:
 	add support for v3.20~7
 
 v8.09:
