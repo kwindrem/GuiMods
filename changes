@@ -1,3 +1,6 @@
+v8.12:
+	added support for v3.11
+
 v8.11:
 	fixed: generator relay does not always open
 	fixed: sync to external state does not work during warm-up/cool-down
