@@ -3,11 +3,8 @@
 /opt/victronenergy/gui/qml/ObjectAcConnection.qml
 /opt/victronenergy/gui/qml/OverviewHubEnhanced.qml
 /opt/victronenergy/gui/qml/OverviewMobileEnhanced.qml
-/opt/victronenergy/gui/qml/TileTankEnhanced.qml
-/opt/victronenergy/gui/qml/MarqueeEnhanced.qml
 /opt/victronenergy/gui/qml/HubData.qml
 /opt/victronenergy/gui/qml/PageSettingsDisplay.qml
-/opt/victronenergy/gui/qml/Tile.qml
 /opt/victronenergy/gui/qml/PageSettingsRelay.qml
 /opt/victronenergy/gui/qml/PageSettingsGuiMods.qml
 /opt/victronenergy/gui/qml/TileRelay.qml

@@ -1,3 +1,7 @@
+v8.13:
+	wrap scrolling text to avoid blank at end of string
+	add support for v3.20~9
+
 v8.12:
 	added support for v3.11
 
