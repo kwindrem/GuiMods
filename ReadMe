@@ -1,4 +1,6 @@
 Recent changes:
+	Replace Multi LEDs with text describing the indicator's funciton
+
 	Added conrol over grid/renewable energy priority to inverter detail
 
 	Added dark mode
@@ -486,18 +488,11 @@ Installation:
 
 GuiMods requires that SetupHelper is installed first.
 
-The easiest way to install GuiMods is to do a "blind install" of SetupHelper and then add the GuiMods package
-via the PackageManager menus.
+The easiest way to install GuiMods is to do a "blind install" of SetupHelper
+	and then add the GuiMods package via the PackageManager menus.
 
-Refer to SetupHelper here:
-
-https://github.com/kwindrem/SetupHelper
-
-Once SetupHelper is installed, you can add GuiMods by placing the archive from its GitHub repo on a USB stick or SD card and inserting it in the GX device (CCGX, Cerbo, etc.). PackageManager will detect the archive and transfer the package to local storage. It will then appear in the Active packages list.
-
-The GuiMods compressed archive can be downloaded here:
-
-https://github.com/kwindrem/GuiMods/archive/refs/tags/latest.tar.gz
+Refer to the SetupHelper ReadMe for instructions and for other install options:
+	https://github.com/kwindrem/SetupHelper
 
 
 Note that installing GuiMods will uninstall GuiMods2.

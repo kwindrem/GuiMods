@@ -104,51 +104,75 @@ MbIcon {
     }
 
 	Column {
-		spacing: 3
+		spacing: 0
 		x: 26
-		y: 62
+		y: 58
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Mains")
+			text: qsTr("AC In")
+			font.pixelSize: 8
 			onColor: "#68FF00"
+			width: 10; height: 8
 		}
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Bulk")
+			text: qsTr("Bulk")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Absorption")
+			text: qsTr("Abs")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Float")
+			text: qsTr("Float")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 	}
 
 	Column {
-		spacing: 3
-		x: multi.width - 28
-		y: 62
+		spacing: 0
+		x: multi.width - 37
+		y: 58
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Inverter")
 			onColor: "#68FF00"
+			text: qsTr("Invert")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Overload")
 			onColor: "#F75E25"
+			text: qsTr("O / L")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/LowBattery")
 			onColor: "#F75E25"
+			text: qsTr("Bat")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 
-		Led {
+		LedText {
 			bind: Utils.path(inverterService, "/Leds/Temperature")
 			onColor: "#F75E25"
+			text: qsTr("Temp")
+			font.pixelSize: 8
+			width: 10; height: 8
 		}
 	}
 

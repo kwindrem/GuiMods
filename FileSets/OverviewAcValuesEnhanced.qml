@@ -30,20 +30,19 @@ Item {
 ////// modified to show power bar graphs
 			font.pixelSize: 19
             height: 21
-            visible: phaseCount >= 1
 		}
 
         // voltage for single leg
         TileText {
             text: EnhFmt.formatVBusItem (root.connection.voltageL1, "V")
-            visible: phaseCount === 1
+            visible: phaseCount <= 1
             font.pixelSize: 15
         }
         // current for single leg
         TileText {
             text: EnhFmt.formatVBusItem (root.connection.currentL1, "A")
             font.pixelSize: 15
-            visible: phaseCount === 1
+            visible: phaseCount <= 1
         }
 
         // power, voltage and current for multiple legs
@@ -89,7 +88,7 @@ Item {
         TileText {
             text: qsTr("Limit: ") + EnhFmt.formatVBusItem (root.connection.inCurrentLimit)
             font.pixelSize: phaseCount >= 2 ? 11 : 15
-            visible: phaseCount >= 1 && root.connection == sys.acInput
+            visible: root.connection == sys.acInput
         }
     }
 }

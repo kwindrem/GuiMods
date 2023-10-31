@@ -1,3 +1,7 @@
+v8.14:
+	Multi LEDs with text for better understanding
+	show AC input current limit even if AC source active
+
 v8.13:
 	wrap scrolling text to avoid blank at end of string
 	add support for v3.20~9

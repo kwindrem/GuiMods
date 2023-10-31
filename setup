@@ -302,11 +302,12 @@ if [ $scriptAction == 'INSTALL' ] ; then
 	updateActiveFile "$qmlDir/enhancedFormat.js"
     updateActiveFile "$qmlDir/DetailTarget.qml"
     updateActiveFile "$qmlDir/DetailButton.qml"
-    updateActiveFile "/opt/victronenergy/gui/qml/TileManualStartEnhanced.qml"
-    updateActiveFile "/opt/victronenergy/gui/qml/TileAutoRunEnhanced.qml"
-    updateActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorEnhanced.qml"
-    updateActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml"
-    updateActiveFile "/opt/victronenergy/gui/qml/DetailFuelCell.qml"
+    updateActiveFile "$qmlDir/TileManualStartEnhanced.qml"
+    updateActiveFile "$qmlDir/TileAutoRunEnhanced.qml"
+    updateActiveFile "$qmlDir/OverviewGeneratorEnhanced.qml"
+    updateActiveFile "$qmlDir/OverviewGeneratorRelayEnhanced.qml"
+    updateActiveFile "$qmlDir/DetailFuelCell.qml"
+    updateActiveFile "$qmlDir/LedText.qml"
 
     updateActiveFile "/opt/victronenergy/dbus-generator-starter/startstop.py"
     if $thisFileUpdated; then
@@ -316,8 +317,8 @@ if [ $scriptAction == 'INSTALL' ] ; then
     if $thisFileUpdated; then
 		restartGeneratorService=true
     fi
-    updateActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
-    updateActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
+    updateActiveFile "$qmlDir/PageGenerator.qml"
+    updateActiveFile "$qmlDir/PageSettingsGenerator.qml"
 
     # only used for darkmode | start
     # can be removed, when Victron launches new UI with darkmode
@@ -417,11 +418,12 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
 	restoreActiveFile "$qmlDir/enhancedFormat.js"
 	restoreActiveFile "$qmlDir/DetailTarget.qml"
 	restoreActiveFile "$qmlDir/DetailButton.qml"
-	restoreActiveFile "/opt/victronenergy/gui/qml/TileManualStartEnhanced.qml"
-	restoreActiveFile "/opt/victronenergy/gui/qml/TileAutoRunEnhanced.qml"
-	restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorEnhanced.qml"
-	restoreActiveFile "/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml"
-	restoreActiveFile "/opt/victronenergy/gui/qml/DetailFuelCell.qml"
+	restoreActiveFile "$qmlDir/TileManualStartEnhanced.qml"
+	restoreActiveFile "$qmlDir/TileAutoRunEnhanced.qml"
+	restoreActiveFile "$qmlDir/OverviewGeneratorEnhanced.qml"
+	restoreActiveFile "$qmlDir/OverviewGeneratorRelayEnhanced.qml"
+	restoreActiveFile "$qmlDir/DetailFuelCell.qml"
+	restoreActiveFile "$qmlDir/LedText.qml"
 
     restoreActiveFile "/opt/victronenergy/dbus-generator-starter/startstop.py"
     if $thisFileUpdated; then
@@ -431,8 +433,8 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     if $thisFileUpdated; then
 		restartGeneratorService=true
     fi
-	restoreActiveFile "/opt/victronenergy/gui/qml/PageGenerator.qml"
-	restoreActiveFile "/opt/victronenergy/gui/qml/PageSettingsGenerator.qml"
+	restoreActiveFile "$qmlDir/PageGenerator.qml"
+	restoreActiveFile "$qmlDir/PageSettingsGenerator.qml"
     logMessage "++ setup: Uninstalled GeneratorConnector"
 
     # only used for darkmode | start

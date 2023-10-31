@@ -1,1 +1,1 @@
-../v3.20~9/DetailInverter.qml
+../v3.20~13/DetailInverter.qml
