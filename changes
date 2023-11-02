@@ -1,3 +1,6 @@
+v8.15:
+	add support for V3.20~16
+
 v8.14:
 	Multi LEDs with text for better understanding
 	show AC input current limit even if AC source active
