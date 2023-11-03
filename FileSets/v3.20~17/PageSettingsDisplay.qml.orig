@@ -105,7 +105,7 @@ MbPage {
 
 		MbItemOptions {
 			property VBusItem updateFeed: VBusItem { bind: "com.victronenergy.settings/Settings/System/ReleaseType" }
-			show: vePlatform.isGuiv2Installed() && updateFeed.value >= Updater.FirmwareCandidate
+			show: vePlatform.isGuiv2Installed() && vePlatform.displayPresent() && updateFeed.value >= Updater.FirmwareCandidate
 			bind: "com.victronenergy.settings/Settings/Gui/RunningVersion"
 			description: "UI version"
 			possibleValues: [

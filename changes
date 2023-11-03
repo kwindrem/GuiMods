@@ -1,5 +1,8 @@
+v8.16:
+	add support for V3.20~17
+
 v8.15:
-	add support for V3.20~16
+	add support for V3.20~16 (never released to the field)
 
 v8.14:
 	Multi LEDs with text for better understanding
