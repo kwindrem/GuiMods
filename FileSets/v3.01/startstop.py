@@ -1185,7 +1185,7 @@ class StartStop(object):
 			if state == States.COOLDOWN:
 				self.log_info ("cool-down complete")
 				# delay restoring load to give generator a chance to stop
-				self._postCoolDownEndTime = self._currentTime + 30
+				self._postCoolDownEndTime = self._currentTime + self._settings['postcooldowntime']
 			self._dbusservice['/State'] = States.STOPPED
 			self._update_remote_switch()
 #### end GuiMods warm-up / cool-down

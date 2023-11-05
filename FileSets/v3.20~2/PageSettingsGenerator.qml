@@ -60,6 +60,15 @@ MbPage {
 				decimals: 0
 				step: 10
 			}
+		MbSpinBox {
+			description: qsTr("Post-cool-down time")
+			show: capabilities.value & warmupCapability
+			item {
+				bind: Utils.path(settingsBindPrefix, "/PostCoolDownTime")
+				unit: "s"
+				decimals: 0
+				step: 5
+			}
 		}
 
 		MbSwitch {

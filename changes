@@ -1,3 +1,6 @@
+v8.17:
+	add generator adjustable post-cool-down delay
+
 v8.16:
 	add support for V3.20~17
 

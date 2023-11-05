@@ -174,7 +174,9 @@ class Generator(object):
 			'autostartdisabledalarm': ['/Settings/{0}/Alarms/AutoStartDisabled', 0, 0, 1],
 			# Warm-up and Cool-down
 			'warmuptime': ['/Settings/{0}/WarmUpTime', 0, 0, 600],
-			'cooldowntime': ['/Settings/{0}/CoolDownTime', 0, 0, 600]
+			'cooldowntime': ['/Settings/{0}/CoolDownTime', 0, 0, 600],
+#### GuiMods warm-up / cool-down - ignore AC to allow generator to stop
+			'postcooldowntime': ['/Settings/{0}/PostCoolDownTime', 15, 0, 600]
 			}
 
 		settings = {}

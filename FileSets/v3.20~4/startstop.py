@@ -61,7 +61,6 @@ Capabilities = enum(
 SYSTEM_SERVICE = 'com.victronenergy.system'
 BATTERY_PREFIX = '/Dc/Battery'
 HISTORY_DAYS = 30
-WAIT_FOR_ENGINE_STOP = 15
 
 def safe_max(args):
 	try:
@@ -1250,7 +1249,7 @@ class StartStop(object):
 			if state == States.COOLDOWN:
 				self.log_info ("starting post cool-down")
 				# delay restoring load to give generator a chance to stop
-				self._postCoolDownEndTime = self._currentTime + WAIT_FOR_ENGINE_STOP
+				self._postCoolDownEndTime = self._currentTime + self._settings['postcooldowntime']
 				self._dbusservice['/State'] = States.STOPPING
 				self._update_remote_switch() # Stop engine
 				self.log_info('Stopping generator that was running by %s condition' %
