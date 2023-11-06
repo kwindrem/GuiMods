@@ -61,6 +61,8 @@ MbPage {
 				decimals: 0
 				step: 10
 			}
+		}
+		//// GuiMods
 		MbSpinBox {
 			description: qsTr("Post-cool-down time")
 			show: capabilities.value & warmupCapability

@@ -1,8 +1,11 @@
+v8.20:
+	fixed: blank screen in Venus v3.01 (bug in v8.17)
+
 v8.19:
 	add support for v3.20~18
 
 v8.18:
-	fixed: blank screen (bug in v8.17)
+	fixed: blank screen  v3.10 (bug in v8.17)
 
 v8.17:
 	add generator adjustable post-cool-down delay
