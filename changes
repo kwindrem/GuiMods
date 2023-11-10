@@ -1,3 +1,6 @@
+v8.21:
+	add support fro v3.20~21
+
 v8.20:
 	fixed: blank screen in Venus v3.01 (bug in v8.17)
 
