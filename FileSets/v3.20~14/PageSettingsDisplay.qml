@@ -58,7 +58,7 @@ MbPage {
 		MbSwitch
 		{
 			id: colorScheme
-			bind: "com.victronenergy.settings/Settings/Gui/ColorScheme"
+			bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
 			name: qsTr ("Dark Mode")
 			writeAccessLevel: User.AccessUser
 		}
