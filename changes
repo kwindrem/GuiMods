@@ -1,3 +1,6 @@
+v8.24:
+	add support for v3.13~1 and v3.20~32
+
 v8.23:
 	add support for v3.20~30
 	GuiMods light/dark mode selection does not work in the Display & Language menu
