@@ -1,3 +1,6 @@
+v8.25:
+	added support for v3.13
+
 v8.24:
 	add support for v3.13~1 and v3.20~32
 
