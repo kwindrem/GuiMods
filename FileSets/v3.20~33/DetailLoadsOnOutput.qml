@@ -144,7 +144,7 @@ MbPage {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
                         text: "L2 values included in L1"
-                        visible: l1AndL2OutShorted }
+                        visible: l2AndL1OutSummed }
             }
         }
     }

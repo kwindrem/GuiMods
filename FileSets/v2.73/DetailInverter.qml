@@ -74,7 +74,8 @@ MbPage {
     VBusItem { id: splitPhaseL2Passthru; bind: Utils.path(inverterService, "/Ac/State/SplitPhaseL2Passthru") }
     VBusItem { id: phaseCountItem; bind: Utils.path(inverterService, "/Ac/NumberOfPhases") }
 
-    property bool splitPhasePassthruDisabled: splitPhaseL2Passthru.valid && splitPhaseL2Passthru.value === 0
+	property bool noL2inverter: splitPhaseL2Passthru.valid
+	property bool l2AndL1OutSummed: noL2inverter && splitPhaseL2Passthru.value === 0
     property int phaseCount: phaseCountItem.valid ? phaseCountItem.value : 0
 
     // background
@@ -172,9 +173,19 @@ MbPage {
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValueDiff (pOutL1, pInL1, "W") }
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: splitPhasePassthruDisabled ? "< < <" : formatValueDiff (pOutL2, pInL2, "W"); visible: phaseCount >= 2 }
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
+						text:
+						{
+							if (l2AndL1OutSummed)
+								return "< < <"
+							else if (noL2inverter)
+								return qsTr("none")
+							else
+								return formatValueDiff (pOutL2, pInL2, "W")
+						}
+						visible: phaseCount >= 2
+				}
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: formatValueDiff (pOutL3, pInL3, "W"); visible: phaseCount >= 3 }
@@ -234,7 +245,7 @@ MbPage {
                         text: EnhFmt.formatVBusItem (iOutL1, "A") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: splitPhasePassthruDisabled ? "< < <" : EnhFmt.formatVBusItem (iOutL2, "A"); visible: phaseCount >= 2 }
+						text: l2AndL1OutSummed ? "< < <" : EnhFmt.formatVBusItem (iOutL2, "A"); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: EnhFmt.formatVBusItem (iOutL3, "A"); visible: phaseCount >= 3 }
@@ -279,10 +290,10 @@ MbPage {
             }
             Row
             {
-                Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-                        text: qsTr ("L2 Output values included in L1")
-                        visible: splitPhasePassthruDisabled
+				Text { font.pixelSize: 12; font.bold: true; color: "black"
+						width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
+						text: l2AndL1OutSummed ? qsTr ("L2 Output values included in L1") : qsTr ("L2 AC out from AC in (no inverter)")
+						visible: noL2inverter
 					}
             }
         }

@@ -83,8 +83,9 @@ MbPage {
     VBusItem { id: _l2L1OutSummed; bind: Utils.path(inverterService, "/Ac/State/SplitPhaseL2L1OutSummed") }
     VBusItem { id: phaseCountItem; bind: Utils.path(inverterService, "/Ac/NumberOfPhases") }
 
-    property bool l2AndL1OutSummed: _l2L1OutSummed.valid && _l2L1OutSummed.value === 0
-    property int phaseCount: phaseCountItem.valid ? phaseCountItem.value : 0
+	property bool noL2inverter: _l2L1OutSummed.valid
+    property bool l2AndL1OutSummed: noL2inverter && _l2L1OutSummed.value === 1
+    property int phaseCount: Item.valid ? phaseCountItem.value : 0
 
     // background
     Rectangle
@@ -180,7 +181,17 @@ MbPage {
 					text: formatValueDiff (pOutL1, pInL1, "W") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
-					text: l2AndL1OutSummed ? "< < <" : formatValueDiff (pOutL2, pInL2, "W"); visible: phaseCount >= 2 }
+					text:
+					{
+						if (l2AndL1OutSummed)
+							return "< < <"
+						else if (noL2inverter)
+							return qsTr("none")
+						else
+							return formatValueDiff (pOutL2, pInL2, "W")
+					}
+					visible: phaseCount >= 2
+			}
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: legColumnWidth; horizontalAlignment: Text.AlignHCenter
 					text: formatValueDiff (pOutL3, pInL3, "W"); visible: phaseCount >= 3 }
@@ -287,8 +298,8 @@ MbPage {
 		{
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: rowTitleWidth + totalDataWidth; horizontalAlignment: Text.AlignHCenter
-					text: qsTr ("L2 Output values included in L1")
-					visible: l2AndL1OutSummed
+					text: l2AndL1OutSummed ? qsTr ("L2 Output values included in L1") : qsTr ("L2 AC out from AC in (no inverter)")
+					visible: noL2inverter
 				}
 		}
 	}

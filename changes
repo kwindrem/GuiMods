@@ -1,3 +1,6 @@
+v8.27:
+	fixed: 120x2 Multi display incorrect in flow overview and Inverter detail
+
 v8.26:
 	fixed: no file set for v3.12
 

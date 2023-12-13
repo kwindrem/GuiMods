@@ -30,28 +30,35 @@ Item {
 ////// modified to show power bar graphs
 			font.pixelSize: 19
             height: 21
+            visible: phaseCount >= 1
 		}
 
         // voltage for single leg
         TileText {
             text: EnhFmt.formatVBusItem (root.connection.voltageL1, "V")
-            visible: phaseCount <= 1
+            visible: phaseCount === 1
             font.pixelSize: 15
         }
         // current for single leg
         TileText {
             text: EnhFmt.formatVBusItem (root.connection.currentL1, "A")
             font.pixelSize: 15
-            visible: phaseCount <= 1
+            visible: phaseCount === 1
         }
 
         // power, voltage and current for multiple legs
         TileText {
-            text: "L1: " + EnhFmt.formatVBusItem (root.connection.powerL1, "W")
+            text: "L1:" + EnhFmt.formatVBusItem (root.connection.powerL1, "W")
 				+ " " + EnhFmt.formatVBusItem (root.connection.voltageL1, "V")
 				+ " " + EnhFmt.formatVBusItem (root.connection.currentL1, "A")
             visible: phaseCount >= 2
             font.pixelSize: 11
+        }
+        // spacer to avoid connection dot
+        TileText {
+            text: ""
+            visible: phaseCount === 2 || phaseCount === 3 && root.height >= 90
+            font.pixelSize: 8
         }
         TileText {
             text:
@@ -69,26 +76,34 @@ Item {
             font.pixelSize: 11
         }
         TileText {
-            text:
-            {
-				if (phaseCount >= 3)
-					return "L3: " + EnhFmt.formatVBusItem (root.connection.powerL3, "W")
+            text: "L3:" + EnhFmt.formatVBusItem (root.connection.powerL3, "W")
 				+ " " + EnhFmt.formatVBusItem (root.connection.voltageL3, "V")
 				+ " " + EnhFmt.formatVBusItem (root.connection.currentL3, "A")
-				else
-					return " "
-			}
-            visible: phaseCount >= 2
+            visible: phaseCount >= 3
+            font.pixelSize: 11
+        }
+        // spacer
+        TileText {
+            text: ""
+            visible: phaseCount === 2 && root.height >= 90
             font.pixelSize: 11
         }
         TileText {
             text: EnhFmt.formatVBusItem (root.connection.frequency, "Hz")
             font.pixelSize: phaseCount >= 2 ? 11 : 15
+            visible: phaseCount === 1 || root.connection != sys.acInput
         }
         TileText {
             text: qsTr("Limit: ") + EnhFmt.formatVBusItem (root.connection.inCurrentLimit)
-            font.pixelSize: phaseCount >= 2 ? 11 : 15
-            visible: root.connection == sys.acInput
+            font.pixelSize: 15
+            visible: phaseCount === 1 && root.connection == sys.acInput
+        }
+        // frequency and input current limit for multiple legs
+        TileText {
+            text: EnhFmt.formatVBusItem (root.connection.frequency, "Hz")
+				+ " " + EnhFmt.formatVBusItem (root.connection.inCurrentLimit)
+            font.pixelSize: 11
+            visible: phaseCount >= 2 && root.connection == sys.acInput
         }
     }
 }
