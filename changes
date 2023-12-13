@@ -1,3 +1,6 @@
+v8.26:
+	fixed: no file set for v3.12
+
 v8.25:
 	added support for v3.13
 
