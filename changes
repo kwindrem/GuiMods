@@ -1,3 +1,6 @@
+v8.28:
+	add support for v3.20~34
+
 v8.27:
 	fixed: 120x2 Multi display incorrect in flow overview and Inverter detail
 
