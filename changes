@@ -1,3 +1,6 @@
+v9.0:
+	incorporate SetupHelper v6 enhancements
+
 v8.29:
 	add support for v3.20~36
 

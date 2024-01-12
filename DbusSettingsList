@@ -1,0 +1,61 @@
+{"path":"/Settings/GuiMods/GaugeLimits/PeakPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/CautionPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/ContiuousPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/AcOutputMaxPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/PvChargerMaxPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/BatteryMaxDischargeCurrent", "default":0.0}
+{"path":"/Settings/GuiMods/AcCurrentLimit/Preset1", "default":10}
+{"path":"/Settings/GuiMods/AcCurrentLimit/Preset2", "default":20}
+{"path":"/Settings/GuiMods/AcCurrentLimit/Preset3", "default":30}
+{"path":"/Settings/GuiMods/AcCurrentLimit/Preset4", "default":50}
+{"path":"/Settings/GuiMods/TemperatureScale", "default":1}
+{"path":"/Settings/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/UseEnhancedMobileOverview", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/UseEnhancedFlowOverview", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowEnhancedFlowLoadsOnInput", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/EnhancedFlowCombineLoads", "default":0, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowGauges", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowTileOverview", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/MoveSettings", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowRelayOverview", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/ShowInactiveFlowTiles", "default":0}
+{"path":"/Settings/GuiMods/ShowTanksTempsDigIn", "default":0, "min":0, "max":1}
+{"path":"/Settings/GuiMods/FlowOverview", "default":1, "min":0, "max":3}
+{"path":"/Settings/GuiMods/CustomDcSystemName", "default":""}
+{"path":"/Settings/GuiMods/TimeFormat", "default":1}
+{"path":"/Settings/Relay/0/CustomName", "default":""}
+{"path":"/Settings/Relay/0/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/1/CustomName", "default":""}
+{"path":"/Settings/Relay/1/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/2/CustomName", "default":""}
+{"path":"/Settings/Relay/2/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/3/CustomName", "default":""}
+{"path":"/Settings/Relay/3/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/4/CustomName", "default":""}
+{"path":"/Settings/Relay/4/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/5/CustomName", "default":""}
+{"path":"/Settings/Relay/5/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxChargerPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxFeedInPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/DcSystemMaxLoad", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/DcSystemMaxCharge", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxAlternatorPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxWindGenPower", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxAcChargerPower", "default":0.0}
+{"path":"/Settings/GuiMods/UseEnhancedGeneratorOverview", "default":1.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxFuelCellPower", "default":0.0}
+{"path":"/Settings/GuiMods/ShowBatteryTempOnFlows", "default":1, "min":0, "max":1}
+{"path":"/Settings/GuiMods/KilowattThreshold", "default":1000, "min":1000, "max":10000}
+{"path":"/Settings/GuiMods/TankBarFormat", "default":0, "min":0, "max":2}
+{"path":"/Settings/FischerPanda0/ServiceInterval", "default":0, "min":-1, "max":5000000}
+{"path":"/Settings/Generator0/ServiceInterval", "default":0, "min":-1, "max":5000000}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxMotorDriveCharge", "default":0.0}
+{"path":"/Settings/GuiMods/GaugeLimits/MaxMotorDriveLoad", "default":0.0}
+{"path":"/Settings/GuiMods/ReplaceInactiveAcIn", "default":0, "min":0, "max":1}
+{"path":"/Settings/GuiMods/DarkMode", "default":0, "min":0, "max":1}
