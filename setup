@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# NOTE: REQUIRES SetupHelper v6.0 or later
-
 # this script provides the following modificaitons:
 #   move Settings and Notifications to the top of the list man page
 #   hides the Tiles Overview
@@ -16,33 +14,20 @@
 
 # enhanced generator control and display is part of GuiMods now so GeneratorConnector must not be installed also
 
-################################################################################################################
-# check to see if SetupHelper is at least v6.0 - exit if not
-# this is done without use of any SetupHelper script extensions
-scriptDir="$( cd "$(dirname $0)" >/dev/null 2>&1 ; /bin/pwd -P )"
-packageName=$( basename $scriptDir )
-setupHelperVersionFile="/data/SetupHelper/version"
-if ! [ -f "$setupHelperVersionFile" ]; then
-	echo "$packageName: SetupHelper version not found - can't continue" | tee -a "/data/log/SetupHelper"
-	exit $EXIT_ERROR
-else
-	version=$( cat "$setupHelperVersionFile" )
-	major=$( echo ${version:1} | awk -F. '{print $1}')
-	if (( major < 6 )); then
-		echo "$packageName: SetupHelper $version found must be v6.0 or newer - can't continue" | tee -a "/data/log/SetupHelper"
-		dbus -y com.victronenergy.packageManager /GuiEditStatus SetValue "$packageName requires SetupHelper v6.0" > /dev/null
-		sleep 5
-		exit 255
-	fi
-fi
-################################################################################################################
-
-#### following lines incorporate SetupHelper utilities into this script
+#### following lines incorporate helper resources into this script
 # Refer to the SetupHelper ReadMe file for details.
 
-source "/data/SetupHelper/CommonResources"
+pkgDir=$( dirname $0 )
+pkgName=$( basename $pkgDir )
 
+if [ -e "$pkgDir/HelperFiles/InstallHelpers" ]; then
+	source "$pkgDir/HelperFiles/InstallHelpers"
+else
+	echo "$pkgName: helper files not found - can't continue" | tee -a "/data/log/SetupHelper"
+	exit 1
+fi
 #### end of lines to include SetupHelper
+
 
 #### running manually and OK to proceed - prompt for input
 if [ $scriptAction == 'NONE' ] ; then
