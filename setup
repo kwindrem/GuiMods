@@ -435,7 +435,6 @@ if [ $scriptAction == 'UNINSTALL' ] ; then
     fi
 	restoreActiveFile "$qmlDir/PageGenerator.qml"
 	restoreActiveFile "$qmlDir/PageSettingsGenerator.qml"
-    logMessage "++ setup: Uninstalled GeneratorConnector"
 
     # only used for darkmode | start
     # can be removed, when Victron launches new UI with darkmode
