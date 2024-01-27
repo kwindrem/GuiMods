@@ -1,0 +1,211 @@
+#!/bin/bash
+
+# DbusSettingsResources for SetupHelper
+#
+# contains a functions and variables necessary to access dbus Settings parameters
+# it should be sourced by scripts setting, creating and removing dbus settings
+#
+# dbus Settings is not operational during system boot when some setup scripts may
+# need to make settings changes
+# These functions check to see if the settings system is operational and defer
+# the set/create/remove activity so the calling script may continue
+
+# dbus Settings funcitons
+# These functions encapsulate an interface to dbus Settings
+# NOTE: dbus Settings resources are not always active when it is necessary for
+# scripts to make changes or create/remove settings
+# it is up to the caller to insure dbus Settings resources are active before callling
+# these functions
+# a dbus exeption error will be logged if settings are not active yet
+
+
+# updateDbusStringSetting
+# updateDbusIntSetting
+# updateDbusRealSetting
+#   updates a dbus setting parameter with a new value
+#
+# if the setting does not exist, it is created
+# but max and min values are not set and the default is "", 0 or 0.0 depending on data type
+# if these are needed use the dbus command directly
+#   this can also be faster if lots of settings must be created at the same time
+#
+# other data types may exist and would need their own function
+#
+# $1 is the path to the setting starting with /Settings
+# $2 is the new value
+#
+# if the setting does not yet exist, it is created, then updated to the new value
+
+updateDbusStringSetting ()
+{
+	# don't do any work if install has already failed
+	if $installFailed; then
+		return
+	fi
+
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings "$1"\
+            com.victronenergy.BusItem.GetValue &> /dev/null
+    if (( $? != 0 )); then
+        logMessage "creating dbus Setting $1"
+        dbus -y com.victronenergy.settings / AddSettings "%[ {\"path\":\"$1\", \"default\":\"\"} ]" &> /dev/null
+    fi
+
+    dbus -y com.victronenergy.settings "$1" SetValue "$2" &> /dev/null
+}
+
+
+updateDbusIntSetting ()
+{
+	# don't do any work if install has already failed
+	if $installFailed; then
+		return
+	fi
+
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings "$1"\
+            com.victronenergy.BusItem.GetValue &> /dev/null
+    if (( $? != 0 )); then
+        logMessage "creating dbus Setting $1"
+        dbus -y com.victronenergy.settings / AddSettings "%[ {\"path\":\"$1\", \"default\":0} ]" &> /dev/null
+    fi
+
+    dbus -y com.victronenergy.settings "$1" SetValue "$2" &> /dev/null
+}
+
+
+updateDbusRealSetting ()
+{
+	# don't do any work if install has already failed
+	if $installFailed; then
+		return
+	fi
+
+    dbus-send --system --print-reply=literal --dest=com.victronenergy.settings "$1"\
+            com.victronenergy.BusItem.GetValue &> /dev/null
+    if (( $? != 0 )); then
+        logMessage "creating dbus Setting $1"
+        dbus -y com.victronenergy.settings / AddSettings "%[ {\"path\":\"$1\", \"default\":0.0} ]" &> /dev/null
+    fi
+
+    dbus -y com.victronenergy.settings "$1" SetValue "$2" &> /dev/null
+}
+
+
+
+# addAllDbusSettings adds settings from DbusSettingsList in the package directory
+# the format of each line is:
+# {"path":"/Settings/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1}
+# min and max are optional
+
+addAllDbusSettings ()
+{
+	local settings
+
+	if [ -f "$scriptDir/DbusSettingsList" ]; then
+		logMessage "updating dbus Settings"
+		while read -r line || [[ -n "$line" ]]; do
+			settings+="$line, "
+		done < "$scriptDir/DbusSettingsList"
+
+		dbus -y com.victronenergy.settings / AddSettings "%[ $settings  ]" &> /dev/null
+	fi
+}
+
+# same as above but removes them
+# typically settings are retained when removing a package so
+# the developer must make this call specifically in the setup script's UNINSTALL section
+# if they wish to remove the settings
+
+removeAllDbusSettings ()
+{
+	local settings
+
+	if [ -f "$scriptDir/DbusSettingsList" ]; then
+		logMessage "removing dbus Settings"
+		while read -r line || [[ -n "$line" ]]; do
+				settings+=$( echo $line | awk -F[:,] '{print $2, ","}' )
+		done < "$scriptDir/DbusSettingsList"
+
+		dbus -y com.victronenergy.settings / RemoveSettings "%[ $settings  ]"
+	fi
+}
+
+
+
+# removeDbusSettings removes the setting from dbus Settings
+#
+# all parameters are each a quoted path to the setting to be removed
+# e.g., removeDbusSettings "/Settings/foo" "/Settings/bar"
+# (including all settings in one dbus call is much faster)
+
+removeDbusSettings ()
+{
+    logMessage "removing dbus Settings $@"
+    local settings=$(echo "$@" | sed -e s_^_\"_ -e s_\$_\"_ -e s_\ _'", "'_g)
+    dbus -y com.victronenergy.settings / RemoveSettings "%[ $settings ]" &> /dev/null
+}
+
+
+# setSetting updates the dbus setting parameter
+# the setting must already exist or the update will fail
+# (the setting can not be created without knowing the data type(s))
+#
+# $1 is the new value
+# $2 is the setting path
+
+setSetting ()
+{
+	# don't do any work if install has already failed
+	if $installFailed; then
+		return
+	fi
+
+    dbus -y com.victronenergy.settings $2 SetValue $1 &> /dev/null
+}
+
+# move a setting from setup options or from previous dbus Setting
+# $1 is the setup options path
+# $2 is the old dbus path (has priority over setup option)
+# $3 is the new dbus path
+# dbus paths start with /Settings
+# if specified, the setup option file must include a value
+#   that value has priority over the old dbus parameter
+#
+# setup options can either contain a value or be a flag file
+# for flag files, the file will be empty and the state of the option
+# depends on the presence of the file (true) or absense of the file (false)
+#
+# Note: this function does NOT create or remove any old option or Setting
+# use other functions or commands to do so
+
+moveSetting ()
+{
+	# don't do any work if install has already failed
+	if $installFailed; then
+		return
+	fi
+
+    local setupOption="$1"
+    local oldDbusPath=$2
+    local newDbusPath=$3
+
+    if [ ! -z "$oldDbusPath" ]; then
+        oldSetting=$(dbus-send --system --print-reply=literal --dest=com.victronenergy.settings\
+            $oldDbusPath com.victronenergy.BusItem.GetValue 2> /dev/null | awk '{print $3}')
+    elif [ ! -z $setupOption ]; then
+        if [ -f "$setupOption" ]; then
+            oldSetting=$(cat "$setupOption")
+            # flag file - old setting is true (1)
+            if [ -z $oldSetting ]; then
+                oldSetting=1
+            fi
+        # file did not exist - assume a false value for a flag file
+        else
+            oldSetting=0
+        fi
+    else
+        oldSetting=""
+    fi
+    if [ ! -z $oldSetting ] && [ ! -z "$newDbusPath" ]; then
+        dbus -y com.victronenergy.settings $newDbusPath SetValue $oldSetting &> /dev/null
+    fi
+}

@@ -17,6 +17,10 @@ OverviewPage
     property int listWidth: tileWidth * numberOfRelaysShown
     property int listHeight: root.height - 30
 
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
     VBusItem
     {
         id: relay0ShowItem
@@ -112,7 +116,8 @@ OverviewPage
         {
             fill: parent
         }
-        color: "#b3b3b3"
+////// GuiMods — DarkMode
+		color: !darkMode ? "gray" : "#202020"
     }
 
     ListModel { id: relaysModel }
@@ -149,7 +154,7 @@ OverviewPage
         delegate: TileRelay
         {
             width: tileWidth
-            height: root.height - 40
+            height: root.height - 38
             Connections
             {
                 target: marqueeTimer

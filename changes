@@ -1,3 +1,8 @@
+v9.0:
+	add support for v3.20~41
+	added Dark Mode to relay overview
+	incorporate SetupHelper v6 enhancements
+
 v8.31:
 	add support for v3.20~40
 

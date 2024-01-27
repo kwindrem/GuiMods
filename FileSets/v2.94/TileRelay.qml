@@ -25,6 +25,10 @@ Tile {
     property bool offButtonActive: false
     property bool onButtonActive: false
 
+////// GuiMods — DarkMode
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+
     VBusItem
     {
         id: stateItem
@@ -81,7 +85,9 @@ Tile {
 
     Component.onCompleted: updateFunction ()
 
-    color: "#d9d9d9"
+////// GuiMods — DarkMode
+	color: !darkMode ? "#d9d9d9" : "#202020"
+	border.color: !darkMode ? "#fff" : "#707070"
 
     function doScroll()
     {
@@ -94,7 +100,6 @@ Tile {
         Column
         {
             width: root.width
-            height: contentHeight + 4
             x: 3
             spacing: 4
             visible: true
@@ -107,7 +112,8 @@ Tile {
             {
                 font.pixelSize: 12
                 font.bold: true
-                color: "black"
+////// GuiMods DarkMode                
+				color: !darkMode ? "black" : "gray"
                 anchors
                 {
                     horizontalCenter: parent.horizontalCenter
@@ -122,14 +128,16 @@ Tile {
                 text: nameItem.valid && nameItem.value != "" ? nameItem.value : " "
                 fontSize: 12
                 bold: true
-                textColor: "black"
+////// GuiMods DarkMode
+				textColor: !darkMode ? "black" : "gray"
                 scroll: false
             }
             Text
             {
                 font.pixelSize: 12
                 font.bold: true
-                color: "black"
+////// GuiMods DarkMode
+				color: !darkMode ? "black" : "gray"
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
                 text: functionText
@@ -141,7 +149,8 @@ Tile {
                 width: parent.width - 4
                 fontSize: 12
                 bold: true
-                textColor: "black"
+////// GuiMods DarkMode
+				textColor: !darkMode ? "black" : "gray"
                 scroll: false
                 text:
                 {
@@ -197,7 +206,8 @@ Tile {
             {
                 font.pixelSize: 4
                 font.bold: true
-                color: "black"
+////// GuiMods - DarkMode
+				color: !darkMode ? "black" : "gray"
                 height: 4
                 anchors.horizontalCenter: parent.horizontalCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -206,7 +216,8 @@ Tile {
             Button
             {
                 id: onButton
-                baseColor: onButtonActive ? "green" : "#e6ffe6"
+////// GuiMods - DarkMode
+				baseColor: !darkMode ? (onButtonActive ? "green" : "#e6ffe6") : (onButtonActive ? "#003000" : "#003000")
                 pressedColor: "#979797"
                 height: 40
                 width: parent.width - 6
@@ -221,7 +232,8 @@ Tile {
             Button
             {
                 id: offButton
-                baseColor: offButtonActive ? "black" : "#e6e6e6"
+////// GuiMods - DarkMode
+				baseColor: !darkMode ? (offButtonActive ? "black" : "#e6e6e6") : (offButtonActive ? "gray" : "gray")
                 pressedColor: "#979797"
                 height: 40
                 width: parent.width - 6
@@ -236,7 +248,8 @@ Tile {
             Button
             {
                 id: autoButton
-                baseColor: autoButtonActive ? "orange" : "#ffedcc"
+////// GuiMods - DarkMode                                          
+				baseColor: !darkMode ? (autoButtonActive ? "orange" : "#ffedcc") : (autoButtonActive ? "#3a2600" : "#3a2600")
                 pressedColor: "#979797"
                 height: 40
                 width: parent.width - 6

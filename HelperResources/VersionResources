@@ -1,0 +1,139 @@
+#!/bin/sh
+
+# this file contains functions for comparing version numbers
+#
+#	NOTE: this script does NOT rely on other helper files
+
+
+# convert a version string to an integer to make comparisions easier
+# the Victron format for version numbers is: vX.Y~Z-large-W
+# the ~Z portion indicates a pre-release version so a version without it is "newer" than a version with it
+# the -W portion has been abandoned but was like the ~Z for large builds and is IGNORED !!!!
+#	large builds now have the same version number as the "normal" build
+#
+# the version string passed to this function allows for quite a bit of flexibility
+#	any alpha characters are permitted prior to the first digit
+#	up to 3 version parts PLUS a prerelease part are permitted
+#		each with up to 4 digits each -- MORE THAN 4 digits is indeterminate
+#	that is: v0.0.0d0  up to v9999.9999.9999b9999 and then v9999.9999.9999 as the highest priority
+#	any non-numeric character can be used to separate main versions
+#	special significance is assigned to single caracter separators between the numeric strings
+#		b or ~ indicates a beta release
+#		a indicates an alpha release
+#		d indicates an development release
+# 		these offset the pre-release number so that b/~ has higher numeric value than any a
+#			and a has higher value than d separator
+#
+# a blank version or one without at least one number part is considered invalid
+# alpha and beta seperators require at least two number parts
+#
+# returns 0 if conversion succeeeded, 1 if not
+# the value integer is returned in $versionNumber
+# a status text string is returned in $versionStringToNumberStatus
+#	and will include the string passed to the function
+#	as well as the converted number if successful and the type of release detected
+#		or an error reason if not
+#
+
+
+function versionStringToNumber ()
+{
+	local version="$*"
+	local numberParts
+	local versionParts
+	local numberParts
+	local otherParts
+	local other
+	local number=0
+	local type='release'
+
+	# split incoming string into
+	# an array of numbers: major, minor, prerelease, etc
+	# and an array of other substrings
+	# the other array is searched for releasy type strings and the related offest added to the version number
+	
+	read -a numberParts <<< $(echo $version | tr -cs '0-9' ' ')
+	numberPartsLength=${#numberParts[@]}
+	if (( $numberPartsLength == 0 )); then
+		versionNumber=0
+		versionStringToNumberStatus="$version: invalid, missing major version"
+		return 1
+	fi
+	if (( $numberPartsLength >= 2 )); then
+		read -a otherParts <<< $(echo $version | tr -s '0-9' ' ')
+	
+		for other in ${otherParts[@]}; do
+			case $other in
+				'b' | '~')
+					type='beta'
+					(( number += 60000 ))
+					break ;;
+				'a')
+					type='alpha'
+					(( number += 30000 ))
+					break ;;
+				'd')
+					type='develop'
+					break ;;
+			esac
+		done
+	fi
+
+	# if release all parts contribute to the main version number
+	#	and offset is greater than all prerelease versions
+	if [ "$type" == "release" ] ; then
+		(( number += 90000 ))
+	# if pre-release, last part will be the pre release part
+	#	and others part will be part the main version number
+	else
+		(( numberPartsLength-- ))
+		(( number += 10#${numberParts[$numberPartsLength]} ))
+	fi
+	# include core version number
+	(( number += 10#${numberParts[0]} * 10000000000000 ))
+	if (( numberPartsLength >= 2)); then
+		(( number += 10#${numberParts[1]} * 1000000000 ))
+	fi
+	if (( numberPartsLength >= 3)); then
+		(( number += 10#${numberParts[2]} * 100000 ))
+	fi
+
+	versionNumber=$number
+	versionStringToNumberStatus="$version:$number $type"
+	return 0
+}
+
+
+
+# compares two version strings
+#
+# missing verions are treated as 0
+#
+# returns 0 if they are equal
+# returns 1 if the first is newer than the second
+# returns -1 if the second is newer than the first
+
+function compareVersions ()
+{
+	local versionNumber2
+
+	if [ -z $2 ]; then
+		versionNumber2=0
+	else
+		versionStringToNumber $2
+		versionNumber2=$versionNumber
+	fi
+	if [ -z $1 ]; then
+		versionNumber=0
+	else
+		versionStringToNumber $1
+	fi
+
+	if (( versionNumber == versionNumber2 ));then
+		return 0
+	elif (( versionNumber > versionNumber2 ));then
+		return 1
+	else
+		return -1
+	fi
+}

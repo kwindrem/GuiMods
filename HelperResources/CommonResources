@@ -1,0 +1,1406 @@
+#!/bin/bash
+
+
+# CommonResources for SetupHelper
+# contains a functions and variables necessary for a setup script to interface with reinstallMods
+#patch file missing for
+# Refer to the SetupHelper ReadMe file for details on how to use these resources.
+
+# what action the script should take:
+#  NONE - do noting - signals script to prompt for user input on how to proceed
+#  INSTALL - install package components
+#  (decommissioned) PROMPT - prompt user for additional installation options
+#  UNINSTALL - remove package components
+#  EXIT - exit script without taking any action
+# CommonResources may set the the action if initial checks
+#  indicate a clear direction
+# otherwise, the action will be set based on user input (in the script)
+# if failures occur during installation,
+# scriptAction should be changed to UNINSTALL so the installation can be cleaned up
+# and the setup script should test for UNINSTALL after it attempts installation
+# A file set error indicates the file set for the current verion is not usable
+#  and installation should not occur
+#  checkFileSets EXITS locally
+
+scriptAction='NONE'
+installFailed=false
+installExitReason=$EXIT_SUCCESS
+
+# flags to control setup script behavior (in endScript)
+rebootNeeded=false
+runAgain=false
+filesUpdated=false
+restartGui=false
+restartGenerator=false
+restartSystemCalc=false
+restartDigitalinputs=false
+
+
+# file lists are populated by getFileLists called from_chckFileSets and autoinstall
+#	so these are global
+fileList=()
+fileListVersionIndependent=()
+fileListAll=()
+
+
+######## skip to bottom of file for remainder of code executed when script is sourced
+
+
+# getFileLists reads the file list from files in the FileSets directory
+#
+#	'fileList' file must only list version-dependent files
+#	'fileListVersionIndependent' file must list only version-independent files
+#		prior to SetupHelper v6.0, this list is ignored
+#	'fileListPatched' lists all files that should be patched before installation
+#
+# $1 specifies where the path to the fileList files
+#
+# three composite file lists are returned in global arrays:
+#	fileList contains only version-dependent files
+#	fileListVersionIndependent contains only version-independent files
+#	fileListPatched contains only files that need to be patched
+#	fileListAll contains both versioned and version-independent files
+
+function getFileLists ()
+{
+	local verListFile="$1/fileList"
+	local indListFile="$1/fileListVersionIndependent"
+	local patchListFile="$1/fileListPatched"
+	local tempListVer=()
+	local tempListInd=()
+	local tempListPatched=()
+
+	if [ -f "$verListFile" ]; then
+		while read -r line || [[ -n "$line" ]]; do
+			read -a params <<< $line
+			# parse line into space-separted parameters then discard any that don't begin with /
+			# this strips all comments beginning with # as well as any leading or trailing spaces
+			for param in ${params[@]} ; do
+				case $param in
+					/*)
+						tempListVer+=("$param")
+						;;
+				esac
+			done
+		done < "$verListFile"
+	fi
+	if [ -f "$indListFile" ]; then
+		while read -r line || [[ -n "$line" ]]; do
+			read -a params <<< $line
+			for param in ${params[@]} ; do
+				case $param in
+					/*)
+						tempListInd+=("$param")
+						;;
+				esac
+			done
+		done < "$indListFile"
+	fi
+	if [ -f "$patchListFile" ]; then
+		while read -r line || [[ -n "$line" ]]; do
+			read -a params <<< $line
+			for param in ${params[@]} ; do
+				case $param in
+					/*)
+						tempListPatched+=("$param")
+						;;
+				esac
+			done
+		done < "$patchListFile"
+	fi
+
+	# remove duplicate files from each list
+	fileList=($(printf "%s\n" "${tempListVer[@]}" | sort -u))
+	fileListVersionIndependent=($(printf "%s\n" "${tempListInd[@]}" | sort -u))
+	fileListPatched=($(printf "%s\n" "${tempListPatched[@]}" | sort -u))
+	tempListAll=(${fileList[@]})
+	tempListAll+=(${fileListVersionIndependent[@]})
+	tempListAll+=(${fileListPatched[@]})
+	fileListAll=($(printf "%s\n" "${tempListAll[@]}" | sort -u))
+}
+
+
+# yesNoPrompt provides user prompting requesting a yes/no response
+#
+# $1 is the prompt displayed when pausing for user input
+#
+# $yesResponse is set to true if the response was yes
+#
+# returns 0 for yes, 1 for no
+
+yesNoPrompt ()
+{
+    response=''
+    while true; do
+        /bin/echo -n "$*"
+        read response
+        case $response in
+            [yY]*)
+                yesResponse=true
+                return 0
+                break
+                ;;
+            [nN]*)
+                yesResponse=false
+                return 1
+                break
+                ;;
+            *)
+        esac
+    done
+}
+
+
+# standardActionPrompt provides the standard set of options for selecting script's action
+# scriptAction is set by install/uninstall
+# other actions are handled locally, including quitting from the script
+#
+# if nonstandard prompts are necessary, duplicate this code in the setup script
+# and add the additional options and do not call standardActionPrompt
+#
+# the reinstall option is permitted only if setup options were previously set
+# if the the reinstall action is choosen, the script action is set to INSTALL
+# the setup script can then test this to skip further prompts
+#
+# $1 indicates if there are additional prompts needed during installaiton
+# if this parameter is 'MORE_PROMPTS', installaiton does NOT change scriptAction
+# if this parameter does not exist, installation WILL change scriptAction to INSTALL
+# this provides backaward compatibility with scripts written prior to the reinstall logic
+#
+
+standardActionPrompt ()
+{
+    if [ $# -gt 0 ] && [ $1 == 'MORE_PROMPTS' ]; then
+        updateScriptAction=false
+    else
+        updateScriptAction=true
+    fi
+
+    echo
+    echo "Available actions:"
+	# don't allow install choice if incompatibilities have already been detected
+	if ! $installFailed ; then
+		echo "  Install and activate (i)"
+	fi
+    if $optionsSet ; then
+        echo "  Reinstall (r) based on options provided at last install"
+    fi
+    echo "  Uninstall (u) and restores all files to stock"
+    echo "  Quit (q) without further action"
+    echo "  Display setup log (s) outputs the last 100 lines of the log"
+    if [ ! -z $packageLogFile ]; then
+        echo "  Display Log (l) outputs the last 100 lines of the log"
+    fi
+    echo
+    response=''
+    while true; do
+        /bin/echo -n "Choose an action from the list above: "
+        read response
+        case $response in
+            [iI]*)
+				if ! $installFailed ; then
+					if $updateScriptAction ; then
+						scriptAction='INSTALL'
+					fi
+					break
+				fi
+                ;;
+            [rR]*)
+                if $optionsSet ; then
+                    scriptAction='INSTALL'
+                    break
+                fi
+                ;;
+            [uU]*)
+                scriptAction='UNINSTALL'
+                break
+                ;;
+            [qQ]*)
+                exit $EXIT_SUCCESS
+                ;;
+            [lL]*)
+                displayLog $packageLogFile
+                ;;
+            [sS]*)
+                displayLog $setupLogFile
+                ;;
+            *)
+        esac
+    done
+}
+
+
+# setInstallFailed sets flags to prevent further install steps
+#	and insure the package is uninstalled completely
+#
+#	$1 indicates the reason for the failure and will evenutally be uused
+#	report the failure reason when exiting the script
+#
+#	any remaining paremeters are passed to logMessage
+#
+#	the UNINSTALL scriptAction is used so that older package setup scripts
+#	will restore everything it has modified (not using updateActiveFile, etc)
+#
+#	also test $installFailed to see if this was an install failure
+#	or an actuall uninstall
+
+setInstallFailed ()
+{
+	installFailed=true
+	scriptAction='UNINSTALL'
+	if [ ! -z "$1" ]; then
+		installExitReason=$1
+	fi
+	message="${@:2}"
+	if [ ! -z "$message" ]; then
+		logMessage "$message"
+	fi
+}
+
+
+# backupActiveFile makes a copy of the active file in file.orig
+# if the original file does not exist the NO_ORIG flag is set
+#	to allow restoreAcive file to remove the active file
+#
+# if the backup (.orig file) exists the backup is not ukpdated
+#
+# $1 is the full path/file name to be backed up
+#
+# returns 0 if backup was made, 1 if not
+#
+
+backupActiveFile ()
+{
+	# don't do any work if install has already failed
+	if $installFailed ; then
+		return 1
+	fi
+
+    baseName=$(basename $1)
+    if [ -e "$1.orig" ] || [ -e "$1.NO_ORIG" ]; then
+        return 1
+    elif [ ! -f "$1" ]; then
+        touch "$1.NO_ORIG"
+        return 0
+    else
+        cp "$1" "$1.orig"
+        rm -f "$1.NO_ORIG"
+        return 0
+    fi
+}
+
+
+# SetupHelper maintains a set of "restart flags"
+#	that control service restarts and system reboot
+#	after the package has been installed / uninstalled
+#
+# some restarts/reboots are based on the directory of the modified file
+# others are based on the actual file itself
+#
+# not all services or specific files are flagged so some work in the setup script may be needed
+#
+# $1 is the full path and name to the modified file
+
+updateRestartFlags ()
+{
+	# flag indicating any file update occurred
+	filesUpdated=true
+
+	case $1 in
+		/opt/victronenergy/gui*)
+			restartGui=true
+			return;;
+		#### TODO: add gui-v2
+		/opt/victronenergy/dbus-generator-starter/*)
+			restartGeneratorService=true
+			return;;
+		/opt/victronenergy/dbus-systemcalc-py/*)
+			restartSystemCalc=true
+			return;;
+		/opt/victronenergy/dbus-digitalinputs/*)
+			restartDigitalinputs=true
+			return;;
+
+		/u-boot/overlay./*) # Raspberry PI DT overlay
+			rebootNeeded=true
+			return;;
+		/etc/udev/rules.d/*) # udev rules directory
+			rebootNeeded=true
+			return;;
+	esac
+
+	# reboots based on specific file
+	case $( basename $1 ) in
+		gpio_list)
+			rebootNeeded=true
+			return;;
+		config.txt)
+			rebootNeeded=true
+			return;;
+	esac
+}
+
+
+# updateActiveFile first backs up the active file
+# then copies the replacement (aka source) to the active file location (aka destination)
+#
+# two variations:
+#
+# updateActiveFile activeFile
+#   an attempt is made to locate the source (replacement)
+#   in the version directory or FileSets
+#
+# updateActiveFile sourceFile activeFile
+#   a separate source (replacement) file is specified
+#
+# both sourceFile and activeFile must be a full path to the file
+#
+# if the update fails, scriptAction is changed to UNINSTALL
+#
+# global thisFileUpdated is set to true if file was updated, false if not
+#	thisFileUpdated supports the old mechanism which may be used in some setup scripts
+# returns 0 if file was updated, 1 if not
+
+
+updateActiveFile ()
+{
+    thisFileUpdated=false
+
+	# don't do any work if install has already failed
+	if $installFailed ; then
+		return 1
+	fi
+
+    # separate source and replacement files specified
+    local sourceFile=""
+    local activeFile=""
+    if [ $# == 2 ]; then
+        if [ -f "$1" ]; then
+			sourceFile="$1"
+        else
+            setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: specified soure file "$1" does not exist - can't continue with install"
+			return 1
+        fi
+        activeFile="$2"
+    # use active file for both source and destination
+    else
+        activeFile="$1"
+    fi
+
+	local baseName=$(basename "$activeFile")
+
+	# replacement files are not needed for some versions
+	# if so marked, leave original untouched
+	if [ -f "$fileSet/$baseName.USE_ORIGINAL" ]; then
+		return 1
+	# source file not specified separately - look for it in expected places
+    elif [ -z "$sourceFile" ]; then
+		# first in patched files
+        if [ -f "$patchedFiles/$baseName" ]; then
+            sourceFile="$patchedFiles/$baseName"
+		# then in version-specific FileSet
+        elif [ -f "$fileSet/$baseName" ]; then
+            sourceFile="$fileSet/$baseName"
+		# then in version-independent file set
+        elif [ -f "$versionIndependentFileSet/$baseName" ]; then
+            sourceFile="$versionIndependentFileSet/$baseName"
+		# then in FileSets
+        elif [ -f "$pkgFileSets/$baseName" ]; then
+            sourceFile="$pkgFileSets/$baseName"
+		# nothing found - can't continue
+		else
+			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: no soure file for $baseName - can't continue with install"
+			return 1
+        fi
+    fi
+
+	local pathToFile=$(dirname "$activeFile")
+	if [ ! -e "$pathToFile" ]; then
+		# fatal if GUI v1 not present and needed for install
+		if [[ "$pathToFile" == "/opt/victronenergy/gui/"* ]]; then
+			if $guiV1required ; then
+				setInstallFailed $EXIT_NO_GUI_V1 "ERROR $packageName requires GUI v1 which is not on the system - can't continue"
+			# GUI v1 not needed - proceed without updating active file
+			fi
+		# active file is not in GUI v1 part of file system - so this is fatal
+		 else
+			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: path to $activeFile does not exist - can't continue with install"
+		fi
+		return 1
+	fi
+
+	# attempt backup --if not made
+	#	indicates installing over a previous install - so check if activeFile would be changed
+	#		this would occur if installing over the top of an already installed package
+	#		which SHOULD update the active file
+	#	or a conflict with another package - OTHER PACKAGE'S MOD (active file) IS OVERWRITTEN SILENTLY !!!!!!
+	#	or a previous install step failed (not relavant here -- already checked above)
+    if ! backupActiveFile "$activeFile" ; then
+		# check to see if active file needs to be updated
+		if [ -f "$activeFile" ]; then
+			# already updated - no change to active file
+			if cmp -s "$sourceFile" "$activeFile" > /dev/null ; then
+				return 1
+			fi
+		fi
+	fi
+
+	# all checks passed - update active file
+	if [ -e "$activeFile.orig" ] || [ -e "$activeFile.NO_ORIG" ]; then
+		# add file to installed files list (used for uninstallAll)
+		# do this before actually modifying things just in case there's an error
+		#	that way the uninstall is assured
+		echo "$activeFile" >> "$installedFilesList"
+
+		cp "$sourceFile" "$activeFile"
+
+		updateRestartFlags "$activeFile"
+		thisFileUpdated=true
+		return 0
+	# backup missing (this should not ever happen)
+	else
+		setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: no backup for $baseName - can't continue with install"
+		return 1
+	fi
+}
+
+
+# restoreActiveFile moves the backup copy to the active location
+# if the backup copy doesn't exist BUT the NO_ORIG flag is set
+# the active copy is deleted to restore the system to stock
+# $1 is the active name, the one to be backed up
+#
+# returns 0 if active file was restored, 1 if not
+# also sets thisFileUpdated for backwards compatibility with existing setup scripts
+
+restoreActiveFile ()
+{
+    thisFileUpdated=false
+
+    local baseName="$(basename $1)"
+    if [ -e "$1.orig" ]; then
+        mv -f "$1.orig" "$1"
+        rm -f "$1.NO_ORIG"
+        thisFileUpdated=true
+    elif [ -f "$1.NO_ORIG" ]; then
+        rm -f "$1"
+        rm -f "$1.NO_ORIG"
+        thisFileUpdated=true
+    fi
+
+	if $thisFileUpdated ; then
+		# remove file from installed file list
+		if [ -f "$installedFilesList" ]; then
+			grep -v "$1" "$installedFilesList" | tee "$installedFilesList" > /dev/null
+		fi
+		updateRestartFlags "$1"
+		return 0
+	else
+		return 1
+	fi
+}
+
+
+# checkFileSets validates the file sets used to install package modifications
+#
+# If a file set for the current Venus OS version exists, the replacement files in that file set
+#	are usable as is and no further checks are needed.
+# The COMPLETE flag file indicates that the file set was validated on the computer creating
+#	the file sets and all replacement files (or symlinks to other file sets) exist.
+#	No checks are needed for a COMPLETE file set.
+# If not, an attempt is made to create a file set for the current Venus OS version
+#   If the new active files for the new version all match another version
+#       the new file set is populated automatically with replacement files from the other version
+#		and may be used with no further action
+#   If not, new file set is marked INCOMPLETE and installation failure information is set
+#	The package can not be installed on this Venus OS version
+#
+# Replacement files that have no original specify an "alternate original" that is used
+# for version comparisons that locate an appropriate replacement
+
+# dummy routine for backward compatibility
+# the actual work is now done in-line when CommonResources is sourced
+
+checkFileSets ()
+{
+    return
+}
+
+_checkFileSets ()
+{
+	# no file sets - nothing to check
+	if ! [ -e "$pkgFileSets" ]; then return; fi
+
+	# no checks needed if all replacement files exist in the selected file set
+	if [ -f "$fileSet/COMPLETE" ]; then return; fi
+
+	# sort versionList in reverse version order to make searches faster
+	# since newer versions will most likely contain the desired files to create a new file set
+	local rawVersionList=($(ls -d "$pkgFileSets"/v* 2> /dev/null))
+    local tempList=()
+    local fs
+    local baseName
+    local version
+    local versionNumber
+	for fs in ${rawVersionList[@]} ; do
+		version=$(basename $fs)
+		versionStringToNumber $version
+		tempList+=("$version:$versionNumber")
+	done
+	local versionList=( $(echo ${tempList[@]} | tr ' ' '\n' | sort -t ':' -r -n -k 2 | uniq ) )
+	
+	# versioned file sets exist but empty file list
+	if [ ! -z $versionList ] && [ -z $fileList ]; then
+        setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: versions exist, but empty file list - can't continue"
+        return
+	# no versioned file sets - nothing to validate - allow install
+	elif [ -z $versionList ]; then return; fi
+	
+	# attempt to create a new file set or validate an existing one not marked as COMPLETE
+
+	rm -f  "$fileSet/INCOMPLETE"
+
+    # attempt to create file set if it doesn't exist
+    if [ ! -d "$fileSet" ]; then
+        logMessage "creating a new file set for $venusVersion"
+        mkdir "$fileSet"
+    fi
+
+    for file in ${fileList[@]} ; do
+        baseName=$(basename "$file")
+
+		# version-independent file exists
+		if [ -e "$versionIndependentFileSet/$baseName" ] || [ -e "$pkgFileSets/$baseName" ]; then
+			# no versioned files (only version-independent found) - skip version checks
+			if [ -z $( find "$fileSet"/v* -name $baseName ) ]; then
+				continue
+			# continue with tests if any versioned files exist
+			else
+				logMessage "WARNING $baseName versioned file exists - version-independent file will be ignored"
+			fi
+		fi
+
+        # skip checks if replacement file already exists
+        # or if there is no replacement file needed
+        if [ -f "$fileSet/$baseName" ] || [ -f "$fileSet/$baseName.USE_ORIGINAL" ]; then
+            rm -f "$fileSet/$baseName.NO_REPLACEMENT"
+			continue
+        fi
+
+        local activeFile
+        if [ -f "$altOrigFileDir/$baseName.ALT_ORIG" ]; then
+            activeFile=$(cat "$altOrigFileDir/$baseName.ALT_ORIG")
+        elif [ -f "$pkgFileSets/$baseName.ALT_ORIG" ]; then
+            activeFile=$(cat "$pkgFileSets/$baseName.ALT_ORIG")
+		else
+			activeFile=$file
+        fi
+        # package already installed, use .orig file for comparisons
+        if [ -f "$activeFile.orig" ]; then
+            activeFile="$activeFile.orig"
+        fi
+
+        # can't process if no original (aka active) file exists in the file set
+        if [ ! -f "$activeFile" ]; then
+            logMessage "ERROR $venusVersion $baseName no active file"
+            touch "$fileSet/$baseName.NO_ACTIVE_FILE"
+			touch "$fileSet/INCOMPLETE"
+            continue
+        fi
+
+        # if an active file exists look for a match in another file set
+        if [ ! -z "$activeFile" ]; then
+            matchFound=false
+            for entry in ${versionList[@]}; do
+				otherVersion=$(echo $entry | awk -F ':' '{print $1}')
+
+                # skip this version
+                if [ "$venusVersion" = "$otherVersion" ]; then
+                    continue
+                fi
+
+                otherFile="$pkgFileSets/$otherVersion/$baseName"
+
+                # skip symbolic links and nonexistent originals
+                if [ ! -f "$otherFile.orig" ] || [ -L "$otherFile.orig" ] ; then
+                    continue
+                fi
+                
+                # files match
+                if cmp -s "$activeFile" "$otherFile.orig" > /dev/null ; then
+                    matchFound=true
+                    break
+                fi
+            done
+ 
+            if $matchFound ;then
+                rm -f "$fileSet/$baseName.orig"
+                rm -f "$fileSet/$baseName.NO_ORIG"
+                # if other file set contains a replacement file, link to it
+                if [ -f "$otherFile" ]; then
+					rm -f "$fileSet/$baseName"
+                    ln -s "../$otherVersion/$baseName" "$fileSet/$baseName"
+                    rm -f "$fileSet/$baseName.NO_REPLACEMENT"
+                    rm -f "$fileSet/$baseName.USE_ORIGINAL"
+                # if other file set does not contain a replacement, this one will not either
+                # this IS permitted and handled in the updateActiveFile and restoreActiveFile functions
+                elif [ -f "$otherFile.USE_ORIGINAL" ]; then
+                    touch "$fileSet/$baseName.USE_ORIGINAL"
+                    rm -f "$fileSet/$baseName.NO_REPLACEMENT"
+                fi
+            # no match to a previous verison - can't create file set automatically
+            # but copy original file to aid manual editing
+            else
+                logMessage "ERROR $venusVersion $baseName no replacement file"
+                cp "$activeFile" "$fileSet/$baseName.orig"
+                touch "$fileSet/$baseName.NO_REPLACEMENT"
+                touch "$fileSet/INCOMPLETE"
+            fi
+        fi
+    done
+
+    if [ -f "$fileSet/INCOMPLETE" ]; then
+        setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: incomplete file set for $venusVersion - can't continue"
+	# if we get this far and fs is not marked INCOMPLETE, then the file set does not need to be checked again next pass
+	else
+		touch "$fileSet/COMPLETE"
+    fi
+}
+
+# builds the installedFilesList and installedServices lists from the package's setup script
+# this is needed for installs with a prior version of SetupHelper that did not
+#	create the installed... lists
+#
+# uninstall... functions then use these lists to uninstall
+
+buildUninstallListsfromSetupScript ()
+{
+	# prevent this from running a second time
+	if [ "$uninstallListsAlreadyBuilt" == 'yes' ]; then
+		return
+	fi
+	uninstallListsAlreadyBuilt='yes'
+	local param
+
+	scriptUninstallFilesList=()
+	scriptUninstallServicesList=()
+	while read -r line || [[ -n "$line" ]]; do
+		commandFound=false
+		read -a params <<< $line
+		numberOfParams=${#params}
+		for (( i=0; i < $numberOfParams; i++ ));do
+			case "${params[i]}" in
+			updateActiveFile)
+				# parameter of intrest is the second one if it exists
+				# otherwise, it should be the first one
+				param=${params[i+2]}
+				if [ -z "$param" ] || [[ $param == \#* ]]; then
+					param=$( echo ${params[i+1]} | sed s?'$qmlDir'?$qmlDir? )
+				fi
+				if ! [ -z "$param" ] && ! [[ $param == \#* ]]; then
+					scriptUninstallFilesList+=("$param")
+				fi
+				;;
+			installService)
+				# parameter of intrest is the first one if it exists
+				# otherwise, is the packageName
+				param=${params[i+1]}
+				if ! [ -z "$param" ] && ! [[ $param == \#* ]]; then
+					scriptUninstallServicesList+=("$param")
+				else
+					scriptUninstallServicesList+=($packageName)
+				fi
+				;;
+			esac
+		done
+	done < "$scriptDir/setup"
+}
+
+# install / uninstall all files / services functions
+#
+# the install... functions are called from endScript if the related flags are set
+#	but may also be called in the setup script
+#	if processing needs to be done after the files are installed
+#
+# NOTE: uninstall functions are called in endScrpit during an uninstall
+#			there are no flags to control this !
+#
+# NOTE: only services in the package's serice directory are installed
+#		any services in the package's root diretory are not installed
+
+
+installAllFiles ()
+{
+	if [ -z "$fileListAll" ]; then
+		getFileLists
+	fi
+
+	if [ ! -z $fileListAll ]; then
+		logMessage "installing files"
+		local file
+		for file in ${fileListAll[@]}; do
+			updateActiveFile "$file"
+		done
+	fi
+}
+
+# uninstall files from
+#	installed files list if present
+#	and from file lists in the package
+#	and from updateActiveFile calls found in the setup script
+# this insures complete uninstall even for packages installed
+#	with SetupHelper prior to v6.0
+
+uninstallAllFiles ()
+{
+	local restoreFilesList=()
+	# add installdeFilesList if present (might be empty but that's fine)
+	if [ -f "$installedFilesList" ]; then
+		restoreFilesList=( $( cat "$installedFilesList" ) )
+	fi
+	# add file lists & calls to installActiveFile in setup script
+	restoreFilesList+=( ${fileListAll[@]} )
+	buildUninstallListsfromSetupScript
+	restoreFilesList+=( ${scriptUninstallFilesList[@]} )
+
+	# remove duplicates
+	if (( ${#restoreFilesList[@]} > 1 )); then
+		restoreFilesList=( $(printf "%s\n" "${restoreFilesList[@]}" | sort -u ) )
+	fi
+
+	# uninstall the files
+	if [ ! -z $restoreFilesList ]; then
+		logMessage "uninstalling files"
+		local file
+		for file in ${restoreFilesList[@]}; do
+			restoreActiveFile $file
+		done
+	fi
+}
+
+
+installAllServices ()
+{
+	local serviceList
+	local service
+	# get list of services in the package's service directory
+	if [ -d "$servicesDir" ]; then
+		servicesList=$( cd "$servicesDir"; ls -d * 2> /dev/null )
+		if [ ! -z $servicesList ]; then
+			logMessage "installing services"
+			for service in $servicesList ; do
+				installService $service
+			done
+		fi
+	fi
+}
+
+
+# uninstal services found in the services directory
+#	and restoreServices call in the package's setup script
+
+uninstallAllServices ()
+{
+	local tempList=()
+	local servicesList=()
+	local service
+
+	if [ -f "$installedServicesList" ]; then
+		servicesList=( $( cat "$installedServicesList" ) )
+	fi
+	# add list from the setup script itself
+	buildUninstallListsfromSetupScript
+	servicesList+=( ${scriptUninstallServicesList[@]} )
+
+	# remove duplicates
+	if (( ${#servicesList[@]} > 1 )); then
+		servicesList=( $(printf "%s\n" "${servicesList[@]}" | sort -u ) )
+	fi
+
+	# uninstall services
+	if [ ! -z $servicesList ]; then
+		logMessage "uninstalling services"
+		for service in $servicesList ; do
+			if [ -z "$service" ]; then
+				removeService $packageName
+			else
+				removeService $service
+			fi
+		done
+	fi
+}
+
+
+# restart the GUI V1 service
+# begining at about v3.20~18, changes were made to accommodate the gui-v2
+# and these changes require different handling of a GUI service restart
+
+
+restartGuiV1Service ()
+{
+	# gui is the older service that runs GUI v1 only
+	if [ -e "/service/gui" ]; then
+		svc -t "/service/gui"
+	# restart GUI if NOT running v2 or can't determine if GUI v1 or v2 is selected
+	elif [ -e "/service/start-gui" ]; then
+		guiVersion="$(dbus-send --system --print-reply --dest=com.victronenergy.settings /Settings/Gui/RunningVersion com.victronenergy.BusItem.GetValue | grep variant | awk '{print $3}')"
+		if (( $guiVersion != 2 )); then
+			svc -t "/service/start-gui"
+		fi
+	fi
+}
+
+# for backward compatibility (oler setup scripts)
+restartGuiService ()
+{
+	restartGuiV1Service
+}
+
+restartGuiV2Service ()
+{
+	# restart GUI if NOT running v1 or can't determine if GUI v1 or v2 is selected
+	if [ -e "/service/start-gui" ]; then
+		guiVersion="$(dbus-send --system --print-reply --dest=com.victronenergy.settings /Settings/Gui/RunningVersion com.victronenergy.BusItem.GetValue | grep variant | awk '{print $3}')"
+		if (( $guiVersion != 1 )); then
+			svc -t "/service/start-gui"
+		fi
+	fi
+}
+
+# determine how the setup script should exit based on $scriptAction and other flags
+# services may be restarted here also
+#
+# endScript accepts these optional parameters which determines if files and/or services are installed
+#
+#	'INSTALL_FILES' causes files from the file lists to be installed
+#	'INSTALL_SERVICES' causes services in the services directory to be installed
+#		all services must be in the package's services directory
+#	'ADD_DBUS_SETTINGS' will add/update dBus settings from the DbusSettingsList
+#	any or may be included
+# do NOT include these if related processing is needed in the setup script !
+# instead, call installAllFiles and/or installAllServices in line with the other processing
+#	or call updateActiveFile or installService directly
+#
+# this function completes package installation 
+#	and sets up conditions for reinstallation following a Venus Os firmware update
+#
+# may EXIT or REBOOT within the function - DOES NOT RETURN TO CALLER           
+
+
+endScript ()
+{
+    if [ $scriptAction == 'INSTALL' ] ; then
+		# do installs as indicated from caller
+		while (( $# > 0 )); do
+			case "$1" in
+				'INSTALL_FILES')
+					installAllFiles
+					;;
+				'INSTALL_SERVICES')
+					installAllServices
+					;;
+				'ADD_DBUS_SETTINGS')
+					addAllDbusSettings
+					;;
+			esac
+			shift
+		done
+
+        # assume that if we get this far, any command line opitons have already been set
+		touch "$setupOptionsDir/optionsSet"
+		
+		# clear flag preventing auto installs in PackageManager
+		rm -f "$setupOptionsDir/DO_NOT_AUTO_INSTALL"
+
+        # if script needs to run again, installedVersionFile flag file is removed
+        # script should run again at boot time via reinstallMods
+        if $runAgain ; then
+          logMessage "script will run again at startup"
+            rm -f "$installedVersionFile"
+        # otherwise, installation is complete - update installedVersion
+        else
+            cp "$scriptDir/version" "$installedVersionFile"
+		fi
+
+		# update rc.local to include call to reinstallMods
+		#	do only for SetupHelper since other packages are now installed by PackageManager
+		if ! $installFailed && [ "$packageName" == "SetupHelper" ]; then
+			if [ ! -f "$rcLocal" ]; then
+				logMessage "creating $rcLocal"
+				cp "$scriptDir/rcS.local" "$rcLocal"
+				chmod +x "$rcLocal"
+			elif  [ $(grep -c "blind install" "$rcLocal") -gt 0 ]; then
+				logMessage "REPLACING blind install $rcLocal with the standard one"
+				rm -f "$rcLocal"
+				cp "$scriptDir/rcS.local" "$rcLocal"
+				chmod +x "$rcLocal"
+			elif  [ $(grep -c "SetupHelper" "$rcLocal") == 0 ]; then
+				logMessage "adding SetupHelper reinstall script to $rcLocal"
+				sed -e '2d' "$scriptDir/rcS.local" >> $rcLocal
+			fi
+		fi
+	fi
+		
+
+    if [ $scriptAction == 'UNINSTALL' ] ; then
+
+		# package was actually uninstalled (not an install failure) - set flag preventing auto installs
+		if ! $installFailed ; then 
+			touch "$setupOptionsDir/DO_NOT_AUTO_INSTALL"
+		fi
+
+		# ALWAYS attempt to uninstall files and services
+		uninstallAllFiles
+		uninstallAllServices
+
+        # flag package not installed since package is being removed
+        rm -f "$installedVersionFile"
+
+		# when uninstalling SetupHelper, remove EMPTY installed...Lists in all packages
+		#	to prevent a future install with an older SetupHelper
+		#	confusing a future future uninstall with a new SetupHelper
+		if [ "$packageName" == "SetupHelper" ] && [ -e "$installedFilesDir" ]; then
+			for file in $(ls "$installedFilesDir") ; do
+				if ! [ -s "$installedFilesDir/$file" ]; then
+					rm "$installedFilesDir/$file"
+				fi
+			done
+			# remove lines from rcS.local
+			sed -i -e "/# SetupHelper reinstall/,/fi/d" "$rcLocal"
+
+		fi
+	fi
+
+	# setup script signals nothing to do - exit without further action without errors
+	if [ $scriptAction == 'EXIT' ]; then
+		exit $EXIT_SUCCESS
+	elif ! [ $scriptAction == 'INSTALL' ] && ! [ $scriptAction == 'UNINSTALL' ]; then
+		logMessage "unexpected script action $scriptAction - did not install or uninstall"
+		exit $EXIT_SUCCESS
+	fi
+
+	# remove temp directory used in installs of files requiring modificaion before installing
+	rm -rf "$patchedFiles"
+
+	# if installation was attempted but failed, exit without checking anything else
+	#	or signaling GUI restart or reboot
+	if $installFailed ; then
+		logMessage "installation failed - package has been uninstalled - exiting"
+		exit $installExitReason
+	elif $rebootNeeded ; then
+		if $userInteraction ; then
+			if yesNoPrompt "Reboot system now (y) or do it manually later (n): " ; then
+				logMessage "rebooting ..."
+				reboot
+			else
+				logMessage "system must be rebooted to finish installation and activate components"
+				exit $EXIT_REBOOT
+			fi
+		else
+			logMessage "completed - reboot needed"
+			exit $EXIT_REBOOT
+		fi
+	fi
+	if $restartGeneratorService ; then
+		logMessage "restarting generator service"
+		svc -t /service/dbus-generator-starter
+	fi
+	if $restartSystemCalc ; then
+		logMessage "restarting systemcalc service"
+		svc -t /service/dbus-systemcalc-py
+	fi
+	if $restartDigitalinputs ; then
+		logMessage "restarting digital inputs service"
+		svc -t /service/dbus-digitalinputs
+	fi
+	#### TODO: add gui v2
+	if $restartGui ; then
+		if $userInteraction ; then
+			if yesNoPrompt "Restart the GUI now (y) or issue a do it manually later (n): " ; then
+				logMessage "completed - restarting GUI"
+				restartGuiV1Service
+				exit $EXIT_SUCCESS
+			else
+				echo "GUI must be restarted to activate components"
+				exit $EXIT_RESTART_GUI
+			fi
+		else
+			if $deferGuiRestart ; then
+				logMessage "completed - GUI restart needed"
+				exit $EXIT_RESTART_GUI
+			# GUI restart NOT deferred - do it now
+			else
+				logMessage "completed - restarting GUI"
+				restartGuiV1Service
+				exit $EXIT_SUCCESS
+			fi
+		fi
+	fi
+	logMessage "completed"
+	exit $EXIT_SUCCESS
+}
+
+######## this code is executed in-line when CommonResources is sourced
+
+# check for reinstall parameter
+# set $scriptAction to control work following the source command
+# if "force" is also provided on the command line, then the installedVersionFile is not checked
+# installedVersionFile contains the installed version (if any)
+# it is compared to the version file in the package directory
+#  if installedVersionFile is missing or contents are different, the installation will proceed
+# if the two versions match, there is no need to reinstall the package
+# we assume a reinstall is always run without benefit of a console (runningAtBoot will be true)
+# so there will be no prompts and all actions will be automatic
+#
+# "deferReboot" signals that endScript should not reboot the system, but return EXIT_REBOOT
+#	assuming the caller will evenutally reboot the system
+#
+# "deferGuiRestart" is similar for restarting the GUI
+#
+# "install" causes the package to be installed silently
+# "uninstall" causes the package to be uninstalled silently
+#
+# command line parameters may appear in any order
+#
+#
+# logToConsole is set to true in the LogHandler script
+# It is set to false here the 'auto' parameter is passed on the command line
+#	which indicates this script is NOT being run from the command line
+
+# move old installedFlag ("...inInstalled...")
+# to its new name ...installedVersionFile...
+if [ ! -f "$installedVersionFile" ] && [  -f "$installedFlag" ]; then
+	installedVersion=$(cat "$installedFlag")
+	if [ -z $installedVersion ]; then
+		installedVersion=""
+	else
+		echo $installedVersion > "$installedVersionFile"
+	fi
+fi
+rm -f "$installedFlag"
+
+# cleanup from previous versions - reinstallScriptsList no loner used
+rm -f "/data/reinstallScriptsList"
+
+# set global machine type
+if [ -f /etc/venus/machine ]; then
+	machine=$(cat /etc/venus/machine)
+else
+	machine=""
+	setInstallFailed $EXIT_INCOMPATIBLE_VERSION "can't determine Venus device type"
+fi
+
+# initialize version strings and numbers for future checks
+if [ -f "$installedVersionFile" ]; then
+	installedVersion=$(cat "$installedVersionFile")
+	versionStringToNumber $installedVersion
+	installedVersionNumber=$versionNumber
+else
+	installedVersion=""
+	installedVersionNumber=0
+fi
+
+packageVersionFile="$scriptDir/version"
+if [ -f "$packageVersionFile" ]; then
+	packageVersion=$(cat "$packageVersionFile")
+
+	versionStringToNumber $packageVersion
+	packageVersionNumber=$versionNumber
+else
+	packageVersion=""
+	packageVersionNumber=0
+fi
+
+logMessage "--- starting setup script $packageVersion"
+
+# collect command line options
+reinstall=false
+force=false
+deferReboot=false
+deferGuiRestart=false
+userInteraction=true
+while [ $# -gt 0 ]; do
+        case $1 in
+            "reinstall")
+                reinstall=true
+                ;;
+            "force")
+                force=true
+                ;;
+            "deferReboot")
+                deferReboot=true
+                ;;
+            "deferGuiRestart")
+                deferGuiRestart=true
+                ;;
+            "install")
+                scriptAction='INSTALL'
+                ;;
+            "uninstall")
+                scriptAction='UNINSTALL'
+                ;;
+            "auto")
+                logToConsole=false
+				userInteraction=false
+                ;;
+            *)
+        esac
+    shift
+done
+
+# make sure rootfs is mounted R/W & and resized to allow space for replacement files
+#	arbitrary minimum size of 3 MB
+rootMinimumSize=3
+availableSpace=$(df -m / | tail -1 | awk '{print $4}')
+
+# remount read-write
+if (( $(mount | grep ' / ' | grep -c 'rw') == 0 )); then
+	# only remount read-write for CCGX
+	if [ "$machine" == "ccgx" ]; then
+		if [ -f /opt/victronenergy/swupdate-scripts/remount-rw.sh ]; then
+			logMessage "remounting root read-write"
+			/opt/victronenergy/swupdate-scripts/remount-rw.sh
+		fi
+	# remount and resize for other platforms
+	elif [ -f /opt/victronenergy/swupdate-scripts/resize2fs.sh ]; then
+		/opt/victronenergy/swupdate-scripts/resize2fs.sh
+		availableSpace=$(df -m / | tail -1 | awk '{print $4}')
+		logMessage "remounting read-write root and resizing - $availableSpace MB now available"
+	fi
+	# check to see if remount was successful
+	if (( $(mount | grep ' / ' | grep -c 'rw') == 0 )); then
+		logMessage "ERROR: unable to remount root read-write - can't continue"
+		exit $EXIT_ROOT_FULL
+	fi
+# root already read-write, attempt to resize if space is limited (CCGX can't resize)
+elif (( $availableSpace < $rootMinimumSize )); then
+	if [ "$machine" == "ccgx" ]; then
+		logMessage "can't resize root on CCGX"
+	else
+		if [ -f /opt/victronenergy/swupdate-scripts/resize2fs.sh ]; then
+			/opt/victronenergy/swupdate-scripts/resize2fs.sh
+			availableSpace=$(df -m / | tail -1 | awk '{print $4}')
+			logMessage "resized root - $availableSpace MB now available"
+		fi
+	fi
+fi
+# make sure the root partition has space for the package
+if (( $availableSpace < $rootMinimumSize )); then
+	logMessage "no room for modified files on root ($availableSpace MB remaining) - can't continue"
+	exit $EXIT_ROOT_FULL
+fi
+
+
+# packages that require options to proceed unattended
+# must include the optionsRequried flag file in their package directory
+# if the flag is present and options haven't been previously set,
+#	SD/USB media will be checked for the package options directory
+#	and copy them into position
+
+opitonsRequiredFile="$scriptDir/optionsRequired"
+optionsSet=false
+if [ -f $opitonsRequiredFile ]; then
+	if [ -f "$setupOptionsDir/optionsSet" ]; then
+		optionsSet=true
+	# options not set - check media for options if doing a blind install
+	elif [ $scriptAction == 'INSTALL' ]; then
+		mediaList=($(ls /media))
+		for dir in ${mediaList[@]} ; do
+			altSetupDir="/media/$dir/"$(basename $setupOptionsRoot)"/$packageName"
+			if [ -f "$altSetupDir/optionsSet" ]; then
+				cp -r "$altSetupDir" "$setupOptionsRoot"
+				if [ -f "$setupOptionsDir/optionsSet" ]; then
+					logMessage "options retrieved from SD/USB media"
+					optionsSet=true
+				fi
+				break
+			fi
+		done
+	fi
+
+# no command line options are needed - ok to reinstall even if
+#	setup was not run from the command line
+else
+	optionsSet=true
+fi
+
+
+# called from reinstallMods at boot time
+if $reinstall ; then
+    runningAtBoot=true
+    if $force ; then
+        scriptAction='INSTALL'
+	# not installed, do it now
+    elif (( installedVersionNumber == 0 )); then
+        scriptAction='INSTALL'
+	# check versions and install only if package version is newer than installed version
+	else
+		# trigger install if version numbers differ
+		if (( installedVersionNumber != packageVersionNumber )); then
+			scriptAction='INSTALL'
+		else
+			exit $EXIT_SUCCESS
+		fi
+	fi
+
+# not running from reinstallMods
+else
+    runningAtBoot=false
+    pruneSetupLogFile
+fi
+
+# initialze integer version number for venus version
+# used below and in _checkFileSets
+versionStringToNumber $venusVersion
+venusVersionNumber=$versionNumber
+
+# create obsolete version file if it does not already exist
+#	accommodates previous mechanism that used shell varaible
+if [ ! -z $obsoleteVersion ] && [ ! -f "$scriptDir/obsoleteVersion" ]; then
+	echo $obsoleteVersion > "$scriptDir/obsoleteVersion"
+fi
+
+
+# prevent installing Raspberry Pi packages on other platforms
+if [ -f "$scriptDir/raspberryPiOnly" ]; then 
+	if [[ $machine != *"raspberrypi"* ]]; then
+		setInstallFailed $EXIT_INCOMPATIBLE_PLATFOM "$packageName not compatible with $machine"
+	fi
+fi
+
+# check to see if package is compatible with this Venus version
+if [ -f "$scriptDir/firstCompatibleVersion" ]; then
+	firstCompatibleVersion=$(cat "$scriptDir/firstCompatibleVersion")
+# no first compatible version specified - use the default
+else
+	firstCompatibleVersion='v2.71'
+fi
+
+versionStringToNumber $firstCompatibleVersion
+firstCompatibleVersionNumber=$versionNumber
+if (( $venusVersionNumber < $firstCompatibleVersionNumber )); then
+	setInstallFailed $EXIT_INCOMPATIBLE_VERSION "ERROR $venusVersion before first compatible $firstCompatibleVersion"
+elif [ -f "$scriptDir/obsoleteVersion" ]; then
+	obsoleteVersion=$(cat "$scriptDir/obsoleteVersion")
+	versionStringToNumber $obsoleteVersion
+	obsoleteVersionNumber=$versionNumber
+	if (( $venusVersionNumber >= $obsoleteVersionNumber )); then
+		setInstallFailed $EXIT_INCOMPATIBLE_VERSION "ERROR $venusVersion after last compatible $obsoleteVersion"
+	fi
+fi
+if ! $installFailed ; then
+	if [ ! -d "$setupOptionsDir" ]; then
+		logMessage "creating package options directory $setupOptionsDir"
+		mkdir -p $setupOptionsDir
+	fi
+fi
+
+# if checks above passed and uninstall was not specified on command line,
+#	do final checks before permitting install
+if [ $scriptAction != 'UNINSTALL' ]; then
+
+	# determine if GUI v1 is installed
+	#	Note, it may NOT be running or selected to run!!!!
+	if [ ! -d "/opt/victronenergy/gui" ]; then
+		guiV1present=false
+	else
+		guiV1present=true
+	fi
+
+	# block installs if any GUI files would be modified and GUI v1 is not present
+	# packages can bypass GUI v1 checks and allow installs even if package contains them
+	if [ -f "$scriptDir/GUI_V1_NOT_REQUIRED" ]; then
+		guiV1required=false
+	# files in the GUI v1 directory are considered mandatory
+	elif (( $( grep 'updateActiveFile' "$scriptDir/setup" | grep -c '$qmlDir\|/gui/') > 0 )); then
+		guiV1required=true
+	elif (( $( cat "$pkgFileSets/fileList"* | grep -c '/gui/' ) > 0 )); then
+		guiV1required=true
+	else
+		guiV1required=false
+	fi
+
+	if ! $guiV1present && $guiV1required ; then
+		setInstallFailed $EXIT_NO_GUI_V1 "ERROR $packageName requires GUI v1 which is not on the system - can't install"
+	fi
+
+	# attempting an install without the comand line prompting
+	#	and needed options have not been set yet - can't continue
+	if [ $scriptAction == 'INSTALL' ]; then
+		if ! $optionsSet ; then
+			setInstallFailed $EXIT_OPTIONS_NOT_SET "ERROR required options have not been set - can't install"
+			endScript
+		fi
+	fi
+	getFileLists "$pkgFileSets"
+
+    _checkFileSets
+    
+
+	# create installed files (and services) directory
+	if [ ! -d "$installedFilesDir" ]; then
+		mkdir "$installedFilesDir"
+	fi
+
+	# location of patch output - used as the replacement file (unique temp directory in volatile storage)
+	patchedFiles=$( mktemp -d ) 
+
+	# create patched files for files with VisibleItemModel for older Venus OS versions
+	versionStringToNumber "v3.00~14"
+	if (( $venusVersionNumber < $versionNumber )); then
+		logMessage "patching VisibleItemModel to VisualItemModel in all .qml replacements"
+		for file in ${fileListVersionIndependent[@]};  do
+			if ! [ -f "$file" ]; then continue; fi
+			baseName=$( basename "$file" )
+			if ! [ "$baseName" == *.qml ]; then continue; fi
+			if (( $(grep -c "VisibleItemModel" "$file") == 0 )); then continue; fi
+			sed -e 's/VisibleItemModel/VisualItemModel/' "$file" > "$patchedFiles/$baseName"
+		done
+	fi
+
+	# create patched files in fileListPatched
+	for file in ${fileListPatched[@]}; do
+		baseName=$( basename $file )
+		patchFile="$patchSourceDir/$baseName.patch"
+		if ! [ -f "$file" ]; then
+			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: original file missing for $baseName - can't continue with install"
+			endScript
+		fi
+		if ! [ -f "$patchFile" ]; then
+			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: patch file missing for $baseName - can't continue with install"
+			endScript
+		fi
+		# BusyBox patch doesn't support the -o option so copy source to output first
+		#	then patch the output
+		# if package already installed, patch .orig
+		if [ -e "$file.orig" ]; then
+			cp "$file.orig" "$patchedFiles/$baseName"
+		# if package probably not installed, patch the active file
+		elif [ -e "$file" ] ; then
+			cp "$file" "$patchedFiles/$baseName"
+		else
+			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: no source for $baseName patch - can't continue with install"
+			endScript
+		fi
+		if ! patch "$patchedFiles/$baseName" "$patchFile" &> /dev/null ; then
+			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: could not patch $baseName - can't continue with install"
+			endScript
+		fi
+	done
+fi
+
+#### do standard prompting, automatic install/uninstall then exit
+if [ "$standardPromptAndActions" == 'yes' ]; then
+	# prompt only if action hasn't been set yet (from command line)
+	if [ "$scriptAction" == 'NONE' ]; then
+		standardActionPrompt
+	fi
+	endScript 'INSTALL_FILES' 'INSTALL_SERVICES' 'ADD_DBUS_SETTINGS'
+fi
+
+# otherwise continue with the setup script 
+
+#### continue executing the setup script which sourced this file
+
+
+

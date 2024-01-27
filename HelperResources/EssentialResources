@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# EssentialResources for SetupHelper
+# contains a variables necessary for all setup helper scripts
+#
+# sourced from CommonResources, UpdateResources and reinstallMods
+#	and also updateFileSets
+
+# get the full, unambiguous path to this script (and therefore to script that sourced it)
+scriptDir="$( cd "$(dirname $0)" >/dev/null 2>&1 ; /bin/pwd -P )"
+packageRoot="$( dirname $scriptDir )"
+packageName=$( basename "$scriptDir" )
+
+shortScriptName=$(basename "$scriptDir")/$(basename "$0")
+fullScriptName="$scriptDir/$(basename "$0")"
+
+if [ -f "/opt/victronenergy/version" ]; then
+	venusVersion="$(cat /opt/victronenergy/version | head -n 1)"
+else
+	venusVersion=""
+fi
+
+installedVersionPrefix="/etc/venus/installedVersion-"
+installedVersionFile="$installedVersionPrefix"$packageName
+
+installedFilesDir="/etc/venus/installedModifications"
+installedFilesList="$installedFilesDir/installedFiles"-$packageName
+installedServicesList="$installedFilesDir/installedServices"-$packageName
+
+
+# obsolete - use installedVersion
+installedFlagPrefix="/etc/venus/inInstalled-"
+installedFlag="$installedFlagPrefix"$packageName
+
+# set up pointers to package files
+#	based on the actual package for compatibility with older packages
+pkgFileSets="$scriptDir/FileSets"
+fileSet="$pkgFileSets/$venusVersion"
+versionIndependentFileSet="$pkgFileSets/VersionIndependent"
+# location of patch files
+patchSourceDir="$pkgFileSets/PatchSource"
+altOrigFileDir="$pkgFileSets/AlternateOriginals"
+
+servicesDir="$scriptDir/services"
+
+
+# rc local file that calls reinstallMods
+#	rcS.local avoids conflicts with mods that blindly replace /data/rc.local
+rcLocal="/data/rcS.local"
+
+# defined exit codes - must be consistent between all setup scripts and reinstallMods
+# and PackageManager.py
+EXIT_SUCCESS=0
+EXIT_REBOOT=123
+EXIT_RESTART_GUI=124
+EXIT_ERROR=255	# unknown error
+EXIT_INCOMPATIBLE_VERSION=254
+EXIT_INCOMPATIBLE_PLATFOM=253
+EXIT_FILE_SET_ERROR=252
+EXIT_OPTIONS_NOT_SET=251
+EXIT_RUN_AGAIN=250
+EXIT_ROOT_FULL=249
+EXIT_DATA_FULL=248
+EXIT_NO_GUI_V1=247
+# old variables - keep for compatibility
+exitReboot=$EXIT_REBOOT
+exitSuccess=$EXIT_SUCCESS
+
+# directory that holds script's options
+# options were removed from the script directory so they are preserved when the package is reinstalled
+setupOptionsRoot="/data/setupOptions"
+setupOptionsDir="$setupOptionsRoot"/$packageName
+
+# packages managed by SetupHelper
+packageListFile="/data/packageList"
+
+qmlDir=/opt/victronenergy/gui/qml
+
+

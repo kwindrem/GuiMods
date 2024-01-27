@@ -1,0 +1,287 @@
+#!/bin/bash
+
+#!/bin/bash
+# ServiceManager for SetupHelper
+# contains a functions to install and remove a package's service
+#
+# If an active copy of the service already exists, the run and log/run files are updated
+# ONLY if there are changes, then the service and/or the logger will be restarted.
+# This leaves other files managed by supervise untouched.
+#
+# in Venus OS between v2.80~10 and v2.90~2, services are stored in /opt/victronenergy/service
+#	which is overlayed onto /service
+# the FS overlay also maintains a "working directory": $overlayWorkDir in this script
+# all services need to be added there rather than /service
+# Note: service calls (eg svc) are still made on /service/...
+# there is an unknown interaction between /service and the overlay source
+# so code here operates on both directories
+#
+# in Venus OS starting with v2.90~3, /service is mounted as a tmpfs (RAM disk)
+# /opt/victronenergy/service is copied to /service ONLY at boot time
+# so new services need to be copied to /opt/victronenergy/service for boot processing
+# AND to /service so they run immediately
+#
+# svc -u /service/<service name> starts a service that is not already running
+# svc -d /service/<service name> stops a service and will not restart
+# these are "temporary" and don't survive a system boot
+# svc -t /service/<service name> sends the service a TERM command
+#	if the service was up at the time, it restarts
+#	if the service was down at the time, it is NOT started
+#
+# the /service/<service name>/down flag file controls the state of a service at boot time:
+#	if the file exists, the service won't start automatically at boot or when created
+#	if the file does not exist, the service will start at boot or immediately when it is created
+#
+# if the services manager (svscan) is not up, or the real service directory does not yet exist
+#	some steps will be skipped to avoid errors in calling daemontools functions
+#
+# more info here:
+#	https://cr.yp.to/daemontools/svc.html
+#	https://cr.yp.to/daemontools/supervise.html
+#	https://cr.yp.to/daemontools/svstat.html
+#	https://cr.yp.to/daemontools/svok.html
+
+victronServicesDir="/opt/victronenergy/service"
+overlayWorkDir="/run/overlays/service"
+serviceDir="$victronServicesDir"
+serviceUsesFsOverlay=false
+serviceMountedTmpfs=false
+
+versionStringToNumber "v2.90~3"
+tmpfsStartVersion=$versionNumber
+versionStringToNumber "v2.80~10"
+overlayStartVersion=$versionNumber
+versionStringToNumber $venusVersion
+
+# service is mounted tmpfs
+if (( $versionNumber >= $tmpfsStartVersion )) ; then
+	serviceMountedTmpfs=true
+# service uses a file system overlay
+elif (( $versionNumber >= $overlayStartVersion )) ; then
+    serviceUsesFsOverlay=true
+# service is writable in place
+else
+    serviceDir="/service"
+fi
+
+# check to see if services manager is running
+svscanIsUp ()
+{
+	pgrep -lx svscan &> /dev/null
+	if (( $? == 0 )) ; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# check to see if named service is up
+serviceIsUp ()
+{
+	if ! svscanIsUp ; then
+		return 1
+	elif [ ! -e "/service/$1" ]; then
+		return 1
+	elif [ $(svstat "/service/$1" | awk '{print $2}') == "up" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+
+#
+# removeService cleanly removes the service
+#
+
+removeService ()
+{
+    # no service specified
+    if (( $# < 1 )); then
+        return
+    fi
+	local serviceName="$1"
+
+    if [ -e "$serviceDir/$serviceName" ]; then
+        logMessage "removing $serviceName service"
+		# stop the service if it is currently running
+		if serviceIsUp $serviceName ; then
+			svc -d "/service/$1"
+		fi
+		if serviceIsUp "$serviceName/log" ; then
+			svc -d "/service/$1/log"
+		fi
+
+		# supervise processes hang around after removing the service so save info and kill them after removal
+		pids=""
+		while read -u 9 line; do
+			read s uid pid ppid vsz rss tty stime time cmd blah <<< "$line"
+			if [ $cmd == 'supervise' ]; then
+				pids+="$pid "
+			elif [ $cmd == 'multilog' ]; then
+				pids+="$ppid "
+			fi
+		done 9<<< $(ps -l | grep $serviceName)
+
+		# remove the service directory
+		rm -rf "$serviceDir/$serviceName"
+		# when /service is mounted as tmpfs, the service needs to be removed from /service also
+		if $serviceMountedTmpfs && [ -d "/service/$serviceName" ]; then
+			rm -rf "/service/$serviceName"
+		# removing the service in the overlayed service directory doesn't remove it from /service
+		# it needs to be removed from the overlay work directory also
+		elif $serviceUsesFsOverlay && [ -d "$overlayWorkDir/$serviceName" ] ; then
+			rm -rf "$overlayWorkDir/$serviceName"
+		fi
+
+		# now kill the supervise processes
+		kill $pids
+    fi
+
+	# remove service from installed services list
+	if [ -f "$installedServicesList" ]; then
+		grep -v "$serviceName" "$installedServicesList" | tee "$installedServicesList" > /dev/null
+	fi
+}
+
+
+# installService adds the service to the /service directory or updates an existing one
+#
+# If the service does not yet exist, it is created
+# If the service already exists, installService will
+# update the service files then restart the service and the logger
+
+
+# The service usually starts automatically within a few seconds of creation.
+# installService waits 10 seconds to see if the service starts on its own
+#	if not, it will be started
+#
+# The service may contain a "down" flag file. If present, the service won't be started.
+# This allows the service to be started manually later.
+# If the down flag is present the service will not start at boot.
+#
+#
+# $1 is the service name -- that is the name of the service in /service
+# 	the package name will be used as the service name if not specified on the command line
+#
+# $2 is the directory in the script directory to be copied to the service in /service
+#	(this includes the run and control (down) files)
+# 	the default is 'service' in the package directory
+#
+# for most packages with one service, the defaults are fine
+# however if a package needs to install more than one service
+#	then the service name and directory must be specified
+#	installService "PackageManager" "servicePM"
+#	installService "SetupHelper" "serviceSH"
+#	servicePM/run would include a call to /data/SetupHelper/PackageManager.py
+#	serviceSH/run would include a call to /data/SetupHelper/SetupHelper.sh
+
+installService ()
+{
+	# don't do any work if install has already failed
+	if $installFailed; then
+		return
+	fi
+
+	local serviceName=""
+    if (( $# >= 1 )); then
+        serviceName=$1
+	else
+		serviceName=$packageName
+    fi
+
+    local servicePath=""
+    if (( $# >= 2 )); then
+        servicePath="$scriptDir/$2"
+	elif [ -e "$servicesDir/$serviceName" ]; then
+		servicePath="$servicesDir/$serviceName"
+	elif [ -e "$scriptDir/service" ]; then
+		servicePath="$scriptDir/service"
+    fi
+	
+    # no service to install
+    if [ ! -e "$servicePath" ]; then
+		setInstallFailed $EXIT_ERROR "service $service not found - can't continue"
+		return
+    fi
+
+    if [ -L "$serviceDir/$serviceName" ]; then
+        logMessage "removing old $serviceName service (was symbolic link)"
+		removeService $serviceName
+    fi
+
+	# add service to the installed services list (used for uninstallAll)
+	# do this before actually modifying things just in case there's an error
+	#	that way the uninstall is assured
+	echo "$serviceName" >> "$installedServicesList"
+
+    # service not yet installed, COPY service directory to the service directory(s)
+    if [ ! -e "/service/$serviceName" ]; then
+        logMessage "installing $serviceName service"
+
+        cp -R "$servicePath" "$serviceDir/$serviceName"
+		if $serviceMountedTmpfs && [ -d "/service" ] ; then
+			cp -R "$servicePath" "/service/$serviceName"
+		fi
+		# if down flag is NOT set, check every second for service to start automatically
+		# then start it here if it is not running after 10 seconds
+		if [ -f "$serviceDir/$serviceName/down" ]; then
+			logMessage "$serviceName not (re)started - must be started manually (down flag set)"
+		elif ! svscanIsUp ; then
+			logMessage "services manager (svscan) not yet up - $serviceName should start automatically later"
+		else
+			local delayCount=10
+			local serviceRunning=false
+			while (( $delayCount > 0 )); do
+				if serviceIsUp $serviceName ; then
+					serviceRunning=true
+					break
+				fi
+				echo "waiting for $serviceName service to start"
+				sleep 1
+				(( delayCount-- ))
+			done
+			if $serviceRunning; then
+				logMessage "service $serviceName running"
+			else
+				logMessage "starting $serviceName service"
+				svc -u "/service/$serviceName"
+				if [ -e "/service/$serviceName/log" ] && ! serviceIsUp "$serviceName/log" ; then
+					svc -u "/service/$serviceName/log"
+				fi
+			fi
+		fi
+
+    # service already installed - only copy changed files, then restart service if it is running
+    else
+        if [ -f "$servicePath/run" ]; then
+            cmp -s "$servicePath/run" "$serviceDir/$serviceName/run" > /dev/null
+            if (( $? != 0 )); then
+				logMessage "updating $serviceName run file"
+                cp "$servicePath/run" "$serviceDir/$serviceName/run"
+				if $serviceMountedTmpfs ; then
+					cp "$servicePath/run" "/service/$serviceName/run"
+				fi
+            fi
+			if serviceIsUp $serviceName ; then
+				logMessage "restarting $serviceName service"
+				svc -t "/service/$serviceName"
+			fi
+        fi
+		# log needs to be handled separtely including a restart
+        if [ -f "$servicePath/log/run" ]; then
+            cmp -s "$servicePath/log/run" "$serviceDir/$serviceName/log/run" > /dev/null
+            if (( $? != 0 )); then
+				logMessage "updating $serviceName log/run file"
+                cp "$servicePath/log/run" "$serviceDir/$serviceName/log/run"
+				if $serviceMountedTmpfs ; then
+					cp "$servicePath/log/run" "/service/$serviceName/log/run"
+				fi
+			fi
+			if serviceIsUp "$serviceName/log" ; then
+				logMessage "restarting $serviceName logger"
+				svc -t "/service/$serviceName/log"
+			fi
+        fi
+    fi
+}

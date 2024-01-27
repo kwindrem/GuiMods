@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# this script selects the correct location for helper Resources
+#	and sources them into the setup script
+#
+# for backward compatibility, CommonResources in the SetupHelper directory
+#	links to this file, not CommonResources
+#	CommonResources previously sourced the other files
+#	now sourcing all resource files is done from here
+#
+# the helper files location is either the package directory or in the SetupHelper directory
+# if both are present, the one with the newer version number is incorporated
+#	into the setup script
+#
+# this script should be sourced in the setup script before any other activities
+
+#	NOTE: this script uses VersionResources ONLY
+#	it does source any other helper files since final location has not yet been chosen
+
+pkgDir=$( dirname $0 )
+pkgName=$( basename $pkgDir )
+shDir=$( dirname "$pkgDir" )/SetupHelper
+
+# assume helper files are in package directory - change below if not
+helperResourcesDir="$pkgDir/HelperResources"
+
+if [ -e "$helperResourcesDir/version" ]; then
+	# both helper file sets are present - compare them and choose the newest
+	if [ -e "$shDir/HelperResources" ]; then
+		# temporarily source the local VersionResources
+		source "$pkgDir/HelperResources/VersionResources"
+		# setup helper files are newer - switch to those helper files
+		compareVersions $( cat "$shDir/version" ) $( cat "$pkgDir/HelperResources/version" )
+		if (( $? == 1 )); then
+			helperResourcesDir="$shDir/HelperResources"
+		fi
+	fi
+elif [ -e "$shDir/HelperResources" ]; then
+	helperResourcesDir="$shDir/HelperResources"
+else
+	echo "$pkgName: helper files not found - can't continue" | tee -a "/data/log/SetupHelper"
+	exit 1
+fi
+
+# if we get here, helper files were located - source the files
+helperFileList=( EssentialResources LogHandler VersionResources \
+		DbusSettingsResources ServiceResources )
+for file in ${helperFileList[@]}; do
+	if [ -f "$helperResourcesDir/$file" ]; then
+		source "$helperResourcesDir/$file"
+	else
+		echo "$pkgName: helper file $file not found - can't continue" | tee -a "/data/log/SetupHelper"
+		exit 1
+	fi
+done
+
+# now transfer control to CommonResoures - it may not return !
+if [ -f "$helperResourcesDir/CommonResources" ]; then
+	source "$helperResourcesDir/CommonResources"
+else
+	echo "$pkgName: helper file CommonResources not found - can't continue" | tee -a "/data/log/SetupHelper"
+	exit 1
+fi
+
+
