@@ -1,3 +1,6 @@
+v9.1:
+	bump version to make sure package reinstalls after v6.1 changes
+
 v9.0:
 	add support for v3.20~41
 	added Dark Mode to relay overview

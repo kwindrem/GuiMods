@@ -451,7 +451,6 @@ updateActiveFile ()
 		# do this before actually modifying things just in case there's an error
 		#	that way the uninstall is assured
 		echo "$activeFile" >> "$installedFilesList"
-
 		cp "$sourceFile" "$activeFile"
 
 		updateRestartFlags "$activeFile"
@@ -1352,9 +1351,10 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 		for file in ${fileListVersionIndependent[@]};  do
 			if ! [ -f "$file" ]; then continue; fi
 			baseName=$( basename "$file" )
-			if ! [ "$baseName" == *.qml ]; then continue; fi
-			if (( $(grep -c "VisibleItemModel" "$file") == 0 )); then continue; fi
-			sed -e 's/VisibleItemModel/VisualItemModel/' "$file" > "$patchedFiles/$baseName"
+			sourceFile="$versionIndependentFileSet/$baseName"
+			if ! [[ "$baseName" == *.qml ]]; then continue; fi
+			if (( $(grep -c "VisibleItemModel" "$sourceFile") == 0 )); then continue; fi
+			sed -e 's/VisibleItemModel/VisualItemModel/' "$sourceFile" > "$patchedFiles/$baseName"
 		done
 	fi
 
