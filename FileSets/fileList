@@ -1,5 +1,3 @@
-/opt/victronenergy/dbus-generator-starter/dbus_generator.py
-/opt/victronenergy/dbus-generator-starter/startstop.py
 /opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py
 /opt/victronenergy/gui/qml/Battery.qml
 /opt/victronenergy/gui/qml/DetailAcInput.qml
@@ -45,3 +43,9 @@
 /opt/victronenergy/gui/qml/TileText.qml
 /opt/victronenergy/gui/qml/main.qml
 /var/www/venus/styling/styles.css
+/opt/victronenergy/gui/qml/PageDigitalInput.qml
+/opt/victronenergy/gui/qml/MbItemDigitalInput.qml
+/opt/victronenergy/dbus-digitalinputs/dbus_digitalinputs.py
+/opt/victronenergy/dbus-modbustcp/attributes.csv
+/opt/victronenergy/dbus-generator-starter/dbus_generator.py
+/opt/victronenergy/dbus-generator-starter/startstop.py

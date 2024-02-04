@@ -66,7 +66,7 @@ MbPage {
 			description: qsTr("Post-cool-down time")
 			show: capabilities.value & warmupCapability
 			item {
-				bind: Utils.path(settingsBindPrefix, "/PostCoolDownTime")
+				bind: Utils.path(settingsBindPrefix, "/GeneratorStopTime")
 				unit: "s"
 				decimals: 0
 				step: 5

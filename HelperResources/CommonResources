@@ -1263,7 +1263,7 @@ fi
 # prevent installing Raspberry Pi packages on other platforms
 if [ -f "$scriptDir/raspberryPiOnly" ]; then 
 	if [[ $machine != *"raspberrypi"* ]]; then
-		setInstallFailed $EXIT_INCOMPATIBLE_PLATFOM "$packageName not compatible with $machine"
+		setInstallFailed $EXIT_INCOMPATIBLE_PLATFORM "$packageName not compatible with $machine"
 	fi
 fi
 

@@ -1,1 +1,1 @@
-../v3.20~42/OverviewGridParallel.qml
+../v3.30~1/OverviewGridParallel.qml

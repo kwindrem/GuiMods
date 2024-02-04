@@ -1,32 +1,9 @@
 Recent changes:
-	Replace Multi LEDs with text describing the indicator's funciton
-
-	Added conrol over grid/renewable energy priority to inverter detail
-
-	Added dark mode
-
-	Added support for generator warm-up and cool-down when using ExtTransferSwitch
-
-	Add generator AC input detection to running/stoped display and link to manual start
-	Add switch to enable/disable external generator state to manual start/stop
-	Added generator start manually / stop automatically mode
-
-	The AC input detal now shows voltage and frequency for grid/shore and generator AC inputs
-		in addition to the active input
-	Incorporte voltage, current and frequency from grid meters
-		addresses systems that have no AC output for example (all loads on inverter input)
-		also allows the actual current to be displayed in all details and overview tiles
-		previously, currents were calculated: I - P / V which isn't accurate due to power factor
-	Treat an alternator as a "generator" source
-		for cases where an AC generator or the grid is not avalable
+	ExtTransferSwitch functionality has been merged into GuiMods
+	ExtTransferSwitch is now obsolete and will be uninstalled by GuiMods
 
 GuiMods has been revived with combined functionality of the original GuiMods and GuiMods2
 
-GuiMods2 has been decommissioned
-
-
-The following components have NOT been tested:
-    Multi-phase(leg) systems
 
 This package provides the following modifications to the VenusOS GUI:
 	A "dark mode" for all overviews and menu pages
@@ -154,7 +131,6 @@ This package provides the following modifications to the VenusOS GUI:
 
 		The Generator overview includes "Running" or "Stopped" in the generator icon if a digital input
 			has been configured for generator run status input.
-			
 
 each of these enhancements/modifications can be selected individually any time
     (while system is running) via the Settings Display GuiMods menu
@@ -483,6 +459,61 @@ Generator enhancements:
 		
 		Note that if all automatic stop conditions are currently satisfied, the generat will not be started.
 		That is, if the battery is at 95% in the above example, the generator will NOT start.
+
+External transfer switch:
+	This supports an external transfer switch ahead of a MultiPlus AC input
+	changing the AC input current limit and and AC source type based on on grid/on generator
+
+	ExtTransferSwitch includes support for "renewable energy" prioritizaiton added in Venus OS 3.10.
+		This also requires Multi firmware 506.
+	Renewable energy priority shuts down the Multi/Quattro charger allowing solar, wind and other charging sources
+		to charge the battery. Grid power is reneabled at a low SOC (battery voltage) set in the Multi configuration.
+	In addition, switching the AC source to generator reenables Multi AC input charging.
+		
+	Note: changes added in Venus OS v3.00 and changes added to Multi/Quattro in fimware 502,
+		support a generator on AC 2 in.
+		These are required for this package to work on a Quattro's AC 2 input
+
+	A GX device digital input is connected to the external transfer switch to indicate
+		if the grid or generator is routed to the Multi's AC input
+		This service then makes changed to the AC input current limit and AC source(type)
+		grid/shore or generator
+
+	External transfer switch configuration:
+
+		Program a digital input for External transfer switch
+
+		For Quattros, select if the transfer switch is connected to AC 1 in or AC 2 in.
+			(for Multis, this selection does not exist since there is only one AC input.)
+
+		Connect an output from the transfer switch to the GX device digital input to indicate
+			if the grid or generator source is being routed to the AC 1 input of the Multi.
+
+			The best signal to use is a grid power detection circuit.
+				A simle relay across the grid is probably fine for this.
+				This same signal would typically switch the transfer switch to the grid position.
+
+			The transfer switch may change state based on generator power being present.
+				If this is the case, the generator might not ever start when using this to feed the digital input.
+				Install a separate grid power detection circuit to insure proper behavior.
+
+			Verify that the On Grid / On Generator state shown in the Device List tracks the actual state
+				of the transfer switch. If it is backwards, change Inverted swich in the device's setup menu.
+
+		While On grid, set the grid input current limit and grid type (grid or shore).
+
+		Cause the transfer switch to change state and while On Generator, set the input current limit again,
+			this time for the generator values.
+
+		Now the input current limit will switch between the grid and generator settings.
+
+		If you make changes to the input current limit, those changes will be remembered and restored when the transfer switch
+		returns to that position again.
+
+		If you wish to prevent the generator from running when On Grid, make sure the system is not On Generator and
+			turn on the Do not run generator when AC1 is in use in:
+				Device List / Settings / Generator start/stop settings /Settings / Conditions
+			The transfer switch logic will turn this off when switching to On Generator and restore it when switching to On Grid.
 
 Installation:
 

@@ -42,6 +42,20 @@ fi
 #### installing
 if [ $scriptAction == 'INSTALL' ] ; then
 
+    # insure ExtTransferSwitch is uninstalled since its functionalty is now part of GuiMods
+    if [ -f "$installedVersionPrefix""ExtTransferSwitch" ] || [ -f "$installedFlagPrefix""ExtTransferSwitch" ]; then
+		logMessage "uninstalling the ExtTransferSwitch - GuiMods incorporates all it's"
+		if [ -e "/data/ExtTransferSwitch/setup" ]; then
+			"/data/ExtTransferSwitch/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"
+		else
+			logMessage "WARNING can't uninstall ExtTransferSwitch - no package or no setup script"
+		fi
+		if [ -e "/data/settupOptions/ExtTransferSwitch" ]; then
+			touch "/data/settupOptions/ExtTransferSwitch/DO_NOT_AUTO_INSTALL"
+			touch "/data/settupOptions/ExtTransferSwitch/DO_NOT_AUTO_ADD"
+			touch "/data/settupOptions/ExtTransferSwitch/FORCE_REMOVE"
+		fi
+    fi
     # insure GeneratorConnector is uninstalled since its functionalty is now part of GuiMods
     if [ -f "$installedVersionPrefix""GeneratorConnector" ] || [ -f "$installedFlagPrefix""GeneratorConnector" ]; then
 		logMessage "uninstalling the GeneratorConnector - GuiMods incorporates all it's features and more"
@@ -62,4 +76,4 @@ fi
 
 # endScript will install or uninstall all files and dBus settings (package has no services)
 # thats all folks - SCRIPT EXITS INSIDE THE FUNCTION
-endScript 'INSTALL_FILES' 'ADD_DBUS_SETTINGS'
+endScript 'INSTALL_FILES' 'INSTALL_SERVICES' 'ADD_DBUS_SETTINGS'

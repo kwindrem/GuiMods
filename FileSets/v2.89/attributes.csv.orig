@@ -1,0 +1,578 @@
+com.victronenergy.gps,/Position/Latitude,d,Decimal degrees,2800,int32,10000000,R
+com.victronenergy.gps,/Position/Longitude,d,Decimal degrees,2802,int32,10000000,R
+com.victronenergy.gps,/Course,d,Degrees,2804,uint16,100,R
+com.victronenergy.gps,/Speed,d,m/s,2805,uint16,100,R
+com.victronenergy.gps,/Fix,y,,2806,uint16,1,R
+com.victronenergy.gps,/NrOfSatellites,y,,2807,uint16,1,R
+com.victronenergy.gps,/Altitude,d,m,2808,int32,10,R
+com.victronenergy.settings,/Settings/CGwacs/BatteryLife/State,i,0=BL disabled;1=Restarting;2=Self-consumption;3=Self-consumption;4=Self-consumption;5=Discharge disabled;6=Force charge;7=Sustain;9=Keep batteries charged;10=BL Disabled;11=BL Disabled (Low SoC),2900,uint16,1,W
+com.victronenergy.settings,/Settings/CGwacs/BatteryLife/MinimumSocLimit,d,%,2901,uint16,10,W
+com.victronenergy.settings,/Settings/CGwacs/Hub4Mode,i,1=ESS with Phase Compensation;2=ESS without phase compensation;3=Disabled/External Control,2902,uint16,1,W
+com.victronenergy.settings,/Settings/CGwacs/BatteryLife/SocLimit,d,%,2903,uint16,10,R
+com.victronenergy.vebus,/Interfaces/Mk2/Version,u,,1,,,R
+com.victronenergy.vebus,/Devices/0/Version,u,,2,,,R
+com.victronenergy.vebus,/Ac/ActiveIn/L1/V,d,V AC,3,uint16,10,R
+com.victronenergy.vebus,/Ac/ActiveIn/L2/V,d,V AC,4,uint16,10,R
+com.victronenergy.vebus,/Ac/ActiveIn/L3/V,d,V AC,5,uint16,10,R
+com.victronenergy.vebus,/Ac/ActiveIn/L1/I,d,A AC,6,int16,10,R
+com.victronenergy.vebus,/Ac/ActiveIn/L2/I,d,A AC,7,int16,10,R
+com.victronenergy.vebus,/Ac/ActiveIn/L3/I,d,A AC,8,int16,10,R
+com.victronenergy.vebus,/Ac/ActiveIn/L1/F,d,Hz,9,int16,100,R
+com.victronenergy.vebus,/Ac/ActiveIn/L2/F,d,Hz,10,int16,100,R
+com.victronenergy.vebus,/Ac/ActiveIn/L3/F,d,Hz,11,int16,100,R
+com.victronenergy.vebus,/Ac/ActiveIn/L1/P,i,VA or Watts,12,int16,0.1,R
+com.victronenergy.vebus,/Ac/ActiveIn/L2/P,i,VA or Watts,13,int16,0.1,R
+com.victronenergy.vebus,/Ac/ActiveIn/L3/P,i,VA or Watts,14,int16,0.1,R
+com.victronenergy.vebus,/Ac/Out/L1/V,d,V AC,15,uint16,10,R
+com.victronenergy.vebus,/Ac/Out/L2/V,d,V AC,16,uint16,10,R
+com.victronenergy.vebus,/Ac/Out/L3/V,d,V AC,17,uint16,10,R
+com.victronenergy.vebus,/Ac/Out/L1/I,d,A AC,18,int16,10,R
+com.victronenergy.vebus,/Ac/Out/L2/I,d,A AC,19,int16,10,R
+com.victronenergy.vebus,/Ac/Out/L3/I,d,A AC,20,int16,10,R
+com.victronenergy.vebus,/Ac/Out/L1/F,d,Hz,21,int16,100,R
+com.victronenergy.vebus,/Ac/ActiveIn/CurrentLimit,d,A,22,int16,10,W
+com.victronenergy.vebus,/Ac/Out/L1/P,i,VA or Watts,23,int16,0.1,R
+com.victronenergy.vebus,/Ac/Out/L2/P,i,VA or Watts,24,int16,0.1,R
+com.victronenergy.vebus,/Ac/Out/L3/P,i,VA or Watts,25,int16,0.1,R
+com.victronenergy.vebus,/Dc/0/Voltage,d,V DC,26,uint16,100,R
+com.victronenergy.vebus,/Dc/0/Current,d,A DC,27,int16,10,R
+com.victronenergy.vebus,/Ac/NumberOfPhases,u,count,28,uint16,1,R
+com.victronenergy.vebus,/Ac/ActiveIn/ActiveInput,u,0=AC Input 1;1=AC Input 2;240=Disconnected,29,uint16,1,R
+com.victronenergy.vebus,/Soc,d,%,30,uint16,10,W
+com.victronenergy.vebus,/State,u,0=Off;1=Low Power;2=Fault;3=Bulk;4=Absorption;5=Float;6=Storage;7=Equalize;8=Passthru;9=Inverting;10=Power assist;11=Power supply;252=Bulk protection,31,uint16,1,R
+com.victronenergy.vebus,/VebusError,u,0=No error;1=VE.Bus Error 1: Device is switched off because one of the other phases in the system has switched off;2=VE.Bus Error 2: New and old types MK2 are mixed in the system;3=VE.Bus Error 3: Not all- or more than- the expected devices were found in the system;4=VE.Bus Error 4: No other device whatsoever detected;5=VE.Bus Error 5: Overvoltage on AC-out;6=VE.Bus Error 6: Error in DDC Program;7=VE.Bus BMS connected- which requires an Assistant- but no assistant found;10=VE.Bus Error 10: System time synchronisation problem occurred;14=VE.Bus Error 14: Device cannot transmit data;16=VE.Bus Error 16: Dongle missing;17=VE.Bus Error 17: One of the devices assumed master status because the original master failed;18=VE.Bus Error 18: AC Overvoltage on the output of a slave has occurred while already switched off;22=VE.Bus Error 22: This device cannot function as slave;24=VE.Bus Error 24: Switch-over system protection initiated;25=VE.Bus Error 25: Firmware incompatibility. The firmware of one of the connected device is not sufficiently up to date to operate in conjunction with this device;26=VE.Bus Error 26: Internal error,32,uint16,1,R
+com.victronenergy.vebus,/Mode,u,1=Charger Only;2=Inverter Only;3=On;4=Off,33,uint16,1,W
+com.victronenergy.vebus,/Alarms/HighTemperature,u,0=Ok;1=Warning;2=Alarm,34,uint16,1,R
+com.victronenergy.vebus,/Alarms/LowBattery,u,0=Ok;1=Warning;2=Alarm,35,uint16,1,R
+com.victronenergy.vebus,/Alarms/Overload,u,0=Ok;1=Warning;2=Alarm,36,uint16,1,R
+com.victronenergy.vebus,/Alarms/TemperatureSensor,u,0=Ok;1=Warning;2=Alarm,42,uint16,1,R
+com.victronenergy.vebus,/Alarms/VoltageSensor,u,0=Ok;1=Warning;2=Alarm,43,uint16,1,R
+com.victronenergy.vebus,/Alarms/L1/HighTemperature,u,0=Ok;1=Warning;2=Alarm,44,uint16,1,R
+com.victronenergy.vebus,/Alarms/L1/LowBattery,u,0=Ok;1=Warning;2=Alarm,45,uint16,1,R
+com.victronenergy.vebus,/Alarms/L1/Overload,u,0=Ok;1=Warning;2=Alarm,46,uint16,1,R
+com.victronenergy.vebus,/Alarms/L1/Ripple,u,0=Ok;1=Warning;2=Alarm,47,uint16,1,R
+com.victronenergy.vebus,/Alarms/L2/HighTemperature,u,0=Ok;1=Warning;2=Alarm,48,uint16,1,R
+com.victronenergy.vebus,/Alarms/L2/LowBattery,u,0=Ok;1=Warning;2=Alarm,49,uint16,1,R
+com.victronenergy.vebus,/Alarms/L2/Overload,u,0=Ok;1=Warning;2=Alarm,50,uint16,1,R
+com.victronenergy.vebus,/Alarms/L2/Ripple,u,0=Ok;1=Warning;2=Alarm,51,uint16,1,R
+com.victronenergy.vebus,/Alarms/L3/HighTemperature,u,0=Ok;1=Warning;2=Alarm,52,uint16,1,R
+com.victronenergy.vebus,/Alarms/L3/LowBattery,u,0=Ok;1=Warning;2=Alarm,53,uint16,1,R
+com.victronenergy.vebus,/Alarms/L3/Overload,u,0=Ok;1=Warning;2=Alarm,54,uint16,1,R
+com.victronenergy.vebus,/Alarms/L3/Ripple,u,0=Ok;1=Warning;2=Alarm,55,uint16,1,R
+com.victronenergy.vebus,/Hub4/L1/AcPowerSetpoint,d,W,37,int16,1,W
+com.victronenergy.vebus,/Hub4/DisableCharge,u,0=Charge allowed;1=Charge disabled,38,uint16,1,W
+com.victronenergy.vebus,/Hub4/DisableFeedIn,u,0=Feed in allowed;1=Feed in disabled,39,uint16,1,W
+com.victronenergy.vebus,/Hub4/L2/AcPowerSetpoint,d,W,40,int16,1,W
+com.victronenergy.vebus,/Hub4/L3/AcPowerSetpoint,d,W,41,int16,1,W
+com.victronenergy.vebus,/PvInverter/Disable,u,0=PV enabled;1=PV disabled,56,uint16,1,W
+com.victronenergy.vebus,/Bms/AllowToCharge,u,0=No;1=Yes,57,uint16,1,R
+com.victronenergy.vebus,/Bms/AllowToDischarge,u,0=No;1=Yes,58,uint16,1,R
+com.victronenergy.vebus,/Bms/BmsExpected,u,0=No;1=Yes,59,uint16,1,R
+com.victronenergy.vebus,/Bms/Error,u,0=No;1=Yes,60,uint16,1,R
+com.victronenergy.vebus,/Dc/0/Temperature,d,Degrees celsius,61,int16,10,R
+com.victronenergy.vebus,/SystemReset,y,0=No action;1=VE.Bus Reset,62,uint16,1,W
+com.victronenergy.vebus,/Alarms/PhaseRotation,u,0=Ok;1=Warning,63,uint16,1,R
+com.victronenergy.vebus,/Alarms/GridLost,i,0=No alarm;2=Alarm,64,uint16,1,R
+com.victronenergy.vebus,/Hub4/DoNotFeedInOvervoltage,i,0=Feed in overvoltage;1=Don't feed in overvoltage,65,uint16,1,W
+com.victronenergy.vebus,/Hub4/L1/MaxFeedInPower,d,W,66,uint16,0.01,W
+com.victronenergy.vebus,/Hub4/L2/MaxFeedInPower,d,W,67,uint16,0.01,W
+com.victronenergy.vebus,/Hub4/L3/MaxFeedInPower,d,W,68,uint16,0.01,W
+com.victronenergy.vebus,/Ac/State/IgnoreAcIn1,i,0=AC input not ignored; 1=AC input ignored,69,uint16,1,R
+com.victronenergy.vebus,/Ac/State/IgnoreAcIn2,i,0=AC input not ignored; 1=AC input ignored,70,uint16,1,R
+com.victronenergy.vebus,/Hub4/TargetPowerIsMaxFeedIn,i,0=AcPowerSetpoint interpreted normally; 1=AcPowerSetpoint as OvervoltageFeedIn limit,71,uint16,W
+com.victronenergy.vebus,/Hub4/FixSolarOffsetTo100mV,i,0=OvervoltageFeedIn uses 1V offset; 1=OvervoltageFeedIn uses 0.1V offset,72,uint16,W
+com.victronenergy.battery,/ProductId,u,,256,,,R
+com.victronenergy.battery,/FirmwareVersion,u,,257,,,R
+com.victronenergy.battery,/Serial,s,,258,,,R
+com.victronenergy.battery,/Dc/0/Voltage,d,V DC,259,uint16,100,R
+com.victronenergy.battery,/Dc/1/Voltage,d,V DC,260,uint16,100,R
+com.victronenergy.battery,/Dc/0/Current,d,A DC,261,int16,10,R
+com.victronenergy.battery,/Dc/0/Temperature,d,Degrees celsius,262,int16,10,R
+com.victronenergy.battery,/Dc/0/MidVoltage,d,V DC,263,uint16,100,R
+com.victronenergy.battery,/Dc/0/MidVoltageDeviation,d,%,264,uint16,100,R
+com.victronenergy.battery,/ConsumedAmphours,d,Ah,265,uint16,-10,R
+com.victronenergy.battery,/Soc,y,%,266,uint16,10,R
+com.victronenergy.battery,/Soh,y,%,304,uint16,10,R
+com.victronenergy.battery,/TimeToGo,q,seconds,303,uint16,0.01,R
+com.victronenergy.battery,/Info/MaxChargeVoltage,u,V DC,305,uint16,10,R
+com.victronenergy.battery,/Info/BatteryLowVoltage,u,V DC,306,uint16,10,R
+com.victronenergy.battery,/Info/MaxChargeCurrent,u,A DC,307,uint16,10,R
+com.victronenergy.battery,/Info/MaxDischargeCurrent,u,A DC,308,uint16,10,R
+com.victronenergy.battery,/Alarms/Alarm,y,0=No alarm;2=Alarm,267,uint16,1,R
+com.victronenergy.battery,/Alarms/LowVoltage,u,0=No alarm;2=Alarm,268,uint16,1,R
+com.victronenergy.battery,/Alarms/HighVoltage,u,0=No alarm;2=Alarm,269,uint16,1,R
+com.victronenergy.battery,/Alarms/LowStarterVoltage,u,0=No alarm;2=Alarm,270,uint16,1,R
+com.victronenergy.battery,/Alarms/HighStarterVoltage,u,0=No alarm;2=Alarm,271,uint16,1,R
+com.victronenergy.battery,/Alarms/LowSoc,u,0=No alarm;2=Alarm,272,uint16,1,R
+com.victronenergy.battery,/Alarms/LowTemperature,u,0=No alarm;2=Alarm,273,uint16,1,R
+com.victronenergy.battery,/Alarms/HighTemperature,u,0=No alarm;2=Alarm,274,uint16,1,R
+com.victronenergy.battery,/Alarms/MidVoltage,u,0=No alarm;2=Alarm,275,uint16,1,R
+com.victronenergy.battery,/Alarms/LowFusedVoltage,u,0=No alarm;2=Alarm,276,uint16,1,R
+com.victronenergy.battery,/Alarms/HighFusedVoltage,u,0=No alarm;2=Alarm,277,uint16,1,R
+com.victronenergy.battery,/Alarms/FuseBlown,u,0=No alarm;2=Alarm,278,uint16,1,R
+com.victronenergy.battery,/Alarms/HighInternalTemperature,u,0=No alarm;2=Alarm,279,uint16,1,R
+com.victronenergy.battery,/Alarms/HighChargeCurrent,u,0=No alarm;2=Alarm,320,uint16,1,R
+com.victronenergy.battery,/Alarms/HighDischargeCurrent,u,0=No alarm;2=Alarm,321,uint16,1,R
+com.victronenergy.battery,/Alarms/CellImbalance,u,0=No alarm;2=Alarm,322,uint16,1,R
+com.victronenergy.battery,/Alarms/InternalFailure,u,0=No alarm;2=Alarm,323,uint16,1,R
+com.victronenergy.battery,/Alarms/HighChargeTemperature,u,0=No alarm;2=Alarm,324,uint16,1,R
+com.victronenergy.battery,/Alarms/LowChargeTemperature,u,0=No alarm;2=Alarm,325,uint16,1,R
+com.victronenergy.battery,/Alarms/LowCellVoltage,u,0=No alarm;1=Almost discharged;2=Alarm,326,uint16,1,R
+com.victronenergy.battery,/Relay/0/State,y,0=Open;1=Closed,280,uint16,1,W
+com.victronenergy.battery,/History/DeepestDischarge,d,Ah,281,uint16,-10,R
+com.victronenergy.battery,/History/LastDischarge,d,Ah,282,uint16,-10,R
+com.victronenergy.battery,/History/AverageDischarge,d,Ah,283,uint16,-10,R
+com.victronenergy.battery,/History/ChargeCycles,i,count,284,uint16,1,R
+com.victronenergy.battery,/History/FullDischarges,i,count,285,uint16,1,R
+com.victronenergy.battery,/History/TotalAhDrawn,d,Ah,286,uint16,-10,R
+com.victronenergy.battery,/History/MinimumVoltage,d,V DC,287,uint16,100,R
+com.victronenergy.battery,/History/MaximumVoltage,d,V DC,288,uint16,100,R
+com.victronenergy.battery,/History/TimeSinceLastFullCharge,i,seconds,289,uint16,0.01,R
+com.victronenergy.battery,/History/AutomaticSyncs,i,count,290,uint16,1,R
+com.victronenergy.battery,/History/LowVoltageAlarms,i,count,291,uint16,1,R
+com.victronenergy.battery,/History/HighVoltageAlarms,i,count,292,uint16,1,R
+com.victronenergy.battery,/History/LowStarterVoltageAlarms,i,count,293,uint16,1,R
+com.victronenergy.battery,/History/HighStarterVoltageAlarms,i,count,294,uint16,1,R
+com.victronenergy.battery,/History/MinimumStarterVoltage,d,V DC,295,uint16,100,R
+com.victronenergy.battery,/History/MaximumStarterVoltage,d,V DC,296,uint16,100,R
+com.victronenergy.battery,/History/LowFusedVoltageAlarms,i,count,297,uint16,1,R
+com.victronenergy.battery,/History/HighFusedVoltageAlarms,i,count,298,uint16,1,R
+com.victronenergy.battery,/History/MinimumFusedVoltage,d,V DC,299,uint16,100,R
+com.victronenergy.battery,/History/MaximumFusedVoltage,d,V DC,300,uint16,100,R
+com.victronenergy.battery,/History/DischargedEnergy,d,kWh,301,uint16,10,R
+com.victronenergy.battery,/History/ChargedEnergy,d,kWh,302,uint16,10,R
+com.victronenergy.battery,/Capacity,d,Ah,309,uint16,10,R
+com.victronenergy.battery,/State,y,0=Initializing (Wait start);1=Initializing (before boot);2=Initializing (Before boot delay);3=Initializing (Wait boot);4=Initializing;5=Initializing (Measure battery voltage);6=Initializing (Calculate battery voltage);7=Initializing (Wait bus voltage);8=Initializing (Wait for lynx shunt);9=Running;10=Error (10);11=Error (11),1282,uint16,1,R
+com.victronenergy.battery,/ErrorCode,y,0=No error;1=Battery initialization error;2=No batteries connected;3=Unknown battery connected;4=Different battery type;5=Number of batteries incorrect;6=Lynx Shunt not found;7=Battery measure error;8=Internal calculation error;9=Batteries in series not ok;10=Number of batteries incorrect;11=Hardware error;12=Watchdog error;13=Over voltage;14=Under voltage;15=Over temperature;16=Under temperature;17=Hardware fault;18=Standby shutdown;19=Pre-charge charge error;20=Safety contactor check error;21=Pre-charge discharge error;22=ADC error;23=Slave error;24=Slave warning;25=Pre-charge error;26=Safety contactor error;27=Over current;28=Slave update failed;29=Slave update unavailable,1283,uint16,1,R
+com.victronenergy.battery,/SystemSwitch,y,0=Disabled;1=Enabled,1284,uint16,1,R
+com.victronenergy.battery,/Balancing,y,0=Inactive;1=Active,1285,uint16,1,R
+com.victronenergy.battery,/System/NrOfBatteries,y,count,1286,uint16,1,R
+com.victronenergy.battery,/System/BatteriesParallel,y,count,1287,uint16,1,R
+com.victronenergy.battery,/System/BatteriesSeries,y,count,1288,uint16,1,R
+com.victronenergy.battery,/System/NrOfCellsPerBattery,y,count,1289,uint16,1,R
+com.victronenergy.battery,/System/MinCellVoltage,d,V DC,1290,uint16,100,R
+com.victronenergy.battery,/System/MaxCellVoltage,d,V DC,1291,uint16,100,R
+com.victronenergy.battery,/Diagnostics/ShutDownsDueError,q,count,1292,uint16,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/1/Error,y,0=No error;1=Battery initialization error;2=No batteries connected;3=Unknown battery connected;4=Different battery type;5=Number of batteries incorrect;6=Lynx Shunt not found;7=Battery measure error;8=Internal calculation error;9=Batteries in series not ok;10=Number of batteries incorrect;11=Hardware error;12=Watchdog error;13=Over voltage;14=Under voltage;15=Over temperature;16=Under temperature;17=Hardware fault;18=Standby shutdown;19=Pre-charge charge error;20=Safety contactor check error;21=Pre-charge discharge error;22=ADC error;23=Slave error;24=Slave warning;25=Pre-charge error;26=Safety contactor error;27=Over current;28=Slave update failed;29=Slave update unavailable,1293,uint16,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/2/Error,y,0=No error;1=Battery initialization error;2=No batteries connected;3=Unknown battery connected;4=Different battery type;5=Number of batteries incorrect;6=Lynx Shunt not found;7=Battery measure error;8=Internal calculation error;9=Batteries in series not ok;10=Number of batteries incorrect;11=Hardware error;12=Watchdog error;13=Over voltage;14=Under voltage;15=Over temperature;16=Under temperature;17=Hardware fault;18=Standby shutdown;19=Pre-charge charge error;20=Safety contactor check error;21=Pre-charge discharge error;22=ADC error;23=Slave error;24=Slave warning;25=Pre-charge error;26=Safety contactor error;27=Over current;28=Slave update failed;29=Slave update unavailable,1294,uint16,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/3/Error,y,0=No error;1=Battery initialization error;2=No batteries connected;3=Unknown battery connected;4=Different battery type;5=Number of batteries incorrect;6=Lynx Shunt not found;7=Battery measure error;8=Internal calculation error;9=Batteries in series not ok;10=Number of batteries incorrect;11=Hardware error;12=Watchdog error;13=Over voltage;14=Under voltage;15=Over temperature;16=Under temperature;17=Hardware fault;18=Standby shutdown;19=Pre-charge charge error;20=Safety contactor check error;21=Pre-charge discharge error;22=ADC error;23=Slave error;24=Slave warning;25=Pre-charge error;26=Safety contactor error;27=Over current;28=Slave update failed;29=Slave update unavailable,1295,uint16,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/4/Error,y,0=No error;1=Battery initialization error;2=No batteries connected;3=Unknown battery connected;4=Different battery type;5=Number of batteries incorrect;6=Lynx Shunt not found;7=Battery measure error;8=Internal calculation error;9=Batteries in series not ok;10=Number of batteries incorrect;11=Hardware error;12=Watchdog error;13=Over voltage;14=Under voltage;15=Over temperature;16=Under temperature;17=Hardware fault;18=Standby shutdown;19=Pre-charge charge error;20=Safety contactor check error;21=Pre-charge discharge error;22=ADC error;23=Slave error;24=Slave warning;25=Pre-charge error;26=Safety contactor error;27=Over current;28=Slave update failed;29=Slave update unavailable,1296,uint16,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/1/Time,u,,310,int32,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/2/Time,u,,312,int32,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/3/Time,u,,314,int32,1,R
+com.victronenergy.battery,/Diagnostics/LastErrors/4/Time,u,,316,int32,1,R
+com.victronenergy.battery,/System/MinCellTemperature,d,Degrees celsius,318,int16,10,R
+com.victronenergy.battery,/System/MaxCellTemperature,d,Degrees celsius,319,int16,10,R
+com.victronenergy.battery,/Io/AllowToCharge,y,0=No;1=Yes,1297,uint16,1,R
+com.victronenergy.battery,/Io/AllowToDischarge,y,0=No;1=Yes,1298,uint16,1,R
+com.victronenergy.battery,/Io/ExternalRelay,y,0=Inactive;1=Active,1299,uint16,1,R
+com.victronenergy.battery,/History/MinimumCellVoltage,d,V DC,1300,uint16,100,R
+com.victronenergy.battery,/History/MaximumCellVoltage,d,V DC,1301,uint16,100,R
+com.victronenergy.solarcharger,/ProductId,u,,768,,,R
+com.victronenergy.solarcharger,/FirmwareVersion,u,,769,,,R
+com.victronenergy.solarcharger,/Serial,s,,770,,,R
+com.victronenergy.solarcharger,/Dc/0/Voltage,d,V DC,771,uint16,100,R
+com.victronenergy.solarcharger,/Dc/0/Current,d,A DC,772,int16,10,R
+com.victronenergy.solarcharger,/Dc/0/Temperature,d,Degrees celsius,773,int16,10,R
+com.victronenergy.solarcharger,/Mode,i,1=On;4=Off,774,uint16,1,W
+com.victronenergy.solarcharger,/State,i,0=Off;2=Fault;3=Bulk;4=Absorption;5=Float;6=Storage;7=Equalize;11=Other (Hub-1);252=Hub-1,775,uint16,1,R
+com.victronenergy.solarcharger,/Pv/V,d,V DC,776,uint16,100,R
+com.victronenergy.solarcharger,/Yield/Power,d,W,789,uint16,10,R
+com.victronenergy.solarcharger,/Equalization/Pending,i,0=No;1=Yes;2=Error;3=Unavailable- Unknown,778,uint16,1,R
+com.victronenergy.solarcharger,/Equalization/TimeRemaining,d,seconds,779,uint16,10,R
+com.victronenergy.solarcharger,/Relay/0/State,i,0=Open;1=Closed,780,uint16,1,R
+com.victronenergy.solarcharger,/Alarms/Alarm,i,0=No alarm;2=Alarm,781,uint16,1,R
+com.victronenergy.solarcharger,/Alarms/LowVoltage,i,0=No alarm;2=Alarm,782,uint16,1,R
+com.victronenergy.solarcharger,/Alarms/HighVoltage,i,0=No alarm;2=Alarm,783,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/0/Yield,d,kWh,784,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/0/MaxPower,d,W,785,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/1/Yield,d,kWh,786,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/1/MaxPower,d,W,787,uint16,1,R
+com.victronenergy.solarcharger,/ErrorCode,i,0=No error;1=Battery temperature too high;2=Battery voltage too high;3=Battery temperature sensor miswired (+);4=Battery temperature sensor miswired (-);5=Battery temperature sensor disconnected;6=Battery voltage sense miswired (+);7=Battery voltage sense miswired (-);8=Battery voltage sense disconnected;9=Battery voltage wire losses too high;17=Charger temperature too high;18=Charger over-current;19=Charger current polarity reversed;20=Bulk time limit reached;22=Charger temperature sensor miswired;23=Charger temperature sensor disconnected;34=Input current too high,788,uint16,1,R
+com.victronenergy.solarcharger,/Yield/User,d,kWh,790,uint16,10,R
+com.victronenergy.solarcharger,/MppOperationMode,i,0=Off;1=Voltage/current limited;2=MPPT active;255=Not available,791,uint16,1,R
+com.victronenergy.solarcharger,/Pv/0/V,d,V DC,3700,uint16,100,R
+com.victronenergy.solarcharger,/Pv/1/V,d,V DC,3701,uint16,100,R
+com.victronenergy.solarcharger,/Pv/2/V,d,V DC,3702,uint16,100,R
+com.victronenergy.solarcharger,/Pv/3/V,d,V DC,3703,uint16,100,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/0/Yield,d,kWh,3708,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/1/Yield,d,kWh,3709,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/2/Yield,d,kWh,3710,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/3/Yield,d,kWh,3711,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/0/Yield,d,kWh,3712,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/1/Yield,d,kWh,3713,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/2/Yield,d,kWh,3714,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/3/Yield,d,kWh,3715,uint16,10,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/0/MaxPower,d,W,3716,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/1/MaxPower,d,W,3717,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/2/MaxPower,d,W,3718,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/0/Pv/3/MaxPower,d,W,3719,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/0/MaxPower,d,W,3720,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/1/MaxPower,d,W,3721,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/2/MaxPower,d,W,3722,uint16,1,R
+com.victronenergy.solarcharger,/History/Daily/1/Pv/3/MaxPower,d,W,3723,uint16,1,R
+com.victronenergy.solarcharger,/Pv/0/P,d,W,3724,uint16,1,R
+com.victronenergy.solarcharger,/Pv/1/P,d,W,3725,uint16,1,R
+com.victronenergy.solarcharger,/Pv/2/P,d,W,3726,uint16,1,R
+com.victronenergy.solarcharger,/Pv/3/P,d,W,3727,uint16,1,R
+com.victronenergy.system,/Ac/PvOnOutput/L1/Power,d,W,808,uint16,1,R
+com.victronenergy.system,/Ac/PvOnOutput/L2/Power,d,W,809,uint16,1,R
+com.victronenergy.system,/Ac/PvOnOutput/L3/Power,d,W,810,uint16,1,R
+com.victronenergy.system,/Ac/PvOnGrid/L1/Power,d,W,811,uint16,1,R
+com.victronenergy.system,/Ac/PvOnGrid/L2/Power,d,W,812,uint16,1,R
+com.victronenergy.system,/Ac/PvOnGrid/L3/Power,d,W,813,uint16,1,R
+com.victronenergy.system,/Ac/PvOnGenset/L1/Power,d,W,814,uint16,1,R
+com.victronenergy.system,/Ac/PvOnGenset/L2/Power,d,W,815,uint16,1,R
+com.victronenergy.system,/Ac/PvOnGenset/L3/Power,d,W,816,uint16,1,R
+com.victronenergy.system,/Dc/Pv/Power,d,W,850,uint16,1,R
+com.victronenergy.system,/Dc/Pv/Current,d,A DC,851,int16,10,R
+com.victronenergy.system,/Dc/Charger/Power,d,W,855,uint16,1,R
+com.victronenergy.system,/Ac/Consumption/L1/Power,d,W,817,uint16,1,R
+com.victronenergy.system,/Ac/Consumption/L2/Power,d,W,818,uint16,1,R
+com.victronenergy.system,/Ac/Consumption/L3/Power,d,W,819,uint16,1,R
+com.victronenergy.system,/Ac/Grid/L1/Power,d,W,820,int16,1,R
+com.victronenergy.system,/Ac/Grid/L2/Power,d,W,821,int16,1,R
+com.victronenergy.system,/Ac/Grid/L3/Power,d,W,822,int16,1,R
+com.victronenergy.system,/Ac/Genset/L1/Power,d,W,823,int16,1,R
+com.victronenergy.system,/Ac/Genset/L2/Power,d,W,824,int16,1,R
+com.victronenergy.system,/Ac/Genset/L3/Power,d,W,825,int16,1,R
+com.victronenergy.system,/Ac/ActiveIn/Source,u,0=Not available;1=Grid;2=Generator;3=Shore power;240=Not connected,826,int16,1,R
+com.victronenergy.system,/Dc/System/Power,d,W,860,int16,1,R
+com.victronenergy.system,/Dc/Battery/Voltage,d,V DC,840,uint16,10,R
+com.victronenergy.system,/Dc/Battery/Current,d,A DC,841,int16,10,R
+com.victronenergy.system,/Dc/Battery/Power,d,W,842,int16,1,R
+com.victronenergy.system,/Dc/Vebus/Current,d,A DC,865,int16,10,R
+com.victronenergy.system,/Dc/Vebus/Power,d,W,866,int16,1,R
+com.victronenergy.system,/Dc/Battery/Soc,d,%,843,uint16,1,R
+com.victronenergy.system,/Dc/Battery/State,i,0=idle;1=charging;2=discharging,844,uint16,1,R
+com.victronenergy.system,/Dc/Battery/ConsumedAmphours,d,Ah,845,uint16,-10,R
+com.victronenergy.system,/Dc/Battery/TimeToGo,d,s,846,uint16,0.01,R
+com.victronenergy.system,/Relay/0/State,i,0=Open;1=Closed,806,uint16,1,W
+com.victronenergy.system,/Relay/1/State,i,0=Open;1=Closed,807,uint16,1,W
+com.victronenergy.system,/Serial,s,,800,string[6],1,R
+com.victronenergy.pvinverter,/ProductId,u,,1024,,,R
+com.victronenergy.pvinverter,/FirmwareVersion,s,,1025,,,R
+com.victronenergy.pvinverter,/Position,i,0=AC input 1;1=AC output;2=AC input 2,1026,uint16,1,R
+com.victronenergy.pvinverter,/Serial,s,,1039,string[7],1,R
+com.victronenergy.pvinverter,/Ac/L1/Voltage,d,V AC,1027,uint16,10,R
+com.victronenergy.pvinverter,/Ac/L1/Current,d,A AC,1028,int16,10,R
+com.victronenergy.pvinverter,/Ac/L1/Power,i,W,1029,uint16,1,R
+com.victronenergy.pvinverter,/Ac/L1/Energy/Forward,u,kWh,1030,uint16,100,R
+com.victronenergy.pvinverter,/Ac/L2/Voltage,d,V AC,1031,uint16,10,R
+com.victronenergy.pvinverter,/Ac/L2/Current,d,A AC,1032,int16,10,R
+com.victronenergy.pvinverter,/Ac/L2/Power,i,W,1033,uint16,1,R
+com.victronenergy.pvinverter,/Ac/L2/Energy/Forward,u,kWh,1034,uint16,100,R
+com.victronenergy.pvinverter,/Ac/L3/Voltage,d,V AC,1035,uint16,10,R
+com.victronenergy.pvinverter,/Ac/L3/Current,d,A AC,1036,int16,10,R
+com.victronenergy.pvinverter,/Ac/L3/Power,i,W,1037,uint16,1,R
+com.victronenergy.pvinverter,/Ac/L3/Energy/Forward,u,kWh,1038,uint16,100,R
+com.victronenergy.pvinverter,/Ac/L1/Energy/Forward,u,kWh,1046,uint32,100,R
+com.victronenergy.pvinverter,/Ac/L2/Energy/Forward,u,kWh,1048,uint32,100,R
+com.victronenergy.pvinverter,/Ac/L3/Energy/Forward,u,kWh,1050,uint32,100,R
+com.victronenergy.pvinverter,/Ac/Power,i,kW,1052,int32,1,W
+com.victronenergy.pvinverter,/Ac/MaxPower,u,kW,1054,uint32,1,W
+com.victronenergy.pvinverter,/Ac/PowerLimit,u,kW,1056,uint32,1,W
+com.victronenergy.motordrive,/Motor/RPM,d,RPM,2048,int16,1,R
+com.victronenergy.motordrive,/Motor/Temperature,d,Degrees celsius,2049,int16,10,R
+com.victronenergy.motordrive,/Dc/0/Voltage,d,V DC,2050,uint16,100,R
+com.victronenergy.motordrive,/Dc/0/Current,d,A DC,2051,int16,10,R
+com.victronenergy.motordrive,/Dc/0/Power,d,W,2052,int16,10,R
+com.victronenergy.motordrive,/Controller/Temperature,d,Degrees celsius,2053,int16,10,R
+com.victronenergy.charger,/ProductId,,,2304,,,R
+com.victronenergy.charger,/FirmwareVersion,,,2305,,,R
+com.victronenergy.charger,/Serial,,,2306,,,R
+com.victronenergy.charger,/Dc/0/Voltage,d,V DC,2307,uint16,100,R
+com.victronenergy.charger,/Dc/0/Current,d,A DC,2308,int16,10,R
+com.victronenergy.charger,/Dc/0/Temperature,d,Degrees celsius,2309,int16,10,R
+com.victronenergy.charger,/Dc/1/Voltage,d,V DC,2310,uint16,100,R
+com.victronenergy.charger,/Dc/1/Current,d,A DC,2311,int16,10,R
+com.victronenergy.charger,/Dc/2/Voltage,d,V DC,2312,uint16,100,R
+com.victronenergy.charger,/Dc/2/Current,d,A DC,2313,int16,10,R
+com.victronenergy.charger,/Ac/In/L1/I,d,A AC,2314,int16,10,R
+com.victronenergy.charger,/Ac/In/L1/P,d,W DC,2315,uint16,1,R
+com.victronenergy.charger,/Ac/In/CurrentLimit,d,A AC,2316,int16,10,W
+com.victronenergy.charger,/Mode,i,0=Off;1=On;2=Error;3=Unavailable- Unknown,2317,uint16,1,W
+com.victronenergy.charger,/State,i,0=Off;1=Low Power Mode;2=Fault;3=Bulk;4=Absorption;5=Float;6=Storage;7=Equalize;8=Passthru;9=Inverting;10=Power assist;11=Power supply mode;252=Bulk protection,2318,uint16,1,R
+com.victronenergy.charger,/ErrorCode,i,0=No error;1=Battery temperature too high;2=Battery voltage too high;3=Battery temperature sensor miswired (+);4=Battery temperature sensor miswired (-);5=Battery temperature sensor disconnected;6=Battery voltage sense miswired (+);7=Battery voltage sense miswired (-);8=Battery voltage sense disconnected;9=Battery voltage wire losses too high;17=Charger temperature too high;18=Charger over-current;19=Charger current polarity reversed;20=Bulk time limit reached;22=Charger temperature sensor miswired;23=Charger temperature sensor disconnected;34=Input current too high,2319,uint16,1,R
+com.victronenergy.charger,/Relay/0/State,i,0=Open;1=Closed,2320,uint16,1,R
+com.victronenergy.charger,/Alarms/LowVoltage,i,0=No alarm;2=Alarm,2321,uint16,1,R
+com.victronenergy.charger,/Alarms/HighVoltage,i,0=No alarm;2=Alarm,2322,uint16,1,R
+com.victronenergy.grid,/Ac/L1/Power,d,W,2600,int16,1,R
+com.victronenergy.grid,/Ac/L2/Power,d,W,2601,int16,1,R
+com.victronenergy.grid,/Ac/L3/Power,d,W,2602,int16,1,R
+com.victronenergy.grid,/Ac/L1/Energy/Forward,d,kWh,2603,uint16,100,R
+com.victronenergy.grid,/Ac/L2/Energy/Forward,d,kWh,2604,uint16,100,R
+com.victronenergy.grid,/Ac/L3/Energy/Forward,d,kWh,2605,uint16,100,R
+com.victronenergy.grid,/Ac/L1/Energy/Reverse,d,kWh,2606,uint16,100,R
+com.victronenergy.grid,/Ac/L2/Energy/Reverse,d,kWh,2607,uint16,100,R
+com.victronenergy.grid,/Ac/L3/Energy/Reverse,d,kWh,2608,uint16,100,R
+com.victronenergy.grid,/Serial,s,,2609,string[7],,R
+com.victronenergy.grid,/Ac/L1/Voltage,d,V AC,2616,uint16,10,R
+com.victronenergy.grid,/Ac/L1/Current,d,A AC,2617,int16,10,R
+com.victronenergy.grid,/Ac/L2/Voltage,d,V AC,2618,uint16,10,R
+com.victronenergy.grid,/Ac/L2/Current,d,A AC,2619,int16,10,R
+com.victronenergy.grid,/Ac/L3/Voltage,d,V AC,2620,uint16,10,R
+com.victronenergy.grid,/Ac/L3/Current,d,A AC,2621,int16,10,R
+com.victronenergy.grid,/Ac/L1/Energy/Forward,d,kWh,2622,uint32,100,R
+com.victronenergy.grid,/Ac/L2/Energy/Forward,d,kWh,2624,uint32,100,R
+com.victronenergy.grid,/Ac/L3/Energy/Forward,d,kWh,2626,uint32,100,R
+com.victronenergy.grid,/Ac/L1/Energy/Reverse,d,kWh,2628,uint32,100,R
+com.victronenergy.grid,/Ac/L2/Energy/Reverse,d,kWh,2630,uint32,100,R
+com.victronenergy.grid,/Ac/L3/Energy/Reverse,d,kWh,2632,uint32,100,R
+com.victronenergy.grid,/Ac/Energy/Forward,d,kWh,2634,uint32,100,R
+com.victronenergy.grid,/Ac/Energy/Reverse,d,kWh,2636,uint32,100,R
+com.victronenergy.settings,/Settings/CGwacs/AcPowerSetPoint,d,W,2700,int16,1,W
+com.victronenergy.settings,/Settings/CGwacs/AcPowerSetPoint,d,W,2703,int16,0.01,W
+com.victronenergy.settings,/Settings/CGwacs/MaxChargePercentage,d,%,2701,uint16,1,W
+com.victronenergy.settings,/Settings/CGwacs/MaxDischargePercentage,d,%,2702,uint16,1,W
+com.victronenergy.settings,/Settings/CGwacs/MaxDischargePower,d,W,2704,uint16,0.1,W
+com.victronenergy.settings,/Settings/SystemSetup/MaxChargeCurrent,d,A,2705,int16,1,W
+com.victronenergy.settings,/Settings/CGwacs/MaxFeedInPower,d,W,2706,int16,0.01,W
+com.victronenergy.settings,/Settings/CGwacs/OvervoltageFeedIn,i,0=Don't feed excess DC-coupled PV into grid;1=Feed excess DC-coupled PV into the grid,2707,uint16,1,W
+com.victronenergy.settings,/Settings/CGwacs/PreventFeedback,i,0=Feed excess AC-coupled PV into grid;1=Don't feed excess AC-coupled PV into the grid,2708,uint16,1,W
+com.victronenergy.settings,/Settings/SystemSetup/MaxChargeVoltage,d,V,2710,uint16,10,W
+com.victronenergy.hub4,/PvPowerLimiterActive,i,0=Feed-in limiting inactive;1=Feed-in limiting active,2709,uint16,1,R
+com.victronenergy.tank,/ProductId,u,,3000,uint16,1,R
+com.victronenergy.tank,/Capacity,d,m3,3001,uint32,10000,R
+com.victronenergy.tank,/FluidType,u,0=Fuel;1=Fresh water;2=Waste water;3=Live well;4=Oil;5=Black water (sewage),3003,uint16,1,R
+com.victronenergy.tank,/Level,d,%,3004,uint16,10,R
+com.victronenergy.tank,/Remaining,d,m3,3005,uint32,10000,R
+com.victronenergy.tank,/Status,u,0=OK;1=Disconnected;2=Short circuited;3=Reverse Polarity;4=Unknown,3007,uint16,1,R
+com.victronenergy.inverter,/ProductId,u,,3127,uint16,1,R
+com.victronenergy.inverter,/FirmwareVersion,u,,3125,uint16,1,R
+com.victronenergy.inverter,/Ac/Out/L1/I,d,A AC,3100,int16,10,R
+com.victronenergy.inverter,/Ac/Out/L1/V,d,V AC,3101,uint16,10,R
+com.victronenergy.inverter,/Ac/Out/L1/P,d,W AC,3102,int16,0.1,R
+com.victronenergy.inverter,/Alarms/HighTemperature,u,0=No alarm;1=Warning;2=Alarm,3110,uint16,1,R
+com.victronenergy.inverter,/Alarms/HighVoltage,u,0=No alarm;1=Warning;2=Alarm,3111,uint16,1,R
+com.victronenergy.inverter,/Alarms/HighVoltageAcOut,u,0=No alarm;1=Warning;2=Alarm,3112,uint16,1,R
+com.victronenergy.inverter,/Alarms/LowTemperature,u,0=No alarm;1=Warning;2=Alarm,3113,uint16,1,R
+com.victronenergy.inverter,/Alarms/LowVoltage,u,0=No alarm;1=Warning;2=Alarm,3114,uint16,1,R
+com.victronenergy.inverter,/Alarms/LowVoltageAcOut,u,0=No alarm;1=Warning;2=Alarm,3115,uint16,1,R
+com.victronenergy.inverter,/Alarms/Overload,u,0=No alarm;1=Warning;2=Alarm,3116,uint16,1,R
+com.victronenergy.inverter,/Alarms/Ripple,u,0=No alarm;1=Warning;2=Alarm,3117,uint16,1,R
+com.victronenergy.inverter,/Dc/0/Voltage,d,V DC,3105,uint16,100,R
+com.victronenergy.inverter,/Dc/0/Current,d,A DC,3106,int16,10,R
+com.victronenergy.inverter,/Mode,u,2=On;4=Off;5=Eco,3126,uint16,1,W
+com.victronenergy.inverter,/State,u,0=Off;1=Low power mode (search mode);2=Fault;9=Inverting (on),3128,uint16,1,R
+com.victronenergy.inverter,/Energy/InverterToAcOut,d,kWh,3130,uint32,100,R
+com.victronenergy.inverter,/Energy/OutToInverter,d,kWh,3132,uint32,100,R
+com.victronenergy.inverter,/Energy/SolarToAcOut,d,kWh,3134,uint32,100,R
+com.victronenergy.inverter,/Energy/SolarToBattery,d,kWh,3136,uint32,100,R
+com.victronenergy.inverter,/Pv/V,d,V DC,3138,uint16,10,R
+com.victronenergy.inverter,/Pv/0/V,d,V DC,3140,uint16,10,R
+com.victronenergy.inverter,/Pv/1/V,d,V DC,3141,uint16,10,R
+com.victronenergy.inverter,/Pv/2/V,d,V DC,3142,uint16,10,R
+com.victronenergy.inverter,/Pv/3/V,d,V DC,3143,uint16,10,R
+com.victronenergy.inverter,/History/Daily/0/Pv/0/Yield,d,kWh,3148,uint16,10,R
+com.victronenergy.inverter,/History/Daily/0/Pv/1/Yield,d,kWh,3149,uint16,10,R
+com.victronenergy.inverter,/History/Daily/0/Pv/2/Yield,d,kWh,3150,uint16,10,R
+com.victronenergy.inverter,/History/Daily/0/Pv/3/Yield,d,kWh,3151,uint16,10,R
+com.victronenergy.inverter,/History/Daily/1/Pv/0/Yield,d,kWh,3152,uint16,10,R
+com.victronenergy.inverter,/History/Daily/1/Pv/1/Yield,d,kWh,3153,uint16,10,R
+com.victronenergy.inverter,/History/Daily/1/Pv/2/Yield,d,kWh,3154,uint16,10,R
+com.victronenergy.inverter,/History/Daily/1/Pv/3/Yield,d,kWh,3155,uint16,10,R
+com.victronenergy.inverter,/History/Daily/0/Pv/0/MaxPower,d,W,3156,uint16,1,R
+com.victronenergy.inverter,/History/Daily/0/Pv/1/MaxPower,d,W,3157,uint16,1,R
+com.victronenergy.inverter,/History/Daily/0/Pv/2/MaxPower,d,W,3158,uint16,1,R
+com.victronenergy.inverter,/History/Daily/0/Pv/3/MaxPower,d,W,3159,uint16,1,R
+com.victronenergy.inverter,/History/Daily/1/Pv/0/MaxPower,d,W,3160,uint16,1,R
+com.victronenergy.inverter,/History/Daily/1/Pv/1/MaxPower,d,W,3161,uint16,1,R
+com.victronenergy.inverter,/History/Daily/1/Pv/2/MaxPower,d,W,3162,uint16,1,R
+com.victronenergy.inverter,/History/Daily/1/Pv/3/MaxPower,d,W,3163,uint16,1,R
+com.victronenergy.inverter,/Pv/0/P,d,W,3164,uint16,1,R
+com.victronenergy.inverter,/Pv/1/P,d,W,3165,uint16,1,R
+com.victronenergy.inverter,/Pv/2/P,d,W,3166,uint16,1,R
+com.victronenergy.inverter,/Pv/3/P,d,W,3167,uint16,1,R
+com.victronenergy.genset,/ProductId,u,,3212,uint16,1,R
+com.victronenergy.genset,/StatusCode,u,0=Standby;1=Startup 1;2=Startup 2;3=Startup 3;4=Startup 4;5=Startup 5;6=Startup 6;7=Startup 7;8=Running;9=Stopping;10=Error,3213,uint16,1,R
+com.victronenergy.genset,/ErrorCode,u,0=No error;1=AC voltage L1 too low;2=AC frequency L1 too low;3=AC current too low;4=AC power too low;5=Emergency stop;6=Servo current too low;7=Oil pressure too low;8=Engine temperature too low;9=Winding temperature too low;10=Exhaust temperature too low;13=Starter current too low;14=Glow current too low;15=Glow current too low;16=Fuel holding magnet current too low;17=Stop solenoid hold coil current too low;18=Stop solenoid pull coil current too low;19=Optional DC out current too low;20=5V output voltage too low;21=Boost output current too low;22=Panel supply current too high;25=Starter battery voltage too low;26=Startup aborted (rotation too low);28=Rotation too low;29=Power contactor current too low;30=AC voltage L2 too low;31=AC frequency L2 too low;32=AC current L2 too low;33=AC power L2 too low;34=AC voltage L3 too low;35=AC frequency L3 too low;36=AC current L3 too low;37=AC power L3 too low;62=Fuel temperature too low;63=Fuel level too low;65=AC voltage L1 too high;66=AC frequency too high;67=AC current too high;68=AC power too high;70=Servo current too high;71=Oil pressure too high;72=Engine temperature too high;73=Winding temperature too high;74=Exhaust temperature too low;77=Starter current too low;78=Glow current too high;79=Glow current too high;80=Fuel holding magnet current too high;81=Stop solenoid hold coil current too high;82=Stop solenoid pull coil current too high;83=Optional DC out current too high;84=5V output voltage too high;85=Boost output current too high;89=Starter battery voltage too high;90=Startup aborted (rotation too high);92=Rotation too high;93=Power contactor current too high;94=AC voltage L2 too high;95=AC frequency L2 too high;96=AC current L2 too high;97=AC power L2 too high;98=AC voltage L3 too high;99=AC frequency L3 too high;100=AC current L3 too high;101=AC power L3 too high;126=Fuel temperature too high;127=Fuel level too high;130=Lost control unit;131=Lost panel;132=Service needed;133=Lost 3-phase module;134=Lost AGT module;135=Synchronization failure;137=Intake airfilter;139=Lost sync. module;140=Load-balance failed;141=Sync-mode deactivated;142=Engine controller;148=Rotating field wrong;149=Fuel level sensor lost;150=Init failed;151=Watchdog;152=Out: winding;153=Out: exhaust;154=Out: Cyl. head;155=Inverter over temperature;156=Inverter overload;157=Inverter communication lost;158=Inverter sync failed;159=CAN communication lost;160=L1 overload;161=L2 overload;162=L3 overload;163=DC overload;164=DC overvoltage;165=Emergency stop;166=No connection,3214,uint16,1,R
+com.victronenergy.genset,/AutoStart,u,0=Disabled;1=Enabled,3215,uint16,1,R
+com.victronenergy.genset,/Start,u,0=Stop;1=Start,3223,uint16,1,W
+com.victronenergy.genset,/Engine/Load,d,%,3216,uint16,1,R
+com.victronenergy.genset,/Engine/Speed,d,RPM,3217,uint16,1,R
+com.victronenergy.genset,/Engine/OperatingHours,d,s,3218,uint16,0.01,R
+com.victronenergy.genset,/Engine/CoolantTemperature,d,Degrees celsius,3219,int16,10,R
+com.victronenergy.genset,/Engine/WindingTemperature,d,Degrees celsius,3220,int16,10,R
+com.victronenergy.genset,/Engine/ExaustTemperature,d,Degrees celsius,3221,int16,10,R
+com.victronenergy.genset,/StarterVoltage,d,V DC,3222,uint16,100,R
+com.victronenergy.genset,/Ac/L1/Voltage,d,V AC,3200,uint16,10,R
+com.victronenergy.genset,/Ac/L1/Current,d,A AC,3203,int16,10,R
+com.victronenergy.genset,/Ac/L1/Power,d,W,3206,int16,1,R
+com.victronenergy.genset,/Ac/L1/Frequency,d,Hz,3209,uint16,100,R
+com.victronenergy.genset,/Ac/L2/Voltage,d,V AC,3201,uint16,10,R
+com.victronenergy.genset,/Ac/L2/Current,d,A AC,3204,int16,10,R
+com.victronenergy.genset,/Ac/L2/Power,d,W,3207,int16,1,R
+com.victronenergy.genset,/Ac/L2/Frequency,d,Hz,3210,uint16,100,R
+com.victronenergy.genset,/Ac/L3/Voltage,d,V AC,3202,uint16,10,R
+com.victronenergy.genset,/Ac/L3/Current,d,A AC,3205,int16,10,R
+com.victronenergy.genset,/Ac/L3/Power,d,W,3208,int16,1,R
+com.victronenergy.genset,/Ac/L3/Frequency,d,Hz,3211,uint16,100,R
+com.victronenergy.temperature,/ProductId,u,,3300,uint16,1,R
+com.victronenergy.temperature,/Scale,d,,3301,uint16,100,R
+com.victronenergy.temperature,/Offset,d,,3302,int16,100,R
+com.victronenergy.temperature,/TemperatureType,u,0=Battery;1=Fridge;2=Generic,3303,uint16,1,R
+com.victronenergy.temperature,/Temperature,d,Degrees celsius,3304,int16,100,R
+com.victronenergy.temperature,/Status,u,0=OK;1=Disconnected;2=Short circuited;3=Reverse Polarity;4=Unknown,3305,uint16,1,R
+com.victronenergy.pulsemeter,/Aggregate,i,,3400,uint32,1,R
+com.victronenergy.pulsemeter,/Count,i,,3402,uint32,1,R
+com.victronenergy.digitalinput,/Count,i,,3420,uint32,1,R
+com.victronenergy.digitalinput,/State,i,,3422,uint16,1,R
+com.victronenergy.digitalinput,/Alarm,i,0=No alarm;2=Alarm,3423,uint16,1,R
+com.victronenergy.digitalinput,/Type,i,2=Door;3=Bilge pump;4=Bilge alarm;5=Burglar alarm;6=Smoke alarm;7=Fire alarm;8=CO2 alarm,3424,uint16,1,R
+com.victronenergy.generator,/Generator0/ManualStart,i,0=Stop generator;1=Start generator,3500,uint16,1,W
+com.victronenergy.generator,/Generator0/RunningByConditionCode,i,0=Stopped;1=Manual;2=TestRun;3=LossOfComms;4=Soc;5=AcLoad;6=BatteryCurrent;7=BatteryVoltage;8=InverterTemperatur;9=InverterOverload;10=StopOnAc1,3501,uint16,1,R
+com.victronenergy.generator,/Generator0/Runtime,i,seconds,3502,uint16,1,R
+com.victronenergy.generator,/Generator0/Runtime,u,seconds,3504,uint32,1,R
+com.victronenergy.generator,/Generator0/State,i,0=Stopped;1=Running;10=Error,3506,uint16,1,R
+com.victronenergy.generator,/Generator0/Error,i,0=No Error;1=Remote disabled;2=Remote fault,3507,uint16,1,R
+com.victronenergy.generator,/Generator0/Alarms/NoGeneratorAtAcIn,i,0=No Alarm;2=Alarm,3508,uint16,1,R
+com.victronenergy.meteo,/Irradiance,d,W/m^2,3600,uint16,10,R
+com.victronenergy.meteo,/WindSpeed,d,m/s,3601,uint16,10,R
+com.victronenergy.meteo,/CellTemperature,d,Degrees celsius,3602,int16,10,R
+com.victronenergy.meteo,/ExternalTemperature,d,Degrees celsius,3603,int16,10,R
+com.victronenergy.evcharger,/ProductId,u,,3800,uint16,1,R
+com.victronenergy.evcharger,/FirmwareVersion,u,,3802,uint32,1,R
+com.victronenergy.evcharger,/Serial,s,,3804,string[6],,R
+com.victronenergy.evcharger,/Model,s,,3810,string[4],,R
+com.victronenergy.evcharger,/MaxCurrent,d,A,3814,uint16,1,W
+com.victronenergy.evcharger,/Mode,u,0=Manual;1=Auto,3815,uint16,1,W
+com.victronenergy.evcharger,/Ac/Energy/Forward,d,kWh,3816,uint32,100,R
+com.victronenergy.evcharger,/Ac/L1/Power,d,W,3818,uint16,1,R
+com.victronenergy.evcharger,/Ac/L2/Power,d,W,3819,uint16,1,R
+com.victronenergy.evcharger,/Ac/L3/Power,d,W,3820,uint16,1,R
+com.victronenergy.evcharger,/Ac/Power,d,W,3821,uint16,1,R
+com.victronenergy.evcharger,/ChargingTime,d,s,3822,uint16,0.01,R
+com.victronenergy.evcharger,/Current,d,A,3823,uint16,1,W
+com.victronenergy.evcharger,/Status,u,0=Disconnected; 1=Connected; 2=Charging; 3=Charged; 4=Waiting for sun; 5=Waiting for RFID; 6=Waiting for start; 7=Low SOC; 8=Ground fault; 9=Welded contacts; 10=CP Input shorted; 11=Residual current detected; 12=Under voltage detected; 13=Overvoltage detected; 14=Overheating detected,3824,uint16,1,R
+com.victronenergy.evcharger,/SetCurrent,d,A,3825,uint16,1,W
+com.victronenergy.evcharger,/StartStop,u,0=Stop;1=Start,3826,uint16,1,W
+com.victronenergy.acload,/Ac/L1/Power,d,W,3900,int16,1,R
+com.victronenergy.acload,/Ac/L2/Power,d,W,3901,int16,1,R
+com.victronenergy.acload,/Ac/L3/Power,d,W,3902,int16,1,R
+com.victronenergy.acload,/Serial,s,,3903,string[7],,R
+com.victronenergy.acload,/Ac/L1/Voltage,d,V AC,3910,uint16,10,R
+com.victronenergy.acload,/Ac/L1/Current,d,A AC,3911,int16,10,R
+com.victronenergy.acload,/Ac/L2/Voltage,d,V AC,3912,uint16,10,R
+com.victronenergy.acload,/Ac/L2/Current,d,A AC,3913,int16,10,R
+com.victronenergy.acload,/Ac/L3/Voltage,d,V AC,3914,uint16,10,R
+com.victronenergy.acload,/Ac/L3/Current,d,A AC,3915,int16,10,R
+com.victronenergy.acload,/Ac/L1/Energy/Forward,d,kWh,3916,uint32,100,R
+com.victronenergy.acload,/Ac/L2/Energy/Forward,d,kWh,3918,uint32,100,R
+com.victronenergy.acload,/Ac/L3/Energy/Forward,d,kWh,3920,uint32,100,R
+com.victronenergy.fuelcell,/Dc/0/Voltage,d,V DC,4000,uint16,100,R
+com.victronenergy.fuelcell,/Dc/0/Current,d,A DC,4001,int16,10,R
+com.victronenergy.fuelcell,/Dc/1/Voltage,d,V DC,4002,int16,10,R
+com.victronenergy.fuelcell,/Dc/0/Temperature,d,Degrees celsius,4003,int16,10,R
+com.victronenergy.fuelcell,/History/EnergyOut,d,kWh,4004,uint32,100,R
+com.victronenergy.fuelcell,/Alarms/LowVoltage,u,0=No alarm;2=Alarm,4006,uint16,1,R
+com.victronenergy.fuelcell,/Alarms/HighVoltage,u,0=No alarm;2=Alarm,4007,uint16,1,R
+com.victronenergy.fuelcell,/Alarms/LowStarterVoltage,u,0=No alarm;2=Alarm,4008,uint16,1,R
+com.victronenergy.fuelcell,/Alarms/HighStarterVoltage,u,0=No alarm;2=Alarm,4009,uint16,1,R
+com.victronenergy.fuelcell,/Alarms/LowTemperature,u,0=No alarm;2=Alarm,4010,uint16,1,R
+com.victronenergy.fuelcell,/Alarms/HighTemperature,u,0=No alarm;2=Alarm,4011,uint16,1,R
+com.victronenergy.alternator,/Dc/0/Voltage,d,V DC,4100,uint16,100,R
+com.victronenergy.alternator,/Dc/0/Current,d,A DC,4101,int16,10,R
+com.victronenergy.alternator,/Dc/1/Voltage,d,V DC,4102,int16,10,R
+com.victronenergy.alternator,/Dc/0/Temperature,d,Degrees celsius,4103,int16,10,R
+com.victronenergy.alternator,/History/EnergyOut,d,kWh,4104,uint32,100,R
+com.victronenergy.alternator,/Alarms/LowVoltage,u,0=No alarm;2=Alarm,4106,uint16,1,R
+com.victronenergy.alternator,/Alarms/HighVoltage,u,0=No alarm;2=Alarm,4107,uint16,1,R
+com.victronenergy.alternator,/Alarms/LowStarterVoltage,u,0=No alarm;2=Alarm,4108,uint16,1,R
+com.victronenergy.alternator,/Alarms/HighStarterVoltage,u,0=No alarm;2=Alarm,4109,uint16,1,R
+com.victronenergy.alternator,/Alarms/LowTemperature,u,0=No alarm;2=Alarm,4110,uint16,1,R
+com.victronenergy.alternator,/Alarms/HighTemperature,u,0=No alarm;2=Alarm,4111,uint16,1,R
+com.victronenergy.dcsource,/Dc/0/Voltage,d,V DC,4200,uint16,100,R
+com.victronenergy.dcsource,/Dc/0/Current,d,A DC,4201,int16,10,R
+com.victronenergy.dcsource,/Dc/1/Voltage,d,V DC,4202,int16,10,R
+com.victronenergy.dcsource,/Dc/0/Temperature,d,Degrees centigrade,4203,int16,10,R
+com.victronenergy.dcsource,/History/EnergyOut,d,kWh,4204,uint32,100,R
+com.victronenergy.dcsource,/Alarms/LowVoltage,u,0=No alarm;2=Alarm,4206,uint16,1,R
+com.victronenergy.dcsource,/Alarms/HighVoltage,u,0=No alarm;2=Alarm,4207,uint16,1,R
+com.victronenergy.dcsource,/Alarms/LowStarterVoltage,u,0=No alarm;2=Alarm,4208,uint16,1,R
+com.victronenergy.dcsource,/Alarms/HighStarterVoltage,u,0=No alarm;2=Alarm,4209,uint16,1,R
+com.victronenergy.dcsource,/Alarms/LowTemperature,u,0=No alarm;2=Alarm,4210,uint16,1,R
+com.victronenergy.dcsource,/Alarms/HighTemperature,u,0=No alarm;2=Alarm,4211,uint16,1,R
+com.victronenergy.dcload,/Dc/0/Voltage,d,V DC,4300,uint16,100,R
+com.victronenergy.dcload,/Dc/0/Current,d,A DC,4301,int16,10,R
+com.victronenergy.dcload,/Dc/1/Voltage,d,V DC,4302,int16,10,R
+com.victronenergy.dcload,/Dc/0/Temperature,d,Degrees centigrade,4303,int16,10,R
+com.victronenergy.dcload,/History/EnergyIn,d,kWh,4304,uint32,100,R
+com.victronenergy.dcload,/Alarms/LowVoltage,u,0=No alarm;2=Alarm,4306,uint16,1,R
+com.victronenergy.dcload,/Alarms/HighVoltage,u,0=No alarm;2=Alarm,4307,uint16,1,R
+com.victronenergy.dcload,/Alarms/LowStarterVoltage,u,0=No alarm;2=Alarm,4308,uint16,1,R
+com.victronenergy.dcload,/Alarms/HighStarterVoltage,u,0=No alarm;2=Alarm,4309,uint16,1,R
+com.victronenergy.dcload,/Alarms/LowTemperature,u,0=No alarm;2=Alarm,4310,uint16,1,R
+com.victronenergy.dcload,/Alarms/HighTemperature,u,0=No alarm;2=Alarm,4311,uint16,1,R
+com.victronenergy.dcsystem,/Dc/0/Voltage,d,V DC,4400,uint16,100,R
+com.victronenergy.dcsystem,/Dc/0/Current,d,A DC,4401,int16,10,R
+com.victronenergy.dcsystem,/Dc/1/Voltage,d,V DC,4402,int16,10,R
+com.victronenergy.dcsystem,/Dc/0/Temperature,d,Degrees centigrade,4403,int16,10,R
+com.victronenergy.dcsystem,/History/EnergyOut,d,kWh,4404,uint32,100,R
+com.victronenergy.dcsystem,/History/EnergyIn,d,kWh,4406,uint32,100,R
+com.victronenergy.dcsystem,/Alarms/LowVoltage,u,0=No alarm;2=Alarm,4408,uint16,1,R
+com.victronenergy.dcsystem,/Alarms/HighVoltage,u,0=No alarm;2=Alarm,4409,uint16,1,R
+com.victronenergy.dcsystem,/Alarms/LowStarterVoltage,u,0=No alarm;2=Alarm,4410,uint16,1,R
+com.victronenergy.dcsystem,/Alarms/HighStarterVoltage,u,0=No alarm;2=Alarm,4411,uint16,1,R
+com.victronenergy.dcsystem,/Alarms/LowTemperature,u,0=No alarm;2=Alarm,4412,uint16,1,R
+com.victronenergy.dcsystem,/Alarms/HighTemperature,u,0=No alarm;2=Alarm,4413,uint16,1,R
+com.victronenergy.multi,/Ac/In/1/L1/V,d,V AC,4500,uint16,10,R
+com.victronenergy.multi,/Ac/In/1/L2/V,d,V AC,4501,uint16,10,R
+com.victronenergy.multi,/Ac/In/1/L3/V,d,V AC,4502,uint16,10,R
+com.victronenergy.multi,/Ac/In/1/L1/I,d,A AC,4503,uint16,10,R
+com.victronenergy.multi,/Ac/In/1/L2/I,d,A AC,4504,uint16,10,R
+com.victronenergy.multi,/Ac/In/1/L3/I,d,A AC,4505,uint16,10,R
+com.victronenergy.multi,/Ac/In/1/L1/P,d,W,4506,int16,0.1,R
+com.victronenergy.multi,/Ac/In/1/L2/P,d,W,4507,int16,0.1,R
+com.victronenergy.multi,/Ac/In/1/L3/P,d,W,4508,int16,0.1,R
+com.victronenergy.multi,/Ac/In/1/L1/F,d,Hz,4509,uint16,100,R
+com.victronenergy.multi,/Ac/Out/L1/V,d,V AC,4510,uint16,10,R
+com.victronenergy.multi,/Ac/Out/L2/V,d,V AC,4511,uint16,10,R
+com.victronenergy.multi,/Ac/Out/L3/V,d,V AC,4512,uint16,10,R
+com.victronenergy.multi,/Ac/Out/L1/I,d,A AC,4513,uint16,10,R
+com.victronenergy.multi,/Ac/Out/L2/I,d,A AC,4514,uint16,10,R
+com.victronenergy.multi,/Ac/Out/L3/I,d,A AC,4515,uint16,10,R
+com.victronenergy.multi,/Ac/Out/L1/P,d,W,4516,int16,0.1,R
+com.victronenergy.multi,/Ac/Out/L2/P,d,W,4517,int16,0.1,R
+com.victronenergy.multi,/Ac/Out/L3/P,d,W,4518,int16,0.1,R
+com.victronenergy.multi,/Ac/Out/L1/F,d,Hz,4519,uint16,100,R
+com.victronenergy.multi,/Ac/In/1/Type,u,0=Unused;1=Grid;2=Genset;3=Shore,4520,uint16,1,R
+com.victronenergy.multi,/Ac/In/2/Type,u,0=Unused;1=Grid;2=Genset;3=Shore,4521,uint16,1,R
+com.victronenergy.multi,/Ac/In/1/CurrentLimit,d,A,4522,uint16,10,W
+com.victronenergy.multi,/Ac/In/2/CurrentLimit,d,A,4523,uint16,10,W
+com.victronenergy.multi,/Ac/NumberOfPhases,u,count,4524,uint16,1,R
+com.victronenergy.multi,/Ac/ActiveIn/ActiveInput,u,0=AC Input 1;1=AC Input 2;240=Disconnected,4525,uint16,1,R
+com.victronenergy.multi,/Dc/0/Voltage,d,V DC,4526,uint16,100,R
+com.victronenergy.multi,/Dc/0/Current,d,A DC,4527,int16,10,R
+com.victronenergy.multi,/Dc/0/Temperature,d,Degrees celsius,4528,int16,10,R
+com.victronenergy.multi,/Soc,d,%,4529,uint16,10,R
+com.victronenergy.multi,/State,u,0=Off;1=Low Power;2=Fault;3=Bulk;4=Absorption;5=Float;6=Storage;7=Equalize;8=Passthru;9=Inverting;10=Power assist;11=Power supply;252=Bulk protection,4530,uint16,1,R
+com.victronenergy.multi,/Mode,u,1=Charger Only;2=Inverter Only;3=On;4=Off,4531,uint16,1,W
+com.victronenergy.multi,/Alarms/HighTemperature,u,0=Ok;1=Warning;2=Alarm,4532,uint16,1,R
+com.victronenergy.multi,/Alarms/HighVoltage,u,0=Ok;1=Warning;2=Alarm,4533,uint16,1,R
+com.victronenergy.multi,/Alarms/HighVoltageAcOut,u,0=Ok;1=Warning;2=Alarm,4534,uint16,1,R
+com.victronenergy.multi,/Alarms/LowTemperature,u,0=Ok;1=Warning;2=Alarm,4535,uint16,1,R
+com.victronenergy.multi,/Alarms/LowVoltage,u,0=Ok;1=Warning;2=Alarm,4536,uint16,1,R
+com.victronenergy.multi,/Alarms/LowVoltageAcOut,u,0=Ok;1=Warning;2=Alarm,4537,uint16,1,R
+com.victronenergy.multi,/Alarms/Overload,u,0=Ok;1=Warning;2=Alarm,4538,uint16,1,R
+com.victronenergy.multi,/Alarms/Ripple,u,0=Ok;1=Warning;2=Alarm,4539,uint16,1,R
+com.victronenergy.multi,/Yield/Power,d,W,4540,uint16,1,R
+com.victronenergy.multi,/Yield/User,d,kWh,4541,uint16,10,R
+com.victronenergy.multi,/Relay/0/State,i,0=Open;1=Closed,4542,uint16,1,R
+com.victronenergy.multi,/MppOperationMode,i,0=Off;1=Voltage/current limited;2=MPPT active;255=Not available,4543,uint16,1,R
+com.victronenergy.multi,/Pv/V,d,V DC,4544,uint16,10,R
+com.victronenergy.multi,/ErrorCode,i,0=No error;1=Battery temperature too high;2=Battery voltage too high;3=Battery temperature sensor miswired (+);4=Battery temperature sensor miswired (-);5=Battery temperature sensor disconnected;6=Battery voltage sense miswired (+);7=Battery voltage sense miswired (-);8=Battery voltage sense disconnected;9=Battery voltage wire losses too high;17=Charger temperature too high;18=Charger over-current;19=Charger current polarity reversed;20=Bulk time limit reached;22=Charger temperature sensor miswired;23=Charger temperature sensor disconnected;34=Input current too high,4545,uint16,1,R
+com.victronenergy.multi,/Energy/AcIn1ToAcOut,d,kWh,4546,uint32,100,R
+com.victronenergy.multi,/Energy/AcIn1ToInverter,d,kWh,4548,uint32,100,R
+com.victronenergy.multi,/Energy/AcIn2ToAcOut,d,kWh,4550,uint32,100,R
+com.victronenergy.multi,/Energy/AcIn2ToInverter,d,kWh,4552,uint32,100,R
+com.victronenergy.multi,/Energy/AcOutToAcIn1,d,kWh,4554,uint32,100,R
+com.victronenergy.multi,/Energy/AcOutToAcIn2,d,kWh,4556,uint32,100,R
+com.victronenergy.multi,/Energy/InverterToAcIn1,d,kWh,4558,uint32,100,R
+com.victronenergy.multi,/Energy/InverterToAcIn2,d,kWh,4560,uint32,100,R
+com.victronenergy.multi,/Energy/InverterToAcOut,d,kWh,4562,uint32,100,R
+com.victronenergy.multi,/Energy/OutToInverter,d,kWh,4564,uint32,100,R
+com.victronenergy.multi,/Energy/SolarToAcIn1,d,kWh,4566,uint32,100,R
+com.victronenergy.multi,/Energy/SolarToAcIn2,d,kWh,4568,uint32,100,R
+com.victronenergy.multi,/Energy/SolarToAcOut,d,kWh,4570,uint32,100,R
+com.victronenergy.multi,/Energy/SolarToBattery,d,kWh,4572,uint32,100,R
