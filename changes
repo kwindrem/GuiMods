@@ -1,3 +1,7 @@
+v10.1:
+	add AC in ignored, etc to Generator AC input tile
+	add support for v3.20~46 & -49 and v3.30~3 (v3.30~1 never released so is not inclulded)
+
 v10.0:
 	incoporate ExtTransferSwitch
 	add support for v3.20~45 adn v3.30~1

@@ -123,7 +123,6 @@ class Monitor:
 			transferSwitchLocation = 0
 		elif self.numberOfAcInputs == 1:
 			transferSwitchLocation = 1
-			self.numberOfAcInputs > 1 and self.DbusSettings['transferSwitchOnAc2'] == 1
 		elif self.DbusSettings['transferSwitchOnAc2'] == 1:
 			transferSwitchLocation = 2
 		else:

@@ -1,1 +1,1 @@
-../v3.30~1/PageSettingsDisplay.qml
+../v3.30~2/PageSettingsDisplay.qml

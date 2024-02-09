@@ -148,22 +148,24 @@ OverviewPage {
 		height: inOutTileHeight
 		title:
 		{
-			// input 2 is active
-			if (! acActiveInput.valid || acActiveInput.value == 1)
-			{
-				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
-					return qsTr ("AC In 2 Ignored")
-				else
-					return getAcSourceName(sys.acSource)
-			}
 			// input 1 is active
-			else
+			if (acActiveInput.value == 0)
 			{
 				if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
 					return qsTr ("AC In 1 Ignored")
 				else
 					return getAcSourceName(sys.acSource)
 			}
+			// input 2 is active
+			else if (acActiveInput.value == 1)
+			{
+				if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
+					return qsTr ("AC In 2 Ignored")
+				else
+					return getAcSourceName(sys.acSource)
+			}
+			else
+				return "no input"
 		}
 ////// GuiMods — DarkMode
 		titleColor: !darkMode ? "#E74c3c" : "#73261E"

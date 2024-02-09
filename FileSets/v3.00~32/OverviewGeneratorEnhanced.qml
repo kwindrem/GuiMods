@@ -53,6 +53,13 @@ OverviewPage {
     property bool showServiceInfo: timeSinceService.valid && generatorServiceInterval.valid && generatorServiceInterval.value > 0
 	property bool serviceOverdue: showServiceInfo && timeSinceService.value > generatorServiceInterval.value
 
+	//////// add to display AC input ignored
+	 VBusItem { id: ignoreAcInput1; bind: Utils.path(sys.vebusPrefix, "/Ac/State/IgnoreAcIn1") }
+	 VBusItem { id: ignoreAcInput2; bind: Utils.path(sys.vebusPrefix, "/Ac/State/IgnoreAcIn2") }
+	 VBusItem { id: acActiveInput; bind: Utils.path(sys.vebusPrefix, "/Ac/ActiveIn/ActiveInput") }
+	 VBusItem { id: ac1source; bind: Utils.path("com.victronenergy.settings", "/Settings/SystemSetup/AcInput1") }
+	 VBusItem { id: ac2source; bind: Utils.path("com.victronenergy.settings", "/Settings/SystemSetup/AcInput2") }
+
 	title: qsTr("Generator")
 
 	property bool autoStartSelected: false
@@ -326,33 +333,65 @@ OverviewPage {
 		visible: showAcIn
 		values:
 		[
-			OverviewAcValuesEnhanced { connection: sys.genset },
+			OverviewAcValuesEnhanced
+			{
+				connection: sys.genset
+				visible: sys.genset.power.valid				
+			},
 			TileText
 			{
 				width: acInTile.width - 5
-				text: qsTr ("--")
-				font.pixelSize: 22
+				text:
+				{
+					// input 1 is active
+					if (acActiveInput.value == 0)
+					{
+						if (! ac1source.valid)
+							return qsTr ("\nno AC 1 In")
+						else if (ac1source.value != 2)
+							return qsTr ("AC In 1\nis not\ngenerator")
+						else if (ignoreAcInput1.valid && ignoreAcInput1.value == 1)
+							return qsTr ("AC In 1\nIgnored")
+						else
+							return ""
+					}
+					// input 2 is active
+					else if (acActiveInput.value == 1)
+					{
+						if (! ac2source.valid)
+							return qsTr ("\nno AC 2 In")
+						else if (ac2source.value != 2)
+							return qsTr ("AC In 2\nis not\ngenerator")
+						else if (ignoreAcInput2.valid && ignoreAcInput2.value == 1)
+							return qsTr ("AC In 2\nIgnored")
+						else
+							return ""
+					}
+					else
+						return "no\nactive\ninput"
+				}
 				visible: !sys.genset.power.valid
 			}			
 		]
 ////// add power bar graph
-        PowerGauge
-        {
-            id: acInBar
-            width: parent.width
-            height: 12
-            anchors
-            {
-                top: parent.top; topMargin: 20
-                horizontalCenter: parent.horizontalCenter
-            }
+		PowerGauge
+		{
+			id: acInBar
+			width: parent.width
+			height: 12
+			anchors
+			{
+				top: parent.top; topMargin: 20
+				horizontalCenter: parent.horizontalCenter
+			}
 			connection: sys.genset
 			useInputCurrentLimit: true
-            maxForwardPowerParameter: ""
-            maxReversePowerParameter: ""
-            visible: showGauges
-        }
+			maxForwardPowerParameter: ""
+			maxReversePowerParameter: ""
+			visible: showGauges && sys.genset.power.valid
+		}
 	}
+
 //////// added to show alternator in place of AC generator
 	Tile {
 		id: alternatorTile
