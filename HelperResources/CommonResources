@@ -1311,9 +1311,10 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	if [ -f "$scriptDir/GUI_V1_NOT_REQUIRED" ]; then
 		guiV1required=false
 	# files in the GUI v1 directory are considered mandatory
-	elif (( $( grep 'updateActiveFile' "$scriptDir/setup" | grep -c '$qmlDir\|/gui/') > 0 )); then
+	elif (( $( cat "$pkgFileSets/fileList"* 2>/dev/null | grep -c '/gui/' ) > 0 )); then
 		guiV1required=true
-	elif (( $( cat "$pkgFileSets/fileList"* | grep -c '/gui/' ) > 0 )); then
+	# look also in setup script
+	elif (( $( grep 'updateActiveFile' "$scriptDir/setup" | grep -c '$qmlDir\|/gui/') > 0 )); then
 		guiV1required=true
 	else
 		guiV1required=false

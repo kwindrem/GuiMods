@@ -1,1 +1,0 @@
-../v3.30~2/dbus_systemcalc.py
