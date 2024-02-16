@@ -1,3 +1,6 @@
+v10.4:
+	fixed: install on v3.20 fails
+
 v10.3:
 	add support for v3.30~6
 
