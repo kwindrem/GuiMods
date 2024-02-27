@@ -37,6 +37,32 @@
 {"path":"/Settings/Relay/4/Show", "default":1, "min":0, "max":1}
 {"path":"/Settings/Relay/5/CustomName", "default":""}
 {"path":"/Settings/Relay/5/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/6/CustomName", "default":""}
+{"path":"/Settings/Relay/6/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/7/CustomName", "default":""}
+{"path":"/Settings/Relay/7/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/8/CustomName", "default":""}
+{"path":"/Settings/Relay/8/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/9/CustomName", "default":""}
+{"path":"/Settings/Relay/9/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/10/CustomName", "default":""}
+{"path":"/Settings/Relay/10/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/11/CustomName", "default":""}
+{"path":"/Settings/Relay/11/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/12/CustomName", "default":""}
+{"path":"/Settings/Relay/12/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/13/CustomName", "default":""}
+{"path":"/Settings/Relay/13/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/14/CustomName", "default":""}
+{"path":"/Settings/Relay/14/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/15/CustomName", "default":""}
+{"path":"/Settings/Relay/15/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/16/CustomName", "default":""}
+{"path":"/Settings/Relay/16/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/17/CustomName", "default":""}
+{"path":"/Settings/Relay/17/Show", "default":1, "min":0, "max":1}
+{"path":"/Settings/Relay/18/CustomName", "default":""}
+{"path":"/Settings/Relay/18/Show", "default":1, "min":0, "max":1}
 {"path":"/Settings/GuiMods/GaugeLimits/BatteryMaxChargeCurrent", "default":0.0}
 {"path":"/Settings/GuiMods/GaugeLimits/AcOutputNonCriticalMaxPower", "default":0.0}
 {"path":"/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower", "default":0.0}

@@ -1350,10 +1350,10 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	if (( $venusVersionNumber < $versionNumber )); then
 		logMessage "patching VisibleItemModel to VisualItemModel in all .qml replacements"
 		for file in ${fileListVersionIndependent[@]};  do
-			if ! [ -f "$file" ]; then continue; fi
 			baseName=$( basename "$file" )
-			sourceFile="$versionIndependentFileSet/$baseName"
 			if ! [[ "$baseName" == *.qml ]]; then continue; fi
+			sourceFile="$versionIndependentFileSet/$baseName"
+			if ! [ -f "$sourceFile" ]; then continue; fi
 			if (( $(grep -c "VisibleItemModel" "$sourceFile") == 0 )); then continue; fi
 			sed -e 's/VisibleItemModel/VisualItemModel/' "$sourceFile" > "$patchedFiles/$baseName"
 		done

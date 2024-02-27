@@ -1,3 +1,8 @@
+v10.5:
+	increase number of relays to 20 for use with RemoteGPIO package
+	support more digital inputs for use with RemoteGPIO package
+	add support for v3.21, v3.22, v3.30~9
+
 v10.4:
 	fixed: install on v3.20 fails
 

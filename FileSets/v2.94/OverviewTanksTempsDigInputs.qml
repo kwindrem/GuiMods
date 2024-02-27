@@ -133,7 +133,8 @@ OverviewPage {
         }
         height: root.digInHeight
         width: root.digInWidth
-        interactive: false
+		// make list flickable if more tiles than will fit completely
+		interactive: root.digInTileHeight * count > (digInputsColumn.height + 1) ? true : false
 
         model: digInModel
         delegate: TileDigIn
