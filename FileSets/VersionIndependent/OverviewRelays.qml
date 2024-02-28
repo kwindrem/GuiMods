@@ -9,49 +9,49 @@ OverviewPage
 {
 	id: root
 
-    property int relayWidth: 0
-    property int relaysOnPage: 6
+	property int relayWidth: 0
+	property int relaysOnPage: 6
 	property int maxRelays: 20
-    property int numberOfRelaysShown: 0
-    property int horizontalMargin: 8
-    property int tileWidth: (root.width - (horizontalMargin * 2)) / root.relaysOnPage
-    property int listWidth: tileWidth * Math.min ( numberOfRelaysShown, relaysOnPage)
-    property int listHeight: root.height - 30
+	property int numberOfRelaysShown: 0
+	property int horizontalMargin: 8
+	property int tileWidth: (root.width - (horizontalMargin * 2)) / root.relaysOnPage
+	property int listWidth: tileWidth * Math.min ( numberOfRelaysShown, relaysOnPage)
+	property int listHeight: root.height - 30
 
 ////// GuiMods — DarkMode
 	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
 	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
-    VBusItem
-    {
-        id: relay0ShowItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/0/Show")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay1ShowItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/1/Show")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay2ShowItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/2/Show")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay3ShowItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/3/Show")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay4ShowItem
-        bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/4/Show")
-        onValueChanged: updateRelays ()
-    }
+	VBusItem
+	{
+		id: relay0ShowItem
+		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/0/Show")
+		onValueChanged: updateRelays ()
+	}
+	VBusItem
+	{
+		id: relay1ShowItem
+		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/1/Show")
+		onValueChanged: updateRelays ()
+	}
+	VBusItem
+	{
+		id: relay2ShowItem
+		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/2/Show")
+		onValueChanged: updateRelays ()
+	}
+	VBusItem
+	{
+		id: relay3ShowItem
+		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/3/Show")
+		onValueChanged: updateRelays ()
+	}
+	VBusItem
+	{
+		id: relay4ShowItem
+		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/4/Show")
+		onValueChanged: updateRelays ()
+	}
 	VBusItem
 	{
 		id: relay5ShowItem
@@ -131,192 +131,174 @@ OverviewPage
 		onValueChanged: updateRelays ()
 	}
 
-    VBusItem
-    {
-        id: relay0StateItem
-        bind: Utils.path("com.victronenergy.system", "/Relay/0/State")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay1StateItem
-        bind: Utils.path("com.victronenergy.system", "/Relay/1/State")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay2StateItem
-        bind: Utils.path("com.victronenergy.system", "/Relay/2/State")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay3StateItem
-        bind: Utils.path("com.victronenergy.system", "/Relay/3/State")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay4StateItem
-        bind: Utils.path("com.victronenergy.system", "/Relay/4/State")
-        onValueChanged: updateRelays ()
-    }
-    VBusItem
-    {
-        id: relay5StateItem
-        bind: Utils.path("com.victronenergy.system", "/Relay/5/State")
-        onValueChanged: updateRelays ()
-    }
+	VBusItem
+	{
+		id: relay0StateItem
+		bind: Utils.path("com.victronenergy.system", "/Relay/0/State")
+	}
+	VBusItem
+	{
+		id: relay1StateItem
+		bind: Utils.path("com.victronenergy.system", "/Relay/1/State")
+	}
+	VBusItem
+	{
+		id: relay2StateItem
+		bind: Utils.path("com.victronenergy.system", "/Relay/2/State")
+	}
+	VBusItem
+	{
+		id: relay3StateItem
+		bind: Utils.path("com.victronenergy.system", "/Relay/3/State")
+	}
+	VBusItem
+	{
+		id: relay4StateItem
+		bind: Utils.path("com.victronenergy.system", "/Relay/4/State")
+	}
+	VBusItem
+	{
+		id: relay5StateItem
+		bind: Utils.path("com.victronenergy.system", "/Relay/5/State")
+	}
 	VBusItem
 	{
 		id: relay6StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/6/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay7StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/7/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay8StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/8/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay9StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/9/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay10StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/10/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay11StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/11/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay12StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/12/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay13StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/13/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay14StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/14/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay15StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/15/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay16StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/16/State")
-		onValueChanged: updateRelays ()
 	}
 	VBusItem
 	{
 		id: relay17StateItem
 		bind: Utils.path("com.victronenergy.system", "/Relay/17/State")
-		onValueChanged: updateRelays ()
 	}
 
-    // Synchronise name text scroll start
-    Timer
-    {
-        id: marqueeTimer
-        interval: 5000
-        repeat: true
-        running: root.active
+	// Synchronise name text scroll start
+	Timer
+	{
+		id: marqueeTimer
+		interval: 5000
+		repeat: true
+		running: root.active
    }
 
 	title: qsTr("Relay overview")
 	clip: true
 
-    Component.onCompleted: updateRelays ()
+	Component.onCompleted: updateRelays ()
 
-    // background
-    Rectangle
-    {
-        anchors
-        {
-            fill: parent
-        }
+	// background
+	Rectangle
+	{
+		anchors
+		{
+			fill: parent
+		}
 ////// GuiMods — DarkMode
 		color: !darkMode ? "gray" : "#202020"
-    }
+	}
 
-    ListModel { id: relaysModel }
+	ListModel { id: relaysModel }
 
-    Text
-    {
-        font.pixelSize: 14
-        font.bold: true
-        color: "black"
-        anchors
-        {
-            top: parent.top
-            topMargin: 7
-            horizontalCenter: parent.horizontalCenter
-        }
-        horizontalAlignment: Text.AlignHCenter
-        text: qsTr("Relay overview")
-    }
+	Text
+	{
+		font.pixelSize: 14
+		font.bold: true
+		color: "black"
+		anchors
+		{
+			top: parent.top
+			topMargin: 7
+			horizontalCenter: parent.horizontalCenter
+		}
+		horizontalAlignment: Text.AlignHCenter
+		text: qsTr("Relay overview")
+	}
 
 	ListView
-    {
-        id: relaysColumn
+	{
+		id: relaysColumn
 
-        anchors.horizontalCenter: root.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: 30
-        width: listWidth
-        height: listHeight
-        orientation: ListView.Horizontal
-        visible: numberOfRelaysShown > 0
-        interactive: numberOfRelaysShown > relaysOnPage
+		anchors.horizontalCenter: root.horizontalCenter
+		anchors.top: parent.top
+		anchors.topMargin: 30
+		width: listWidth
+		height: listHeight
+		orientation: ListView.Horizontal
+		visible: numberOfRelaysShown > 0
+		interactive: numberOfRelaysShown > relaysOnPage
 
-        model: relaysModel
-        delegate: TileRelay
-        {
-            width: tileWidth
-            height: root.height - 38
-            Connections
-            {
-                target: marqueeTimer
-                onTriggered: doScroll()
-            }
-        }
-    }
+		model: relaysModel
+		delegate: TileRelay
+		{
+			width: tileWidth
+			height: root.height - 38
+			Connections
+			{
+				target: marqueeTimer
+				onTriggered: doScroll()
+			}
+		}
+	}
 
-    function updateRelays ()
-    {
-        var show = false
-        numberOfRelaysShown = 0
-        relaysModel.clear()
-        for (var i = 0; i < maxRelays; i++)
-        {
-            switch (i)
-            {
+	function updateRelays ()
+	{
+		var show = false
+		numberOfRelaysShown = 0
+		relaysModel.clear()
+		for (var i = 0; i < maxRelays; i++)
+		{
+			switch (i)
+			{
 			case 0:
 				show = relay0StateItem.valid && relay0ShowItem.valid && relay0ShowItem.value === 1
 				break;;
@@ -372,15 +354,15 @@ OverviewPage
 				show = relay17StateItem.valid && relay17ShowItem.valid && relay17ShowItem.value === 1
 				break;;
 			default:
-                show = false
+				show = false
 				break;;
-            }
+			}
 
-            if (show)
-            {
-                numberOfRelaysShown++ // increment before append so ListView centers properly
-                relaysModel.append ({relayNumber: i})
-            }
-        }
-    }
+			if (show)
+			{
+				numberOfRelaysShown++ // increment before append so ListView centers properly
+				relaysModel.append ({relayNumber: i})
+			}
+		}
+	}
 }

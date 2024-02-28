@@ -13,7 +13,7 @@ Tile {
 
     property int relayFunction: 0
     property bool relayInverted: polarityItem.valid ? polarityItem.value : false
-    property bool relayActive: ((stateItem.value === 1) != relayInverted)
+	property bool relayActive: flase
 
     property string activeText: ""
     property string inactiveText: ""
@@ -63,6 +63,21 @@ Tile {
         bind: Utils.path(settingsPrefix, "/Settings/Generator0/AutoStartEnabled")
         onValueChanged: updateButtons ()
     }
+	VBusItem
+	{
+		id: generatorStateItem
+		bind: Utils.path("com.victronenergy.generator.startstop0" , "/State")
+	}
+	VBusItem
+	{
+		id: generatorConditionItem
+		bind: Utils.path("com.victronenergy.generator.startstop0" , "/RunningByConditionCode")
+	}
+	VBusItem
+	{
+		id: generatorExternalOverrideItem
+		bind: Utils.path("com.victronenergy.generator.startstop0" , "/ExternalOverride")
+	}
     VBusItem
     {
         id: pumpModeItem
@@ -140,244 +155,288 @@ Tile {
                 text: functionText
             }
 
-            Text
-            {
-                id: relayState
-                font.pixelSize: 12
-                font.bold: true
+			MarqueeEnhanced
+			{
+				id: relayState
+				width: parent.width - 4
+				fontSize: 12
+				bold: true
 ////// GuiMods DarkMode
 				textColor: !darkMode ? "black" : "gray"
-                anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
-                text:
-                {
-                    if (stateItem.valid)
-                    {
-                         if (relayActive)
-                            text: activeText
-                        else
-                            text: inactiveText
-                        }
-                    else
-                        text: "??"
-                }
-            }
-            // spacer
-            Text
-            {
-                font.pixelSize: 4
-                font.bold: true
-////// GuiMods - DarkMode
-				color: !darkMode ? "black" : "gray"
-                height: 4
-                anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
-                text: " "
-            }
-            Button
-            {
-                id: onButton
+				scroll: false
+				text:
+				{
+					// special handling for generator
+					if (relayFunction == 1)
+					{
+						if (generatorExternalOverrideItem.valid && generatorExternalOverrideItem.value == 1)
+							return qsTr ("External override - stopped")
+						else if (!generatorStateItem.valid)
+							return qsTr ("Error")
+						else if (generatorStateItem.value == 2)
+							return qsTr("Warm-up")
+						else if (generatorStateItem.value == 3)
+							return qsTr("Cool-down")
+						else if (generatorStateItem.value == 4)
+							return qsTr("Stopping")
+						else if (generatorConditionItem.valid)
+						{
+							switch (generatorConditionItem.value)
+							{
+								case 0:
+									return qsTr ("Stopped")
+								case 1:
+									return qsTr ("Man run")
+								case 2:
+									return qsTr ("Test run")
+								case 3:
+									return qsTr ("Loss of comms run")
+								case 4:
+									return qsTr ("SOC run")
+								case 5:
+									return qsTr ("Load run")
+								case 6:
+									return qsTr ("Battery current run")
+								case 7:
+									return qsTr ("Battery voltage run")
+								case 8:
+									return qsTr ("Inverter temperature run")
+								case 9:
+									return qsTr ("Inverter overload run")
+								default:
+									return "??"
+							}
+						}
+						else
+							return "??"
+					}
+					else if (stateItem.valid)
+					{
+						if (relayActive)
+							return activeText
+						else
+							return inactiveText
+					}
+					else
+						return "??"
+				}
+			}
+			// spacer
+			Text
+			{
+				font.pixelSize: 4
+				font.bold: true
+				color: "black"
+				height: 4
+				anchors.horizontalCenter: parent.horizontalCenter
+				horizontalAlignment: Text.AlignHCenter
+				text: " "
+			}
+			Button
+			{
+				id: onButton
 ////// GuiMods - DarkMode
 				baseColor: !darkMode ? (onButtonActive ? "green" : "#e6ffe6") : (onButtonActive ? "#003000" : "#003000")
-                pressedColor: "#979797"
-                height: 40
-                width: parent.width - 6
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: buttonPress (1)
-                content: TileText
-                {
-                    text: onButtonText; font.bold: true;
-                    color: onButtonActive ? "white" : "black"
-                }
-            }
-            Button
-            {
-                id: offButton
+				pressedColor: "#979797"
+				height: 40
+				width: parent.width - 6
+				anchors.horizontalCenter: parent.horizontalCenter
+				onClicked: buttonPress (1)
+				content: TileText
+				{
+					text: onButtonText; font.bold: true;
+					color: onButtonActive ? "white" : "black"
+				}
+			}
+			Button
+			{
+				id: offButton
 ////// GuiMods - DarkMode
 				baseColor: !darkMode ? (offButtonActive ? "black" : "#e6e6e6") : (offButtonActive ? "gray" : "gray")
-                pressedColor: "#979797"
-                height: 40
-                width: parent.width - 6
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: buttonPress (2)
-                content: TileText
-                {
-                    text: offButtonText; font.bold: true;
-                    color: offButtonActive ? "white" : "black"
-                }
-            }
-            Button
-            {
-                id: autoButton
+				pressedColor: "#979797"
+				height: 40
+				width: parent.width - 6
+				anchors.horizontalCenter: parent.horizontalCenter
+				onClicked: buttonPress (2)
+				content: TileText
+				{
+					text: offButtonText; font.bold: true;
+					color: offButtonActive ? "white" : "black"
+				}
+			}
+			Button
+			{
+				id: autoButton
 ////// GuiMods - DarkMode                                          
 				baseColor: !darkMode ? (autoButtonActive ? "orange" : "#ffedcc") : (autoButtonActive ? "#3a2600" : "#3a2600")
-                pressedColor: "#979797"
-                height: 40
-                width: parent.width - 6
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: buttonPress (3)
-                content: TileText
-                {
-                    text: autoButtonText; font.bold: true;
-                    color: autoButtonActive ? "white" : "black"
-                }
-            }
-        }
+				pressedColor: "#979797"
+				height: 40
+				width: parent.width - 6
+				anchors.horizontalCenter: parent.horizontalCenter
+				onClicked: buttonPress (3)
+				content: TileText
+				{
+					text: autoButtonText; font.bold: true;
+					color: autoButtonActive ? "white" : "black"
+				}
+			}
+		}
 	}
-    function updateFunction ()
-    {
-        if (functionItem.valid)
-        {
-            relayFunction = functionItem.value
-            switch (relayFunction)
-            {
-            // Alarm - no buttons
-            case 0:
-                functionText = qsTr("Alarm")
-                activeText = qsTr("Alarm")
-                inactiveText = qsTr("No Alarm")
-                offButtonText = "--" // empty string causes interactions between instances
-                onButtonText = "--" // empty string causes interactions between instances
-                autoButtonText = "--" // empty string causes interactions between instances
-                onButton.show = false 
-                offButton.show = false 
-                autoButton.show = false 
-                break;;
-            // Generator
-            case 1:
-                functionText = qsTr("Generator")
-                activeText = qsTr("Running")
-                inactiveText = qsTr("Stopped")
-                onButtonText = qsTr("Manual\nStart")
-                offButtonText = qsTr("Manual\nStop")
-                autoButtonText = qsTr("Auto\nEnable")
-                onButton.show = true 
-                offButton.show = true 
-                autoButton.show = true
-                break;;
-            // pump
-            case 3:
-                functionText = qsTr("Pump")
-                activeText = qsTr("On")
-                inactiveText = qsTr("Off")
-                onButtonText = qsTr("On")
-                offButtonText = qsTr("Off")
-                autoButtonText = qsTr("Auto")
-                onButton.show = true 
-                offButton.show = true 
-                autoButton.show = true
-                break;;
-            // temperature
-            case 4:
-                functionText = qsTr("Temp")
-                activeText = qsTr("Alarm")
-                inactiveText = qsTr("No Alarm")
-                onButtonText = "--"
-                offButtonText = "--"
-                autoButtonText = "--"
-                onButton.show = false 
-                offButton.show = false 
-                autoButton.show = false
-                break;;
-            // manual (2) and undefined
-            default:
-                functionText = qsTr("Manual")
-                activeText = qsTr("On")
-                inactiveText = qsTr("Off")
-                onButtonText = qsTr("On")
-                offButtonText = qsTr("Off")
-                autoButtonText = "--" // empty string causes interactions between instances
-                onButton.show = true 
-                offButton.show = true 
-                autoButton.show = false 
-                break;;
-            }
-        }
-        // only relay 1 has a function selector, so use manual settings for other relays
-        else
-        {
-            relayFunction = 2
-            functionText = qsTr("Manual")
-            activeText = qsTr("On")
-            inactiveText = qsTr("Off")
-            onButtonText = qsTr("On")
-            offButtonText = qsTr("Off")
-            autoButtonText = "--" // empty string causes interactions
-            autoButton.show =false 
-        }
-        updateButtons ()
-        // trigger delay to refresh buttons again after new dBus services can be established
-        functionDelayTimer.running = true
-    }
-    
-    function updateButtons ()
-    {
-        switch (relayFunction)
-        {
-        // alarm - no buttons
-        case 0:
-            break;;
-        // Generator
-        case 1:
-            if (generatorManualStartItem.valid)
-            {
-                onButtonActive = generatorManualStartItem.value === 1
-                offButtonActive = ! onButtonActive
-                autoButtonActive = generatorAutoRunItem.value
-            }
-            else
-            {
-                offButtonActive = false
-                onButtonActive = false
-                autoButtonActive = false
-            }
-            break;;
-        // pump
-        case 3:
-            if (pumpModeItem.valid)
-            {
-                switch (pumpModeItem.value)
-                {
-                // Auto
-                case 0:
-                    onButtonActive = false
-                    offButtonActive = false
-                    autoButtonActive = true
-                    break;;
-                // On
-                case 1:
-                    onButtonActive = true
-                    offButtonActive = false
-                    autoButtonActive = false
-                    break;;
-                 // Off
-                case 2:
-                    onButtonActive = false
-                    offButtonActive = true
-                    autoButtonActive = false
-                    break;;
-                default:
-                    onButtonActive = false
-                    offButtonActive = false
-                    autoButtonActive = false
-                    break;;
-                }
-            }
-            else
-            {
-                offButtonActive = false
-                onButtonActive = false
-                autoButtonActive = false
-            }
-            break;;
-        // manual (2) and undefined
-        default:
-            onButtonActive = relayActive
-            offButtonActive = ! onButtonActive
-            autoButtonActive = false
-            break;;
-        }
-    }
+	function updateFunction ()
+	{
+		if (functionItem.valid)
+		{
+			relayFunction = functionItem.value
+			switch (relayFunction)
+			{
+			// Alarm - no buttons
+			case 0:
+				functionText = qsTr("Alarm")
+				activeText = qsTr("Alarm")
+				inactiveText = qsTr("No Alarm")
+				offButtonText = ""
+				onButtonText = ""
+				autoButtonText = ""
+				onButton.visible = false 
+				offButton.visible = false 
+				autoButton.visible = false 
+				break;;
+			// Generator
+			case 1:
+				functionText = qsTr("Generator")
+				activeText = qsTr("")	// generator state text handled below
+				inactiveText = qsTr("")
+				onButtonText = qsTr("Manual\nStart")
+				offButtonText = qsTr("Manual\nStop")
+				autoButtonText = qsTr("Auto\nEnable")
+				onButton.visible = true 
+				offButton.visible = true 
+				autoButton.visible = true
+				break;;
+			// pump
+			case 3:
+				functionText = qsTr("Pump")
+				activeText = qsTr("On")
+				inactiveText = qsTr("Off")
+				onButtonText = qsTr("On")
+				offButtonText = qsTr("Off")
+				autoButtonText = qsTr("Auto")
+				onButton.visible = true 
+				offButton.visible = true 
+				autoButton.visible = true
+				break;;
+			// temperature
+			case 4:
+				functionText = qsTr("Temp")
+				activeText = qsTr("Alarm")
+				inactiveText = qsTr("No Alarm")
+				onButtonText = "--"
+				offButtonText = "--"
+				autoButtonText = "--"
+				onButton.visible = false 
+				offButton.visible = false 
+				autoButton.visible = false
+				break;;
+			// manual (2) and undefined
+			default:
+				functionText = qsTr("Manual")
+				activeText = qsTr("On")
+				inactiveText = qsTr("Off")
+				onButtonText = qsTr("On")
+				offButtonText = qsTr("Off")
+				autoButtonText = ""
+				onButton.visible = true 
+				offButton.visible = true 
+				autoButton.visible = false 
+				break;;
+			}
+		}
+		// only relay 1 has a function selector, so use manual settings for other relays
+		else
+		{
+			relayFunction = 2
+			functionText = qsTr("Manual")
+			activeText = qsTr("On")
+			inactiveText = qsTr("Off")
+			onButtonText = qsTr("On")
+			offButtonText = qsTr("Off")
+			autoButtonText = "--" // empty string causes interactions
+			autoButton.visible = false 
+		}
+		updateButtons ()
+	}
+	
+	function updateButtons ()
+	{
+		switch (relayFunction)
+		{
+		// alarm - no buttons
+		case 0:
+			break;;
+		// Generator
+		case 1:
+			if (generatorManualStartItem.valid)
+			{
+				onButtonActive = generatorManualStartItem.value === 1
+				offButtonActive = ! onButtonActive
+			}
+			else
+			{
+				offButtonActive = false
+				onButtonActive = false
+			}
+			if (generatorAutoRunItem.valid)
+				autoButtonActive = generatorAutoRunItem.value
+			else
+				autoButtonActive = false
+			break;;
+		// pump
+		case 3:
+			if (pumpModeItem.valid)
+			{
+				switch (pumpModeItem.value)
+				{
+				// Auto
+				case 0:
+					onButtonActive = false
+					offButtonActive = false
+					autoButtonActive = true
+					break;;
+				// On
+				case 1:
+					onButtonActive = true
+					offButtonActive = false
+					autoButtonActive = false
+					break;;
+				 // Off
+				case 2:
+					onButtonActive = false
+					offButtonActive = true
+					autoButtonActive = false
+					break;;
+				default:
+					onButtonActive = false
+					offButtonActive = false
+					autoButtonActive = false
+					break;;
+				}
+			}
+			else
+			{
+				offButtonActive = false
+				onButtonActive = false
+				autoButtonActive = false
+			}
+			break;;
+		// manual (2) and undefined
+		default:
+			relayActive = stateItem.value === 1 != relayInverted
+			onButtonActive = relayActive
+			offButtonActive = ! onButtonActive
+			autoButtonActive = false
+			break;;
+		}
+	}
 
     function buttonPress (button)
     {

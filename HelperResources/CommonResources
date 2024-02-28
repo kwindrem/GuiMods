@@ -1253,13 +1253,6 @@ fi
 versionStringToNumber $venusVersion
 venusVersionNumber=$versionNumber
 
-# create obsolete version file if it does not already exist
-#	accommodates previous mechanism that used shell varaible
-if [ ! -z $obsoleteVersion ] && [ ! -f "$scriptDir/obsoleteVersion" ]; then
-	echo $obsoleteVersion > "$scriptDir/obsoleteVersion"
-fi
-
-
 # prevent installing Raspberry Pi packages on other platforms
 if [ -f "$scriptDir/raspberryPiOnly" ]; then 
 	if [[ $machine != *"raspberrypi"* ]]; then
@@ -1297,6 +1290,9 @@ fi
 # if checks above passed and uninstall was not specified on command line,
 #	do final checks before permitting install
 if [ $scriptAction != 'UNINSTALL' ]; then
+
+	# check for package conflicts and prevent installs if there are any
+	###################################
 
 	# determine if GUI v1 is installed
 	#	Note, it may NOT be running or selected to run!!!!

@@ -13,7 +13,7 @@ Tile {
 
     property int relayFunction: 0
     property bool relayInverted: polarityItem.valid ? polarityItem.value : false
-    property bool relayActive: ((stateItem.value === 1) != relayInverted)
+	property bool relayActive: flase
 
     property string activeText: ""
     property string inactiveText: ""
@@ -411,6 +411,7 @@ Tile {
             break;;
         // manual (2) and undefined
         default:
+            relayActive = stateItem.value === 1 != relayInverted
             onButtonActive = relayActive
             offButtonActive = ! onButtonActive
             autoButtonActive = false

@@ -43,8 +43,8 @@ fi
 if [ $scriptAction == 'INSTALL' ] ; then
 
     # insure ExtTransferSwitch is uninstalled since its functionalty is now part of GuiMods
-    if [ -f "$installedVersionPrefix""ExtTransferSwitch" ] || [ -f "$installedFlagPrefix""ExtTransferSwitch" ]; then
-		logMessage "uninstalling the ExtTransferSwitch - GuiMods incorporates all it's"
+    if [ -f "$installedVersionPrefix""ExtTransferSwitch" ]; then
+		logMessage "uninstalling the ExtTransferSwitch - GuiMods incorporates all it's features"
 		if [ -e "/data/ExtTransferSwitch/setup" ]; then
 			"/data/ExtTransferSwitch/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"
 		else
@@ -57,7 +57,7 @@ if [ $scriptAction == 'INSTALL' ] ; then
 		fi
     fi
     # insure GeneratorConnector is uninstalled since its functionalty is now part of GuiMods
-    if [ -f "$installedVersionPrefix""GeneratorConnector" ] || [ -f "$installedFlagPrefix""GeneratorConnector" ]; then
+    if [ -f "$installedVersionPrefix""GeneratorConnector" ]; then
 		logMessage "uninstalling the GeneratorConnector - GuiMods incorporates all it's features and more"
 		if [ -e "/data/GeneratorConnector/setup" ]; then
 			"/data/GeneratorConnector/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"

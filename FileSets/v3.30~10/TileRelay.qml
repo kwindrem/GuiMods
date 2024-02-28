@@ -13,7 +13,7 @@ Tile {
 
     property int relayFunction: 0
     property bool relayInverted: polarityItem.valid ? polarityItem.value : false
-    property bool relayActive: ((stateItem.value === 1) != relayInverted)
+    property bool relayActive: flase
 
     property string activeText: ""
     property string inactiveText: ""
@@ -171,6 +171,8 @@ Tile {
 							return qsTr("Warm-up")
 						else if (generatorStateItem.value == 3)
 							return qsTr("Cool-down")
+						else if (generatorStateItem.value == 4)
+							return qsTr("Stopping")
 						else if (generatorConditionItem.valid)
 						{
 							switch (generatorConditionItem.value)
@@ -422,7 +424,8 @@ Tile {
             break;;
         // manual (2) and undefined
         default:
-            onButtonActive = relayActive
+            relayActive = stateItem.value === 1 != relayInverted
+			onButtonActive = relayActive
             offButtonActive = ! onButtonActive
             autoButtonActive = false
             break;;
