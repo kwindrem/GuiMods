@@ -39,11 +39,12 @@ Rectangle {
         id: _textToDisplay
         text: _text.text + "..." + _text.text
         font.pixelSize: 13
-        color: "#fff"
+        color: _text.color
+        font.bold: _text.font.bold
         width: parent.width
         anchors.verticalCenter: parent.verticalCenter
         // use spcified alignment unless name won't fit or are scrolling, then align left
-        horizontalAlignment: marqueeTimer.running ? Text.AlignLeft : textHorizontalAlignment
+        horizontalAlignment: Text.AlignLeft
         visible: longName
     }
 

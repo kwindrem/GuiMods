@@ -1,3 +1,6 @@
+v10.8:
+	fixed: Marquee scrolling colors/bold switch to default, not those specified
+
 v10.7:
 	add support for v3.30~11
 
