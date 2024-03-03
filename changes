@@ -1,3 +1,6 @@
+v10.7:
+	add support for v3.30~11
+
 v10.6:
 	fixed: relay overview scrolls to beginning when relays turned on/off
 
