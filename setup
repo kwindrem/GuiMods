@@ -6,12 +6,11 @@
 #   replaces the Mobile Overview with an enhanced version
 #
 # each of these modifications is optional and can be selected
-#   at install time
+#   in the GUI
 #
-# Note: both Enhanced Mobile Overview and hiding the Tile Overview modify main.qml
-# so order of operations is important.
 
-# enhanced generator control and display is part of GuiMods now so GeneratorConnector must not be installed also
+# everything done in HelperResources which never returns here !!!
+standardPromptAndActions='yes'
 
 #### following lines incorporate helper resources into this script
 pkgDir=$( dirname $0 )
@@ -26,54 +25,3 @@ else
 	exit 1
 fi
 #### end of lines to include helper resources
-
-#### running manually and OK to proceed - prompt for input
-if [ $scriptAction == 'NONE' ] ; then
-    # display innitial message
-    echo
-    echo "This package modifies the GUI in several areas"
-    echo "Refer to the ReadMe for an explaination of each modification"
-    echo "Installation enables all modificaions by default"
-    echo "  however each modificaiton can be enabled/disabled in the Display * language / GuiMods menus"
-
-    standardActionPrompt
-fi
-
-#### installing
-if [ $scriptAction == 'INSTALL' ] ; then
-
-    # insure ExtTransferSwitch is uninstalled since its functionalty is now part of GuiMods
-    if [ -f "$installedVersionPrefix""ExtTransferSwitch" ]; then
-		logMessage "uninstalling the ExtTransferSwitch - GuiMods incorporates all it's features"
-		if [ -e "/data/ExtTransferSwitch/setup" ]; then
-			"/data/ExtTransferSwitch/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"
-		else
-			logMessage "WARNING can't uninstall ExtTransferSwitch - no package or no setup script"
-		fi
-		if [ -e "/data/settupOptions/ExtTransferSwitch" ]; then
-			touch "/data/settupOptions/ExtTransferSwitch/DO_NOT_AUTO_INSTALL"
-			touch "/data/settupOptions/ExtTransferSwitch/DO_NOT_AUTO_ADD"
-			touch "/data/settupOptions/ExtTransferSwitch/FORCE_REMOVE"
-		fi
-    fi
-    # insure GeneratorConnector is uninstalled since its functionalty is now part of GuiMods
-    if [ -f "$installedVersionPrefix""GeneratorConnector" ]; then
-		logMessage "uninstalling the GeneratorConnector - GuiMods incorporates all it's features and more"
-		if [ -e "/data/GeneratorConnector/setup" ]; then
-			"/data/GeneratorConnector/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"
-		else
-			logMessage "WARNING can't uninstall GeneratorConnector - no package or no setup script"
-		fi
-		if [ -e "/data/settupOptions/GeneratorConnector" ]; then
-			touch "/data/settupOptions/GeneratorConnector/DO_NOT_AUTO_INSTALL"
-			touch "/data/settupOptions/GeneratorConnector/DO_NOT_AUTO_ADD"
-			touch "/data/settupOptions/GeneratorConnector/FORCE_REMOVE"
-		fi
-    fi
-fi
-
-# endScript handles normal install and all uninstall tasks
-
-# endScript will install or uninstall all files and dBus settings (package has no services)
-# thats all folks - SCRIPT EXITS INSIDE THE FUNCTION
-endScript 'INSTALL_FILES' 'INSTALL_SERVICES' 'ADD_DBUS_SETTINGS'

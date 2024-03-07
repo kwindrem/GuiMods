@@ -62,6 +62,9 @@ EXIT_RUN_AGAIN=250
 EXIT_ROOT_FULL=249
 EXIT_DATA_FULL=248
 EXIT_NO_GUI_V1=247
+EXIT_PACKAGE_CONFLICT=246
+
+
 # old variables - keep for compatibility
 exitReboot=$EXIT_REBOOT
 exitSuccess=$EXIT_SUCCESS

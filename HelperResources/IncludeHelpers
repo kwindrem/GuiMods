@@ -17,26 +17,26 @@
 #	NOTE: this script uses VersionResources ONLY
 #	it does source any other helper files since final location has not yet been chosen
 
-pkgDir=$( dirname $0 )
+pkgDir="$( cd "$(dirname $0)" >/dev/null 2>&1 ; /bin/pwd -P )"
+pkgRoot="$( dirname "$pkgDir")"
 pkgName=$( basename $pkgDir )
-shDir=$( dirname "$pkgDir" )/SetupHelper
-
+shHelperDir="$pkgRoot/SetupHelper/HelperResources"
 # assume helper files are in package directory - change below if not
 helperResourcesDir="$pkgDir/HelperResources"
 
 if [ -e "$helperResourcesDir/version" ]; then
 	# both helper file sets are present - compare them and choose the newest
-	if [ -e "$shDir/HelperResources" ]; then
+	if [ -e "$shHelperDir" ]; then
 		# temporarily source the local VersionResources
 		source "$pkgDir/HelperResources/VersionResources"
 		# setup helper files are newer - switch to those helper files
-		compareVersions $( cat "$shDir/version" ) $( cat "$pkgDir/HelperResources/version" )
+		compareVersions $( cat "$shHelperDir/version" ) $( cat "$pkgDir/HelperResources/version" )
 		if (( $? == 1 )); then
-			helperResourcesDir="$shDir/HelperResources"
+			helperResourcesDir="$shHelperDir"
 		fi
 	fi
-elif [ -e "$shDir/HelperResources" ]; then
-	helperResourcesDir="$shDir/HelperResources"
+elif [ -e "$shHelperDir" ]; then
+	helperResourcesDir="$shHelperDir"
 else
 	echo "$pkgName: helper files not found - can't continue" | tee -a "/data/log/SetupHelper"
 	exit 1

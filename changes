@@ -1,3 +1,10 @@
+v10.9:
+	add support for v3.30~13
+	remove alarm relay On switch starting with v3.30~3 to match stock code
+	add Generic I/O to MbItemDigitalInput.qml
+	use the new package depencency mechanism to handle
+		ExtTransferSwitch and GeneratorConnector conflicts
+
 v10.8:
 	fixed: Marquee scrolling colors/bold switch to default, not those specified
 

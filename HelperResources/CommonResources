@@ -46,6 +46,47 @@ fileListAll=()
 ######## skip to bottom of file for remainder of code executed when script is sourced
 
 
+# checkPackageDependencies checks the packageDependencies file in the package directory
+#
+# all unmet dependencies are reported to the command line/log
+#	and to stderr if not running from the command line
+# then the script exists
+
+function checkPackageDependencies ()
+{
+	dependencyFile="$scriptDir/packageDependencies"
+
+	#no dependencies specified for this package
+	if ! [ -f "$dependencyFile" ]; then return; fi
+
+	errors=false
+
+	while IFS= read -r line; do
+		read package requirement <<< "$line"
+		if [ -f "$installedVersionPrefix"$package ]; then
+			packageInstalled=true
+		else
+			packageInstalled=false
+		fi
+		case $requirement in
+			installed)
+				if ! $packageInstalled ; then
+					setInstallFailed $EXIT_PACKAGE_CONFLICT "$package must be installed first"
+					error=true
+				fi
+				;;
+			uninstalled)
+				if $packageInstalled ; then
+					setInstallFailed $EXIT_PACKAGE_CONFLICT "$package must be uninstalled first"
+					error=true
+				fi
+				;;
+		esac
+
+		if $errors; then endScript; fi
+	done < "$dependencyFile"
+}
+
 # getFileLists reads the file list from files in the FileSets directory
 #
 #	'fileList' file must only list version-dependent files
@@ -253,7 +294,39 @@ setInstallFailed ()
 	fi
 	message="${@:2}"
 	if [ ! -z "$message" ]; then
-		logMessage "$message"
+		logMessage "ERROR: $message"
+		# if not running from console, output error to stderr
+		if ! $logToConsole ; then
+			echo "$message" >&2
+		fi
+	fi
+}
+
+# forcePackageUninstall insures a conflicting package is uninstalled before
+#	this package is installed
+# the setup script must call this script BEFORE it begins installing anything
+# $1 is the package name
+# $2 contains an optional message
+
+forcePackageUninstall ()
+{
+	if (( $# < 1 )); then
+		return
+	fi
+	if [ -f "$installedVersionPrefix""$1" ]; then
+		if (( $# >= 2 )); then
+			logMessage "${@:2}"
+		else
+			logMessage "uninstalling $1 - it conflicts with $packageName"
+		fi
+		if [ -e "/data/$1/setup" ]; then
+			"/data/$1/setup" "uninstall" "auto" "deferReboot" "deferGuiRestart"
+		else
+			logMessage "WARNING can't uninstall $1 - no package directory or no setup script"
+		fi
+		if [ -e "/data/settupOptions/$1" ]; then
+			touch "/data/settupOptions/$1/DO_NOT_AUTO_INSTALL"
+		fi
 	fi
 }
 
@@ -374,11 +447,12 @@ updateActiveFile ()
     # separate source and replacement files specified
     local sourceFile=""
     local activeFile=""
+    local prevousPackage=""
     if [ $# == 2 ]; then
         if [ -f "$1" ]; then
 			sourceFile="$1"
         else
-            setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: specified soure file "$1" does not exist - can't continue with install"
+            setInstallFailed $EXIT_FILE_SET_ERROR "specified soure file "$1" does not exist"
 			return 1
         fi
         activeFile="$2"
@@ -409,7 +483,7 @@ updateActiveFile ()
             sourceFile="$pkgFileSets/$baseName"
 		# nothing found - can't continue
 		else
-			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: no soure file for $baseName - can't continue with install"
+			setInstallFailed $EXIT_FILE_SET_ERROR "no soure file for $baseName"
 			return 1
         fi
     fi
@@ -419,48 +493,48 @@ updateActiveFile ()
 		# fatal if GUI v1 not present and needed for install
 		if [[ "$pathToFile" == "/opt/victronenergy/gui/"* ]]; then
 			if $guiV1required ; then
-				setInstallFailed $EXIT_NO_GUI_V1 "ERROR $packageName requires GUI v1 which is not on the system - can't continue"
+				setInstallFailed $EXIT_NO_GUI_V1 "$packageName requires GUI v1"
 			# GUI v1 not needed - proceed without updating active file
 			fi
 		# active file is not in GUI v1 part of file system - so this is fatal
 		 else
-			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: path to $activeFile does not exist - can't continue with install"
+			setInstallFailed $EXIT_FILE_SET_ERROR "path to $activeFile does not exist"
 		fi
 		return 1
 	fi
 
-	# attempt backup --if not made
-	#	indicates installing over a previous install - so check if activeFile would be changed
-	#		this would occur if installing over the top of an already installed package
-	#		which SHOULD update the active file
-	#	or a conflict with another package - OTHER PACKAGE'S MOD (active file) IS OVERWRITTEN SILENTLY !!!!!!
-	#	or a previous install step failed (not relavant here -- already checked above)
-    if ! backupActiveFile "$activeFile" ; then
-		# check to see if active file needs to be updated
-		if [ -f "$activeFile" ]; then
-			# already updated - no change to active file
-			if cmp -s "$sourceFile" "$activeFile" > /dev/null ; then
-				return 1
-			fi
+	# check for package conflicts
+	if [ -f "$activeFile.package" ]; then
+		prevousPackage=$( cat "$activeFile.package" )
+		if [ $packageName != $prevousPackage ]; then
+			setInstallFailed $EXIT_PACKAGE_CONFLICT "$(basename $activeFile) was already modfied by $prevousPackage"
+			return 1
 		fi
 	fi
 
-	# all checks passed - update active file
-	if [ -e "$activeFile.orig" ] || [ -e "$activeFile.NO_ORIG" ]; then
-		# add file to installed files list (used for uninstallAll)
-		# do this before actually modifying things just in case there's an error
-		#	that way the uninstall is assured
-		echo "$activeFile" >> "$installedFilesList"
-		cp "$sourceFile" "$activeFile"
+	# add file to installed files list (used for uninstallAll)
+	# do this before actually modifying things just in case there's an error
+	#	that way the uninstall is assured
+	echo "$activeFile" >> "$installedFilesList"
 
-		updateRestartFlags "$activeFile"
-		thisFileUpdated=true
-		return 0
-	# backup missing (this should not ever happen)
-	else
-		setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: no backup for $baseName - can't continue with install"
-		return 1
+	# update package flag to prevent overwrites by other packages
+	echo $packageName > "$activeFile.package"
+
+	# already updated - don't need to any more
+	if [ -f "$activeFile" ]; then
+		if cmp -s "$sourceFile" "$activeFile" > /dev/null ; then
+			return 1
+		fi
 	fi
+
+    backupActiveFile "$activeFile"
+
+	# update the active file
+	cp "$sourceFile" "$activeFile"
+
+	updateRestartFlags "$activeFile"
+	thisFileUpdated=true
+	return 0
 }
 
 
@@ -471,23 +545,31 @@ updateActiveFile ()
 #
 # returns 0 if active file was restored, 1 if not
 # also sets thisFileUpdated for backwards compatibility with existing setup scripts
+#
+# restore only if the package that updated this file is the current package
+#	failure is indicated in the return code but does not trigger as faliure
 
 restoreActiveFile ()
 {
     thisFileUpdated=false
 
-    local baseName="$(basename $1)"
+	if [ -f "$1.package" ]; then
+		prevousPackage=$( cat "$1.package" )
+		if [ $packageName != $prevousPackage ]; then
+			return 1
+		fi
+    fi
     if [ -e "$1.orig" ]; then
         mv -f "$1.orig" "$1"
-        rm -f "$1.NO_ORIG"
         thisFileUpdated=true
     elif [ -f "$1.NO_ORIG" ]; then
         rm -f "$1"
-        rm -f "$1.NO_ORIG"
         thisFileUpdated=true
     fi
 
 	if $thisFileUpdated ; then
+        rm -f "$1.NO_ORIG"
+        rm -f "$1.package"
 		# remove file from installed file list
 		if [ -f "$installedFilesList" ]; then
 			grep -v "$1" "$installedFilesList" | tee "$installedFilesList" > /dev/null
@@ -550,7 +632,7 @@ _checkFileSets ()
 	
 	# versioned file sets exist but empty file list
 	if [ ! -z $versionList ] && [ -z $fileList ]; then
-        setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: versions exist, but empty file list - can't continue"
+        setInstallFailed $EXIT_FILE_SET_ERROR "versions exist, but empty file list"
         return
 	# no versioned file sets - nothing to validate - allow install
 	elif [ -z $versionList ]; then return; fi
@@ -659,7 +741,7 @@ _checkFileSets ()
     done
 
     if [ -f "$fileSet/INCOMPLETE" ]; then
-        setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: incomplete file set for $venusVersion - can't continue"
+        setInstallFailed $EXIT_FILE_SET_ERROR "incomplete file set for $venusVersion"
 	# if we get this far and fs is not marked INCOMPLETE, then the file set does not need to be checked again next pass
 	else
 		touch "$fileSet/COMPLETE"
@@ -697,6 +779,8 @@ buildUninstallListsfromSetupScript ()
 					param=$( echo ${params[i+1]} | sed s?'$qmlDir'?$qmlDir? )
 				fi
 				if ! [ -z "$param" ] && ! [[ $param == \#* ]]; then
+					# remove any  quotes around parameters
+					param=$( echo $param | sed -e 's?"?? g' -e "s?'?? g" )
 					scriptUninstallFilesList+=("$param")
 				fi
 				;;
@@ -707,6 +791,8 @@ buildUninstallListsfromSetupScript ()
 				if ! [ -z "$param" ] && ! [[ $param == \#* ]]; then
 					scriptUninstallServicesList+=("$param")
 				else
+					# remove any quotes around parameters
+					param=$( echo $param | sed -e 's?"?? g' -e "s?'?? g" )
 					scriptUninstallServicesList+=($packageName)
 				fi
 				;;
@@ -1086,7 +1172,7 @@ if [ -f /etc/venus/machine ]; then
 	machine=$(cat /etc/venus/machine)
 else
 	machine=""
-	setInstallFailed $EXIT_INCOMPATIBLE_VERSION "can't determine Venus device type"
+	setInstallFailed $EXIT_INCOMPATIBLE_PLATFORM "can't determine Venus device type"
 fi
 
 # initialize version strings and numbers for future checks
@@ -1109,8 +1195,6 @@ else
 	packageVersion=""
 	packageVersionNumber=0
 fi
-
-logMessage "--- starting setup script $packageVersion"
 
 # collect command line options
 reinstall=false
@@ -1146,6 +1230,9 @@ while [ $# -gt 0 ]; do
         esac
     shift
 done
+
+# do after logToConsole is enabled/disabled abvove
+logMessage "--- starting setup script $packageVersion"
 
 # make sure rootfs is mounted R/W & and resized to allow space for replacement files
 #	arbitrary minimum size of 3 MB
@@ -1271,13 +1358,13 @@ fi
 versionStringToNumber $firstCompatibleVersion
 firstCompatibleVersionNumber=$versionNumber
 if (( $venusVersionNumber < $firstCompatibleVersionNumber )); then
-	setInstallFailed $EXIT_INCOMPATIBLE_VERSION "ERROR $venusVersion before first compatible $firstCompatibleVersion"
+	setInstallFailed $EXIT_INCOMPATIBLE_VERSION "$venusVersion before first compatible $firstCompatibleVersion"
 elif [ -f "$scriptDir/obsoleteVersion" ]; then
 	obsoleteVersion=$(cat "$scriptDir/obsoleteVersion")
 	versionStringToNumber $obsoleteVersion
 	obsoleteVersionNumber=$versionNumber
 	if (( $venusVersionNumber >= $obsoleteVersionNumber )); then
-		setInstallFailed $EXIT_INCOMPATIBLE_VERSION "ERROR $venusVersion after last compatible $obsoleteVersion"
+		setInstallFailed $EXIT_INCOMPATIBLE_VERSION "$venusVersion after last compatible $obsoleteVersion"
 	fi
 fi
 if ! $installFailed ; then
@@ -1290,9 +1377,6 @@ fi
 # if checks above passed and uninstall was not specified on command line,
 #	do final checks before permitting install
 if [ $scriptAction != 'UNINSTALL' ]; then
-
-	# check for package conflicts and prevent installs if there are any
-	###################################
 
 	# determine if GUI v1 is installed
 	#	Note, it may NOT be running or selected to run!!!!
@@ -1317,17 +1401,20 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	fi
 
 	if ! $guiV1present && $guiV1required ; then
-		setInstallFailed $EXIT_NO_GUI_V1 "ERROR $packageName requires GUI v1 which is not on the system - can't install"
+		setInstallFailed $EXIT_NO_GUI_V1 "$packageName requires GUI v1"
 	fi
 
 	# attempting an install without the comand line prompting
 	#	and needed options have not been set yet - can't continue
 	if [ $scriptAction == 'INSTALL' ]; then
 		if ! $optionsSet ; then
-			setInstallFailed $EXIT_OPTIONS_NOT_SET "ERROR required options have not been set - can't install"
+			setInstallFailed $EXIT_OPTIONS_NOT_SET "required options have not been set"
 			endScript
 		fi
 	fi
+
+	checkPackageDependencies
+
 	getFileLists "$pkgFileSets"
 
     _checkFileSets
@@ -1360,11 +1447,11 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 		baseName=$( basename $file )
 		patchFile="$patchSourceDir/$baseName.patch"
 		if ! [ -f "$file" ]; then
-			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: original file missing for $baseName - can't continue with install"
+			setInstallFailed $EXIT_FILE_SET_ERROR "original file missing for $baseName"
 			endScript
 		fi
 		if ! [ -f "$patchFile" ]; then
-			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: patch file missing for $baseName - can't continue with install"
+			setInstallFailed $EXIT_FILE_SET_ERROR "patch file missing for $baseName"
 			endScript
 		fi
 		# BusyBox patch doesn't support the -o option so copy source to output first
@@ -1376,11 +1463,11 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 		elif [ -e "$file" ] ; then
 			cp "$file" "$patchedFiles/$baseName"
 		else
-			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: no source for $baseName patch - can't continue with install"
+			setInstallFailed $EXIT_FILE_SET_ERROR "no source for $baseName patch"
 			endScript
 		fi
 		if ! patch "$patchedFiles/$baseName" "$patchFile" &> /dev/null ; then
-			setInstallFailed $EXIT_FILE_SET_ERROR "ERROR: could not patch $baseName - can't continue with install"
+			setInstallFailed $EXIT_FILE_SET_ERROR "could not patch $baseName"
 			endScript
 		fi
 	done

@@ -17,6 +17,7 @@ MbItemOptions {
 		MbOption { description: qsTr("Fire alarm"); value: 7 },
 		MbOption { description: qsTr("CO2 alarm"); value: 8 },
 		MbOption { description: qsTr("Generator"); value: 9 },
+		MbOption { description: qsTr("Generic I/O"); value: 10 },
 //// added for ExtTransferSwitch package
 		MbOption { description: qsTr("External transfer switch"); value: 11 }
 	]
