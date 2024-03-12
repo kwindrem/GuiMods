@@ -1,3 +1,6 @@
+v10.10:
+	add support for v3.30~15
+
 v10.9:
 	add support for v3.30~13
 	remove alarm relay On switch starting with v3.30~3 to match stock code
