@@ -85,7 +85,7 @@ MbPage {
 
 	property bool noL2inverter: _l2L1OutSummed.valid
     property bool l2AndL1OutSummed: noL2inverter && _l2L1OutSummed.value === 1
-    property int phaseCount: Item.valid ? phaseCountItem.value : 0
+    property int phaseCount: phaseCountItem.valid ? phaseCountItem.value : 0
 
     // background
     Rectangle

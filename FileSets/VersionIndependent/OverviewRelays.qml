@@ -11,7 +11,7 @@ OverviewPage
 
 	property int relayWidth: 0
 	property int relaysOnPage: 6
-	property int maxRelays: 20
+	property int maxRelays: 18
 	property int numberOfRelaysShown: 0
 	property int horizontalMargin: 8
 	property int tileWidth: (root.width - (horizontalMargin * 2)) / root.relaysOnPage
@@ -253,7 +253,7 @@ OverviewPage
 	{
 		font.pixelSize: 14
 		font.bold: true
-		color: "black"
+		color: darkMode ? "#707070" : "black"
 		anchors
 		{
 			top: parent.top
@@ -261,7 +261,7 @@ OverviewPage
 			horizontalCenter: parent.horizontalCenter
 		}
 		horizontalAlignment: Text.AlignHCenter
-		text: qsTr("Relay overview")
+		text: numberOfRelaysShown > 0 ? qsTr("Relay overview") : qsTr("Relay overview (no relays)")
 	}
 
 	ListView

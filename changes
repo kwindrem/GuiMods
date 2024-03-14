@@ -1,3 +1,7 @@
+v10.11:
+	fixed: inverter detail only shows L1 of a multiphase system
+	added "no relays" to blank relay overview
+
 v10.10:
 	add support for v3.30~15
 
