@@ -12,6 +12,9 @@
 #  (decommissioned) PROMPT - prompt user for additional installation options
 #  UNINSTALL - remove package components
 #  EXIT - exit script without taking any action
+#  CHECK - runs file set checks only
+#		this will attempt to create a missing file set so PackageManager
+#		won't report it missing
 # CommonResources may set the the action if initial checks
 #  indicate a clear direction
 # otherwise, the action will be set based on user input (in the script)
@@ -23,8 +26,6 @@
 #  checkFileSets EXITS locally
 
 scriptAction='NONE'
-installFailed=false
-installExitReason=$EXIT_SUCCESS
 
 # flags to control setup script behavior (in endScript)
 rebootNeeded=false
@@ -46,6 +47,87 @@ fileListAll=()
 ######## skip to bottom of file for remainder of code executed when script is sourced
 
 
+# setInstallFailed sets flags to prevent further install steps
+#	and insure the package is uninstalled completely
+#
+#	$1 indicates the reason for the failure and will evenutally be uused
+#	report the failure reason when exiting the script
+#
+#	any remaining paremeters are passed to logMessage
+#		and also saved in installFailMessage for others to use
+#	the message is also sent to stderr if not running from the command line
+#		this allows PackageManager to report the full reason for failure
+#
+#	a setup script can be run from the console, or from another script or program (unattended)
+#	when running from the console
+#		setInstallFailed will report errors and return to the caller
+#
+#	if running unattended and if the script action is INSTALL
+#		during the precheck period (before any system modification)
+#			setInstallFailed WILL EXIT WITHOUT RETURNING TO THE CALLER !!!!!
+#		after the precheck period, system modifications may have been made so
+#			the scriptAction is changed to UNINSTALL
+#				so the modifictions can be reversed
+#	otherwise, setInstallFailed just logs the error
+#
+#	note that PackageManager makes most of the pre-check tests
+#			before calling the setup script
+#		the only exception is file set checks made in checkFileSets
+
+installFailed=false
+installExitReason=$EXIT_ERROR
+installFailMessage=""
+installPreChecks=true
+installFailCount=0
+
+# cleanup on any exit
+
+exitCleanup ()
+{
+	# remove temp directory
+	rm -rf "$patchedFiles"
+}
+
+trap exitCleanup EXIT
+
+setInstallFailed ()
+{
+	(( installFailCount += 1 ))
+	installFailed=true
+	if [ ! -z "$1" ]; then
+		installExitReason=$1
+	# no reson specified - use the generaic error exit code
+	else
+		installExitReason=EXIT_ERROR
+	fi
+	message="${@:2}"
+	if [ ! -z "$message" ]; then
+		installFailMessage="$message"
+		logMessage "ERROR: $message"
+		# if not running from console, output error to stderr
+		if ! $logToConsole ; then
+			echo "$message" >&2
+		fi
+	else
+		installFailMessage=""
+	fi
+
+	if ! $userInteraction && [ $scriptAction == 'INSTALL' ]; then
+		# during "pre-checks" failures occur before any system mofifications
+
+		#	EXIT NOW - DO NOT RETURN TO THE CALLER !!!!!
+		if $installPreChecks ; then
+			exit $installExitReason
+		# after "pre-checks" system mofifications may already have occured
+		#	so an uninstall needs to follow the install
+		else
+			scriptAction='UNINSTALL'
+		fi
+	fi
+}
+
+
+
 # checkPackageDependencies checks the packageDependencies file in the package directory
 #
 # all unmet dependencies are reported to the command line/log
@@ -59,9 +141,9 @@ function checkPackageDependencies ()
 	#no dependencies specified for this package
 	if ! [ -f "$dependencyFile" ]; then return; fi
 
-	errors=false
-
+	errors=""
 	while IFS= read -r line; do
+		error=""
 		read package requirement <<< "$line"
 		if [ -f "$installedVersionPrefix"$package ]; then
 			packageInstalled=true
@@ -71,20 +153,26 @@ function checkPackageDependencies ()
 		case $requirement in
 			installed)
 				if ! $packageInstalled ; then
-					setInstallFailed $EXIT_PACKAGE_CONFLICT "$package must be installed first"
-					error=true
+					error="$package must be installed"
 				fi
 				;;
 			uninstalled)
 				if $packageInstalled ; then
-					setInstallFailed $EXIT_PACKAGE_CONFLICT "$package must be uninstalled first"
-					error=true
+					error="$package must be uninstalled"
 				fi
 				;;
 		esac
+		if ! [ -z "$error" ]; then
+			if ! [ -z "$errors" ]; then
+				errors+=", "
+			fi
+			errors+="$error"
+		fi
 
-		if $errors; then endScript; fi
 	done < "$dependencyFile"
+	if ! [ -z "$errors" ]; then
+		setInstallFailed $EXIT_PACKAGE_CONFLICT "$errors"
+	fi
 }
 
 # getFileLists reads the file list from files in the FileSets directory
@@ -208,7 +296,6 @@ yesNoPrompt ()
 # if this parameter does not exist, installation WILL change scriptAction to INSTALL
 # this provides backaward compatibility with scripts written prior to the reinstall logic
 #
-
 standardActionPrompt ()
 {
     if [ $# -gt 0 ] && [ $1 == 'MORE_PROMPTS' ]; then
@@ -222,6 +309,8 @@ standardActionPrompt ()
 	# don't allow install choice if incompatibilities have already been detected
 	if ! $installFailed ; then
 		echo "  Install and activate (i)"
+	else
+		echo "  can't install - errors reported above"
 	fi
     if $optionsSet ; then
         echo "  Reinstall (r) based on options provided at last install"
@@ -270,37 +359,6 @@ standardActionPrompt ()
     done
 }
 
-
-# setInstallFailed sets flags to prevent further install steps
-#	and insure the package is uninstalled completely
-#
-#	$1 indicates the reason for the failure and will evenutally be uused
-#	report the failure reason when exiting the script
-#
-#	any remaining paremeters are passed to logMessage
-#
-#	the UNINSTALL scriptAction is used so that older package setup scripts
-#	will restore everything it has modified (not using updateActiveFile, etc)
-#
-#	also test $installFailed to see if this was an install failure
-#	or an actuall uninstall
-
-setInstallFailed ()
-{
-	installFailed=true
-	scriptAction='UNINSTALL'
-	if [ ! -z "$1" ]; then
-		installExitReason=$1
-	fi
-	message="${@:2}"
-	if [ ! -z "$message" ]; then
-		logMessage "ERROR: $message"
-		# if not running from console, output error to stderr
-		if ! $logToConsole ; then
-			echo "$message" >&2
-		fi
-	fi
-}
 
 # forcePackageUninstall insures a conflicting package is uninstalled before
 #	this package is installed
@@ -599,15 +657,7 @@ restoreActiveFile ()
 # Replacement files that have no original specify an "alternate original" that is used
 # for version comparisons that locate an appropriate replacement
 
-# dummy routine for backward compatibility
-# the actual work is now done in-line when CommonResources is sourced
-
 checkFileSets ()
-{
-    return
-}
-
-_checkFileSets ()
 {
 	# no file sets - nothing to check
 	if ! [ -e "$pkgFileSets" ]; then return; fi
@@ -632,14 +682,16 @@ _checkFileSets ()
 	
 	# versioned file sets exist but empty file list
 	if [ ! -z $versionList ] && [ -z $fileList ]; then
-        setInstallFailed $EXIT_FILE_SET_ERROR "versions exist, but empty file list"
+        setInstallFailed $EXIT_FILE_SET_ERROR "empty file list"
+		touch "$fileSet/INCOMPLETE"
+		rm -f "$fileSet/COMPLETE"
         return
 	# no versioned file sets - nothing to validate - allow install
 	elif [ -z $versionList ]; then return; fi
 	
 	# attempt to create a new file set or validate an existing one not marked as COMPLETE
 
-	rm -f  "$fileSet/INCOMPLETE"
+	rm -f "$fileSet/INCOMPLETE"
 
     # attempt to create file set if it doesn't exist
     if [ ! -d "$fileSet" ]; then
@@ -974,7 +1026,7 @@ restartGuiV2Service ()
 
 endScript ()
 {
-    if [ $scriptAction == 'INSTALL' ] ; then
+    if [ $scriptAction == 'INSTALL' ] && ! $installFailed ; then
 		# do installs as indicated from caller
 		while (( $# > 0 )); do
 			case "$1" in
@@ -1028,9 +1080,10 @@ endScript ()
 		
 
     if [ $scriptAction == 'UNINSTALL' ] ; then
-
+		if $installFailed ; then
+			logMessage "INSTALL failed - attempting UNINSTALL in endScript"
 		# package was actually uninstalled (not an install failure) - set flag preventing auto installs
-		if ! $installFailed ; then 
+		else 
 			touch "$setupOptionsDir/DO_NOT_AUTO_INSTALL"
 		fi
 
@@ -1052,27 +1105,20 @@ endScript ()
 			done
 			# remove lines from rcS.local
 			sed -i -e "/# SetupHelper reinstall/,/fi/d" "$rcLocal"
-
 		fi
 	fi
 
 	# setup script signals nothing to do - exit without further action without errors
-	if [ $scriptAction == 'EXIT' ]; then
-		exit $EXIT_SUCCESS
-	elif ! [ $scriptAction == 'INSTALL' ] && ! [ $scriptAction == 'UNINSTALL' ]; then
-		logMessage "unexpected script action $scriptAction - did not install or uninstall"
-		exit $EXIT_SUCCESS
+	if ! $installFailed; then
+		if [ $scriptAction == 'EXIT' ]; then
+			exit $EXIT_SUCCESS
+		elif ! [ $scriptAction == 'INSTALL' ] && ! [ $scriptAction == 'UNINSTALL' ]; then
+			setInstallFailed $EXIT_ERROR "unexpected script action $scriptAction - did not install or uninstall"
+		fi
 	fi
 
-	# remove temp directory used in installs of files requiring modificaion before installing
-	rm -rf "$patchedFiles"
-
-	# if installation was attempted but failed, exit without checking anything else
-	#	or signaling GUI restart or reboot
-	if $installFailed ; then
-		logMessage "installation failed - package has been uninstalled - exiting"
-		exit $installExitReason
-	elif $rebootNeeded ; then
+	# check for reboot or restarts
+	if $rebootNeeded ; then
 		if $userInteraction ; then
 			if yesNoPrompt "Reboot system now (y) or do it manually later (n): " ; then
 				logMessage "rebooting ..."
@@ -1104,9 +1150,13 @@ endScript ()
 			if yesNoPrompt "Restart the GUI now (y) or issue a do it manually later (n): " ; then
 				logMessage "completed - restarting GUI"
 				restartGuiV1Service
-				exit $EXIT_SUCCESS
+				if $installFailed ; then
+					exit $installExitReason
+				else
+					exit $EXIT_SUCCESS
+				fi
 			else
-				echo "GUI must be restarted to activate components"
+				echo "GUI must be restarted to activate changes"
 				exit $EXIT_RESTART_GUI
 			fi
 		else
@@ -1117,12 +1167,28 @@ endScript ()
 			else
 				logMessage "completed - restarting GUI"
 				restartGuiV1Service
-				exit $EXIT_SUCCESS
+				if $installFailed ; then
+					exit $installExitReason
+				else
+					exit $EXIT_SUCCESS
+				fi
 			fi
 		fi
 	fi
-	logMessage "completed"
-	exit $EXIT_SUCCESS
+
+	# if installation was attempted but failed, exit without checking anything else
+	if $installFailed ; then
+		if [ $scriptAction == 'UNINSTALL' ]; then
+			logMessage "complete - package has been uninstalled"
+		else
+			logMessage "complete - no changes were made"
+		fi
+		exit $installExitReason
+	# install/uninstall succeeded
+	else
+		logMessage "complete - no errors"
+		exit $EXIT_SUCCESS
+	fi
 }
 
 ######## this code is executed in-line when CommonResources is sourced
@@ -1151,18 +1217,6 @@ endScript ()
 # logToConsole is set to true in the LogHandler script
 # It is set to false here the 'auto' parameter is passed on the command line
 #	which indicates this script is NOT being run from the command line
-
-# move old installedFlag ("...inInstalled...")
-# to its new name ...installedVersionFile...
-if [ ! -f "$installedVersionFile" ] && [  -f "$installedFlag" ]; then
-	installedVersion=$(cat "$installedFlag")
-	if [ -z $installedVersion ]; then
-		installedVersion=""
-	else
-		echo $installedVersion > "$installedVersionFile"
-	fi
-fi
-rm -f "$installedFlag"
 
 # cleanup from previous versions - reinstallScriptsList no loner used
 rm -f "/data/reinstallScriptsList"
@@ -1202,6 +1256,7 @@ force=false
 deferReboot=false
 deferGuiRestart=false
 userInteraction=true
+runFromPm=false
 while [ $# -gt 0 ]; do
         case $1 in
             "reinstall")
@@ -1226,56 +1281,27 @@ while [ $# -gt 0 ]; do
                 logToConsole=false
 				userInteraction=false
                 ;;
+            "runFromPm")
+				runFromPm=true
+                logToConsole=false
+				userInteraction=false
+                deferReboot=true
+                deferGuiRestart=true
+                ;;
+            "check")
+				# if no other actions were set, set it here
+				#	but allow other actions to override this one
+				if [ $scriptAction == 'NONE' ]; then
+					scriptAction='CHECK'
+				fi
+                ;;
             *)
         esac
     shift
 done
 
 # do after logToConsole is enabled/disabled abvove
-logMessage "--- starting setup script $packageVersion"
-
-# make sure rootfs is mounted R/W & and resized to allow space for replacement files
-#	arbitrary minimum size of 3 MB
-rootMinimumSize=3
-availableSpace=$(df -m / | tail -1 | awk '{print $4}')
-
-# remount read-write
-if (( $(mount | grep ' / ' | grep -c 'rw') == 0 )); then
-	# only remount read-write for CCGX
-	if [ "$machine" == "ccgx" ]; then
-		if [ -f /opt/victronenergy/swupdate-scripts/remount-rw.sh ]; then
-			logMessage "remounting root read-write"
-			/opt/victronenergy/swupdate-scripts/remount-rw.sh
-		fi
-	# remount and resize for other platforms
-	elif [ -f /opt/victronenergy/swupdate-scripts/resize2fs.sh ]; then
-		/opt/victronenergy/swupdate-scripts/resize2fs.sh
-		availableSpace=$(df -m / | tail -1 | awk '{print $4}')
-		logMessage "remounting read-write root and resizing - $availableSpace MB now available"
-	fi
-	# check to see if remount was successful
-	if (( $(mount | grep ' / ' | grep -c 'rw') == 0 )); then
-		logMessage "ERROR: unable to remount root read-write - can't continue"
-		exit $EXIT_ROOT_FULL
-	fi
-# root already read-write, attempt to resize if space is limited (CCGX can't resize)
-elif (( $availableSpace < $rootMinimumSize )); then
-	if [ "$machine" == "ccgx" ]; then
-		logMessage "can't resize root on CCGX"
-	else
-		if [ -f /opt/victronenergy/swupdate-scripts/resize2fs.sh ]; then
-			/opt/victronenergy/swupdate-scripts/resize2fs.sh
-			availableSpace=$(df -m / | tail -1 | awk '{print $4}')
-			logMessage "resized root - $availableSpace MB now available"
-		fi
-	fi
-fi
-# make sure the root partition has space for the package
-if (( $availableSpace < $rootMinimumSize )); then
-	logMessage "no room for modified files on root ($availableSpace MB remaining) - can't continue"
-	exit $EXIT_ROOT_FULL
-fi
-
+logMessage "--- starting setup script $packageVersion action $scriptAction"
 
 # packages that require options to proceed unattended
 # must include the optionsRequried flag file in their package directory
@@ -1310,7 +1336,6 @@ else
 	optionsSet=true
 fi
 
-
 # called from reinstallMods at boot time
 if $reinstall ; then
     runningAtBoot=true
@@ -1335,48 +1360,43 @@ else
     pruneSetupLogFile
 fi
 
+if [ ! -d "$setupOptionsDir" ]; then
+	logMessage "creating package options directory $setupOptionsDir"
+	mkdir -p $setupOptionsDir
+fi
+
 # initialze integer version number for venus version
-# used below and in _checkFileSets
+# used below and in checkFileSets
 versionStringToNumber $venusVersion
 venusVersionNumber=$versionNumber
 
-# prevent installing Raspberry Pi packages on other platforms
-if [ -f "$scriptDir/raspberryPiOnly" ]; then 
-	if [[ $machine != *"raspberrypi"* ]]; then
-		setInstallFailed $EXIT_INCOMPATIBLE_PLATFORM "$packageName not compatible with $machine"
-	fi
-fi
-
-# check to see if package is compatible with this Venus version
-if [ -f "$scriptDir/firstCompatibleVersion" ]; then
-	firstCompatibleVersion=$(cat "$scriptDir/firstCompatibleVersion")
-# no first compatible version specified - use the default
-else
-	firstCompatibleVersion='v2.71'
-fi
-
-versionStringToNumber $firstCompatibleVersion
-firstCompatibleVersionNumber=$versionNumber
-if (( $venusVersionNumber < $firstCompatibleVersionNumber )); then
-	setInstallFailed $EXIT_INCOMPATIBLE_VERSION "$venusVersion before first compatible $firstCompatibleVersion"
-elif [ -f "$scriptDir/obsoleteVersion" ]; then
-	obsoleteVersion=$(cat "$scriptDir/obsoleteVersion")
-	versionStringToNumber $obsoleteVersion
-	obsoleteVersionNumber=$versionNumber
-	if (( $venusVersionNumber >= $obsoleteVersionNumber )); then
-		setInstallFailed $EXIT_INCOMPATIBLE_VERSION "$venusVersion after last compatible $obsoleteVersion"
-	fi
-fi
-if ! $installFailed ; then
-	if [ ! -d "$setupOptionsDir" ]; then
-		logMessage "creating package options directory $setupOptionsDir"
-		mkdir -p $setupOptionsDir
-	fi
-fi
-
-# if checks above passed and uninstall was not specified on command line,
-#	do final checks before permitting install
+# do pre-checks - skip if uninstalling
 if [ $scriptAction != 'UNINSTALL' ]; then
+	# prevent installing Raspberry Pi packages on other platforms
+	if [ -f "$scriptDir/raspberryPiOnly" ]; then 
+		if [[ $machine != *"raspberrypi"* ]]; then
+			setInstallFailed $EXIT_INCOMPATIBLE_PLATFORM "$packageName not compatible with $machine"
+		fi
+	fi
+	# check to see if package is compatible with this Venus version
+	if [ -f "$scriptDir/firstCompatibleVersion" ]; then
+		firstCompatibleVersion=$(cat "$scriptDir/firstCompatibleVersion")
+	# no first compatible version specified - use the default
+	else
+		firstCompatibleVersion='v2.71'
+	fi
+	versionStringToNumber $firstCompatibleVersion
+	firstCompatibleVersionNumber=$versionNumber
+	if (( $venusVersionNumber < $firstCompatibleVersionNumber )); then
+		setInstallFailed $EXIT_INCOMPATIBLE_VERSION "$venusVersion before first compatible $firstCompatibleVersion"
+	elif [ -f "$scriptDir/obsoleteVersion" ]; then
+		obsoleteVersion=$(cat "$scriptDir/obsoleteVersion")
+		versionStringToNumber $obsoleteVersion
+		obsoleteVersionNumber=$versionNumber
+		if (( $venusVersionNumber >= $obsoleteVersionNumber )); then
+			setInstallFailed $EXIT_INCOMPATIBLE_VERSION "$venusVersion after last compatible $obsoleteVersion"
+		fi
+	fi
 
 	# determine if GUI v1 is installed
 	#	Note, it may NOT be running or selected to run!!!!
@@ -1385,7 +1405,6 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	else
 		guiV1present=true
 	fi
-
 	# block installs if any GUI files would be modified and GUI v1 is not present
 	# packages can bypass GUI v1 checks and allow installs even if package contains them
 	if [ -f "$scriptDir/GUI_V1_NOT_REQUIRED" ]; then
@@ -1399,33 +1418,41 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	else
 		guiV1required=false
 	fi
-
 	if ! $guiV1present && $guiV1required ; then
 		setInstallFailed $EXIT_NO_GUI_V1 "$packageName requires GUI v1"
 	fi
 
 	# attempting an install without the comand line prompting
 	#	and needed options have not been set yet - can't continue
-	if [ $scriptAction == 'INSTALL' ]; then
+	if ! $installFailed && [ $scriptAction == 'INSTALL' ]; then
 		if ! $optionsSet ; then
 			setInstallFailed $EXIT_OPTIONS_NOT_SET "required options have not been set"
-			endScript
+		fi
+	fi
+
+	getFileLists "$pkgFileSets"
+
+	checkFileSets
+
+	# checkFileSets created a missing file set and set the INCOMPLETE flag if needed
+	# that is all CHECK needed to do so EXIT HERE !!!!
+	if [ $scriptAction == 'CHECK' ]; then
+		if [ -f "$fileSet/INCOMPLETE" ]; then
+			exit $EXIT_FILE_SET_ERROR
+		else
+			exit $EXIT_SUCCESS
 		fi
 	fi
 
 	checkPackageDependencies
-
-	getFileLists "$pkgFileSets"
-
-    _checkFileSets
-    
 
 	# create installed files (and services) directory
 	if [ ! -d "$installedFilesDir" ]; then
 		mkdir "$installedFilesDir"
 	fi
 
-	# location of patch output - used as the replacement file (unique temp directory in volatile storage)
+	# create place for patch output (unique temp directory in volatile storage)
+	# this is removed in the exit trap above
 	patchedFiles=$( mktemp -d ) 
 
 	# create patched files for files with VisibleItemModel for older Venus OS versions
@@ -1448,11 +1475,9 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 		patchFile="$patchSourceDir/$baseName.patch"
 		if ! [ -f "$file" ]; then
 			setInstallFailed $EXIT_FILE_SET_ERROR "original file missing for $baseName"
-			endScript
 		fi
 		if ! [ -f "$patchFile" ]; then
 			setInstallFailed $EXIT_FILE_SET_ERROR "patch file missing for $baseName"
-			endScript
 		fi
 		# BusyBox patch doesn't support the -o option so copy source to output first
 		#	then patch the output
@@ -1468,10 +1493,76 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 		fi
 		if ! patch "$patchedFiles/$baseName" "$patchFile" &> /dev/null ; then
 			setInstallFailed $EXIT_FILE_SET_ERROR "could not patch $baseName"
-			endScript
 		fi
 	done
+fi # if [ $scriptAction != 'UNINSTALL' ]
+
+# make sure rootfs is mounted R/W & and resized to allow space for replacement files
+#	arbitrary minimum size of 3 MB
+if ! $installFailed; then
+	rootMinimumSize=3
+	availableSpace=$(df -m / | tail -1 | awk '{print $4}')
+
+	# remount read-write
+	if (( $(mount | grep ' / ' | grep -c 'rw') == 0 )); then
+		# only remount read-write for CCGX
+		if [ "$machine" == "ccgx" ]; then
+			if [ -f /opt/victronenergy/swupdate-scripts/remount-rw.sh ]; then
+				logMessage "remounting root read-write"
+				/opt/victronenergy/swupdate-scripts/remount-rw.sh
+			fi
+		# remount and resize for other platforms
+		elif [ -f /opt/victronenergy/swupdate-scripts/resize2fs.sh ]; then
+			/opt/victronenergy/swupdate-scripts/resize2fs.sh
+			availableSpace=$(df -m / | tail -1 | awk '{print $4}')
+			logMessage "remounting read-write root and resizing - $availableSpace MB now available"
+		fi
+		# check to see if remount was successful
+		if (( $(mount | grep ' / ' | grep -c 'rw') == 0 )); then
+			setInstallFailed $EXIT_ROOT_FULL "ERROR: unable to remount root read-write - can't continue"
+		fi
+	# root already read-write, attempt to resize if space is limited (CCGX can't resize)
+	elif (( $availableSpace < $rootMinimumSize )); then
+		if [ "$machine" == "ccgx" ]; then
+			logMessage "can't resize root on CCGX"
+		else
+			if [ -f /opt/victronenergy/swupdate-scripts/resize2fs.sh ]; then
+				/opt/victronenergy/swupdate-scripts/resize2fs.sh
+				availableSpace=$(df -m / | tail -1 | awk '{print $4}')
+				logMessage "resized root - $availableSpace MB now available"
+			fi
+		fi
+	fi
 fi
+if ! $installFailed; then
+	# make sure the root partition has space for the package
+	if (( $availableSpace < $rootMinimumSize )); then
+		setInstallFailed $EXIT_ROOT_FULL "no room for modified files on root ($availableSpace MB remaining) - can't continue"
+	fi
+fi
+
+# done with pre checks
+#	prior to this no system mofications have been made
+#	after this system modifications may occur
+
+if $installFailed ; then
+	if ! $userInteraction ; then
+		logMessage "ERROR: errors occured during pre-checks - can't continue"
+		# EXIT HERE if errors occured during pre-checks while running unattended !!!!
+		# the LAST install failure reported to setInstallFailed is used as the exit code
+		exit $installExitReason	# EXIT HERE !!!!
+	# command line install request failed - reset scriptAction to NONE
+	# so prompts will be shown - eg
+	#	to show the log or
+	#	to trigger a manual uninstall
+	elif  [ $scriptAction == 'INSTALL' ]; then
+		logMessage "ERROR: install failed during pre-checks - select another action"
+		scriptAction='NONE'
+	fi
+fi
+
+installPreChecks=false
+
 
 #### do standard prompting, automatic install/uninstall then exit
 if [ "$standardPromptAndActions" == 'yes' ]; then

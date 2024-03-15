@@ -264,8 +264,13 @@ installService ()
 				fi
             fi
 			if serviceIsUp $serviceName ; then
-				logMessage "restarting $serviceName service"
-				svc -t "/service/$serviceName"
+				if $runFromPm && [ $serviceName == 'PackageManager' ]; then
+					logMessage "$serviceName restart deferred until GUI restart"
+					restartGui=true
+				else
+					logMessage "restarting $serviceName service"
+					svc -t "/service/$serviceName"
+				fi
 			fi
         fi
 		# log needs to be handled separtely including a restart
