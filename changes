@@ -1,3 +1,6 @@
+v10.13:
+	fixed: system calc crash introduced in v10.12
+
 v10.12:
 	add support for v3.30~17
 
