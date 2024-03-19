@@ -1,1 +1,1 @@
-../v3.30~17/MbEditBoxDateTime.qml
+../v3.30/MbEditBoxDateTime.qml

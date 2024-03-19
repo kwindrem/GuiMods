@@ -1372,6 +1372,10 @@ venusVersionNumber=$versionNumber
 
 # do pre-checks - skip if uninstalling
 if [ $scriptAction != 'UNINSTALL' ]; then
+	# flag the version that is performing these checks
+	#	this is used by PackageManager to know when to run checks
+	echo "$venusVersion" > "$scriptDir/packageCheckVersion"
+
 	# prevent installing Raspberry Pi packages on other platforms
 	if [ -f "$scriptDir/raspberryPiOnly" ]; then 
 		if [[ $machine != *"raspberrypi"* ]]; then
@@ -1439,8 +1443,6 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	if [ $scriptAction == 'CHECK' ]; then
 		if [ -f "$fileSet/INCOMPLETE" ]; then
 			exit $EXIT_FILE_SET_ERROR
-		else
-			exit $EXIT_SUCCESS
 		fi
 	fi
 
@@ -1455,6 +1457,56 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 	# this is removed in the exit trap above
 	patchedFiles=$( mktemp -d ) 
 
+	# create patched files in fileListPatched
+	patchErrors=()
+	for file in ${fileListPatched[@]}; do
+		message=""
+		baseName=$( basename $file )
+		patchFile="$patchSourceDir/$baseName.patch"
+		if ! [ -f "$patchFile" ]; then
+			message="patch file missing for $baseName"
+			patchErrors+="$message\n"
+			setInstallFailed $EXIT_PATCH_ERROR "$message"
+			continue
+		fi
+		# BusyBox patch doesn't support the -o option so copy source to output first
+		#	then patch the output
+		# if package already installed, patch .orig
+		if [ -e "$file.orig" ]; then
+			cp "$file.orig" "$patchedFiles/$baseName"
+		# if package probably not installed, patch the active file
+		elif [ -e "$file" ] ; then
+			cp "$file" "$patchedFiles/$baseName"
+		else
+			message="no source for $baseName patch"
+			patchErrors+=( "$message" )
+			setInstallFailed $EXIT_PATCH_ERROR "$message"
+			continue
+		fi
+		if ! patch "$patchedFiles/$baseName" "$patchFile" &> /dev/null ; then
+			message="patch unsuccesful for $baseName"
+			patchErrors+=( "$message" )
+			setInstallFailed $EXIT_PATCH_ERROR "$message"
+		fi
+	done
+
+	# save any errors in PatchErrors file
+	if [ -z "$patchErrors" ] ; then
+		rm -f "$scriptDir/patchErrors"
+	else
+		printf "%s\n" "${patchErrors[@]}" > "$scriptDir/patchErrors"
+		if [ $scriptAction == 'CHECK' ]; then
+			exit $EXIT_PATCH_ERROR
+		else
+			endScript
+		fi
+	fi
+
+	# go no further if just checking
+	if [ $scriptAction == 'CHECK' ]; then
+		exit $EXIT_SUCCESS
+	fi
+
 	# create patched files for files with VisibleItemModel for older Venus OS versions
 	versionStringToNumber "v3.00~14"
 	if (( $venusVersionNumber < $versionNumber )); then
@@ -1468,33 +1520,6 @@ if [ $scriptAction != 'UNINSTALL' ]; then
 			sed -e 's/VisibleItemModel/VisualItemModel/' "$sourceFile" > "$patchedFiles/$baseName"
 		done
 	fi
-
-	# create patched files in fileListPatched
-	for file in ${fileListPatched[@]}; do
-		baseName=$( basename $file )
-		patchFile="$patchSourceDir/$baseName.patch"
-		if ! [ -f "$file" ]; then
-			setInstallFailed $EXIT_FILE_SET_ERROR "original file missing for $baseName"
-		fi
-		if ! [ -f "$patchFile" ]; then
-			setInstallFailed $EXIT_FILE_SET_ERROR "patch file missing for $baseName"
-		fi
-		# BusyBox patch doesn't support the -o option so copy source to output first
-		#	then patch the output
-		# if package already installed, patch .orig
-		if [ -e "$file.orig" ]; then
-			cp "$file.orig" "$patchedFiles/$baseName"
-		# if package probably not installed, patch the active file
-		elif [ -e "$file" ] ; then
-			cp "$file" "$patchedFiles/$baseName"
-		else
-			setInstallFailed $EXIT_FILE_SET_ERROR "no source for $baseName patch"
-			endScript
-		fi
-		if ! patch "$patchedFiles/$baseName" "$patchFile" &> /dev/null ; then
-			setInstallFailed $EXIT_FILE_SET_ERROR "could not patch $baseName"
-		fi
-	done
 fi # if [ $scriptAction != 'UNINSTALL' ]
 
 # make sure rootfs is mounted R/W & and resized to allow space for replacement files

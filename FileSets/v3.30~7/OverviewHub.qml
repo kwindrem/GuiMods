@@ -1,1 +1,1 @@
-../v3.30~17/OverviewHub.qml
+../v3.30/OverviewHub.qml

@@ -1,1 +1,1 @@
-../v3.30~17/OverviewTanks.qml
+../v3.30/OverviewTanks.qml

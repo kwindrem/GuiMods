@@ -1,1 +1,1 @@
-../v3.30~17/Tile.qml
+../v3.30/Tile.qml

@@ -1,1 +1,1 @@
-../v3.30~17/MbSpinBox.qml
+../v3.30/MbSpinBox.qml

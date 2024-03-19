@@ -1,1 +1,1 @@
-../v3.30~17/main.qml
+../v3.30/main.qml

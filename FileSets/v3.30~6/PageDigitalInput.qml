@@ -1,1 +1,1 @@
-../v3.30~17/PageDigitalInput.qml
+../v3.30/PageDigitalInput.qml
