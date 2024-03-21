@@ -1,1 +1,1 @@
-../v3.30/OverviewConnection.qml
+../v3.40~1/OverviewConnection.qml

@@ -1,1 +1,1 @@
-../v3.30/OverviewTankDelegate.qml
+../v3.40~1/OverviewTankDelegate.qml

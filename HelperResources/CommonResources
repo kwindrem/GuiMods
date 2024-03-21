@@ -869,7 +869,7 @@ buildUninstallListsfromSetupScript ()
 installAllFiles ()
 {
 	if [ -z "$fileListAll" ]; then
-		getFileLists
+		getFileLists "$pkgFileSets"
 	fi
 
 	if [ ! -z $fileListAll ]; then

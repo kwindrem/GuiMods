@@ -262,7 +262,13 @@ class Monitor:
 			logging.info ("switching to generator settings")
 			# save current values for restore when switching back to grid
 			try:
-				self.DbusSettings['gridInputType'] = self.acInputTypeObj.GetValue ()
+				inputType = self.acInputTypeObj.GetValue ()
+				# grid input type can only be either 1 (grid) or 3 (shore)
+				#	patch this up to prevent issues later
+				if inputType == 2:
+					logging.warning ("grid input can not be generator - setting to grid")
+					inputType = 1
+				self.DbusSettings['gridInputType'] = inputType
 			except:
 				logging.error ("dbus error AC input type not saved when switching to generator")
 			try:
@@ -378,6 +384,12 @@ class Monitor:
 						}
 		self.DbusSettings = SettingsDevice(bus=self.theBus, supportedSettings=settingsList,
 								timeout = 10, eventCallback=None )
+
+		# grid input type should be either 1 (grid) or 3 (shore)
+		#	patch this up to prevent issues later
+		if self.DbusSettings['gridInputType'] == 2:
+			logging.warning ("grid input type was generator - resetting to grid")
+			self.DbusSettings['gridInputType'] = 1
 
 		GLib.timeout_add (1000, self.background)
 		return None
