@@ -279,7 +279,7 @@ OverviewPage {
 			}
 			TileText
 			{
-				text: alternatorName1.valid ? alternatorName1.text : "-"
+				text: alternatorName1.valid ? alternatorName1.value : "-"
 				visible: showAlternator && numberOfAlternators >= 1
 			}
 			TileText
@@ -300,7 +300,7 @@ OverviewPage {
 			}
 			TileText
 			{
-				text: alternatorName2.valid ? alternatorName2.text : "-"
+				text: alternatorName2.valid ? alternatorName2.value : "-"
 				visible: showAlternator && numberOfAlternators >= 2
 			}
 			TileText
@@ -905,7 +905,7 @@ OverviewPage {
 //////// add individual PV inverter powers
 			TileText {
 				y: 31
-				text: pvInverterName1.valid ? pvInverterName1.text : "-"
+				text: pvInverterName1.valid ? pvInverterName1.value : "-"
 				visible: !showDcAndAcSolar && numberOfPvInverters >= 2
 			},
 			TileText {
@@ -916,7 +916,7 @@ OverviewPage {
 			},
 			TileText {
 				y: 63
-				text: pvInverterName2.valid ? pvInverterName2.text : "-"
+				text: pvInverterName2.valid ? pvInverterName2.value : "-"
 				visible: !showDcAndAcSolar && numberOfPvInverters >= 2
 			},
 			TileText {
@@ -927,7 +927,7 @@ OverviewPage {
 			},
 			TileText {
 				y: 93
-				text: pvInverterName3.valid ? pvInverterName3.text : "-"
+				text: pvInverterName3.valid ? pvInverterName3.value : "-"
 				visible: !showDcAndAcSolar && numberOfPvInverters >=3 && ! showTanksTemps
 			},
 			TileText {

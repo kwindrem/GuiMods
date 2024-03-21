@@ -1,3 +1,6 @@
+v10.17:
+	fixed: GuiMods simple overview showing '--' for PV Inverter names
+
 v10.16:
 	add support for v3.40~1
 
