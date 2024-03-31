@@ -318,7 +318,7 @@ standardActionPrompt ()
     echo "  Uninstall (u) and restores all files to stock"
     echo "  Quit (q) without further action"
     echo "  Display setup log (s) outputs the last 100 lines of the log"
-    if [ ! -z $packageLogFile ]; then
+    if [ ! -z "$packageLogFile" ]; then
         echo "  Display Log (l) outputs the last 100 lines of the log"
     fi
     echo
@@ -681,14 +681,14 @@ checkFileSets ()
 	local versionList=( $(echo ${tempList[@]} | tr ' ' '\n' | sort -t ':' -r -n -k 2 | uniq ) )
 	
 	# versioned file sets exist but empty file list
-	if [ ! -z $versionList ] && [ -z $fileList ]; then
+	if [ ! -z "$versionList" ] && [ -z "$fileList" ]; then
         setInstallFailed $EXIT_FILE_SET_ERROR "empty file list"
 		touch "$fileSet/INCOMPLETE"
 		rm -f "$fileSet/COMPLETE"
         return
 	# no versioned file sets - nothing to validate - allow install
-	elif [ -z $versionList ]; then return; fi
-	
+	elif [ -z "$versionList" ]; then return; fi
+
 	# attempt to create a new file set or validate an existing one not marked as COMPLETE
 
 	rm -f "$fileSet/INCOMPLETE"
@@ -872,7 +872,7 @@ installAllFiles ()
 		getFileLists "$pkgFileSets"
 	fi
 
-	if [ ! -z $fileListAll ]; then
+	if [ ! -z "$fileListAll" ]; then
 		logMessage "installing files"
 		local file
 		for file in ${fileListAll[@]}; do
@@ -906,7 +906,7 @@ uninstallAllFiles ()
 	fi
 
 	# uninstall the files
-	if [ ! -z $restoreFilesList ]; then
+	if [ ! -z "$restoreFilesList" ]; then
 		logMessage "uninstalling files"
 		local file
 		for file in ${restoreFilesList[@]}; do
@@ -923,7 +923,7 @@ installAllServices ()
 	# get list of services in the package's service directory
 	if [ -d "$servicesDir" ]; then
 		servicesList=$( cd "$servicesDir"; ls -d * 2> /dev/null )
-		if [ ! -z $servicesList ]; then
+		if [ ! -z "$servicesList" ]; then
 			logMessage "installing services"
 			for service in $servicesList ; do
 				installService $service
@@ -955,7 +955,7 @@ uninstallAllServices ()
 	fi
 
 	# uninstall services
-	if [ ! -z $servicesList ]; then
+	if [ ! -z "$servicesList" ]; then
 		logMessage "uninstalling services"
 		for service in $servicesList ; do
 			if [ -z "$service" ]; then
