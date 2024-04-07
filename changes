@@ -1,3 +1,6 @@
+v10.20:
+	add support for v3.40~5
+
 v10.19:
 	fixed: systemcalc crash in v10.18 (v3.40~2 only)
 
