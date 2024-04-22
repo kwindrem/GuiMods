@@ -1,1 +1,1 @@
-../v3.40~5/OverviewSolarCharger.qml
+../v3.40~6/OverviewSolarCharger.qml

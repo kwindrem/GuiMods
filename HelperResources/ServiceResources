@@ -121,7 +121,7 @@ removeService ()
 			elif [ $cmd == 'multilog' ]; then
 				pids+="$ppid "
 			fi
-		done 9<<< $(ps -l | grep $serviceName)
+		done 9<<< $(ps -lw | grep $serviceName)
 
 		# remove the service directory
 		rm -rf "$serviceDir/$serviceName"

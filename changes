@@ -1,3 +1,7 @@
+v10.21:
+	removed v3.30 beta versions
+	add support for v3.31
+
 v10.20:
 	add support for v3.40~5
 
