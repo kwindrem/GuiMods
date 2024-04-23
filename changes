@@ -1,3 +1,6 @@
+v10.22:
+	fixed: relay overview not refreshning when number of relays changes (RemoteGPIO)
+
 v10.21:
 	removed v3.30 beta versions
 	add support for v3.31
