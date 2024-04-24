@@ -1,3 +1,6 @@
+v10.23:
+	add support for v3.40~8
+
 v10.22:
 	fixed: relay overview not refreshning when number of relays changes (RemoteGPIO)
 
