@@ -1,1 +1,1 @@
-../v3.40~8/Battery.qml
+../v3.40~10/Battery.qml
