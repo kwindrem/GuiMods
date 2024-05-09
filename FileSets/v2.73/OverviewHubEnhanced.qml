@@ -55,7 +55,7 @@ OverviewPage {
 	property int numberOfTanks: 0
 	property int numberOfTemps: 0
 //////// added/modified for control show/hide gauges, tanks and temps from menus
-	property int tankCount: showTanksEnable ? numberOfTanks : 0
+	property int tankCount: showTanksEnable ? tankModel.rowCount : 0
 	property int tempCount: showTempsEnable ? numberOfTemps : 0
 	property int tankTempCount: tankCount + tempCount
 	property bool showTanks: showTanksEnable ? showStatusBar ? false : tankCount > 0 ? true : false : false
@@ -1108,8 +1108,11 @@ OverviewPage {
 		interactive: count > 4 ? true : false
 		orientation: ListView.Horizontal
 
-		model: tanksModel
+		model: TankModel { id: tankModel }
 		delegate: TileTankEnhanced {
+			// Without an intermediate assignment this will trigger a binding loop warning.
+			property variant theService: DBusServices.get(buddy.id)
+			service: theService
 			width: tanksColum.tileWidth
 			height: root.tanksHeight
 			pumpBindPrefix: root.pumpBindPreffix
@@ -1193,11 +1196,6 @@ OverviewPage {
 	{
 		 switch (service.type)
 		{
-//////// add for temp sensors
-		case (service.type === DBusService.DBUS_SERVICE_TANK):
-			tanksModel.append({serviceName: service.name})
-			numberOfTanks++
-			break;;
 //////// add for temp sensors
 		case DBusService.DBUS_SERVICE_TEMPERATURE_SENSOR:
 			numberOfTemps++
@@ -1287,7 +1285,6 @@ OverviewPage {
 		pvInverterPrefix3 = ""
 		alternatorPrefix1 = ""
 		alternatorPrefix2 = ""
-		tanksModel.clear()
 		tempsModel.clear()
 		for (var i = 0; i < DBusServices.count; i++)
 		{

@@ -12,16 +12,6 @@
 # everything done in HelperResources which never returns here !!!
 standardPromptAndActions='yes'
 
-#### following lines incorporate helper resources into this script
-pkgDir=$( dirname $0 )
-pkgName=$( basename $pkgDir )
-pkgRoot=$( dirname $pkgDir )
-if [ -e "$pkgDir/HelperResources/IncludeHelpers" ]; then
-	source "$pkgDir/HelperResources/IncludeHelpers"
-elif [ -e "$pkgRoot/SetupHelper/HelperResources/IncludeHelpers" ]; then
-	source "$pkgRoot/SetupHelper/HelperResources/IncludeHelpers"
-else
-	echo "$pkgName: helper resources not found - can't continue" | tee -a "/data/log/SetupHelper"
-	exit 1
-fi
+#### following line incorporates helper resources into this script
+source "/data/SetupHelper/HelperResources/IncludeHelpers"
 #### end of lines to include helper resources

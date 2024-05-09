@@ -23,7 +23,7 @@ from logger import setup_logging
 import delegates
 from sc_utils import safeadd as _safeadd, safemax as _safemax
 
-softwareVersion = '2.165'
+softwareVersion = '2.166'
 
 class SystemCalc:
 	STATE_IDLE = 0
@@ -558,12 +558,13 @@ class SystemCalc:
 		batteries = self._get_connected_service_list('com.victronenergy.battery')
 
 		# Pick the battery service that has the lowest DeviceInstance, giving
-		# preference to those with a BMS.
+		# preference to those with a BMS. Instances of 'lynxparallel' are preferred over regular BMSes.
 		if len(batteries) > 0:
 			batteries = [
-				(not self._dbusmonitor.seen(s, '/Info/MaxChargeVoltage'), i, s)
+				(not self._dbusmonitor.seen(s, '/Info/MaxChargeVoltage'),
+	 			 not s.startswith('com.victronenergy.battery.lynxparallel'), i, s)
 				for s, i in batteries.items()]
-			return sorted(batteries, key=lambda x: x[:2])[0][2]
+			return sorted(batteries, key=lambda x: x[:3])[0][3]
 
 		# No battery services, and there is a charger in the system. Abandon
 		# hope.

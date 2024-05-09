@@ -1,5 +1,10 @@
+v10.27:
+	add support for v3.40~13
+	fixed: GuiMods Simple flow not showning tanks
+	remove local copy of HelperResources
+
 v10.26:
-	add support for v3.40~12
+	add support for v3.40~12 (never released)
 
 v10.25:
 	add support for v3.40~11 (never released)
