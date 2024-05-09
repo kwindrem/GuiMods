@@ -9,6 +9,7 @@ Row {
     // uses the same sizes as DetailsPvCharger page
     property int tableColumnWidth: 0
     property int rowTitleWidth: 0
+	property int phaseCount: 0
 
     VBusItem { id: customNameItem; bind: Utils.path(serviceName, "/CustomName") }
     VBusItem { id: pvTotalPower; bind: Utils.path(serviceName, "/Ac/Power") }
@@ -43,15 +44,15 @@ Row {
             text: EnhFmt.formatVBusItem (pvTotalPower, "W") }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPowerL1, "W") }
+            text: EnhFmt.formatVBusItem (pvPowerL1, "W"); visible: phaseCount > 1 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPowerL2, "W") }
+            text: EnhFmt.formatVBusItem (pvPowerL2, "W"); visible: phaseCount >= 2 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
             width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-            text: EnhFmt.formatVBusItem (pvPowerL3, "W") }
+            text: EnhFmt.formatVBusItem (pvPowerL3, "W"); visible: phaseCount >= 3 }
     Text { font.pixelSize: 12; font.bold: true; color: "black"
-            width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+            width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
             text: 
             {
                 if (position.valid)

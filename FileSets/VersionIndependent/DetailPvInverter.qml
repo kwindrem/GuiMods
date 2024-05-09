@@ -16,10 +16,12 @@ MbPage
     property string systemPrefix: "com.victronenergy.system"
     property color backgroundColor: "#b3b3b3"
 
-    property int dataColumns: 4
+	property int gridPhaseCount: sys.pvOnGrid.phaseCount.valid ? sys.pvOnGrid.phaseCount.value : 0
+	property int outputPhaseCount: sys.pvOnAcOut.phaseCount.valid ? sys.pvOnAcOut.phaseCount.value : 0
+	property int phaseCount: Math.max (gridPhaseCount, outputPhaseCount, 1)
+    property int dataColumns: 2 + phaseCount
     property int rowTitleWidth: 130
-    // gauge and "conneciton column use title width too"
-    property int totalDataWidth: root.width - (rowTitleWidth * 2) - 10
+    property int totalDataWidth: root.width - rowTitleWidth - 10
     property int tableColumnWidth: totalDataWidth / dataColumns
 
     Component.onCompleted: discoverServices()
@@ -38,7 +40,7 @@ MbPage
     {
         spacing: 5
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top; anchors.topMargin: + 10
+        anchors.top: parent.top; anchors.topMargin: 5
         Column 
         {
             spacing: 2
@@ -52,13 +54,13 @@ MbPage
                         text: qsTr("Total") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L1" }
+                        text: "L1"; visible: phaseCount > 1 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L2" }
+                        text: "L2"; visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L3" }
+                        text: "L3"; visible: phaseCount >= 3 }
             }
             Row
             {
@@ -70,17 +72,17 @@ MbPage
                         text: EnhFmt.formatVBusItem (sys.pvOnGrid.power) }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL1) }
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL1); visible: phaseCount > 1 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL2) }
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL2); visible: phaseCount >= 2}
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL3) }
+                        text: EnhFmt.formatVBusItem (sys.pvOnGrid.powerL3); visible: phaseCount >= 3}
                 PowerGauge
                 {
                     id: pvGridGauge
-                    width: rowTitleWidth
+                    width: tableColumnWidth
                     height: 15
                     connection: sys.pvOnGrid
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
@@ -97,13 +99,13 @@ MbPage
                         text: EnhFmt.formatVBusItem (sys.pvOnAcOut.power) }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL1) }
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL1); visible: phaseCount > 1 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL2) }
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL2); visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL3) }
+                        text: EnhFmt.formatVBusItem (sys.pvOnAcOut.powerL3); visible: phaseCount >= 3 }
                 PowerGauge
                 {
                     id: pvAcOutGauge
@@ -120,7 +122,7 @@ MbPage
                         width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr(" ") }
 			}
-           Row
+			Row
             {
                 id: tableHeaderRow
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
@@ -131,15 +133,15 @@ MbPage
                         text: qsTr("Total") }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L1" }
+                        text: "L1"; visible: phaseCount > 1 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L2" }
+                        text: "L2"; visible: phaseCount >= 2 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
                         width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
-                        text: "L3" }
+                        text: "L3"; visible: phaseCount >= 3 }
                 Text { font.pixelSize: 12; font.bold: true; color: "black"
-                        width: rowTitleWidth; horizontalAlignment: Text.AlignHCenter
+                        width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                         text: qsTr("Connection") }
             }
         }
@@ -164,6 +166,7 @@ MbPage
         {
             tableColumnWidth: root.tableColumnWidth
             rowTitleWidth: root.rowTitleWidth
+			phaseCount: root.phaseCount
             width: pvInverterTable.width
             Connections
             {

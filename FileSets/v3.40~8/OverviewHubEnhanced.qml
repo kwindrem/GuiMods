@@ -953,7 +953,6 @@ OverviewPage {
 			}
 		]
 ////// add power bar graph
-////// only shows one of possibly 3 PV inverter locations !!!!!!!!!!!!!!!!!!!!!
 		PowerGauge
 		{
 			id: pvInverterBar
@@ -964,15 +963,11 @@ OverviewPage {
 				top: parent.top; topMargin: 19
 				horizontalCenter: parent.horizontalCenter
 			}
-			maxForwardPowerParameter:
-			{
-				if (hasAcSolarOnOut)
-					return "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
-				else
-					return "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
-			}
-			connection: hasAcSolarOnOut ? sys.pvOnAcOut : hasAcSolarOnAcIn1 ? sys.pvOnAcIn1 : sys.pvOnAcIn2
-			visible: showGauges && showAcSolar && !showDcAndAcSolar
+			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"
+			maxForwardPowerParameter2: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnGridMaxPower"
+			connection: sys.pvOnAcOut
+			connection2: sys.pvOnGrid
+			visible: showGauges && showAcSolar
 		}
 		DetailTarget { id: pvInverterTarget;  detailsPage: "DetailPvInverter.qml" }
 	}

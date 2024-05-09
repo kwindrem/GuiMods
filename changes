@@ -1,3 +1,8 @@
+v10.28:
+	fixed: PV Inverter detail page not looking at phase count
+	fixed: PV Inverter detail page columns run together
+	fixed: PV Inverter tile does not always show correct gauge
+
 v10.27:
 	add support for v3.40~13
 	fixed: GuiMods Simple flow not showning tanks

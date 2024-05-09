@@ -12,25 +12,35 @@ Item {
 	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
 	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
-    property variant connection
+	property variant connection
+	// connection2 accommodates combined PV inverter AC input and AC output
+	property variant connection2: undefined
+	property bool includeConnection2: connection2 != undefined
 
     property bool reversePower: false
     property bool useInputCurrentLimit: false
     property variant endLabelFontSize: 16
     property color endLabelBackgroundColor: "transparent"
 
-	property int reportedPhaseCount: connection == undefined ? 0 : connection.phaseCount == undefined || ! connection.phaseCount.valid ? 1 : connection.phaseCount.value
-    property int phaseCount: reportedPhaseCount < 2 ? reportedPhaseCount : (connection.isAcOutput ? connection.l2AndL1OutSummed : connection.splitPhaseL2PassthruDisabled) ? 1 : connection.phaseCount.value
+	property int reportedPhaseCount1: connection == undefined ? 0 : connection.phaseCount == undefined || ! connection.phaseCount.valid ? 1 : connection.phaseCount.value
+	property int phaseCount1: reportedPhaseCount1 < 2 ? reportedPhaseCount1 : (connection.isAcOutput ? connection.l2AndL1OutSummed : connection.splitPhaseL2PassthruDisabled) ? 1 : connection.phaseCount.value
 
-    property string maxForwardPowerParameter: ""
-    VBusItem { id: maxForwardLimitItem; bind: root.maxForwardPowerParameter }
+	property int reportedPhaseCount2: connection2 == undefined ? 0 : connection2.phaseCount == undefined || ! connection2.phaseCount.valid ? 1 : connection2.phaseCount.value
+	property int phaseCount2: reportedPhaseCount2 < 2 ? reportedPhaseCount2 : (connection2.isAcOutput ? connection2.l2AndL1OutSummed : connection2.splitPhaseL2PassthruDisabled) ? 1 : connection2.phaseCount.value
+
+	property int phaseCount: includeConnection2 ? Math.max (phaseCount1, phaseCount2) : phaseCount1
+	
+	property string maxForwardPowerParameter: ""
+	VBusItem { id: maxForwardLimitItem; bind: root.maxForwardPowerParameter }
+	property string maxForwardPowerParameter2: ""
+	VBusItem { id: maxForwardLimitItem2; bind: root.maxForwardPowerParameter2 }
 
     property string maxReversePowerParameter: ""
     VBusItem { id: maxReverseLimitItem; bind: root.maxReversePowerParameter }
 
     property real inPowerLimit: sys.acInput.inCurrentLimit.valid ? sys.acInput.inCurrentLimit.value * sys.acInput.voltageL1.value : 0
 
-    property real maxForwardLimit: useInputCurrentLimit ? inPowerLimit : maxForwardLimitItem.valid ? maxForwardLimitItem.value : 0
+    property real maxForwardLimit: useInputCurrentLimit ? inPowerLimit : maxForwardLimitItem.valid ? maxForwardLimitItem.value : 0 + maxForwardLimitItem2.valid ? maxForwardLimitItem2.value : 0
     property real maxReverseLimit: maxReverseLimitItem.valid ? maxReverseLimitItem.value : 0
 	// overload range is 10% of forward to reverse limits
 	property real overload: (maxForwardLimit + maxReverseLimit) * 0.1
@@ -216,13 +226,15 @@ Item {
 
     function calculateBar1width ()
     {
-        var currentValue, barWidth
+        var currentValue = 0.0, barWidth
 		if (root.connection.powerL1 != undefined)
-            currentValue = root.connection.powerL1.valid ? root.connection.powerL1.value : 0
+            currentValue += root.connection.powerL1.valid ? root.connection.powerL1.value : 0
 		else if (root.connection.power != undefined)
-            currentValue = root.connection.power.valid ? root.connection.power.value : 0
-		else
-            currentValue = 0
+            currentValue += root.connection.power.valid ? root.connection.power.value : 0
+		if (includeConnection2 && root.connection2.powerL1 != undefined)
+			currentValue += root.connection2.powerL1.valid ? root.connection2.powerL1.value : 0
+		else if (includeConnection2 && root.connection2.power != undefined)
+			currentValue += root.connection2.power.valid ? root.connection2.power.value : 0
 
         if (reversePower)
 			currentValue = -currentValue
@@ -246,7 +258,10 @@ Item {
     {
         var currentValue, barWidth
         currentValue = root.connection.powerL2.valid ? root.connection.powerL2.value : 0
-        if (reversePower)
+		if (includeConnection2)
+			currentValue += root.connection2.powerL2.valid ? root.connection2.powerL2.value : 0
+
+		if (reversePower)
 			currentValue = -currentValue
 		root.bar2color = getBarColor (currentValue)
         barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
@@ -267,7 +282,10 @@ Item {
     {
         var currentValue, barWidth
         currentValue = root.connection.powerL3.valid ? root.connection.powerL3.value : 0
-        if (reversePower)
+		if (includeConnection2)
+			currentValue += root.connection2.powerL3.valid ? root.connection2.powerL3.value : 0
+
+		if (reversePower)
 			currentValue = -currentValue
 		root.bar3color = getBarColor (currentValue)
         barWidth = Math.min ( Math.max (currentValue, -maxReverseDisplayed), maxForwardDisplayed) * scaleFactor
