@@ -1,3 +1,6 @@
+v10.29:
+	simplified PowerGauge code added for PV Inverters
+
 v10.28:
 	fixed: PV Inverter detail page not looking at phase count
 	fixed: PV Inverter detail page columns run together

@@ -39,7 +39,9 @@ Item {
 
 	property real inPowerLimit: sys.acInput.inCurrentLimit.valid ? sys.acInput.inCurrentLimit.value * sys.acInput.voltageL1.value : 0
 
-	property real maxForwardLimit: useInputCurrentLimit ? inPowerLimit : maxForwardLimitItem.valid ? maxForwardLimitItem.value : 0 + maxForwardLimitItem2.valid ? maxForwardLimitItem2.value : 0
+	property real maxForwardPower1: maxForwardLimitItem.valid ? maxForwardLimitItem.value : 0
+	property real maxForwardPower2: maxForwardLimitItem2.valid ? maxForwardLimitItem2.value : 0
+	property real maxForwardLimit: useInputCurrentLimit ? inPowerLimit : maxForwardPower1 + maxForwardPower2
 	property real maxReverseLimit: maxReverseLimitItem.valid ? maxReverseLimitItem.value : 0
 	// overload range is 10% of forward to reverse limits
 	property real overload: (maxForwardLimit + maxReverseLimit) * 0.1
