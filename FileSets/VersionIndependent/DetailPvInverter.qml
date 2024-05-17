@@ -109,7 +109,7 @@ MbPage
                 PowerGauge
                 {
                     id: pvAcOutGauge
-                    width: rowTitleWidth
+                    width: tableColumnWidth
                     height: 15
                     connection: sys.pvOnAcOut
                     maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/PvOnOutputMaxPower"

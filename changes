@@ -1,3 +1,7 @@
+v10.30:
+	add support for v3.40~15
+	additional changes to PV Inverter code
+
 v10.29:
 	simplified PowerGauge code added for PV Inverters
 

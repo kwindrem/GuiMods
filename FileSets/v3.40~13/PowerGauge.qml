@@ -233,10 +233,13 @@ Item {
             currentValue += root.connection.powerL1.valid ? root.connection.powerL1.value : 0
 		else if (root.connection.power != undefined)
             currentValue += root.connection.power.valid ? root.connection.power.value : 0
-		if (includeConnection2 && root.connection2.powerL1 != undefined)
-			currentValue += root.connection2.powerL1.valid ? root.connection2.powerL1.value : 0
-		else if (includeConnection2 && root.connection2.power != undefined)
-			currentValue += root.connection2.power.valid ? root.connection2.power.value : 0
+		if (includeConnection2)
+		{
+			if (root.connection2.powerL1 != undefined)
+				currentValue += root.connection2.powerL1.valid ? root.connection2.powerL1.value : 0
+			else if (root.connection2.power != undefined)
+				currentValue += root.connection2.power.valid ? root.connection2.power.value : 0
+		}
 
         if (reversePower)
 			currentValue = -currentValue
