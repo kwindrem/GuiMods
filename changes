@@ -1,3 +1,6 @@
+v10.31:
+	add support for v3.40~16
+
 v10.30:
 	add support for v3.40~15
 	additional changes to PV Inverter code
