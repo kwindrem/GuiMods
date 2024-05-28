@@ -1,1 +1,1 @@
-../v3.40~17/DetailLoadsCombined.qml
+../v3.40~18/DetailLoadsCombined.qml
