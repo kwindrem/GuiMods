@@ -1,5 +1,8 @@
-v10.35:
+v10.36:
 	add support for v3.40~21
+
+v10.35:
+	add support for v3.40~23
 
 v10.34:
 	add support for v3.33~1 and v3.40~20
