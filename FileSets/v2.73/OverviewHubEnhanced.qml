@@ -38,6 +38,8 @@ OverviewPage {
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
 	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
+	property bool showInverter: inverterService != "" || showAllTiles
+
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
 	property bool hasAcSolarOnIn: hasAcSolarOnAcIn1 || hasAcSolarOnAcIn2
@@ -327,6 +329,7 @@ OverviewPage {
 			top: parent.top; topMargin: 3
 		}
 		inverterService: root.inverterService
+		visible: showInverter
 ////// add power bar graph
 		PowerGaugeMulti
 		{
@@ -339,7 +342,7 @@ OverviewPage {
 				horizontalCenter: parent.horizontalCenter
 			}
 			inverterService: root.inverterService
-			show: showGauges
+			visible: showGauges && showInverter
 		}
 		DetailTarget { id: multiTarget;  detailsPage: "DetailInverter.qml"; width: 60; height: 60 }
 	}
@@ -358,6 +361,7 @@ OverviewPage {
 	{
 		text: wallClock.time
 		font.pixelSize: 18
+		color: showInverter || darkMode ? "white" : "black"
 		anchors
 		{
 			top: multi.top; topMargin: 96
@@ -919,7 +923,7 @@ OverviewPage {
 		visible: showAcInput
 		ballCount: 2
 		path: straight
-		active: root.active
+		active: root.active && showAcInput && showInverter
 		value: flow(sys.acInput ? sys.acInput.power : 0)
 
 		anchors {
@@ -932,7 +936,7 @@ OverviewPage {
 		id: multiToAcLoads
 		ballCount: 2
 		path: straight
-		active: root.active && ( showAcLoads || showAllTiles )
+		active: root.active && ( showAcLoads && showInverter )
 		value: flow(sys.acLoad.power)
 
 		anchors {
@@ -971,7 +975,7 @@ OverviewPage {
 		id: dcBus2
 		ballCount: 2
 		path: straight
-		active: root.active
+		active: root.active && ( showInverter || showDcSolar )
 		value: -Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.vebusDc.power))
 		startPointVisible: false
 		endPointVisible: false
@@ -1007,7 +1011,7 @@ OverviewPage {
 		id: multiToDcConnect
 		ballCount: showTanksTemps ? 2 : 4
 		path: straight
-		active: root.active
+		active: root.active && showInverter
 		value: -flow(sys.vebusDc.power);
 		startPointVisible: false
 
@@ -1041,7 +1045,7 @@ OverviewPage {
 		id: batteryToDcBus2
 		ballCount: 1
 		path: straight
-		active: root.active
+		active: root.active && ( showInverter || showDcSolar )
 		value: Utils.sign(noNoise(sys.pvCharger.power) + noNoise(sys.vebusDc.power) + alternatorFlow)
 		startPointVisible: false
 

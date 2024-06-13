@@ -357,6 +357,7 @@ OverviewPage {
 	MultiEnhancedGP {
 		id: multi
 		iconId: "overview-inverter-short"
+		visible: showInverter
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: acInBox.top
@@ -373,14 +374,14 @@ OverviewPage {
                 horizontalCenter: multi.horizontalCenter
             }
             inverterService: root.inverterService
-            visible: showGauges
+			visible: showGauges && showInverter
         }
 		DetailTarget { id: multiTarget; detailsPage: "DetailInverter.qml"; width: 60; height: 60 }
 	}
     TileText
     {
         text: wallClock.time
-        color: "white"
+		color: showInverter || darkMode ? "white" : "black"
         width: inOutTileWidth
         wrapMode: Text.WordWrap
         font.pixelSize: 16
