@@ -1,3 +1,6 @@
+v10.40:
+	add support for v3.40~27
+
 v10.39:
 	hide multi tile if no inverter
 	add support for v3.40~26

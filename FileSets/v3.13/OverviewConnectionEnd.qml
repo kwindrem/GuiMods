@@ -1,1 +1,1 @@
-../v3.40~26/OverviewConnectionEnd.qml
+../v3.40~27/OverviewConnectionEnd.qml

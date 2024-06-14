@@ -513,7 +513,8 @@ com.victronenergy.pulsemeter,/Count,i,,3402,uint32,1,R
 com.victronenergy.digitalinput,/Count,i,,3420,uint32,1,R
 com.victronenergy.digitalinput,/State,i,,3422,uint16,1,R
 com.victronenergy.digitalinput,/Alarm,i,0=No alarm;2=Alarm,3423,uint16,1,R
-com.victronenergy.digitalinput,/Type,i,2=Door;3=Bilge pump;4=Bilge alarm;5=Burglar alarm;6=Smoke alarm;7=Fire alarm;8=CO2 alarm;9=Generator,3424,uint16,1,R;11=ExtTransferSwitch,3424,uint16,1,Rcom.victronenergy.generator,/ManualStart,i,0=Stop generator;1=Start generator,3500,uint16,1,W
+com.victronenergy.digitalinput,/Type,i,2=Door;3=Bilge pump;4=Bilge alarm;5=Burglar alarm;6=Smoke alarm;7=Fire alarm;8=CO2 alarm;9=Generator,3424,uint16,1,R;11=ExtTransferSwitch,3424,uint16,1,R
+com.victronenergy.generator,/ManualStart,i,0=Stop generator;1=Start generator,3500,uint16,1,W
 com.victronenergy.generator,/RunningByConditionCode,i,0=Stopped;1=Manual;2=TestRun;3=LossOfComms;4=Soc;5=AcLoad;6=BatteryCurrent;7=BatteryVoltage;8=InverterTemperatur;9=InverterOverload;10=StopOnAc1,3501,uint16,1,R
 com.victronenergy.generator,/Runtime,i,seconds,3502,uint16,1,R
 com.victronenergy.generator,/QuietHours,i,0=Quiet hours inactive; 1=Quiet hours active,3503,uint16,1,R
