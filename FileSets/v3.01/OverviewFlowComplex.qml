@@ -42,7 +42,9 @@ OverviewPage {
 	// for debug, ignore validity checks so all tiles and their flow lines will show
     property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
-    property bool showInverter: inverterService != "" || showAllTiles
+	property bool hasInverter: false
+	property bool showInverter: hasInverter || showAllTiles
+
     property bool showLoadsOnOutput: showInverter || outputLoad.power.valid
     property bool showAcInput: isMulti || sys.acInput.power.valid || showAllTiles
 	property bool hasLoadsOnInput: showAcInput && ! combineAcLoads && (! loadsOnInputItem.valid || loadsOnInputItem.value === 1)
@@ -1399,6 +1401,7 @@ OverviewPage {
             break;;
 
         case DBusService.DBUS_SERVICE_MULTI:
+			hasInverter = true
 			root.tempServiceName = service.name
 			if (temperatureItem.valid && showBatteryTemp)
 			{
@@ -1406,10 +1409,15 @@ OverviewPage {
 				tempsModel.append({serviceName: service.name})
 			}
             break;;
-        case DBusService.DBUS_SERVICE_INVERTER:
-            if (veDirectInverterService == "")
+		case DBusService.DBUS_SERVICE_MULTI_RS:
+			hasInverter = true
+			break;;
+
+		case DBusService.DBUS_SERVICE_INVERTER:
+			hasInverter = true
+			if (veDirectInverterService == "")
 				veDirectInverterService = service.name;
-            break;;
+			break;;
         case DBusService.DBUS_SERVICE_BATTERY:
 			root.tempServiceName = service.name
 			if (temperatureItem.valid && showBatteryTemp)
@@ -1427,6 +1435,7 @@ OverviewPage {
         numberOfTemps = 0
         tempsModel.clear()
 		veDirectInverterService = ""
+		hasInverter = false
         for (var i = 0; i < DBusServices.count; i++)
         {
             addService(DBusServices.at(i))

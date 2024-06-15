@@ -1,3 +1,6 @@
+v10.41:
+	fixed: multi tile is sometimes hidden when inverter switches off
+
 v10.40:
 	add support for v3.40~27
 

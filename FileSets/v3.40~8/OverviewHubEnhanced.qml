@@ -43,7 +43,8 @@ OverviewPage {
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
 	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
-	property bool showInverter: inverterService != "" || showAllTiles
+	property bool hasInverter: false
+	property bool showInverter: hasInverter || showAllTiles
 
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
@@ -1258,6 +1259,7 @@ OverviewPage {
 			tempsModel.append({serviceName: service.name})
 			break;;
 		case DBusService.DBUS_SERVICE_MULTI:
+			hasInverter = true
 			root.tempServiceName = service.name
 			if (temperatureItem.valid && showBatteryTemp)
 			{
@@ -1267,6 +1269,7 @@ OverviewPage {
 			break;;
 //////// add for VE.Direct inverters
 		case DBusService.DBUS_SERVICE_INVERTER:
+			hasInverter = true
 			if (veDirectInverterService == "")
 				veDirectInverterService = service.name;
 			break;;
@@ -1274,6 +1277,8 @@ OverviewPage {
 //////// add for PV CHARGER voltage and current display
 		case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
 		case DBusService.DBUS_SERVICE_MULTI_RS:
+			if ( service.type == DBUS_SERVICE_MULTI_RS )
+				hasInverter = true
 			numberOfPvChargers++
 			if (numberOfPvChargers === 1)
 				pvChargerPrefix1 = service.name;
@@ -1328,6 +1333,7 @@ OverviewPage {
 		numberOfPvInverters = 0
 		numberOfAlternators = 0
 		veDirectInverterService = ""
+		hasInverter = false
 		pvChargerPrefix1 = ""
 		pvChargerPrefix2 = ""
 		pvChargerPrefix3 = ""
