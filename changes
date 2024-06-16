@@ -1,4 +1,7 @@
-c10.43:
+v10.44:
+	add support for v3.40~29
+
+v10.43:
 	fixed: PV chargers, temps, multi not always showing up in v10.41/42
 
 v10.42:
