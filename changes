@@ -1,3 +1,6 @@
+v10.42:
+	fixed: gui crash in v10.41
+
 v10.41:
 	fixed: multi tile is sometimes hidden when inverter switches off
 

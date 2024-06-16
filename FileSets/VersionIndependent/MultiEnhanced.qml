@@ -36,7 +36,7 @@ MbIcon {
         bind: Utils.path(inverterService, "/Mode")
     }
     // flag a VE.Direct inverter
-    property VBusItem isInverterChargerItem: VBusItem { bind: Utils.path(=, "/IsInverterCharger") }
+    property VBusItem isInverterChargerItem: VBusItem { bind: Utils.path(inverterService, "/IsInverterCharger") }
     property bool isInverter: isInverterChargerItem.valid ? true : false
 
     SvgRectangle
