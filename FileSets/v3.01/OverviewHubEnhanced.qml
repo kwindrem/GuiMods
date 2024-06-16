@@ -44,7 +44,7 @@ OverviewPage {
 	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
 	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
 	property bool hasInverter: false
-	property bool showInverter: hasInverter || showAllTiles
+	property bool showInverter: hasInverter || inverterService != "" || showAllTiles
 
 	property bool hasAcSolarOnAcIn1: sys.pvOnAcIn1.power.valid
 	property bool hasAcSolarOnAcIn2: sys.pvOnAcIn2.power.valid
@@ -1280,7 +1280,7 @@ OverviewPage {
 //////// add for PV CHARGER voltage and current display
 		case DBusService.DBUS_SERVICE_SOLAR_CHARGER:
 		case DBusService.DBUS_SERVICE_MULTI_RS:
-			if ( service.type == DBUS_SERVICE_MULTI_RS )
+			if ( service.type == DBusService.DBUS_SERVICE_MULTI_RS )
 				hasInverter = true
 			numberOfPvChargers++
 			if (numberOfPvChargers === 1)

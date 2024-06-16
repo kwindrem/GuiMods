@@ -43,7 +43,7 @@ OverviewPage {
     property bool showAllTiles: showInactiveTilesItem.valid && showInactiveTilesItem.value == 3
 
 	property bool hasInverter: false
-	property bool showInverter: hasInverter || showAllTiles
+	property bool showInverter: hasInverter || inverterService != "" || showAllTiles
 
     property bool showLoadsOnOutput: showInverter || outputLoad.power.valid
     property bool showAcInput: isMulti || sys.acInput.power.valid || showAllTiles

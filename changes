@@ -1,3 +1,6 @@
+c10.43:
+	fixed: PV chargers, temps, multi not always showing up in v10.41/42
+
 v10.42:
 	fixed: gui crash in v10.41
 
