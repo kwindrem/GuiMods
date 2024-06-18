@@ -359,7 +359,8 @@ OverviewPage {
 	MultiEnhancedGP {
 		id: multi
 		iconId: "overview-inverter-short"
-		visible: showInverter
+		opacity: showAcInput ? 1 : disabledTileOpacity
+		visible: showAcInput || showInactiveTiles
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: acInBox.top

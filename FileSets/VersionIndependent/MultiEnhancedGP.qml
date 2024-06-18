@@ -50,7 +50,6 @@ MbIcon {
             horizontalCenter: multi.horizontalCenter; horizontalCenterOffset: -6.5
             verticalCenter: multi.verticalCenter; verticalCenterOffset: 15
         }
-        visible: inverterMode.valid
     }
     Text
     {
@@ -68,7 +67,6 @@ MbIcon {
         text: inverterModeText ()
         lineHeightMode: Text.FixedHeight
         lineHeight: 12
-        visible: inverterMode.valid
     }
     function inverterModeText ()
     {
@@ -100,7 +98,7 @@ MbIcon {
             }
         }
         else
-            return ""
+            return "?"
     }
 
 	Column {

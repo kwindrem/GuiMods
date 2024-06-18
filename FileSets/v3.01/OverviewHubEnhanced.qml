@@ -337,7 +337,8 @@ OverviewPage {
 			horizontalCenter: parent.horizontalCenter
 			top: parent.top; topMargin: 3
 		}
-		visible: showInverter
+		opacity: showAcInput ? 1 : disabledTileOpacity
+		visible: showAcInput || showInactiveTiles
 		inverterService: root.inverterService
 ////// add power bar graph
 		PowerGaugeMulti
