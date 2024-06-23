@@ -178,7 +178,15 @@ OverviewPage {
 
 	VBusItem { id: hasDcSystemItem; bind: "com.victronenergy.settings/Settings/SystemSetup/HasDcSystem" }
 
-	Component.onCompleted: { discoverServices(); showHelp () }
+	//Component.onCompleted: { discoverServices(); showHelp () }
+	onActiveChanged:
+	{
+		if (root.active)
+		{
+			discoverServices()
+			showHelp ()
+		}
+	}
 
 	title: qsTr("Simple Overview")
 
@@ -330,8 +338,8 @@ OverviewPage {
 			top: parent.top; topMargin: 3
 		}
 		inverterService: root.inverterService
-		opacity: showAcInput ? 1 : disabledTileOpacity
-		visible: showAcInput || showInactiveTiles
+		opacity: showInverter ? 1 : disabledTileOpacity
+		visible: showInverter || showInactiveTiles
 ////// add power bar graph
 		PowerGaugeMulti
 		{

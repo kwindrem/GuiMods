@@ -131,10 +131,14 @@ OverviewPage {
             return "hh:mm"
     }
 
-    Component.onCompleted:
-    {
-		discoverServices ()
-		showHelp ()
+	//Component.onCompleted: { discoverServices(); showHelp () }
+	onActiveChanged:
+	{
+		if (root.active)
+		{
+			discoverServices()
+			showHelp ()
+		}
 	}
 
 	title: dcCoupled ? qsTr("DC Coupled overview") :  qsTr("AC Coupled overview")
@@ -359,8 +363,8 @@ OverviewPage {
 	MultiEnhancedGP {
 		id: multi
 		iconId: "overview-inverter-short"
-		opacity: showAcInput ? 1 : disabledTileOpacity
-		visible: showAcInput || showInactiveTiles
+		opacity: showInverter ? 1 : disabledTileOpacity
+		visible: showInverter || showInactiveTiles
 		anchors {
 			horizontalCenter: parent.horizontalCenter
 			top: acInBox.top
