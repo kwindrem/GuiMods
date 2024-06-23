@@ -420,9 +420,9 @@ class StartStop:
 		if  self._dbusservice['/ManualStartTimer'] < 0 and self._dbusservice['/ManualStart'] == 1:
 			self._dbusservice['/ManualStartTimer'] = 0
 			self._dbusservice['/ManualStart'] = 0
-			ignoresAutoStartCondition = True
+			ignoreAutoStartCondition = True
 		else:
-			ignoresAutoStartCondition = False
+			ignoreAutoStartCondition = False
 			if self._evaluate_manual_start():
 				startbycondition = 'manual'
 				start = True
@@ -437,7 +437,7 @@ class StartStop:
 			# Evaluate value conditions
 			for condition in conditions:
 #### GuiMods
-				start = self._evaluate_condition(self._condition_stack[condition], values[condition], ignoresAutoStartCondition) or start
+				start = self._evaluate_condition(self._condition_stack[condition], values[condition], ignoreAutoStartCondition) or start
 
 				startbycondition = condition if start and startbycondition is None else startbycondition
 				# Connection lost is set to true if the number of retries of one or more enabled conditions
@@ -461,6 +461,12 @@ class StartStop:
 				if self._dbusservice['/State'] == States.RUNNING and self._settings['onlosscommunication'] == 2:
 					start = True
 					startbycondition = 'lossofcommunication'
+
+#### GuiMods
+		## auto start disabled and generator is stopped - clear the 'reached' flags
+		elif self._dbusservice['/State'] == States.STOPPED:
+			for condition, data in self._condition_stack.items():
+				self._reset_condition(data)
 
 		if not start and self._errorstate:
 			self._stop_generator()

@@ -424,7 +424,7 @@ class StartStop(object):
 		self._dbusservice.add_path('/ExternalOverride', value=None)
 		self._dbusservice['/GeneratorRunningState'] = "?"
 		self._dbusservice['/ExternalOverride'] = False
-		self._ignoresAutoStartCondition = False
+		self._ignoreAutoStartCondition = False
 			
 	@property
 	def capabilities(self):
@@ -647,9 +647,9 @@ class StartStop(object):
 		if  self._dbusservice['/ManualStartTimer'] < 0 and self._dbusservice['/ManualStart'] == 1:
 			self._dbusservice['/ManualStartTimer'] = 0
 			self._dbusservice['/ManualStart'] = 0
-			self._ignoresAutoStartCondition = True
+			self._ignoreAutoStartCondition = True
 		else:
-			self._ignoresAutoStartCondition = False
+			self._ignoreAutoStartCondition = False
 			if self._evaluate_manual_start():
 				startbycondition = 'manual'
 				start = True
@@ -702,6 +702,12 @@ class StartStop(object):
 				if running and self._settings['onlosscommunication'] == 2:
 					start = True
 					startbycondition = 'lossofcommunication'
+
+#### GuiMods
+		## auto start disabled and generator is stopped - clear the 'reached' flags
+		elif self._dbusservice['/State'] == States.STOPPED:
+			for condition, data in self._condition_stack.items():
+				self._reset_condition(data)
 
 		if not start and self._errorstate:
 			self._stop_generator()
@@ -866,7 +872,7 @@ class StartStop(object):
 		stop = value <= stopvalue if start_is_greater else value >= stopvalue
 		# when starting manually and stopping based on auto stop values,
 		#	start if stop condition is not satisfied
-		if self._ignoresAutoStartCondition:
+		if self._ignoreAutoStartCondition:
 			start = not stop
 		else:
 			# When the condition is already reached only the stop value can set it to False
