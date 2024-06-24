@@ -1,3 +1,6 @@
+v10.49:
+	add support for v3.40~32
+
 v10.48:
 	changed behavior: previously, if the generator auto starts then auto start is disabled
 		the generator will restart if auto start is reenabled
