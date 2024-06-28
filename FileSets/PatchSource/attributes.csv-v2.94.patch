@@ -1,0 +1,5 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/attributes.csv-v2.94.orig	2024-06-24 12:49:39
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/attributes.csv-v2.94	2024-05-14 07:00:12
+@@ -433 +433 @@
+-com.victronenergy.digitalinput,/Type,i,2=Door;3=Bilge pump;4=Bilge alarm;5=Burglar alarm;6=Smoke alarm;7=Fire alarm;8=CO2 alarm,3424,uint16,1,R
++com.victronenergy.digitalinput,/Type,i,2=Door;3=Bilge pump;4=Bilge alarm;5=Burglar alarm;6=Smoke alarm;7=Fire alarm;8=CO2 alarm;9=Generator;10=ExtTransferSwitch,3424,uint16,1,R
