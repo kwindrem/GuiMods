@@ -1,4 +1,3 @@
-/opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py
 /opt/victronenergy/gui/qml/Battery.qml
 /opt/victronenergy/gui/qml/DetailAcInput.qml
 /opt/victronenergy/gui/qml/DetailInverter.qml
@@ -31,7 +30,6 @@
 /opt/victronenergy/gui/qml/OverviewTanks.qml
 /opt/victronenergy/gui/qml/OverviewTanksTempsDigInputs.qml
 /opt/victronenergy/gui/qml/PageGenerator.qml
-/opt/victronenergy/gui/qml/PageMain.qml
 /opt/victronenergy/gui/qml/PageSettingsDisplay.qml
 /opt/victronenergy/gui/qml/PageSettingsGenerator.qml
 /opt/victronenergy/gui/qml/PageSettingsGuiMods.qml
@@ -41,7 +39,6 @@
 /opt/victronenergy/gui/qml/TileDigIn.qml
 /opt/victronenergy/gui/qml/TileRelay.qml
 /opt/victronenergy/gui/qml/TileText.qml
-/opt/victronenergy/gui/qml/main.qml
 /var/www/venus/styling/styles.css
 /opt/victronenergy/gui/qml/PageDigitalInput.qml
 /opt/victronenergy/gui/qml/MbItemDigitalInput.qml
