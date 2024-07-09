@@ -14,7 +14,7 @@ MbPage {
 
 	model: VisualModels {
 //////// GuiMods put Settings, Notifications, Remove disconnected... at top of list
-		VisibleItemModel {
+		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
 			MbSubMenu {
 				description: qsTr("Settings")
 				subpage: Component { PageSettings {} }
@@ -64,7 +64,7 @@ MbPage {
 				subpage: model.page
 			}
 		}
-		VisibleItemModel {
+		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
 			MbSubMenu {
 				id: menuNotifications
 				description: qsTr("Notifications")

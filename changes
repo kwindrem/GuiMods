@@ -1,3 +1,6 @@
+v10.54:
+	fixed: white screen with firmware prior to v3.0
+
 v10.53:
 	add support for v3.40~36
 	switched several files to patched to minimize changes as firmware versions are released

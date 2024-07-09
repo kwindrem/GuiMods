@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.22.orig	2024-07-08 09:45:00
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.22	2024-01-24 10:19:41
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.22	2024-07-09 09:53:20
 @@ -1,11 +1,52 @@
 +//////// GuiMods modified order to put Settings, then Notifications at top of list
 +
@@ -17,7 +17,7 @@
 +
  	model: VisualModels {
 +//////// GuiMods put Settings, Notifications, Remove disconnected... at top of list
-+		VisibleItemModel {
++		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
 +			MbSubMenu {
 +				description: qsTr("Settings")
 +				subpage: Component { PageSettings {} }
@@ -53,6 +53,15 @@
  		VisualDataModel {
  			model: VeSortFilterProxyModel {
  				model: DeviceList {
+@@ -27,7 +68,7 @@
+ 				subpage: model.page
+ 			}
+ 		}
+-		VisibleItemModel {
++		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
+ 			MbSubMenu {
+ 				id: menuNotifications
+ 				description: qsTr("Notifications")
 @@ -37,17 +78,22 @@
  					value: active.length > 0 ? active.length : ""
  				}

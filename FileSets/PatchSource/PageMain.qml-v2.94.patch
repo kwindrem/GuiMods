@@ -1,0 +1,120 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v2.94.orig	2024-06-23 12:13:50
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v2.94	2024-07-09 10:17:55
+@@ -1,11 +1,49 @@
++//////// modified order to put Settings, then Notifications at top of list
++
+ import QtQuick 1.1
++import "utils.js" as Utils
+ import com.victron.velib 1.0
+ 
+ MbPage {
+ 	id: root
+ 	title: qsTr("Device List")
++    property VBusItem moveSettings: VBusItem { id: moveSettings; bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/MoveSettings")}
++    property bool settingsAtTop: moveSettings.valid && moveSettings.value === 1
+ 
+ 	model: VisualModels {
++//////// put Settings at top of list
++        VisualItemModel { //////// use VisualItemModel below for v2.93 and earlier
++            MbSubMenu {
++                description: qsTr("Settings")
++                subpage: Component { PageSettings {} }
++                show: settingsAtTop
++            }
++
++//////// put Notifications second
++            MbSubMenu {
++                id: menuNotificationsTop
++                description: qsTr("Notifications")
++                item: VBusItem {
++                    property variant active: NotificationCenter.notifications.filter(
++                                                 function isActive(obj) { return obj.active} )
++                    value: active.length > 0 ? active.length : ""
++                }
++                subpage: Component { PageNotifications {} }
++                show: settingsAtTop
++            }
++
++            MbOK {
++                description: qsTr("Remove disconnected devices")
++                value: qsTr("Press to remove")
++                show: settingsAtTop && deviceList.disconnectedDevices != 0
++                editable: true
++
++                function clicked() {
++                    listview.decrementCurrentIndex()
++                    deviceList.removeDisconnected()
++                }
++            }
++        }
+ 		VisualDataModel {
+ 			model: VeSortFilterProxyModel {
+ 				model: DeviceList {
+@@ -27,37 +65,40 @@
+ 				subpage: model.page
+ 			}
+ 		}
+-		VisualItemModel {
+-			MbSubMenu {
+-				id: menuNotifications
+-				description: qsTr("Notifications")
+-				item: VBusItem {
+-					property variant active: NotificationCenter.notifications.filter(
+-												 function isActive(obj) { return obj.active} )
+-					value: active.length > 0 ? active.length : ""
+-				}
+-				subpage: Component { PageNotifications {} }
+-			}
+ 
+-			MbSubMenu {
+-				description: qsTr("Settings")
+-				subpage: Component { PageSettings {} }
+-			}
++    VisualItemModel { //////// use VisualItemModel below for v2.93 and earlier
++            MbSubMenu {
++                id: menuNotifications
++                description: qsTr("Notifications")
++                item: VBusItem {
++                    property variant active: NotificationCenter.notifications.filter(
++                                                 function isActive(obj) { return obj.active} )
++                    value: active.length > 0 ? active.length : ""
++                }
++                subpage: Component { PageNotifications {} }
++                show: !settingsAtTop
++            }
+ 
+-			MbOK {
+-				description: qsTr("Remove disconnected devices")
+-				value: qsTr("Press to remove")
+-				show: deviceList.disconnectedDevices != 0
+-				editable: true
++            MbSubMenu {
++                description: qsTr("Settings")
++                subpage: Component { PageSettings {} }
++                show: !settingsAtTop
++            }
+ 
+-				function clicked() {
+-					listview.decrementCurrentIndex()
+-					deviceList.removeDisconnected()
+-				}
+-			}
+-		}
+-	}
++            MbOK {
++                description: qsTr("Remove disconnected devices")
++                value: qsTr("Press to remove")
++                show: !settingsAtTop && deviceList.disconnectedDevices != 0
++                editable: true
+ 
++                function clicked() {
++                    listview.decrementCurrentIndex()
++                    deviceList.removeDisconnected()
++                }
++            }
++        }
++    }
++
+ 	Component {
+ 		id: vebusPage
+ 		PageVebus {}

@@ -1,48 +1,11 @@
-//////// GuiMods modified order to put Settings, then Notifications at top of list
-
 import QtQuick 1.1
-import "utils.js" as Utils
 import com.victron.velib 1.0
 
 MbPage {
 	id: root
 	title: qsTr("Device List")
 
-//////// GuiMods put Settings, Notifications, Remove disconnected... at top of list
-	property VBusItem moveSettings: VBusItem { id: moveSettings; bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/MoveSettings")}
-	property bool settingsAtTop: moveSettings.valid && moveSettings.value === 1
-
 	model: VisualModels {
-//////// GuiMods put Settings, Notifications, Remove disconnected... at top of list
-		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
-			MbSubMenu {
-				description: qsTr("Settings")
-				subpage: Component { PageSettings {} }
-				show: settingsAtTop
-			}
-
-			MbSubMenu {
-				id: menuNotificationsTop
-				description: qsTr("Notifications")
-				item: VBusItem { value: menuNotifications.subpage.summary }
-				subpage: PageNotifications { }
-				show: settingsAtTop
-			}
-
-			MbOK {
-				description: qsTr("Remove disconnected devices")
-				value: qsTr("Press to remove")
-				show: settingsAtTop && deviceList.disconnectedDevices != 0
-				editable: true
-
-				function clicked() {
-					listview.decrementCurrentIndex()
-					deviceList.removeDisconnected()
-				}
-			}
-		}
-//////// end GuiMods put Settings, Notifications, Remove disconnected... at top of list
-
 		VisualDataModel {
 			model: VeSortFilterProxyModel {
 				model: DeviceList {
@@ -64,28 +27,27 @@ MbPage {
 				subpage: model.page
 			}
 		}
-		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
+		VisualItemModel {
 			MbSubMenu {
 				id: menuNotifications
 				description: qsTr("Notifications")
-				item: VBusItem { value: menuNotifications.subpage.summary }
-				subpage: PageNotifications { }
-//////// GuiMods hide this if added at top
-				show: !settingsAtTop
+				item: VBusItem {
+					property variant active: NotificationCenter.notifications.filter(
+												 function isActive(obj) { return obj.active} )
+					value: active.length > 0 ? active.length : ""
+				}
+				subpage: Component { PageNotifications {} }
 			}
 
 			MbSubMenu {
 				description: qsTr("Settings")
 				subpage: Component { PageSettings {} }
-//////// GuiMods hide this if added at top
-				show: !settingsAtTop
 			}
 
 			MbOK {
 				description: qsTr("Remove disconnected devices")
 				value: qsTr("Press to remove")
-//////// GuiMods hide this if added at top
-				show: !settingsAtTop && deviceList.disconnectedDevices != 0
+				show: deviceList.disconnectedDevices != 0
 				editable: true
 
 				function clicked() {
@@ -181,11 +143,6 @@ MbPage {
 		PageAlternator {}
 	}
 
-	Component {
-		id: dcDcConverterPage
-		PageDcDcConverter {}
-	}
-
 	function addService(service)
 	{
 		var name = service.name
@@ -262,15 +219,13 @@ MbPage {
 		case DBusService.DBUS_SERVICE_ALTERNATOR:
 			page = alternatorPage
 			break
-		case DBusService.DBUS_SERVICE_DCDC:
-			page = dcDcConverterPage
-			break
 		default:
 			console.log("unknown service " + name)
 			return;
 		}
 
 		deviceList.append(service, page.createObject(root, {service: service, bindPrefix: service.name}))
+		initListView()
 	}
 
 	Component.onCompleted: {
