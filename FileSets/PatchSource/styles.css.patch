@@ -1,0 +1,90 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/styles.css.orig	2024-07-09 10:20:03
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/styles.css	2024-05-14 07:00:12
+@@ -2207,9 +2207,9 @@
+   padding-top: 0;
+ }
+ /*
+- 
++
+ ====== Zoom effect ======
+- 
++
+ */
+ .mfp-zoom-in {
+   /* start state */
+@@ -10971,4 +10971,73 @@
+ #cssValues.fonts.fontFamily {
+   font-family: 'MuseoSans-300', sans-serif;
+ }
+-/*# sourceMappingURL=1a83de5aa35b26837c2042d512c73c5a_md5_7b8754c004401cfe0be061108bf9f813.css.map */
+\ No newline at end of file
++/*# sourceMappingURL=1a83de5aa35b26837c2042d512c73c5a_md5_7b8754c004401cfe0be061108bf9f813.css.map *
++
++/****************************************************************************************************************************************
++Dark mode (start)
++****************************************************************************************************************************************/
++@media (prefers-color-scheme: dark) {
++  body,
++  .remote-console-rotate-message-container {
++    /*background-color: #1b1b1b;*/
++    background-color: #101010;
++    color: #e6e5e1;
++  }
++  .remote-console-display {
++    /*background-color: #303030;*/
++    background-color: #202020;
++  }
++  .remote-console-popup-container {
++    /*background-color: #303030;*/
++    background-color: #202020;
++  }
++  .remote-console-controls-container {
++    background-color: #234868;
++  }
++
++  .remote-console-controls-title,
++  .remote-console-controls-subtitle,
++  .remote-console-logged-in .remote-console-controls-title,
++  .remote-console-logged-in .remote-console-controls-subtitle {
++    color: #f3f2ee;
++  }
++
++  .btn.light, input.light, textarea.light {
++    /*background-color: #7d7c7a;*/
++    background-color: #303030;
++    /*background-color: #202020;*/
++    border: 1px solid #4b4b4b;
++  }
++  .btn.light:hover, input.light:hover, textarea.light:hover {
++    /*background-color: #9d9d9d;*/
++    background-color: #565656;
++    border: 1px solid #727272;
++  }
++  .remote-console-control-button .remote-console-control-icon {
++    color: #cfe9ff;
++    fill: #cfe9ff;
++  }
++  .remote-console-control-button .remote-console-control-icon path {
++    fill: #cfe9ff;
++  }
++  .remote-console-display-inner {
++    border: 1px solid #4b4b4b;
++  }
++
++  @media screen and (max-width: 795px) {
++    .remote-console-logged-in .remote-console-controls-container {
++      background-color: #234868;
++    }
++
++    .remote-console-controls-title,
++    .remote-console-controls-subtitle,
++    .remote-console-logged-in .remote-console-controls-title,
++    .remote-console-logged-in .remote-console-controls-subtitle {
++      color: #f3f2ee;
++    }
++  }
++
++}
++/****************************************************************************************************************************************
++Dark mode (end)
++****************************************************************************************************************************************/

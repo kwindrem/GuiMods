@@ -1,0 +1,81 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsDisplay.qml-v3.22.orig	2024-07-09 10:19:58
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsDisplay.qml-v3.22	2024-03-24 08:13:08
+@@ -1,3 +1,5 @@
++//////// modified to add GuiMods controls
++
+ import QtQuick 1.1
+ import com.victron.velib 1.0
+ import "utils.js" as Utils
+@@ -52,6 +54,15 @@
+ 			]
+ 		}
+ 
++		////// GuiMods — DarkMode
++				MbSwitch
++				{
++					id: colorScheme
++					bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
++					name: qsTr ("Dark Mode")
++					writeAccessLevel: User.AccessUser
++				}
++
+ 		MbSwitch {
+ 			bind: Utils.path(bindPrefix, "/MobileOverview")
+ 			name: qsTr("Show boat & motorhome overview")
+@@ -65,6 +76,15 @@
+ 			name: qsTr("Show tanks overview")
+ 		}
+ 
++		//////// add Gui Mods menu
++				MbSubMenu {
++					id: guiModsMenu
++					description: qsTr("Gui Mods")
++					subpage: Component {
++						PageSettingsGuiMods { }
++					}
++				}
++
+ 		MbItemOptions {
+ 			id: languageSelect
+ 			description: qsTr("Language")
+@@ -75,23 +95,23 @@
+ 			// The current font might not be able to display these values / the default
+ 			// font might not be contain the characters required for the selected language.
+ 			possibleValues: [
+-				MbOptionLang { description: "English"; value: "en" },
+-				MbOptionLang { description: "Čeština"; value: "cs" },
+-				MbOptionLang { description: "Dansk"; value: "da" },
+-				MbOptionLang { description: "Deutsch"; value: "de" },
+-				MbOptionLang { description: "Español"; value: "es" },
+-				MbOptionLang { description: "Français"; value: "fr" },
+-				MbOptionLang { description: "Italiano"; value: "it" },
+-				MbOptionLang { description: "Nederlands"; value: "nl" },
+-				MbOptionLang { description: "Polski"; value: "pl" },
+-				MbOptionLang { description: "Русский"; value: "ru" },
+-				MbOptionLang { description: "Română"; value: "ro" },
+-				MbOptionLang { description: "Svenska"; value: "se" },
+-				MbOptionLang { description: "ไทย"; value: "th" },
+-				MbOptionLang { description: "Türkçe"; value: "tr" },
+-				MbOptionLang { description: "Українська"; value: "uk" },
+-				MbOptionLang { description: "中文"; value: "zh" },
+-				MbOptionLang { description: "العربية"; value: "ar" }
++			MbOptionLang { description: "English"; value: "en" },
++			MbOptionLang { description: "Čeština"; value: "cs" },
++			MbOptionLang { description: "Dansk"; value: "da" },
++			MbOptionLang { description: "Deutsch"; value: "de" },
++			MbOptionLang { description: "Español"; value: "es" },
++			MbOptionLang { description: "Français"; value: "fr" },
++			MbOptionLang { description: "Italiano"; value: "it" },
++			MbOptionLang { description: "Nederlands"; value: "nl" },
++			MbOptionLang { description: "Polski"; value: "pl" },
++			MbOptionLang { description: "Русский"; value: "ru" },
++			MbOptionLang { description: "Română"; value: "ro" },
++			MbOptionLang { description: "Svenska"; value: "se" },
++			MbOptionLang { description: "ไทย"; value: "th" },
++			MbOptionLang { description: "Türkçe"; value: "tr" },
++			MbOptionLang { description: "Українська"; value: "uk" },
++			MbOptionLang { description: "中文"; value: "zh" },
++			MbOptionLang { description: "العربية"; value: "ar" }
+ 			]
+ 		}
+ 

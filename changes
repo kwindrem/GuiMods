@@ -1,3 +1,8 @@
+v10.55:
+	add support for v3.40~39
+	moved more replacements to patched files
+	use SetupHelper velib_python if it exists
+
 v10.54:
 	fixed: white screen with firmware prior to v3.0
 

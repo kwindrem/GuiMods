@@ -1,0 +1,75 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewTanks.qml.orig	2024-07-09 10:19:56
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewTanks.qml	2024-05-14 07:00:12
+@@ -6,6 +6,10 @@
+ OverviewPage {
+ 	id: root
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property int numberOfTanks: tanks.all.rowCount
+ 	property int visibleTanks: tanks.rowCount
+ 	property int maxTanksPerPage: 10
+@@ -35,6 +39,8 @@
+ 
+ 	Text {
+ 		text: qsTr("No tanks found")
++////// GuiMods — DarkMode
++		color: !darkMode ? "#ffffff" : "#e1e1e1"
+ 		font.pixelSize: 25
+ 		anchors.centerIn: parent
+ 		visible: numberOfTanks === 0
+@@ -62,9 +68,12 @@
+ 			text: fluidName
+ 			height: 25
+ 			font.pixelSize: 16
+-			opacity: ListView.isCurrentItem ? 1 : 0.3
++////// GuiMods — DarkMode
++			opacity: ListView.isCurrentItem ? 1 : (!darkMode ? 0.3 : 0.5)
+ 			verticalAlignment: Text.AlignVCenter
+ 			scale: ListView.isCurrentItem ? 1.25 : 1
++////// GuiMods — DarkMode
++			color: !darkMode ? "black" : "#e1e1e1"
+ 
+ 			Behavior on scale {
+ 				NumberAnimation { duration: 150 }
+@@ -83,7 +92,8 @@
+ 			y: 25
+ 			transform: Rotation { origin.x: 0; origin.y: 0; angle: -90}
+ 			gradient: Gradient {
+-				GradientStop { position: 0.7; color: "white" }
++////// GuiMods — DarkMode
++				GradientStop { position: 0.7; color: !darkMode ? "white" : "#202020" }
+ 				GradientStop { position: 1; color: "transparent" }
+ 			}
+ 		}
+@@ -94,14 +104,16 @@
+ 			x: parent.width
+ 			transform: Rotation { origin.x: 0; origin.y: 0; angle: 90}
+ 			gradient: Gradient {
+-				GradientStop { position: 0.7; color: "white" }
++////// GuiMods — DarkMode
++				GradientStop { position: 0.7; color: !darkMode ? "white" : "#202020" }
+ 				GradientStop { position: 1; color: "transparent" }
+ 			}
+ 		}
+ 
+ 		// touch buttons for selecting a tank type
+ 		MbIcon {
+-			iconId: "icon-toolbar-enter"
++////// GuiMods — DarkMode
++			iconId: darkMode ? "icon-toolbar-enter" : "icon-toolbar-enter-active"
+ 			rotation: 180
+ 			anchors {
+ 				left: parent.left; leftMargin: 40
+@@ -117,7 +129,8 @@
+ 		}
+ 
+ 		MbIcon {
+-			iconId: "icon-toolbar-enter"
++////// GuiMods — DarkMode
++			iconId: darkMode ? "icon-toolbar-enter" : "icon-toolbar-enter-active"
+ 			anchors {
+ 				right: parent.right; rightMargin: 40
+ 				verticalCenter: parent.verticalCenter

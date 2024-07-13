@@ -1,0 +1,23 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbItem.qml.orig	2024-07-09 10:19:45
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbItem.qml	2024-05-14 07:00:12
+@@ -14,6 +14,10 @@
+ 	height: defaultHeight
+ 	property bool show: user.accessLevel >= showAccessLevel
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property int defaultHeight: style.itemHeight
+ 
+ 	property bool editMode
+@@ -104,7 +108,8 @@
+ 	MbIcon {
+ 		id: cornerMarkIcon
+ 
+-		iconId: "icon-items-corner" + (root.ListView.isCurrentItem ? "-active" : "")
++////// GuiMods — DarkMode
++		iconId: "icon-items-corner" + (root.ListView.isCurrentItem || darkMode ? "-active" : "")
+ 		visible: cornerMark
+ 		anchors {
+ 			right: parent.right; rightMargin: 1

@@ -1,0 +1,39 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Multi.qml.orig	2024-07-09 10:19:47
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Multi.qml	2024-05-14 07:00:12
+@@ -6,6 +6,21 @@
+ 	id: multi
+ 	iconId: "overview-inverter"
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
++    SvgRectangle
++    {
++        id:inverterForeground
++        width: multi.width
++		height: multi.height
++        radius: 3
++        color: "#000000"
++////// GuiMods — DarkMode
++        opacity: !darkMode ? 0 : 0.35
++    }
++
+ 	property string vebusPrefix: ""
+ 	property string systemPrefix: "com.victronenergy.system"
+ 	property VBusItem systemState: VBusItem { bind: Utils.path(systemPrefix, "/SystemState/State") }
+@@ -67,7 +82,8 @@
+ 			top: multi.top; topMargin: 8
+ 		}
+ 		horizontalAlignment: Text.AlignHCenter
+-		color: "white"
++////// GuiMods — DarkMode
++        color: !darkMode ? "white" : "#e1e1e1"
+ 		font {pixelSize: 16; bold: true}
+ 		text: vebusState.text
+ 
+@@ -101,4 +117,3 @@
+ 		}
+ 	}
+ }
+-

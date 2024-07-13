@@ -1,0 +1,35 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewBox.qml.orig	2024-07-09 10:19:49
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewBox.qml	2024-05-14 07:00:12
+@@ -3,14 +3,20 @@
+ SvgRectangle {
+ 	id: root
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	radius: 6
+ 	width: 110
+ 	height: 110
+-	color: "#16a185"
++////// GuiMods — DarkMode
++	color: !darkMode ? "#16a185" : "#0B5042"
+ 	clip: true // hides an off by one pixel offset
+ 
+ 	property string title
+-	property string titleColor :"#1abc9c"
++////// GuiMods — DarkMode
++	property string titleColor: !darkMode ? "#1abc9c" : "#136050"
+ 	property alias values: _values.children
+ 
+ 	SvgRectangle {
+@@ -31,7 +37,8 @@
+ 		Text {
+ 			text: title
+ 			font {pixelSize: 14; bold: true}
+-			color: "white"
++////// GuiMods — DarkMode
++			color: !darkMode ? "white" : "#e1e1e1"
+ 			anchors.centerIn: parent
+ 		}
+ 	}

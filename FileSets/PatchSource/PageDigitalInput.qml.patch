@@ -1,0 +1,71 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageDigitalInput.qml.orig	2024-07-09 10:19:57
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageDigitalInput.qml	2024-05-14 07:00:12
+@@ -1,3 +1,5 @@
++//// modified for ExtTransferSwitch package
++
+ import QtQuick 1.1
+ import com.victron.velib 1.0
+ import "utils.js" as Utils
+@@ -18,6 +20,20 @@
+ 		bind: service.path("/DeviceInstance")
+ 	}
+ 
++//// added for ExtTransferSwitch package
++	VBusItem
++	{
++		id: ac2connectedItem
++		bind: Utils.path ("com.victronenergy.system", "/Ac/In/1/Connected")
++	}
++	property bool showTransferSwitchConnection: ac2connectedItem.valid
++	VBusItem
++	{
++		id: typeItem
++		bind: service.path("/Type")
++	}
++	property bool isTransferSwitch: typeItem.valid && typeItem.value == 12
++
+ 	// Handle translations
+ 	function getType(type){
+ 		switch (type) {
+@@ -41,6 +57,9 @@
+ 			return qsTr("CO2 alarm")
+ 		case "Generator":
+ 			return qsTr("Generator")
++//// added for ExtTransferSwitch package
++		case "TransferSwitch":
++			return qsTr("External transfer switch")
+ 		}
+ 		return type;
+ 	}
+@@ -72,6 +91,11 @@
+ 			return qsTr("Running")
+ 		case 11:
+ 			return qsTr("Stopped")
++//// added for ExtTransferSwitch package
++		case 12:
++			return qsTr("On generator")
++		case 13:
++			return qsTr("On grid")
+ 		}
+ 
+ 		return qsTr("Unknown")
+@@ -105,5 +129,19 @@
+ 				}
+ 			}
+ 		}
++
++//// added for ExtTransferSwitch package 
++		MbItemOptions
++		{
++            id: extTransferSwitch
++			description: qsTr("External transfer switch connection")
++            bind: Utils.path ("com.victronenergy.settings/Settings", "/TransferSwitch/TransferSwitchOnAc2")
++			possibleValues:
++			[
++				MbOption {description: qsTr("AC 1 in"); value: 0},
++				MbOption {description: qsTr("AC 2 in"); value: 1}
++			]
++			visible: root.isTransferSwitch && root.showTransferSwitchConnection
++		}
+ 	}
+ }

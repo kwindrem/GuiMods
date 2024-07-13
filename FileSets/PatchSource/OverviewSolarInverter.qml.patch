@@ -1,0 +1,25 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewSolarInverter.qml.orig	2024-07-09 10:19:55
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewSolarInverter.qml	2024-05-14 07:00:12
+@@ -3,6 +3,10 @@
+ Rectangle {
+ 	id: root
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	default property alias values: pvInverterBox.values
+ 	property alias title: pvInverterBox.title
+ 	property bool showInverterIcon: true
+@@ -24,8 +28,9 @@
+ 
+ 		height: root.height
+ 		title: qsTr("PV Power")
+-		titleColor: "#F4B350"
+-		color: "#F39C12"
++////// GuiMods — DarkMode
++		titleColor: !darkMode ? "#F4B350" : "#7A5928"
++		color: !darkMode ? "#F39C12" : "#794E09"
+ 
+ 		anchors {
+ 			bottom: parent.bottom

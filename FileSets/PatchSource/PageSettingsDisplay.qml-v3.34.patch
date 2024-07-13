@@ -1,0 +1,24 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsDisplay.qml-v3.34.orig	2024-07-09 10:19:58
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsDisplay.qml-v3.34	2024-03-24 08:13:08
+@@ -1,3 +1,5 @@
++//////// modified to add GuiMods controls
++
+ import QtQuick 1.1
+ import com.victron.velib 1.0
+ import "utils.js" as Utils
+@@ -65,6 +67,15 @@
+ 			name: qsTr("Show tanks overview")
+ 		}
+ 
++//////// add Gui Mods menu
++		MbSubMenu {
++			id: guiModsMenu
++			description: qsTr("Gui Mods")
++			subpage: Component {
++				PageSettingsGuiMods { }
++			}
++		}
++
+ 		MbItemOptions {
+ 			id: languageSelect
+ 			description: qsTr("Language")

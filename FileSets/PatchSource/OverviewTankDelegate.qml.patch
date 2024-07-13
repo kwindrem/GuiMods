@@ -1,0 +1,33 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewTankDelegate.qml.orig	2024-07-09 10:19:55
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewTankDelegate.qml	2024-05-14 07:00:12
+@@ -6,6 +6,10 @@
+ Item {
+ 	id: root
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property string bindPrefix
+ 	property variant service: DBusServices.get(bindPrefix)
+ 	property variant info: TankSensor.info(fluidTypeItem.value)
+@@ -34,7 +38,8 @@
+ 		border { color: info.color; width: 2 }
+ 		width: root.width
+ 		height: root.height * 0.72
+-		color: "white"
++////// GuiMods — DarkMode
++		color: !darkMode ? "white" : "#c0c0c0"
+ 
+ 		SvgRectangle {
+ 			color: info.color
+@@ -93,7 +98,8 @@
+ 	Text {
+ 		id: _tankName
+ 		text: service.description
+-		color: "black"
++////// GuiMods — DarkMode
++		color: !darkMode ? "black" : "#e1e1e1"
+ 		width: parent.width + (parent.width < 50 ? 4 : 13)
+ 		horizontalAlignment: Text.AlignHCenter
+ 		wrapMode: Text.WrapAtWordBoundaryOrAnywhere

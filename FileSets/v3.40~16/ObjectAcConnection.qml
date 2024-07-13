@@ -1,1 +1,1 @@
-../v3.40~35/ObjectAcConnection.qml
+../v3.40~39/ObjectAcConnection.qml
