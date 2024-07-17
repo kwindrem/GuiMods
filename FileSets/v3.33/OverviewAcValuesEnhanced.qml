@@ -1,1 +1,1 @@
-../v3.40~39/OverviewAcValuesEnhanced.qml
+../v3.40/OverviewAcValuesEnhanced.qml

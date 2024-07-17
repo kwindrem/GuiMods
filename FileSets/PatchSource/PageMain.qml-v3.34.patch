@@ -1,0 +1,82 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.34.orig	2024-07-08 09:45:00
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.34	2024-07-09 09:53:47
+@@ -1,11 +1,48 @@
++//////// GuiMods modified order to put Settings, then Notifications at top of list
++
+ import QtQuick 1.1
++import "utils.js" as Utils
+ import com.victron.velib 1.0
+ 
+ MbPage {
+ 	id: root
+ 	title: qsTr("Device List")
+ 
++//////// GuiMods put Settings, Notifications, Remove disconnected... at top of list
++	property VBusItem moveSettings: VBusItem { id: moveSettings; bind: Utils.path("com.victronenergy.settings", "/Settings/GuiMods/MoveSettings")}
++	property bool settingsAtTop: moveSettings.valid && moveSettings.value === 1
++
+ 	model: VisualModels {
++//////// GuiMods put Settings, Notifications, Remove disconnected... at top of list
++		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
++			MbSubMenu {
++				description: qsTr("Settings")
++				subpage: Component { PageSettings {} }
++				show: settingsAtTop
++			}
++
++			MbSubMenu {
++				id: menuNotificationsTop
++				description: qsTr("Notifications")
++				item: VBusItem { value: menuNotifications.subpage.summary }
++				subpage: PageNotifications { }
++				show: settingsAtTop
++			}
++
++			MbOK {
++				description: qsTr("Remove disconnected devices")
++				value: qsTr("Press to remove")
++				show: settingsAtTop && deviceList.disconnectedDevices != 0
++				editable: true
++
++				function clicked() {
++					listview.decrementCurrentIndex()
++					deviceList.removeDisconnected()
++				}
++			}
++		}
++//////// end GuiMods put Settings, Notifications, Remove disconnected... at top of list
++
+ 		VisualDataModel {
+ 			model: VeSortFilterProxyModel {
+ 				model: DeviceList {
+@@ -27,23 +64,28 @@
+ 				subpage: model.page
+ 			}
+ 		}
+-		VisibleItemModel {
++		VisibleItemModel { //////// use VisualItemModel below for v2.93 and earlier
+ 			MbSubMenu {
+ 				id: menuNotifications
+ 				description: qsTr("Notifications")
+ 				item: VBusItem { value: menuNotifications.subpage.summary }
+ 				subpage: PageNotifications { }
++//////// GuiMods hide this if added at top
++				show: !settingsAtTop
+ 			}
+ 
+ 			MbSubMenu {
+ 				description: qsTr("Settings")
+ 				subpage: Component { PageSettings {} }
++//////// GuiMods hide this if added at top
++				show: !settingsAtTop
+ 			}
+ 
+ 			MbOK {
+ 				description: qsTr("Remove disconnected devices")
+ 				value: qsTr("Press to remove")
+-				show: deviceList.disconnectedDevices != 0
++//////// GuiMods hide this if added at top
++				show: !settingsAtTop && deviceList.disconnectedDevices != 0
+ 				editable: true
+ 
+ 				function clicked() {

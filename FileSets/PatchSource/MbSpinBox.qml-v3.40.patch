@@ -1,0 +1,28 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbSpinBox.qml-v3.40.orig	2024-07-09 10:19:46
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbSpinBox.qml-v3.40	2024-05-14 07:00:12
+@@ -6,6 +6,10 @@
+ 	id: root
+ 	cornerMark: !readOnly && !spinbox.enabled
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property string description
+ 	property bool readOnly: !userHasWriteAccess
+ 	property VBusItem item: VBusItem {
+@@ -71,10 +75,12 @@
+ 
+ 		MbBackgroundRect {
+ 			id: graytag
+-			color: !spinbox.enabled? "#ddd": "#fff"
++////// GuiMods — DarkMode
++			color: !darkMode ? (!spinbox.enabled ? "#ddd": "#fff") : (!spinbox.enabled ? "#4b4b4b": "#747474")
+ 			height: spinbox.height + 6
+ 			width:  spinbox.width  + unit.width + 10
+-			border.color: "#ddd"
++////// GuiMods — DarkMode
++			border.color: !darkMode ? "#ddd" : "#4b4b4b"
+ 			border.width: spinbox.enabled ? 1 : 0
+ 			anchors {
+ 				right: parent.right; rightMargin: style.marginDefault

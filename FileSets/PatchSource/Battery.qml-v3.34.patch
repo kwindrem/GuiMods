@@ -1,0 +1,59 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Battery.qml-v3.34.orig	2024-07-09 10:19:41
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Battery.qml-v3.34	2024-05-14 07:00:12
+@@ -6,9 +6,14 @@
+ 	width: 145
+ 	height: 101
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property real soc: 80
+-	property string color: "#4789d0"
+-	property string emptyColor: "#1abc9c"
++////// GuiMods — DarkMode
++	property string color: !darkMode ? "#4789d0" : "#234468"
++	property string emptyColor: !darkMode ? "#1abc9c" : "#0d5e4e"
+ 	property alias values: _values.children
+ 
+ 	SvgRectangle {
+@@ -38,7 +43,8 @@
+ 		id: background
+ 
+ 		// NOTE: to remove the bottom of the terminals
+-		border {width: 2; color: "white"}
++////// GuiMods — DarkMode
++		border {width: 2; color: !darkMode ? "white" : "#202020"}
+ 		height: root.height - leftTerminal.height
+ 		width: root.width
+ 		y: leftTerminal.height - 1
+@@ -63,7 +69,8 @@
+ 			height: parent.height
+ 			width: parent.width * 0.7
+ 			anchors.centerIn: parent
+-			color: "#ffffff"
++////// GuiMods — DarkMode
++			color: !darkMode ? "#ffffff" : "#202020"
+ 			opacity: 0.06
+ 		}
+ 	}
+@@ -92,7 +99,8 @@
+ 		font.pixelSize: 13; font.bold: true
+ 		anchors.centerIn: leftTerminal
+ 		anchors.verticalCenterOffset: 12
+-		color: "#fff"
++////// GuiMods — DarkMode
++		color: !darkMode ? "#fff" : "#e1e1e1"
+ 	}
+ 
+ 	Text {
+@@ -100,7 +108,8 @@
+ 		font.pixelSize: 13; font.bold: true
+ 		anchors.centerIn: rightTerminal
+ 		anchors.verticalCenterOffset: 12
+-		color: "#fff"
++////// GuiMods — DarkMode
++		color: !darkMode ? "#fff" : "#e1e1e1"
+ 	}
+ 
+ 	Item {

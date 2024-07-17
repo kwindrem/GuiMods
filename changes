@@ -1,3 +1,9 @@
+10.56:
+	add support for v3.40
+	dropping support for firmware earlier than v3.10
+	dropping support for v3.40 beta versions
+	moved velib_python in SetupHelper to a single version
+
 v10.55:
 	add support for v3.40~39
 	moved more replacements to patched files

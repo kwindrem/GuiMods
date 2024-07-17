@@ -1,1 +1,1 @@
-../v3.40~39/OverviewMobileEnhanced.qml
+../v3.40/OverviewMobileEnhanced.qml

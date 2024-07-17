@@ -1,1 +1,0 @@
-../v2.89/PageSettingsDisplay.qml

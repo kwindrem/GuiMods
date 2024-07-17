@@ -1,1 +1,0 @@
-../v3.40~39/DetailLoadsOnOutput.qml

@@ -1,1 +1,1 @@
-../v3.40~8/HubData.qml
+../v3.34/HubData.qml
