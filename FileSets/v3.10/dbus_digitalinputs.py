@@ -1,1 +1,1 @@
-../v3.40/dbus_digitalinputs.py
+../v3.50~3/dbus_digitalinputs.py

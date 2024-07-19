@@ -22,5 +22,4 @@
 /opt/victronenergy/gui/qml/TileDigIn.qml
 /opt/victronenergy/gui/qml/TileRelay.qml
 /opt/victronenergy/dbus-digitalinputs/dbus_digitalinputs.py
-/opt/victronenergy/dbus-generator-starter/dbus_generator.py
 /opt/victronenergy/dbus-generator-starter/startstop.py

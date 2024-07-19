@@ -1,5 +1,5 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbEditBox.qml.orig	2024-07-09 10:19:44
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbEditBox.qml	2024-05-14 07:00:12
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbEditBox.qml-v3.50~3.orig	2024-07-18 14:31:06
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbEditBox.qml-v3.50~3	2024-07-18 20:55:13
 @@ -7,6 +7,10 @@
  	cornerMark: !readonly && !editMode
  	height: expanded.y + expanded.height + 1
@@ -18,7 +18,7 @@
 -			color: editMode ? "#fff": "#ddd"
 +////// GuiMods — DarkMode
 +			color: !darkMode ? (editMode ? "#fff": "#ddd") : (editMode ? "#747474": "#4b4b4b")
- 			width: ti.width + 2 * style.marginDefault
+ 			width: ti.width + 2 * mbStyle.marginDefault
  			height: ti.height + 6
 -			border.color: "#ddd"
 +////// GuiMods — DarkMode
