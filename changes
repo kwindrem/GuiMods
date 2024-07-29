@@ -1,6 +1,12 @@
+v10.60:
+	fixed (maybe): battery detail not showing consumed and remaining with some batteries
+
 v10.59:
 	add support for v3.50~5
 	add support for v3.50~7
+
+v10.59:
+	add support for v3.50~3
 
 10.56/10.57: (10.56 had a version of v10.5)
 	add support for v3.40
