@@ -40,14 +40,14 @@ MbPage
 
 	property string batteryService: batteryServiceItem.valid ? batteryServiceItem.value : ""
 
-	VBusItem { id: capacityItem;  bind: Utils.path(batteryService,"/Capacity") }
-	VBusItem { id: consumedItem;  bind: Utils.path(systemPrefix,"/Dc/Battery/ConsumedAmphours") }
-	property real consumed: capacityItem.valid ? capacityItem.value : ( consumedItem.valid ? consumedItem.value : undefined )
-	property bool showConsumed: consumed != undefined
-
+	VBusItem { id: remainingItem;  bind: Utils.path(batteryService,"/Capacity") }
+	property bool showRemaining: remainingItem.valid
 	VBusItem { id: installedCapacityItem; bind: Utils.path(batteryService, "/InstalledCapacity") }
-	property bool showRemaining: showConsumed && installedCapacityItem.valid
-	property real remaining: installedCapacityItem.value - consumed
+	property bool calculateConsumed: remainingItem.valid && installedCapacityItem.valid
+
+	VBusItem { id: consumedItem;  bind: Utils.path(systemPrefix,"/Dc/Battery/ConsumedAmphours") }
+	property real consumed: calculateConsumed ? installedCapacityItem.value - remainingItem.value : consumedItem.value
+	property bool showConsumed: calculateConsumed || consumedItem.valid
 
 	VBusItem { id: minimumCellVoltageItem; bind: Utils.path(batteryService, "/System/MinCellVoltage") }
 	VBusItem { id: maximumCellVoltageItem; bind: Utils.path(batteryService, "/System/MaxCellVoltage") }
@@ -124,7 +124,7 @@ MbPage
         {
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-                    text: showConsumed ? qsTr ("Consumed") : ""}
+                    text: showConsumed ? qsTr ("Consumed") : "" }
             Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter
                     text: showConsumed ? EnhFmt.formatValue (consumed, "AH") : "" }
@@ -133,7 +133,7 @@ MbPage
                     text: showRemaining ? qsTr ("Remaining") : "" }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
                     width: tableColumnWidth; horizontalAlignment: Text.AlignHCenter;
-                    text: showRemaining ? EnhFmt.formatValue (remaining, "AH") : ""
+                    text: showRemaining ? EnhFmt.formatValue (remainingItem.value, "AH") : ""
                     
 			}
         }
