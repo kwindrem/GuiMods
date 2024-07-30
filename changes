@@ -1,3 +1,6 @@
+v10.61:
+	another cut at battery detail consumed remaining
+
 v10.60:
 	fixed (maybe): battery detail not showing consumed and remaining with some batteries
 
