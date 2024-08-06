@@ -5,7 +5,7 @@
 +//////// Modified to substitute flow overview pages
 +
  import QtQuick 1.1
- 
+
  import Qt.labs.components.native 1.0
 @@ -16,7 +19,8 @@
  	property bool completed: false
@@ -15,12 +15,12 @@
 +//////// added for GuiMods flow pages
 +    property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && guiModsFlowOverview.valid && generatorOverviewEnhanced.valid
  	property string bindPrefix: "com.victronenergy.settings"
- 
+
  	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
 @@ -25,25 +29,83 @@
- 
+
  	property bool hasGridMeter: theSystem.hasGridMeter
- 
+
 +//////// modified for GuiMods pages
 +    property string currentHubOverview: "OverviewHub.qml"
 +    property string currentMobileOverview: ""
@@ -29,7 +29,7 @@
  	// Keep track of the current view (menu/overview) to show as default next time the
  	// CCGX is restarted
  	onIsOverviewPageChanged: startWithMenu.setValue(isOverviewPage ? 0 : 1)
- 
+
  	// Add the correct OverviewHub page
 -	onHasGridMeterChanged: {
 -		if (hasGridMeter) {
@@ -47,8 +47,8 @@
 +    }
 +
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
 +////// GuiMods — DarkMode
 +	Rectangle {
@@ -59,7 +59,7 @@
 +		color: !darkMode ? "transparent" : "#202020"
 +		z: -1
  	}
- 
+
 +    // base a new hub selection on the hub type and the enhanced flow overview flag
 +    function selectHubOverview ()
 +    {
@@ -96,7 +96,7 @@
 -		onValueChanged: extraOverview("OverviewGeneratorRelay.qml", value === 1)
 +		onValueChanged: selectGeneratorOverview ()
  	}
- 
+
 +    VBusItem
 +    {
 +        id: generatorOverviewEnhanced
@@ -108,18 +108,18 @@
  		bind: "com.victronenergy.generator.startstop1/GensetProductId"
  		onValueChanged: {
 @@ -52,7 +114,7 @@
- 
+
  			// Show generic overview for ComAp and DSE
  			extraOverview("OverviewGeneratorOther.qml",
 -				[0xB044, 0xB046, 0xB048, 0xB049].indexOf(value) > -1)
 +			[0xB044, 0xB046, 0xB048, 0xB049].indexOf(value) > -1)
- 
+
  			// Switch to FP overview in case it is the default one
  			if (isOverviewPage) {
 @@ -61,20 +123,102 @@
  		}
  	}
- 
+
 -	VBusItem {
 -		id: mobileOverview
 -		bind: "com.victronenergy.settings/Settings/Gui/MobileOverview"
@@ -229,13 +229,13 @@
 +            extraOverview("OverviewTanks.qml", value === 1)
 +        }
 +    }
- 
+
  	VBusItem {
  		id: startWithMenu
 @@ -165,76 +309,111 @@
  		id: mbTools
  		height: parent.height
- 
+
 -		Item {
 -			anchors.verticalCenter: parent.verticalCenter
 -			anchors.left: mbTools.left
@@ -251,7 +251,7 @@
 +				anchors.verticalCenter: parent.verticalCenter
 +				height: mbTools.height
 +				width: 170
- 
+
 -			MouseArea {
 -				anchors.fill: parent
 -				onClicked: {
@@ -283,14 +283,14 @@
 +					}
 +				}
  			}
- 
+
 -			Row {
 -				anchors.centerIn: parent
 +			Item {
 +				anchors.verticalCenter: parent.verticalCenter
 +				height: mbTools.height
 +				width: mbTools.width - pagesItem.width - menusItem.width - centerScrollIndicator.width
- 
+
 -				MbIcon {
 -					anchors.verticalCenter: parent.verticalCenter
 -					iconId: pageStack.currentPage ? pageStack.currentPage.leftIcon : ""
@@ -303,7 +303,7 @@
 +							darkModeItem.setValue (! darkMode)
 +					}
  				}
- 
+
 -				Text {
 -					anchors.verticalCenter: parent.verticalCenter
 -					text: pageStack.currentPage ? pageStack.currentPage.leftText : ""
@@ -353,7 +353,7 @@
 +					iconId: pageStack.currentPage ? pageStack.currentPage.scrollIndicator : ""
  				}
  			}
- 
+
 -			Row {
 -				anchors.centerIn: parent
 +			Item {
@@ -361,7 +361,7 @@
 +				anchors.verticalCenter: parent.verticalCenter
 +				height: mbTools.height
 +				width: pagesItem.width
- 
+
 -				MbIcon {
 -					iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
 -					anchors.verticalCenter: parent.verticalCenter
@@ -372,7 +372,7 @@
 +							pageStack.currentPage.toolbarHandler.rightAction(true)
 +					}
  				}
- 
+
 -				Text {
 -					text: pageStack.currentPage ? pageStack.currentPage.rightText : ""
 -					anchors.verticalCenter: parent.verticalCenter
@@ -409,7 +409,7 @@
 +//		pageSource: "OverviewTiles.qml"
 +//		}
  	}
- 
+
  	Component {
 @@ -270,7 +450,12 @@
  	Timer {
@@ -423,7 +423,7 @@
 +            if (startWithMenu.value === 0) showOverview()
 +        }
  	}
- 
+
  	function getDefaultOverviewIndex()
 @@ -293,6 +478,7 @@
  	Component {
@@ -431,12 +431,12 @@
  		PageSettingsFirmwareOffline { checkOnCompleted: true}
 +
  	}
- 
+
  	// Add or remove extra overviews. for example, generator overview
 @@ -323,11 +509,19 @@
  		}
  	}
- 
+
 +//////// Modified to append page if oldPage not found
  	function replaceOverview(oldPage, newPage)
  	{
@@ -451,5 +451,5 @@
 +        // here if oldPage wasn't found -- append the new page
 +        overviewModel.append({"pageSource": newPage})
  	}
- 
+
  	// Central mover for the ball animation on the overviews

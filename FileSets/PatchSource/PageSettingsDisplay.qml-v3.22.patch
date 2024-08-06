@@ -9,12 +9,12 @@
 @@ -52,6 +54,15 @@
  			]
  		}
- 
+
 +		////// GuiMods — DarkMode
 +				MbSwitch
 +				{
 +					id: colorScheme
-+					bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode"
++					bind: "com.victronenergy.settings/Settings/Gui/ColorScheme"
 +					name: qsTr ("Dark Mode")
 +					writeAccessLevel: User.AccessUser
 +				}
@@ -25,7 +25,7 @@
 @@ -65,6 +76,15 @@
  			name: qsTr("Show tanks overview")
  		}
- 
+
 +		//////// add Gui Mods menu
 +				MbSubMenu {
 +					id: guiModsMenu
@@ -78,4 +78,3 @@
 +			MbOptionLang { description: "العربية"; value: "ar" }
  			]
  		}
- 

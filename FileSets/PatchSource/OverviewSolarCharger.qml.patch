@@ -3,16 +3,16 @@
 @@ -3,6 +3,10 @@
  Item {
  	id: root
- 
+
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
  	default property alias values: blueSolarChargerBox.values
  	property alias title: blueSolarChargerBox.title
  	property bool showChargerIcon: true
 @@ -23,8 +27,9 @@
- 
+
  		height: root.height
  		title: qsTr("PV Power")
 -		titleColor: "#F4B350"
@@ -20,6 +20,6 @@
 +////// GuiMods — DarkMode
 +		titleColor: !darkMode ? "#F4B350" : "#7A5928"
 +		color: !darkMode ? "#F39C12" : "#794E09"
- 
+
  		anchors {
  			bottom: root.bottom

@@ -3,16 +3,16 @@
 @@ -6,6 +6,10 @@
  OverviewPage {
  	id: root
- 
+
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
  	property int numberOfTanks: tanks.all.rowCount
  	property int visibleTanks: tanks.rowCount
  	property int maxTanksPerPage: 10
 @@ -35,6 +39,8 @@
- 
+
  	Text {
  		text: qsTr("No tanks found")
 +////// GuiMods — DarkMode
@@ -31,7 +31,7 @@
  			scale: ListView.isCurrentItem ? 1.25 : 1
 +////// GuiMods — DarkMode
 +			color: !darkMode ? "black" : "#e1e1e1"
- 
+
  			Behavior on scale {
  				NumberAnimation { duration: 150 }
 @@ -83,7 +92,8 @@
@@ -54,7 +54,7 @@
  				GradientStop { position: 1; color: "transparent" }
  			}
  		}
- 
+
  		// touch buttons for selecting a tank type
  		MbIcon {
 -			iconId: "icon-toolbar-enter"
@@ -65,7 +65,7 @@
  				left: parent.left; leftMargin: 40
 @@ -117,7 +129,8 @@
  		}
- 
+
  		MbIcon {
 -			iconId: "icon-toolbar-enter"
 +////// GuiMods — DarkMode

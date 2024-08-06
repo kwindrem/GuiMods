@@ -3,16 +3,16 @@
 @@ -6,6 +6,10 @@
  	id: root
  	cornerMark: !readOnly && !spinbox.enabled
- 
+
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
  	property string description
  	property bool readOnly: !userHasWriteAccess
  	property VBusItem item: VBusItem {
 @@ -71,10 +75,12 @@
- 
+
  		MbBackgroundRect {
  			id: graytag
 -			color: !spinbox.enabled? "#ddd": "#fff"

@@ -8,8 +8,8 @@ Item {
 
 	property real soc: 80
 ////// GuiMods — DarkMode
-	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 	property string color: !darkMode ? "#4789d0" : "#234468"
 	property string emptyColor: !darkMode ? "#1abc9c" : "#0d5e4e"
 

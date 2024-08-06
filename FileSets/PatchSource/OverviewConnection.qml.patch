@@ -3,16 +3,16 @@
 @@ -22,6 +22,10 @@
  Item {
  	id: root
- 
+
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
  	property Path path: emptyPath
- 
+
  	property Path straight: Path {
 @@ -37,9 +41,11 @@
- 
+
  	property bool active
  	property int ballCount: 4
 -	property color ballColor: "#4789d0"

@@ -7,8 +7,8 @@ MbItem {
 	width: pageStack ? pageStack.currentPage.width : 0
 
 ////// GuiMods — DarkMode
-	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 
 	property string description
 	property VBusItem item: VBusItem {}

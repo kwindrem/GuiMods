@@ -26,8 +26,8 @@ Tile {
     property bool onButtonActive: false
 
 ////// GuiMods — DarkMode
-	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 
 
     VBusItem
@@ -118,7 +118,7 @@ Tile {
             {
                 font.pixelSize: 12
                 font.bold: true
-////// GuiMods DarkMode                
+////// GuiMods DarkMode
 				color: !darkMode ? "black" : "gray"
                 anchors
                 {
@@ -261,7 +261,7 @@ Tile {
             Button
             {
                 id: autoButton
-////// GuiMods - DarkMode                                          
+////// GuiMods - DarkMode
 				baseColor: !darkMode ? (autoButtonActive ? "orange" : "#ffedcc") : (autoButtonActive ? "#3a2600" : "#3a2600")
                 pressedColor: "#979797"
                 height: 40
@@ -291,9 +291,9 @@ Tile {
                 offButtonText = ""
                 onButtonText = ""
                 autoButtonText = ""
-                onButton.visible = false 
-                offButton.visible = false 
-                autoButton.visible = false 
+                onButton.visible = false
+                offButton.visible = false
+                autoButton.visible = false
                 break;;
             // Generator
             case 1:
@@ -303,8 +303,8 @@ Tile {
                 onButtonText = qsTr("Manual\nStart")
                 offButtonText = qsTr("Manual\nStop")
                 autoButtonText = qsTr("Auto\nEnable")
-                onButton.visible = true 
-                offButton.visible = true 
+                onButton.visible = true
+                offButton.visible = true
                 autoButton.visible = true
                 break;;
             // pump
@@ -315,8 +315,8 @@ Tile {
                 onButtonText = qsTr("On")
                 offButtonText = qsTr("Off")
                 autoButtonText = qsTr("Auto")
-                onButton.visible = true 
-                offButton.visible = true 
+                onButton.visible = true
+                offButton.visible = true
                 autoButton.visible = true
                 break;;
             // temperature
@@ -327,8 +327,8 @@ Tile {
                 onButtonText = "--"
                 offButtonText = "--"
                 autoButtonText = "--"
-                onButton.visible = false 
-                offButton.visible = false 
+                onButton.visible = false
+                offButton.visible = false
                 autoButton.visible = false
                 break;;
             // manual (2) and undefined
@@ -339,9 +339,9 @@ Tile {
                 onButtonText = qsTr("On")
                 offButtonText = qsTr("Off")
                 autoButtonText = ""
-                onButton.visible = true 
-                offButton.visible = true 
-                autoButton.visible = false 
+                onButton.visible = true
+                offButton.visible = true
+                autoButton.visible = false
                 break;;
             }
         }
@@ -355,11 +355,11 @@ Tile {
             onButtonText = qsTr("On")
             offButtonText = qsTr("Off")
             autoButtonText = "--" // empty string causes interactions
-            autoButton.visible = false 
+            autoButton.visible = false
         }
         updateButtons ()
     }
-    
+
     function updateButtons ()
     {
         switch (relayFunction)
