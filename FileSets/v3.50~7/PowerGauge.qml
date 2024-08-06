@@ -9,8 +9,8 @@ Item {
 	id: root
 
 ////// GuiMods — DarkMode
-	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 
 	property variant connection
 	// connection2 accommodates combined PV inverter AC input and AC output
@@ -29,7 +29,7 @@ Item {
 	property int phaseCount2: reportedPhaseCount2 < 2 ? reportedPhaseCount2 : (connection2.isAcOutput ? connection2.l2AndL1OutSummed : connection2.splitPhaseL2PassthruDisabled) ? 1 : connection2.phaseCount.value
 
 	property int phaseCount: includeConnection2 ? Math.max (phaseCount1, phaseCount2) : phaseCount1
-	
+
 	property string maxForwardPowerParameter: ""
 	VBusItem { id: maxForwardLimitItem; bind: root.maxForwardPowerParameter }
 	property string maxForwardPowerParameter2: ""

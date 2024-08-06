@@ -3,16 +3,16 @@
 @@ -7,6 +7,10 @@
  	cornerMark: !readonly && !editMode
  	height: expanded.y + expanded.height + 1
- 
+
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
  	property alias maximumLength: ti.maximumLength
  	property variant tmpValue
  	property string matchString: "0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()-_=+[]{}\\;:|/.,<>?"
 @@ -240,10 +244,12 @@
- 
+
  		MbBackgroundRect {
  			id: greytag
 -			color: editMode ? "#fff": "#ddd"
@@ -29,7 +29,7 @@
 @@ -273,6 +279,9 @@
  				topMargin: (defaultHeight - height) / 2
  			}
- 
+
 +////// GuiMods — DarkMode
 +			color: !darkMode ? "#000000" : "#fdfdfd"
 +

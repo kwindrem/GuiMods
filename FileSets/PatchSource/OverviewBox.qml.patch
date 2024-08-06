@@ -3,10 +3,10 @@
 @@ -3,14 +3,20 @@
  SvgRectangle {
  	id: root
- 
+
 +////// GuiMods — DarkMode
-+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 +
  	radius: 6
  	width: 110
@@ -15,13 +15,13 @@
 +////// GuiMods — DarkMode
 +	color: !darkMode ? "#16a185" : "#0B5042"
  	clip: true // hides an off by one pixel offset
- 
+
  	property string title
 -	property string titleColor :"#1abc9c"
 +////// GuiMods — DarkMode
 +	property string titleColor: !darkMode ? "#1abc9c" : "#136050"
  	property alias values: _values.children
- 
+
  	SvgRectangle {
 @@ -31,7 +37,8 @@
  		Text {

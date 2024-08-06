@@ -27,8 +27,8 @@ OverviewPage {
 	property string guiModsPrefix: "com.victronenergy.settings/Settings/GuiMods"
 
 ////// GuiMods — DarkMode
-	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
-	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
+	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/Gui/ColorScheme" }
+	property bool darkMode: darkModeItem.valid && darkModeItem.value == 0
 
 	VBusItem { id: vebusService; bind: Utils.path(systemPrefix, "/VebusService") }
 	property bool isMulti: vebusService.valid
