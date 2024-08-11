@@ -1,3 +1,6 @@
+c10.63:
+	add support for v3.41
+
 v10.62:
 	fixed: battery detail consumed and remaining incorrect
 

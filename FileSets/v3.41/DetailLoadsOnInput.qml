@@ -1,0 +1,1 @@
+../v3.50~7/DetailLoadsOnInput.qml
