@@ -1,4 +1,8 @@
-c10.63:
+v10.64:
+	add support for v3.50~13 and ~14
+	fixed: Relay info not centered in Relay Overview tiles on v3.50~13
+
+v10.63:
 	add support for v3.41
 
 v10.62:
