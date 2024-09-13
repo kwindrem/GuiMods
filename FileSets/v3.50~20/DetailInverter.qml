@@ -272,27 +272,24 @@ MbPage {
 		{
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
 					width: rowTitleWidth; horizontalAlignment: Text.AlignRight
-					text: qsTr("DC Power / Current") }
-			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: totalDataWidth * 0.4; horizontalAlignment: Text.AlignHCenter
 					text:
 					{
 						if (! dcPower.valid)
 							return ""
 						else if (dcPower.value > 0)
-							return qsTr ("supplying")
+							return qsTr ("DC: supplying")
 						else if (dcPower.value < 0)
-							return qsTr ("consuming")
+							return qsTr ("DC: consuming")
 						else
 							return ""
 					}
 			}
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: totalDataWidth * 0.3; horizontalAlignment: Text.AlignHCenter
-					text: EnhFmt.formatVBusItem (dcPower, "W") }
+					width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
+					text: EnhFmt.formatVBusItemAbs (dcPower, "W") }
 			Text { font.pixelSize: 12; font.bold: true; color: "black"
-					width: totalDataWidth * 0.3; horizontalAlignment: Text.AlignHCenter
-					text: EnhFmt.formatVBusItem (dcCurrent, "A") }
+					width: totalDataWidth / 2; horizontalAlignment: Text.AlignHCenter
+					text: EnhFmt.formatVBusItemAbs (dcCurrent, "A") }
 		}
 		Row
 		{
