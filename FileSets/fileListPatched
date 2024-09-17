@@ -22,5 +22,6 @@
 /opt/victronenergy/gui/qml/PageSettingsDisplay.qml
 /opt/victronenergy/gui/qml/Tile.qml
 /opt/victronenergy/gui/qml/TileText.qml
-/var/www/venus/styling/styles.css
 /opt/victronenergy/dbus-generator-starter/dbus_generator.py
+/var/www/venus/styling/styles.css
+/var/www/venus/gui-v1/styling/styles.css

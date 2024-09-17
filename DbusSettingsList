@@ -11,7 +11,6 @@
 {"path":"/Settings/GuiMods/TemperatureScale", "default":1}
 {"path":"/Settings/GuiMods/ShortenTankNames", "default":1, "min":0, "max":1}
 {"path":"/Settings/GuiMods/UseEnhancedMobileOverview", "default":1, "min":0, "max":1}
-{"path":"/Settings/GuiMods/UseEnhancedFlowOverview", "default":1, "min":0, "max":1}
 {"path":"/Settings/GuiMods/ShowEnhancedFlowOverviewTanks", "default":1, "min":0, "max":1}
 {"path":"/Settings/GuiMods/ShowEnhancedFlowOverviewTemps", "default":1, "min":0, "max":1}
 {"path":"/Settings/GuiMods/ShowEnhancedFlowLoadsOnInput", "default":1, "min":0, "max":1}

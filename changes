@@ -1,3 +1,6 @@
+v10.66:
+	add support for v3.50~22
+
 v10.65:
 	add support for v3.50~20
 	fixed: inverter detail DC line formatting
