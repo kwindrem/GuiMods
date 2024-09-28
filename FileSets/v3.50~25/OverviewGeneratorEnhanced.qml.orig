@@ -1,0 +1,96 @@
+import QtQuick 1.1
+import "utils.js" as Utils
+
+MbPage {
+	id: root
+	title: qsTr("Generator start/stop")
+	property string settingsBindPrefix
+	property string startStopBindPrefix
+	property bool showRunTime: true
+	property alias startStopModel: _startStopModel
+	property VBusItem activeCondition: VBusItem { bind: Utils.path(startStopBindPrefix, "/RunningByCondition") }
+	property VBusItem generatorState: VBusItem { bind: Utils.path(startStopBindPrefix, "/State") }
+	property VBusItem runningTime: VBusItem { bind: Utils.path(startStopBindPrefix, "/Runtime") }
+
+	FnGeneratorStates {
+		id: genState
+	}
+
+	model: startStopModel
+
+	function formatError(text, value)
+	{
+		return "#" + value.toString() + " " + text
+	}
+
+	VisibleItemModel {
+		id: _startStopModel
+
+		MbSwitch {
+			name: qsTr("Auto start functionality")
+			bind: Utils.path(startStopBindPrefix, "/AutoStartEnabled")
+			show: startStopBindPrefix === "com.victronenergy.generator.startstop0"
+		}
+
+		MbSubMenu {
+			description: qsTr("Manual start")
+			show: startStopBindPrefix === "com.victronenergy.generator.startstop0"
+			subpage:
+				Component {
+				PageGeneratorManualStart {
+					startStopBindPrefix: root.startStopBindPrefix
+				}
+			}
+		}
+
+		MbItemValue {
+			description: qsTr("Current run time")
+			item.text: runningTime.valid ? Utils.secondsToNoSecsString(runningTime.value) : "0"
+			show: generatorState.value >= 1 && generatorState.value <= 3 // Running, Warm-up, Cool-down
+		}
+
+		MbItemValue {
+			description: qsTr("State")
+			show: startStopBindPrefix === "com.victronenergy.generator.startstop0"
+			item.text: activeCondition.valid ? genState.getState(generatorState.value, activeCondition.value) : '---'
+		}
+
+		MbItemOptions {
+			id: _gensetStatus
+			description: qsTr("Error")
+			bind: Utils.path(startStopBindPrefix, "/Error")
+			readonly: true
+			show: valid && startStopBindPrefix === "com.victronenergy.generator.startstop0"
+			possibleValues: [
+				MbOption { description: qsTr("No error"); value: 0 },
+				MbOption { description: formatError(qsTr("Remote switch control disabled"), 1); value: 1 },
+				MbOption { description: formatError(qsTr("Generator in fault condition"), 2); value: 2 },
+				MbOption { description: formatError(qsTr("Generator not detected at AC input"), 3); value: 3 }
+			]
+		}
+
+		MbSubMenu {
+			id: conditions
+			description: qsTr("Settings")
+			subpage: Component {
+				PageSettingsGenerator {
+					settingsBindPrefix: root.settingsBindPrefix
+					startStopBindPrefix: root.startStopBindPrefix
+				}
+			}
+		}
+
+		MbSubMenu {
+			id: runtimePage
+			description: qsTr("Run time and service")
+			subpage:
+				Component {
+				PageGeneratorRuntimeService {
+					title: qsTr("Run time and service")
+					settingsBindPrefix: root.settingsBindPrefix
+					startStopBindPrefix: root.startStopBindPrefix
+				}
+			}
+		}
+	}
+}

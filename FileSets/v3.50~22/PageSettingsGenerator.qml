@@ -52,8 +52,6 @@ MbPage {
 		}
 
 		MbSwitch {
-			id: detectGeneratorAtAcIn
-
 			property bool generatorIsSet: acIn1Source.value === 2 || acIn2Source.value === 2
 			name: qsTr("Detect generator at AC input")
 			bind: Utils.path(settingsBindPrefix, "/Alarms/NoGeneratorAtAcIn")
