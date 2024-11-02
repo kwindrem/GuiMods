@@ -1,0 +1,38 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbEditBox.qml-v3.50.orig	2024-07-18 14:31:06
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/MbEditBox.qml-v3.50	2024-07-18 20:55:13
+@@ -7,6 +7,10 @@
+ 	cornerMark: !readonly && !editMode
+ 	height: expanded.y + expanded.height + 1
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property alias maximumLength: ti.maximumLength
+ 	property variant tmpValue
+ 	property string matchString: "0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()-_=+[]{}\\;:|/.,<>?"
+@@ -240,10 +244,12 @@
+ 
+ 		MbBackgroundRect {
+ 			id: greytag
+-			color: editMode ? "#fff": "#ddd"
++////// GuiMods — DarkMode
++			color: !darkMode ? (editMode ? "#fff": "#ddd") : (editMode ? "#747474": "#4b4b4b")
+ 			width: ti.width + 2 * mbStyle.marginDefault
+ 			height: ti.height + 6
+-			border.color: "#ddd"
++////// GuiMods — DarkMode
++			border.color: !darkMode ? "#ddd" : "#4b4b4b"
+ 			border.width: editMode ? 1 : 0
+ 			anchors.centerIn: ti
+ 		}
+@@ -273,6 +279,9 @@
+ 				topMargin: (defaultHeight - height) / 2
+ 			}
+ 
++////// GuiMods — DarkMode
++			color: !darkMode ? "#000000" : "#fdfdfd"
++
+ 			text: editMode ? _editText : item.text
+ 			// When editing the it is nice to have a fix with font, so when changing
+ 			// digits the text does change in length all the time. However this fonts

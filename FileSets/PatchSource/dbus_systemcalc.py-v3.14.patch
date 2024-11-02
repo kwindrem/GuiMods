@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_systemcalc.py-v3.14.orig	2024-07-08 07:47:23
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_systemcalc.py-v3.14	2023-12-02 07:35:03
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_systemcalc.py-v3.14	2024-10-01 15:26:58
 @@ -1,6 +1,8 @@
  #!/usr/bin/python3 -u
  # -*- coding: utf-8 -*-

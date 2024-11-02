@@ -1,3 +1,9 @@
+v10.69:
+	add support for v3.50 and v3.51~2
+	removed support for v3.50 beta versions
+		revert to GuiMods v10.68 to support those
+	Note: there is no support for New UI but config possible in Classic UI
+
 v10.68:
 	improve contrast in Relay Overview in dark mode
 
