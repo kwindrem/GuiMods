@@ -1,3 +1,6 @@
+v10.74:
+	fixed: generator overview stock/enhanced not working
+
 v10.73:
 	fixed: incomplete file set for v3.50
 

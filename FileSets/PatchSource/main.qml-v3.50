@@ -101,13 +101,13 @@ PageStackWindow {
         bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGeneratorOverview"
         onValueChanged: selectGeneratorOverview ()
     }
-////// end GuiMods
 
 	VBusItem {
 		id: generatorOverview
 		bind: "com.victronenergy.settings/Settings/Relay/Function"
-		onValueChanged: extraOverview("OverviewGeneratorRelay.qml", value === 1)
+		onValueChanged: selectGeneratorOverview ()
 	}
+////// end GuiMods
 
 	VBusItem {
 		bind: "com.victronenergy.generator.startstop1/GensetProductId"

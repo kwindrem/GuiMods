@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50.orig	2024-10-29 13:29:52
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50	2024-11-02 22:34:13
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50	2024-11-03 13:26:42
 @@ -1,3 +1,6 @@
 +//////// Modified to hide the OverviewTiles page
 +//////// Modified to substitute flow overview pages
@@ -17,7 +17,7 @@
  	property string bindPrefix: "com.victronenergy.settings"
  
  	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
-@@ -27,19 +31,78 @@
+@@ -27,24 +31,83 @@
  	property bool showInputLoads: theSystem.acInLoad.power.valid && (hasVebusEss ? (theSystem.hasGridMeter && withoutGridMeter.value === 0) : theSystem.hasGridMeter)
  	property int newUiAnnouncementVersion: 2 // Increase to make the popup appear again
  
@@ -96,11 +96,17 @@
 +        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGeneratorOverview"
 +        onValueChanged: selectGeneratorOverview ()
 +    }
-+////// end GuiMods
 +
  	VBusItem {
  		id: generatorOverview
  		bind: "com.victronenergy.settings/Settings/Relay/Function"
+-		onValueChanged: extraOverview("OverviewGeneratorRelay.qml", value === 1)
++		onValueChanged: selectGeneratorOverview ()
+ 	}
++////// end GuiMods
+ 
+ 	VBusItem {
+ 		bind: "com.victronenergy.generator.startstop1/GensetProductId"
 @@ -63,13 +126,98 @@
  		}
  	}
