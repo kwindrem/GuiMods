@@ -1,3 +1,6 @@
+v10.70:
+	fixed: PackageManager crash (bad GuiMods version string)
+
 v10.69:
 	add support for v3.50 and v3.51~2
 	removed support for v3.50 beta versions
