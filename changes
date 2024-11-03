@@ -1,3 +1,7 @@
+v10.71:
+	fixed: white screen (GUI crash)
+	fixed: light/dark selection not shown at bottom of screen
+
 v10.70:
 	fixed: PackageManager crash (bad GuiMods version string)
 
