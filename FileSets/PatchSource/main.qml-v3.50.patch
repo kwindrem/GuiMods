@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50.orig	2024-10-29 13:29:52
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50	2024-11-02 21:56:23
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50	2024-11-02 22:34:13
 @@ -1,3 +1,6 @@
 +//////// Modified to hide the OverviewTiles page
 +//////// Modified to substitute flow overview pages
@@ -7,16 +7,17 @@
  import QtQuick 1.1
  
  import Qt.labs.components.native 1.0
-@@ -16,7 +19,7 @@
+@@ -16,7 +19,8 @@
  	property bool completed: false
  	property bool alarm: alarmNotification.valid ? alarmNotification.value : 0
  	property bool showAlert: alertNotification.valid ? alertNotification.value : 0
 -	property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid
++//////// added for GuiMods flow pages
 +	property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && guiModsFlowOverview.valid && generatorOverviewEnhanced.valid
  	property string bindPrefix: "com.victronenergy.settings"
  
  	property bool isNotificationPage: pageStack.currentPage && pageStack.currentPage.title === qsTr("Notifications")
-@@ -27,19 +30,71 @@
+@@ -27,19 +31,78 @@
  	property bool showInputLoads: theSystem.acInLoad.power.valid && (hasVebusEss ? (theSystem.hasGridMeter && withoutGridMeter.value === 0) : theSystem.hasGridMeter)
  	property int newUiAnnouncementVersion: 2 // Increase to make the popup appear again
  
@@ -37,6 +38,13 @@
 -			replaceOverview("OverviewGridParallel.qml", "OverviewHub.qml");
 +//////// modified for OverviewHubEnhanced page
 +	onShowInputLoadsChanged: selectHubOverview ()
++
++	VBusItem
++    {
++        id: guiModsFlowOverview
++        bind: "com.victronenergy.settings/Settings/GuiMods/FlowOverview"
++        onValueChanged: selectHubOverview ()
++    }
 +
 +////// GuiMods — DarkMode
 +	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
@@ -93,7 +101,7 @@
  	VBusItem {
  		id: generatorOverview
  		bind: "com.victronenergy.settings/Settings/Relay/Function"
-@@ -63,13 +118,98 @@
+@@ -63,13 +126,98 @@
  		}
  	}
  
@@ -198,7 +206,7 @@
  	VBusItem {
  		id: tanksOverview
  		bind: "com.victronenergy.settings/Settings/Gui/TanksOverview"
-@@ -172,76 +312,111 @@
+@@ -172,76 +320,111 @@
  		id: mbTools
  		height: parent.height
  
@@ -363,7 +371,7 @@
  				}
  			}
  		}
-@@ -256,9 +431,10 @@
+@@ -256,9 +439,10 @@
  		ListElement {
  			pageSource: "OverviewHub.qml"
  		}
@@ -377,7 +385,7 @@
  	}
  
  	Component {
-@@ -284,7 +460,12 @@
+@@ -284,7 +468,12 @@
  		id: newUiPopupTimer
  		interval: 10000
  		running: false
@@ -391,7 +399,7 @@
  	}
  
  	function showNewUiPopup()
-@@ -350,11 +531,19 @@
+@@ -350,11 +539,19 @@
  		}
  	}
  

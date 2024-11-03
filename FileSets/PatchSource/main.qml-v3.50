@@ -19,6 +19,7 @@ PageStackWindow {
 	property bool completed: false
 	property bool alarm: alarmNotification.valid ? alarmNotification.value : 0
 	property bool showAlert: alertNotification.valid ? alertNotification.value : 0
+//////// added for GuiMods flow pages
 	property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && guiModsFlowOverview.valid && generatorOverviewEnhanced.valid
 	property string bindPrefix: "com.victronenergy.settings"
 
@@ -42,6 +43,13 @@ PageStackWindow {
 	// Add the correct OverviewHub page
 //////// modified for OverviewHubEnhanced page
 	onShowInputLoadsChanged: selectHubOverview ()
+
+	VBusItem
+    {
+        id: guiModsFlowOverview
+        bind: "com.victronenergy.settings/Settings/GuiMods/FlowOverview"
+        onValueChanged: selectHubOverview ()
+    }
 
 ////// GuiMods — DarkMode
 	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }

@@ -1,3 +1,6 @@
+v10.72:
+	fixed: not showing GuiMods flow overview pages
+
 v10.71:
 	fixed: white screen (GUI crash)
 	fixed: light/dark selection not shown at bottom of screen
