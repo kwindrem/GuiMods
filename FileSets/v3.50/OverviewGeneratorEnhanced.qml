@@ -1,1 +1,1 @@
-../v3.51/OverviewGeneratorEnhanced.qml
+../v3.52~1/OverviewGeneratorEnhanced.qml

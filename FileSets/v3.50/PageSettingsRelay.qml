@@ -1,1 +1,1 @@
-../v3.51/PageSettingsRelay.qml
+../v3.52~1/PageSettingsRelay.qml
