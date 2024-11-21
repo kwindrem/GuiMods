@@ -1,1 +1,1 @@
-../v3.52~2/OverviewGeneratorRelayEnhanced.qml
+../v3.52/OverviewGeneratorRelayEnhanced.qml
