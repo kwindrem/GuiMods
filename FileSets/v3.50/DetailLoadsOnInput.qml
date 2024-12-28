@@ -1,1 +1,1 @@
-../v3.52/DetailLoadsOnInput.qml
+../v3.60~13/DetailLoadsOnInput.qml

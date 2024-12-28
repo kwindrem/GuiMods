@@ -1,10 +1,9 @@
 NOTE: starting with firmware v3.50, the "New UI" (aka gui-v2) is available for use
-	For GuiMods, the following opitons must be configured via Classic UI but will continue to function after switching
-			back to New UI:
+	For GuiMods, the following opitons must be configured via Classic UI
+		but will continue to function after switching back to New UI:
 		configutaiton of the External transfer switch digital input
 		syncronizing the generator manual run to the generator digital input
 	PackageManager menus are also available only in Classic UI	
-
 
 NOTE: Support for firmware prior to v3.10 has been dropped starting with GuiMods v10.56
 	if you are running older versions, change the branch/tag to preV3.10support

@@ -1,1 +1,1 @@
-../v3.52/PowerGauge.qml
+../v3.60~13/PowerGauge.qml
