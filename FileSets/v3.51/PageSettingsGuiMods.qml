@@ -1,1 +1,1 @@
-../v3.60~13/PageSettingsGuiMods.qml
+../v3.60~17/PageSettingsGuiMods.qml

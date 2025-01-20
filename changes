@@ -1,3 +1,7 @@
+v10.80:
+	add support for v3.60~17 and v3.53
+	moved more files from version dependent to patched
+
 v10.79:
 	add support for v3.53~2 and v3.60~13
 

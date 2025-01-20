@@ -1,0 +1,88 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.41.orig	2025-01-12 08:43:07
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.41	2024-05-14 07:00:12
+@@ -1,5 +1,7 @@
+ #!/usr/bin/python3 -u
+ 
++#### modified for ExtTransferSwitch package
++
+ import sys, os
+ import signal
+ from threading import Thread
+@@ -39,6 +41,8 @@
+     'Generator',
+     'Generic I/O',
+     'Touch enable',
++#### added for ExtTransferSwitch package -- must be LAST in the list
++    'Transfer switch'
+ ]
+ 
+ # Translations. The text will be used only for GetText, it will be translated
+@@ -49,7 +53,9 @@
+     Translation('no', 'yes'),
+     Translation('open', 'closed'),
+     Translation('ok', 'alarm'),
+-    Translation('running', 'stopped')
++    Translation('running', 'stopped'),
++#### added for ExtTransferSwitch package
++    Translation('on generator', 'on grid')
+ ]
+ 
+ class SystemBus(dbus.bus.BusConnection):
+@@ -406,12 +412,31 @@
+         self._timer = GLib.timeout_add(30000,
+             lambda: self.select_generator(self.level ^ self.settings['invert'] ^ 1) or True)
+ 
++#### added for ExtTransferSwitch package
++        self.mainVeBusServiceItem = None
++#### end added for ExtTransferSwitch package
++
++
+     def select_generator(self, v):
++
+         # Find all vebus services, and let them know
+         try:
+             services = [n for n in self.bus.list_names() if n.startswith(
+                 'com.victronenergy.vebus.')]
+             for n in services:
++#### added for ExtTransferSwitch package
++                # skip this service if it is the main VE.Bus device
++                # processing for that is handled in ExtTransferSwitch
++                try:
++                    if self.mainVeBusServiceItem == None:
++                        self.mainVeBusServiceItem = VeDbusItemImport(self.bus,
++                            "com.victronenergy.service", "/VebusService")
++                    if n == self.mainVeBusService.get_value ():
++                        continue
++                except:
++                    pass
++#### end added for ExtTransferSwitch package
++
+                 self.bus.call_async(n, '/Ac/Control/RemoteGeneratorSelected', None,
+                     'SetValue', 'v', [v], None, None)
+         except dbus.exceptions.DBusException:
+@@ -430,8 +455,9 @@
+         self.select_generator(0)
+ 
+         # And kill the periodic job
+-        GLib.source_remove(self._timer)
+-        self._timer = None
++        if self._timer is not None:
++            GLib.source_remove(self._timer)
++            self._timer = None
+ 
+ # Various types of things we might want to monitor
+ class DoorSensor(PinAlarm):
+@@ -474,7 +500,13 @@
+     type_id = 10
+     translation = 0 # low, high
+ 
++#### added for ExtTransferSwitch package
++class TransferSwitch(PinAlarm):
++    _product_name = "External AC Input transfer switch"
++    type_id = 12
++    translation = 6 # Grid In / Generator In
+ 
++
+ def dbusconnection():
+     return SessionBus() if 'DBUS_SESSION_BUS_ADDRESS' in os.environ else SystemBus()
+ 

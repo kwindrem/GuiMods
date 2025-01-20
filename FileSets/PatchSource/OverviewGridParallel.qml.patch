@@ -1,0 +1,59 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewGridParallel.qml.orig	2025-01-12 08:30:33
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/OverviewGridParallel.qml	2024-05-14 07:00:12
+@@ -4,6 +4,10 @@
+ OverviewPage {
+ 	id: root
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	property variant sys: theSystem
+ 	property bool hasAcOutSystem: _hasAcOutSystem.value === 1
+ 
+@@ -20,8 +24,9 @@
+ 		width: 148
+ 		height: 100
+ 		title: getAcSourceName(sys.acSource)
+-		titleColor: "#E74c3c"
+-		color: "#C0392B"
++////// GuiMods — DarkMode
++		titleColor: !darkMode ? "#E74c3c" : "#73261E"
++		color: !darkMode ? "#C0392B" : "#601C15"
+ 		anchors {
+ 			top: root.top; topMargin: 1
+ 			left: parent.left; leftMargin: 5
+@@ -44,8 +49,9 @@
+ 	OverviewBox {
+ 		id: acLoadBox
+ 		title: qsTr("AC Loads")
+-		color: "#27AE60"
+-		titleColor: "#2ECC71"
++////// GuiMods — DarkMode
++		color: !darkMode ? "#27AE60" : "#135730"
++		titleColor: !darkMode ? "#2ECC71" : "#176638"
+ 		width: 148
+ 		height: 100
+ 
+@@ -63,8 +69,9 @@
+ 	OverviewBox {
+ 		id: acOutputBox
+ 		title: qsTr("Critical Loads")
+-		color: "#157894"
+-		titleColor: "#419FB9"
++////// GuiMods — DarkMode
++		color: !darkMode ? "#157894" : "#0a3c4a"
++		titleColor: !darkMode ? "#419FB9" : "#204f5c"
+ 		height: 100
+ 		width: 148
+ 		visible: hasAcOutSystem
+@@ -103,8 +110,7 @@
+ 
+ 		soc: sys.battery.soc.valid ? sys.battery.soc.value : 0
+ 		preferRenewable: sys.preferRenewableEnergy.valid
+-		preferRenewableOverride: sys.preferRenewableEnergy.value === 0 || sys.preferRenewableEnergy.value === 2
+-		preferRenewableOverrideGenset: sys.remoteGeneratorSelected.value === 1 || sys.acSource.value === 2
++		preferRenewableOverride: sys.preferRenewableEnergy.value === 0
+ 		height: pvInverterOnGrid.visible ? 81 : 101
+ 		width: 145
+ 

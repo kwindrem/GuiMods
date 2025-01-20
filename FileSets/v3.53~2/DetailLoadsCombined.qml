@@ -1,1 +1,0 @@
-../v3.60~13/DetailLoadsCombined.qml

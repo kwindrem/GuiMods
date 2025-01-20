@@ -1,0 +1,28 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsGenerator.qml.orig	2025-01-12 08:33:22
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsGenerator.qml	2024-09-28 14:15:31
+@@ -1,3 +1,6 @@
++//// GuiMods
++////	added link to external state enable
++
+ import QtQuick 1.1
+ import com.victron.velib 1.0
+ import "utils.js" as Utils
+@@ -66,7 +69,18 @@
+ 			}
+ 		}
+ 
++//// GuiMods
+ 		MbSwitch {
++			name: qsTr("Link to external running state")
++			bind: Utils.path(settingsBindPrefix, "/LinkToExternalStatus")
++			onClicked:
++			{
++				if (!checked)
++					toast.createToast(qsTr("Manual run will be synchronized with the generaror 'is running digital input' or AC input"), 10000, "icon-info-active")
++			}
++		}
++
++		MbSwitch {
+ 			name: qsTr("Alarm when generator is not in auto start mode")
+ 			bind: Utils.path(settingsBindPrefix, "/Alarms/AutoStartDisabled")
+ 			onClicked: {
