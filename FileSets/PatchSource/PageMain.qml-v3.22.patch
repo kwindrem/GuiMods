@@ -1,8 +1,6 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.22.orig	2024-07-08 09:45:00
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.22	2024-07-09 09:53:20
-@@ -1,11 +1,52 @@
-+//////// GuiMods modified order to put Settings, then Notifications at top of list
-+
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageMain.qml-v3.22	2025-02-02 17:47:12
+@@ -1,11 +1,50 @@
  import QtQuick 1.1
 +import "utils.js" as Utils
  import com.victron.velib 1.0
@@ -53,7 +51,7 @@
  		VisualDataModel {
  			model: VeSortFilterProxyModel {
  				model: DeviceList {
-@@ -27,7 +68,7 @@
+@@ -27,7 +66,7 @@
  				subpage: model.page
  			}
  		}
@@ -62,7 +60,7 @@
  			MbSubMenu {
  				id: menuNotifications
  				description: qsTr("Notifications")
-@@ -37,17 +78,22 @@
+@@ -37,17 +76,22 @@
  					value: active.length > 0 ? active.length : ""
  				}
  				subpage: Component { PageNotifications {} }

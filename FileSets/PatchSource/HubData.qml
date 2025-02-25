@@ -1,11 +1,7 @@
-//////// modified for VE.Direct inverter support
-//////// modified for grid/genset meter
-//////// added alternator, AC charger, wind generator
-
 import QtQuick 1.1
-import com.victron.velib 1.0
 import "utils.js" as Utils
 
+import com.victron.velib 1.0
 Item {
 	id: root
 

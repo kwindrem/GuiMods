@@ -1,13 +1,6 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/ObjectAcConnection.qml.orig	2025-01-12 08:28:05
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/ObjectAcConnection.qml	2024-05-14 07:00:12
-@@ -1,19 +1,41 @@
-+////// modified to show voltage, current and frequency in flow overview
-+////// modified to show bar graphs
-+////// modified to use grid or genset meter if present
-+
- import QtQuick 1.1
- import com.victron.velib 1.0
- import "utils.js" as Utils
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/ObjectAcConnection.qml	2025-02-02 17:43:09
+@@ -4,16 +4,34 @@
  
  QtObject {
  	property string bindPrefix

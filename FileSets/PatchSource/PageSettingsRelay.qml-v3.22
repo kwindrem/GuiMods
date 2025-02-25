@@ -1,8 +1,3 @@
-//////// modified to
-////////   add 6 relays for Raspberry PI
-////////   custom relay name for Relay Overview
-////////   show/hide relay in Relay Overview
-
 import QtQuick 1.1
 import com.victron.velib 1.0
 import "utils.js" as Utils

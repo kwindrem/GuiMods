@@ -1,14 +1,10 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/HubData.qml.orig	2025-01-12 08:25:03
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/HubData.qml	2024-05-17 06:58:33
-@@ -1,14 +1,32 @@
-+//////// modified for VE.Direct inverter support
-+//////// modified for grid/genset meter
-+//////// added alternator, AC charger, wind generator
-+
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/HubData.qml	2025-02-02 21:49:14
+@@ -1,14 +1,28 @@
  import QtQuick 1.1
-+import com.victron.velib 1.0
  import "utils.js" as Utils
  
++import com.victron.velib 1.0
  Item {
  	id: root
  
@@ -33,7 +29,7 @@
  	property alias pvCharger: _pvCharger
  	property alias pvOnAcIn1: _pvOnAcIn1
  	property alias pvOnAcIn2: _pvOnAcIn2
-@@ -18,8 +36,8 @@
+@@ -18,8 +32,8 @@
  	property alias acInLoad: _acInLoad
  	property alias acOutLoad: _acOutLoad
  	property alias grid: _grid
@@ -43,7 +39,7 @@
  	property VBusItem systemType: VBusItem { bind: Utils.path(systemPrefix, "/SystemType") }
  	property bool hasGridMeter: _hasGridMeter.valid
  	property variant acSource: _acSource.value
-@@ -60,6 +78,30 @@
+@@ -60,6 +74,30 @@
  		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/Pv/Power"); unit: "W"}
  	}
  
@@ -74,7 +70,7 @@
  	ObjectAcConnection {
  		id: _pvOnAcOut
  		bindPrefix: Utils.path(systemPrefix, "/Ac/PvOnOutput")
-@@ -77,8 +119,11 @@
+@@ -77,8 +115,11 @@
  
  	ObjectAcConnection {
  		id: _genset
@@ -87,7 +83,7 @@
  	}
  
  	VBusItem {
-@@ -91,20 +136,20 @@
+@@ -91,20 +132,20 @@
  		bind: Utils.path(systemPrefix, "/Ac/Grid/DeviceType")
  	}
  
@@ -121,7 +117,7 @@
  
  	VBusItem {
  		id: _l2L1OutSummed
-@@ -114,32 +159,42 @@
+@@ -114,32 +155,42 @@
  
  	ObjectAcConnection {
  		id: _grid
@@ -172,7 +168,7 @@
  		bindPrefix: Utils.path(systemPrefix, "/Ac/ConsumptionOnInput")
  	}
  
-@@ -167,4 +222,47 @@
+@@ -167,4 +218,47 @@
  		id: _dcSystem
  		property VBusItem power: VBusItem { bind: Utils.path(systemPrefix, "/Dc/System/Power"); unit: "W"}
  	}

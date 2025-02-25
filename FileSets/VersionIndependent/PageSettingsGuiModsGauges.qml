@@ -9,7 +9,7 @@ MbPage {
 	title: qsTr("Gui Mods power gauges")
     property string bindPrefixGuiMods: "com.victronenergy.settings/Settings/GuiMods"
 
-	model: VisualItemModel
+	model: VisibleItemModel
     {
          MbSwitch
         {

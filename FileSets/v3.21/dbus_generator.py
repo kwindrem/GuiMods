@@ -1,1 +1,0 @@
-../v3.40/dbus_generator.py

@@ -1,5 +1,3 @@
-//// modified for ExtTransferSwitch package
-
 import QtQuick 1.1
 
 MbItemOptions {

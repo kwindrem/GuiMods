@@ -1,15 +1,6 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.22.orig	2025-01-09 14:05:43
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.22	2024-02-27 21:25:25
-@@ -1,3 +1,8 @@
-+//////// modified to
-+////////   add 6 relays for Raspberry PI
-+////////   custom relay name for Relay Overview
-+////////   show/hide relay in Relay Overview
-+
- import QtQuick 1.1
- import com.victron.velib 1.0
- import "utils.js" as Utils
-@@ -6,13 +11,85 @@
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.22	2025-02-02 17:44:48
+@@ -6,13 +6,85 @@
  	id: pageRelaySettings
  	title: qsTr("Relay")
  	property string bindPrefix: "com.victronenergy.settings"
@@ -98,7 +89,7 @@
  			bind: Utils.path(bindPrefix, "/Settings/Relay/Function")
  			possibleValues:[
  				MbOption { description: qsTr("Alarm relay"); value: 0 },
-@@ -21,12 +98,13 @@
+@@ -21,12 +93,13 @@
  				MbOption { description: qsTr("Manual"); value: 2 },
  				MbOption { description: qsTr("Temperature"); value: 4 }
  			]
@@ -113,7 +104,7 @@
  			possibleValues: [
  				MbOption { description: qsTr("Normally open"); value: 0 },
  				MbOption { description: qsTr("Normally closed"); value: 1 }
-@@ -34,58 +112,422 @@
+@@ -34,52 +107,147 @@
  		}
  
  		MbSwitch {
@@ -276,10 +267,10 @@
  			subpage: Component {
  				PageSettingsRelayTempSensors {
  					id: relayPage
- 					title: qsTr("Temperature control rules")
+@@ -87,5 +255,274 @@
  				}
  			}
-+		}
+ 		}
 +
 +		MbEditBox {
 +			id: relay1name
@@ -309,7 +300,7 @@
 +			name: qsTr("Show Relay 2 in overview")
 +			bind: "com.victronenergy.settings/Settings/Relay/1/Show"
 +			show: hasRelay2
- 		}
++		}
 +
 +		MbEditBox {
 +			id: relay3name
