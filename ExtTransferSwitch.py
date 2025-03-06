@@ -118,7 +118,7 @@ class Monitor:
 		elif self.DbusSettings['transferSwitchOnAc2'] == 1:
 			transferSwitchLocation = 2
 		else:
-			transferSwitchLocation = 1
+			transferSwitchLocation = 1		
 
 		# if changed, trigger refresh of object pointers
 		if transferSwitchLocation != self.transferSwitchLocation:
@@ -165,49 +165,48 @@ class Monitor:
 
 
 	def updateTransferSwitchState (self):
-		inputInvalid = False
-		try:
-			if self.transferSwitchActive:
+		inputValid = False
+		if self.transferSwitchActive:
+			try:
 				state = self.transferSwitchStateObj.GetValue ()
 				if state == 12:		# 12 is the on generator value
+					inputValid = True
 					self.onGenerator = True
 				elif state == 13:	# 13 is the on grid value
+					inputValid = True
 					self.onGenerator = False
-				# other value indicates the selected digital input is assigned to a different function
-				else:
-					inputInvalid = True
+			except:
+				pass
 
-			# digital input not active
-			# search for a new one only every 10 seconds to avoid unnecessary processing
-			elif self.tsInputSearchDelay >= 10:
-				newInputService = ""
-				for service in self.theBus.list_names():
-					# found a digital input service, now check the for valid state value
-					if service.startswith ("com.victronenergy.digitalinput"):
+		if not inputValid and self.transferSwitchActive:
+			logging.info ("Transfer switch digital input no longer valid")
+			self.transferSwitchActive = False
+
+		# current digital input (if any)n not valid
+		# search for a new one only every 10 seconds to avoid unnecessary processing
+		elif not inputValid and self.tsInputSearchDelay >= 10:
+			newInputService = ""
+			for service in self.theBus.list_names():
+				# found a digital input service, now check the for valid state value
+				if service.startswith ("com.victronenergy.digitalinput"):
+					try:
 						self.transferSwitchStateObj = self.theBus.get_object (service, '/State')
 						state = self.transferSwitchStateObj.GetValue()
 						# found it!
 						if state == 12 or state == 13:
 							newInputService = service
 							break
- 
-				# found new service - set up to use it's values
-				if newInputService != "":
-					logging.info ("discovered transfer switch digital input service at %s", newInputService)
-					self.transferSwitchActive = True
-				elif self.transferSwitchActive:
-					logging.info ("Transfer switch digital input service NOT found")
-					self.transferSwitchActive = False
+					# ignore errors - continue to check for other services
+					except:
+						pass
 
-
-		# any exception indicates the selected digital input is no longer active
-		except:
-			inputInvalid = True
-
-		if inputInvalid:
-			if self.transferSwitchActive:
-				logging.info ("Transfer switch digital input no longer valid")
-			self.transferSwitchActive = False
+			# found new service - set up to use it's values
+			if newInputService != "":
+				logging.info ("discovered transfer switch digital input service at %s", newInputService)
+				self.transferSwitchActive = True
+			elif self.transferSwitchActive:
+				logging.info ("Transfer switch digital input service NOT found")
+				self.transferSwitchActive = False
 
 		if self.transferSwitchActive:
 			self.tsInputSearchDelay = 0
@@ -308,7 +307,6 @@ class Monitor:
 
 		# skip processing if any dbus paramters were not initialized properly
 		if self.dbusOk and self.transferSwitchActive:
-
 			# process transfer switch state change
 			if self.lastOnGenerator != None and self.onGenerator != self.lastOnGenerator:
 				if self.onGenerator:
@@ -342,7 +340,6 @@ class Monitor:
 
 
 	def __init__(self):
-
 		self.theBus = dbus.SystemBus()
 		self.onGenerator = False
 		self.veBusService = ""

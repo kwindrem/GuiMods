@@ -1,10 +1,10 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~25.orig	2025-02-25 09:42:59
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~25	2025-02-25 09:42:55
-@@ -1,6 +1,17 @@
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~25	2025-03-06 09:51:56
+@@ -1,5 +1,16 @@
  #!/usr/bin/python -u
  # -*- coding: utf-8 -*-
- 
-+#### GuiMods
++
++#### GuiMods v3.60~25
 +#### This file has been modified to allow the generator running state derived from the generator digital input
 +#### Previous versions also used the genset AC input but this has been removed from this version with recent changes to stock code !!!!!
 +#### If the incoming generator state changes, the manual start state is updated
@@ -14,10 +14,9 @@
 +#### warm-up and cool-down periods have been modified in order to work with an external transfer switch
 +####	selecting grid or generator ahead of a MultiPlus input.
 +#### Search for #### GuiMods to find changes
-+
+ 
  # Function
  # dbus_generator monitors the dbus for batteries (com.victronenergy.battery.*) and
- # vebus com.victronenergy.vebus.*
 @@ -272,6 +283,23 @@
  class StartStop(object):
  	_driver = None
@@ -55,17 +54,18 @@
  		# Manual battery service selection is deprecated in favour
  		# of getting the values directly from systemcalc, we keep
  		# manual selected services handling for compatibility reasons.
-@@ -440,6 +469,14 @@
+@@ -439,7 +468,15 @@
+ 
  		# When this startstop instance controls a genset which reports operatinghours, make sure to synchronize with that.
  		self._useGensetHours = self._dbusmonitor.get_value(self._remoteservice, '/Engine/OperatingHours', None) is not None
- 
++
 +#### GuiMods
 +		# generator input running state
 +		# external override active
 +		self._dbusservice.add_path('/ExternalOverride', value=None)
 +		self._dbusservice['/ExternalOverride'] = False
 +		self._ignoreAutoStartCondition = False
-+
+ 
 +
  	@property
  	def _is_running(self):
@@ -143,20 +143,19 @@
  		# Conditions will only be evaluated if the autostart functionality is enabled
  		if self._settings['autostart'] == 1:
  
-@@ -669,6 +751,12 @@
- 				if running and self._settings['onlosscommunication'] == 2:
+@@ -670,18 +752,26 @@
  					start = True
  					startbycondition = 'lossofcommunication'
-+
+ 
 +#### GuiMods
 +		## auto start disabled and generator is stopped - clear the 'reached' flags
 +		elif self._dbusservice['/State'] == States.STOPPED:
 +			for condition, data in self._condition_stack.items():
 +				self._reset_condition(data)
- 
++
  		if not start and self._errorstate:
  			self._stop_generator()
-@@ -676,12 +764,14 @@
+ 
  		if self._errorstate:
  			return
  
@@ -185,7 +184,7 @@
  			if self._dbusservice['/Alarms/AutoStartDisabled'] != 0:
  				self._dbusservice['/Alarms/AutoStartDisabled'] = 0
  			if self._dbusservice['/Alarms/RemoteStartModeDisabled'] != 0:
-@@ -708,35 +798,37 @@
+@@ -708,29 +798,31 @@
  
  		# GX auto start/stop alarm
  		if self._settings['autostart'] == 1:
@@ -222,21 +221,14 @@
  		if state in [States.STOPPED, States.COOLDOWN, States.WARMUP]:
  			self._reset_power_input_timer()
  			return
- 
- 		if self._settings['nogeneratoratacinalarm'] == 0:
--			self._reset_power_input_timer()
-+			self._reset_acpower_inverter_input()
- 			return
- 
- 		if self.multiservice_type == 'vebus':
-@@ -757,23 +849,38 @@
+@@ -757,16 +849,31 @@
  		# Not connected = 0, connected = 1
  		activein_connected = activein_state == 1
  
 +#### GuiMods warm-up / cool-down
 +		if self._settings['nogeneratoratacinalarm'] == 0:
 +			processAlarm = False
-+			self._reset_acpower_inverter_input()
++			self._reset_power_input_timer()
 +		else:
 +			processAlarm = True
 +
@@ -247,48 +239,30 @@
 +#### GuiMods warm-up / cool-down
 +			if processAlarm and self._power_input_timer['unabletostart']:
  				self.log_info('Generator detected at inverter AC input, alarm removed')
--			self._reset_power_input_timer()
--		elif self._power_input_timer['timeout'] < self.RETRIES_ON_ERROR:
--			self._power_input_timer['timeout'] += 1
--		elif not self._power_input_timer['unabletostart']:
--			self._power_input_timer['unabletostart'] = True
-+			self._reset_power_inverter_input()
+ 			self._reset_power_input_timer()
 +#### GuiMods warm-up / cool-down
 +		elif not processAlarm:
-+			self._reset_power_inverter_input()
++			self._reset_power_input_timer()
 +			return
-+		elif self._aower_inverter_input['timeout'] < self.RETRIES_ON_ERROR:
-+			self._power_inverter_input['timeout'] += 1
-+		elif not self._power_inverter_input['unabletostart']:
-+			self._power_inverter_input['unabletostart'] = True
+ 		elif self._power_input_timer['timeout'] < self.RETRIES_ON_ERROR:
+ 			self._power_input_timer['timeout'] += 1
+ 		elif not self._power_input_timer['unabletostart']:
+ 			self._power_input_timer['unabletostart'] = True
  			self._dbusservice['/Alarms/NoGeneratorAtAcIn'] = 2
  			self.log_info('Generator not detected at inverter AC input, triggering alarm')
 +#### end GuiMods
  
  	def _reset_power_input_timer(self):
--		if self._power_input_timer['timeout'] != 0:
--			self._power_input_timer['timeout'] = 0
-+		if self._acpower_inverter_input['timeout'] != 0:
-+			self._acpower_inverter_input['timeout'] = 0
- 
--		if self._power_input_timer['unabletostart'] != 0:
--			self._power_input_timer['unabletostart'] = False
-+		if self._acpower_inverter_input['unabletostart'] != 0:
-+			self._acpower_inverter_input['unabletostart'] = 0
- 
- 		self._dbusservice['/Alarms/NoGeneratorAtAcIn'] = 0
- 
-@@ -851,8 +958,20 @@
- 
- 		# When the condition is already reached only the stop value can set it to False
+ 		if self._power_input_timer['timeout'] != 0:
+@@ -853,6 +960,18 @@
  		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
-+		stop = value <= stopvalue if start_is_greater else value >= stopvalue
-+
-+#### GuiMods
  		stop = value <= stopvalue if start_is_greater else value >= stopvalue
+ 
++#### GuiMods
++		stop = value <= stopvalue if start_is_greater else value >= stopvalue
 +		# when starting manually and stopping based on auto stop values,
 +		#	start if stop condition is not satisfied
- 
++
 +		if self._ignoreAutoStartCondition:
 +			start = not stop
 +		else:

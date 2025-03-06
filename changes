@@ -1,3 +1,7 @@
+v10.82:
+	fixed: generator not working
+	fixed: external transfer switch not working
+
 v10.81:
 	add support for v3.54, v3.60~25
 	remove unused symbolic links

@@ -828,7 +828,7 @@ class StartStop(object):
 			return
 
 		if self._settings['nogeneratoratacinalarm'] == 0:
-			self._reset_acpower_inverter_input()
+			self._reset_power_input_timer()
 			return
 
 		if self.multiservice_type == 'vebus':
@@ -852,7 +852,7 @@ class StartStop(object):
 #### GuiMods warm-up / cool-down
 		if self._settings['nogeneratoratacinalarm'] == 0:
 			processAlarm = False
-			self._reset_acpower_inverter_input()
+			self._reset_power_input_timer()
 		else:
 			processAlarm = True
 
@@ -862,25 +862,25 @@ class StartStop(object):
 #### GuiMods warm-up / cool-down
 			if processAlarm and self._power_input_timer['unabletostart']:
 				self.log_info('Generator detected at inverter AC input, alarm removed')
-			self._reset_power_inverter_input()
+			self._reset_power_input_timer()
 #### GuiMods warm-up / cool-down
 		elif not processAlarm:
-			self._reset_power_inverter_input()
+			self._reset_power_input_timer()
 			return
-		elif self._aower_inverter_input['timeout'] < self.RETRIES_ON_ERROR:
-			self._power_inverter_input['timeout'] += 1
-		elif not self._power_inverter_input['unabletostart']:
-			self._power_inverter_input['unabletostart'] = True
+		elif self._power_input_timer['timeout'] < self.RETRIES_ON_ERROR:
+			self._power_input_timer['timeout'] += 1
+		elif not self._power_input_timer['unabletostart']:
+			self._power_input_timer['unabletostart'] = True
 			self._dbusservice['/Alarms/NoGeneratorAtAcIn'] = 2
 			self.log_info('Generator not detected at inverter AC input, triggering alarm')
 #### end GuiMods
 
 	def _reset_power_input_timer(self):
-		if self._acpower_inverter_input['timeout'] != 0:
-			self._acpower_inverter_input['timeout'] = 0
+		if self._power_input_timer['timeout'] != 0:
+			self._power_input_timer['timeout'] = 0
 
-		if self._acpower_inverter_input['unabletostart'] != 0:
-			self._acpower_inverter_input['unabletostart'] = 0
+		if self._power_input_timer['unabletostart'] != 0:
+			self._power_input_timer['unabletostart'] = False
 
 		self._dbusservice['/Alarms/NoGeneratorAtAcIn'] = 0
 
