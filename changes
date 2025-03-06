@@ -1,3 +1,6 @@
+v10.83:
+	fixed: manual start / auto stop not working
+
 v10.82:
 	fixed: generator not working
 	fixed: external transfer switch not working

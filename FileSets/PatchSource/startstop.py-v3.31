@@ -887,6 +887,7 @@ class StartStop(object):
 		#	start if stop condition is not satisfied
 		if self._ignoreAutoStartCondition:
 			start = not stop
+			condition['reached'] = start
 		else:
 			# When the condition is already reached only the stop value can set it to False
 			start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)

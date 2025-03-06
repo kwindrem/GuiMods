@@ -1,5 +1,5 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.53~2.orig	2025-01-12 08:47:10
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.53~2	2024-11-02 16:44:21
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.53.orig	2025-01-12 08:47:10
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.53	2025-03-06 14:56:39
 @@ -1,5 +1,16 @@
  #!/usr/bin/python -u
  # -*- coding: utf-8 -*-
@@ -52,17 +52,18 @@
  
  
  		# Manual battery service selection is deprecated in favour
-@@ -410,6 +438,14 @@
+@@ -409,7 +437,15 @@
+ 
  		# When this startstop instance controls a genset which reports operatinghours, make sure to synchronize with that.
  		self._useGensetHours = self._dbusmonitor.get_value(self._remoteservice, '/Engine/OperatingHours', None) is not None
- 
++
 +#### GuiMods
 +		# generator input running state
 +		# external override active
 +		self._dbusservice.add_path('/ExternalOverride', value=None)
 +		self._dbusservice['/ExternalOverride'] = False
 +		self._ignoreAutoStartCondition = False
-+
+ 
 +
  	@property
  	def _is_running(self):
@@ -258,17 +259,20 @@
  
  	def _reset_acpower_inverter_input(self, clear_error=True):
  		if self._acpower_inverter_input['timeout'] != 0:
-@@ -819,6 +921,18 @@
- 		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
+@@ -816,9 +918,20 @@
+ 		start_is_greater = startvalue > stopvalue
+ 
+ 		# When the condition is already reached only the stop value can set it to False
+-		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
++#### GuiMods
  		stop = value <= stopvalue if start_is_greater else value >= stopvalue
  
-+#### GuiMods
-+		stop = value <= stopvalue if start_is_greater else value >= stopvalue
 +		# when starting manually and stopping based on auto stop values,
 +		#	start if stop condition is not satisfied
 +
 +		if self._ignoreAutoStartCondition:
 +			start = not stop
++			condition['reached'] = start
 +		else:
 +			# When the condition is already reached only the stop value can set it to False
 +			start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
@@ -277,7 +281,7 @@
  		# Timed conditions must start/stop after the condition has been reached for a minimum
  		# time.
  		if condition['timed']:
-@@ -851,7 +965,8 @@
+@@ -851,7 +964,8 @@
  		# If /ManualStartTimer has a value greater than zero will use it to set a stop timer.
  		# If no timer is set, the generator will not stop until the user stops it manually.
  		# Once started by manual start, each evaluation the timer is decreased
@@ -287,7 +291,7 @@
  			self._manualstarttimer += time.time() if self._manualstarttimer == 0 else 0
  			self._dbusservice['/ManualStartTimer'] -= int(time.time()) - int(self._manualstarttimer)
  			self._manualstarttimer = time.time()
-@@ -1154,31 +1269,40 @@
+@@ -1154,31 +1268,40 @@
  		running = state in (States.WARMUP, States.COOLDOWN, States.STOPPING, States.RUNNING)
  		if not (running and remote_running): # STOPPED, ERROR
  			# There is an option to skip warm-up for the inverteroverload condition.
@@ -341,7 +345,7 @@
  
  		self._dbusservice['/RunningByCondition'] = condition
  		self._dbusservice['/RunningByConditionCode'] = RunningConditions.lookup(condition)
-@@ -1189,46 +1313,47 @@
+@@ -1189,46 +1312,47 @@
  		running = state in (States.WARMUP, States.COOLDOWN, States.STOPPING, States.RUNNING)
  
  		if running or remote_running:
@@ -426,7 +430,7 @@
  	@property
  	def _ac1_is_generator(self):
  		return self._dbusmonitor.get_value('com.victronenergy.settings',
-@@ -1239,15 +1364,41 @@
+@@ -1239,15 +1363,41 @@
  		return self._dbusmonitor.get_value('com.victronenergy.settings',
  			'/Settings/SystemSetup/AcInput2') == 2
  
@@ -473,7 +477,7 @@
  	def _update_remote_switch(self):
  		# Engine should be started in these states
  		v = self._dbusservice['/State'] in (States.RUNNING, States.WARMUP, States.COOLDOWN)
-@@ -1290,3 +1441,42 @@
+@@ -1290,3 +1440,42 @@
  
  	def _create_dbus_service(self):
  		return create_dbus_service(self._instance)
