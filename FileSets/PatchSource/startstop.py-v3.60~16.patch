@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~16.orig	2025-01-12 08:47:10
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~16	2025-03-06 14:57:27
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~16	2025-03-07 23:28:49
 @@ -1,5 +1,16 @@
  #!/usr/bin/python -u
  # -*- coding: utf-8 -*-
@@ -54,18 +54,17 @@
  		# Manual battery service selection is deprecated in favour
  		# of getting the values directly from systemcalc, we keep
  		# manual selected services handling for compatibility reasons.
-@@ -438,7 +467,15 @@
- 
+@@ -439,6 +468,14 @@
  		# When this startstop instance controls a genset which reports operatinghours, make sure to synchronize with that.
  		self._useGensetHours = self._dbusmonitor.get_value(self._remoteservice, '/Engine/OperatingHours', None) is not None
-+
+ 
 +#### GuiMods
 +		# generator input running state
 +		# external override active
 +		self._dbusservice.add_path('/ExternalOverride', value=None)
 +		self._dbusservice['/ExternalOverride'] = False
-+		self._ignoreAutoStartCondition = False
- 
++		self.manualStartAutoStop = False
++
 +
  	@property
  	def _is_running(self):
@@ -115,34 +114,39 @@
  	def _evaluate_startstop_conditions(self):
  		if self.get_error() != Errors.NONE:
  			# First evaluation after an error, log it
-@@ -616,9 +684,23 @@
+@@ -616,10 +684,28 @@
  
  		self._update_runtime()
  
 -		if self._evaluate_manual_start():
 -			startbycondition = 'manual'
 -			start = True
-+#### GuiMods
 +		# A negative /ManualStartTimer is used by the GUI to signal the generator should start now
 +		#	but stop when all auto stop conditions have been met
 +		# so we skip manual start evaluation if this is the case
-+		#	and set a flag for use below to ignore auto start conditions
-+		# the generator is actually started by the auto start/stop logic below
++		#	and set a flag to ignore auto start conditions when evaluating conditional start/stop
++		# the generator is actually started by the auto start/stop logic in evaluate condition
++		#   to avoid the generator starting, then stopping immediately if all stop conditions are already met
 +		if  self._dbusservice['/ManualStartTimer'] < 0 and self._dbusservice['/ManualStart'] == 1:
 +			self._dbusservice['/ManualStartTimer'] = 0
 +			self._dbusservice['/ManualStart'] = 0
-+			self._ignoreAutoStartCondition = True
-+
++			self.manualStartAutoStop = True
++			if self._settings['autostart'] == 1:
++				logging.info ("manual start / auto stop command received")
++			else:
++				logging.info ("manual start / auto stop command received - but AutoStart not enabled - generator will not start")
+ 
 +		else:
-+			self._ignoreAutoStartCondition = False
++			self.manualStartAutoStop = False
 +			if self._evaluate_manual_start():
 +				startbycondition = 'manual'
 +				start = True
 +#### end GuiMods
- 
++
  		# Conditions will only be evaluated if the autostart functionality is enabled
  		if self._settings['autostart'] == 1:
-@@ -669,18 +751,26 @@
+ 
+@@ -669,18 +755,28 @@
  					start = True
  					startbycondition = 'lossofcommunication'
  
@@ -163,6 +167,8 @@
  			self._start_generator(startbycondition)
 -		elif (int(mtime - self._starttime) >= self._settings['minimumruntime'] * 60
 -				or activecondition == 'manual'):
++		elif self.manualStartAutoStop:
++			logging.info ("manual start / auto stop: all stop conditions satisfied - generator not started")
 +#### GuiMods
 +		# bypass the minimum run time check if External Override is active
 +		elif (self._dbusservice['/Runtime'] >= self._settings['minimumruntime'] * 60
@@ -172,7 +178,7 @@
  
  	def _update_runtime(self, just_stopped=False):
  		# Update current and accumulated runtime.
-@@ -697,8 +787,8 @@
+@@ -697,8 +793,8 @@
  	def _evaluate_autostart_disabled_alarm(self):
  
  		if self._settings['autostartdisabledalarm'] == 0:
@@ -183,7 +189,7 @@
  			if self._dbusservice['/Alarms/AutoStartDisabled'] != 0:
  				self._dbusservice['/Alarms/AutoStartDisabled'] = 0
  			if self._dbusservice['/Alarms/RemoteStartModeDisabled'] != 0:
-@@ -707,29 +797,31 @@
+@@ -707,29 +803,31 @@
  
  		# GX auto start/stop alarm
  		if self._settings['autostart'] == 1:
@@ -220,7 +226,7 @@
  		if state in [States.STOPPED, States.COOLDOWN, States.WARMUP]:
  			self._reset_acpower_inverter_input()
  			return
-@@ -756,16 +848,31 @@
+@@ -756,16 +854,31 @@
  		# Not connected = 0, connected = 1
  		activein_connected = activein_state == 1
  
@@ -253,29 +259,22 @@
  
  	def _reset_acpower_inverter_input(self, clear_error=True):
  		if self._acpower_inverter_input['timeout'] != 0:
-@@ -849,9 +956,20 @@
- 		start_is_greater = startvalue > stopvalue
- 
+@@ -851,6 +964,14 @@
  		# When the condition is already reached only the stop value can set it to False
--		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
-+#### GuiMods
+ 		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
  		stop = value <= stopvalue if start_is_greater else value >= stopvalue
- 
-+		# when starting manually and stopping based on auto stop values,
-+		#	start if stop condition is not satisfied
-+
-+		if self._ignoreAutoStartCondition:
-+			start = not stop
-+			condition['reached'] = start
-+		else:
-+			# When the condition is already reached only the stop value can set it to False
-+			start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
++#### GuiMods
++		# when starting manually and stopping based on conditions,
++		#	start if stop condition is not yet satisfied
++		if self.manualStartAutoStop and not stop:
++			start = True
++			condition['reached'] = True
++			logging.info ("starting manually, stop based on %s reaching %d", name, stopvalue)
 +#### end GuiMods
-+
+ 
  		# Timed conditions must start/stop after the condition has been reached for a minimum
  		# time.
- 		if condition['timed']:
-@@ -884,7 +1002,8 @@
+@@ -884,7 +1005,8 @@
  		# If /ManualStartTimer has a value greater than zero will use it to set a stop timer.
  		# If no timer is set, the generator will not stop until the user stops it manually.
  		# Once started by manual start, each evaluation the timer is decreased
@@ -285,7 +284,7 @@
  			self._manualstarttimer += time.time() if self._manualstarttimer == 0 else 0
  			self._dbusservice['/ManualStartTimer'] -= int(time.time()) - int(self._manualstarttimer)
  			self._manualstarttimer = time.time()
-@@ -1218,31 +1337,40 @@
+@@ -1218,31 +1340,40 @@
  		running = state in (States.WARMUP, States.COOLDOWN, States.STOPPING, States.RUNNING)
  		if not (running and remote_running): # STOPPED, ERROR
  			# There is an option to skip warm-up for the inverteroverload condition.
@@ -313,13 +312,12 @@
 -			self._starttime = monotonic_time.monotonic_time().to_seconds_double()
 -
 -			self.log_info('Starting generator by %s condition' % condition)
--		else: # WARMUP, COOLDOWN, RUNNING, STOPPING
+ 		else: # WARMUP, COOLDOWN, RUNNING, STOPPING
 -			if state == States.WARMUP:
 -				if monotonic_time.monotonic_time().to_seconds_double() - self._starttime > self._settings['warmuptime']:
 -					self._set_ignore_ac(False) # Release load onto Generator
 -					self._dbusservice['/State'] = States.RUNNING
 -			elif state in (States.COOLDOWN, States.STOPPING):
-+		else: # WARMUP, COOLDOWN, RUNNING, STOPPING
 +			if state in (States.COOLDOWN, States.STOPPING):
  				# Start request during cool-down run, go back to RUNNING
 -				self._set_ignore_ac(False) # Put load back onto Generator
@@ -339,7 +337,7 @@
  
  		self._dbusservice['/RunningByCondition'] = condition
  		self._dbusservice['/RunningByConditionCode'] = RunningConditions.lookup(condition)
-@@ -1253,46 +1381,47 @@
+@@ -1253,46 +1384,47 @@
  		running = state in (States.WARMUP, States.COOLDOWN, States.STOPPING, States.RUNNING)
  
  		if running or remote_running:
@@ -424,7 +422,7 @@
  	@property
  	def _ac1_is_generator(self):
  		return self._dbusmonitor.get_value('com.victronenergy.settings',
-@@ -1303,15 +1432,41 @@
+@@ -1303,15 +1435,41 @@
  		return self._dbusmonitor.get_value('com.victronenergy.settings',
  			'/Settings/SystemSetup/AcInput2') == 2
  
@@ -471,7 +469,7 @@
  	def _update_remote_switch(self):
  		# Engine should be started in these states
  		v = self._dbusservice['/State'] in (States.RUNNING, States.WARMUP, States.COOLDOWN)
-@@ -1354,3 +1509,42 @@
+@@ -1354,3 +1512,42 @@
  
  	def _create_dbus_service(self):
  		return create_dbus_service(self._instance)

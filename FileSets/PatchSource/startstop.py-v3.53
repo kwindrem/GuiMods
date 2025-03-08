@@ -443,7 +443,7 @@ class StartStop(object):
 		# external override active
 		self._dbusservice.add_path('/ExternalOverride', value=None)
 		self._dbusservice['/ExternalOverride'] = False
-		self._ignoreAutoStartCondition = False
+		self.manualStartAutoStop = False
 
 
 	@property
@@ -658,15 +658,20 @@ class StartStop(object):
 		# A negative /ManualStartTimer is used by the GUI to signal the generator should start now
 		#	but stop when all auto stop conditions have been met
 		# so we skip manual start evaluation if this is the case
-		#	and set a flag for use below to ignore auto start conditions
-		# the generator is actually started by the auto start/stop logic below
+		#	and set a flag to ignore auto start conditions when evaluating conditional start/stop
+		# the generator is actually started by the auto start/stop logic in evaluate condition
+		#   to avoid the generator starting, then stopping immediately if all stop conditions are already met
 		if  self._dbusservice['/ManualStartTimer'] < 0 and self._dbusservice['/ManualStart'] == 1:
 			self._dbusservice['/ManualStartTimer'] = 0
 			self._dbusservice['/ManualStart'] = 0
-			self._ignoreAutoStartCondition = True
+			self.manualStartAutoStop = True
+			if self._settings['autostart'] == 1:
+				logging.info ("manual start / auto stop command received")
+			else:
+				logging.info ("manual start / auto stop command received - but AutoStart not enabled - generator will not start")
 
 		else:
-			self._ignoreAutoStartCondition = False
+			self.manualStartAutoStop = False
 			if self._evaluate_manual_start():
 				startbycondition = 'manual'
 				start = True
@@ -735,6 +740,8 @@ class StartStop(object):
 
 		if start:
 			self._start_generator(startbycondition)
+		elif self.manualStartAutoStop:
+			logging.info ("manual start / auto stop: all stop conditions satisfied - generator not started")
 #### GuiMods
 		# bypass the minimum run time check if External Override is active
 		elif (self._dbusservice['/Runtime'] >= self._settings['minimumruntime'] * 60
@@ -918,18 +925,15 @@ class StartStop(object):
 		start_is_greater = startvalue > stopvalue
 
 		# When the condition is already reached only the stop value can set it to False
-#### GuiMods
+		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
 		stop = value <= stopvalue if start_is_greater else value >= stopvalue
-
-		# when starting manually and stopping based on auto stop values,
-		#	start if stop condition is not satisfied
-
-		if self._ignoreAutoStartCondition:
-			start = not stop
-			condition['reached'] = start
-		else:
-			# When the condition is already reached only the stop value can set it to False
-			start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
+#### GuiMods
+		# when starting manually and stopping based on conditions,
+		#	start if stop condition is not yet satisfied
+		if self.manualStartAutoStop and not stop:
+			start = True
+			condition['reached'] = True
+			logging.info ("starting manually, stop based on %s reaching %d", name, stopvalue)
 #### end GuiMods
 
 		# Timed conditions must start/stop after the condition has been reached for a minimum

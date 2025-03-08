@@ -1,3 +1,5 @@
+v10.84:
+	added log messages for manual start / auto stop
 v10.83:
 	fixed: manual start / auto stop not working
 
