@@ -1,9 +1,9 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py.orig	2024-07-18 07:51:43
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py	2024-05-14 07:00:12
-@@ -1,5 +1,15 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py-v3.60~53.orig	2018-03-09 04:34:56
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py-v3.60~53	2025-03-30 17:12:51
+@@ -1,6 +1,16 @@
  #!/usr/bin/python3 -u
  # -*- coding: utf-8 -*-
-+
+ 
 +#### GuiMods
 +#### This file has been modified to allow the generator running state derived from the generator digital input
 +####	or the genset AC input
@@ -13,10 +13,11 @@
 +#### It is now possible to start the generator manually and have it stop automatically based on the preset conditions
 +####	for automaitc start / stop
 +#### Search for #### GuiMods to find changes
- 
++
  from dbus.mainloop.glib import DBusGMainLoop
  import dbus
-@@ -81,7 +91,10 @@
+ import argparse
+@@ -92,7 +102,10 @@
  				'/VebusService': dummy,
  				'/Dc/Battery/Voltage': dummy,
  				'/Dc/Battery/Current': dummy,
@@ -25,10 +26,10 @@
 +#### GuiMods
 +				'/Ac/Genset/Frequency': dummy,
 +				'/Ac/In/NumberOfAcInputs': dummy
- 				}
- 			}
- 
-@@ -93,6 +106,9 @@
+ 				},
+ 			'com.victronenergy.tank': {
+ 				'/Level': dummy,
+@@ -110,6 +123,9 @@
  			'accumulateddaily': ['/Settings/{0}/AccumulatedDaily', '', 0, 0, True],
  			'accumulatedtotal': ['/Settings/{0}/AccumulatedTotal', 0, 0, 0, True], # Internal, can't be reset by the user
  			'accumulatedtotalOffset': ['/Settings/{0}/AccumulatedTotalOffset', 0, 0, 0], # For calculating user runtime
@@ -38,3 +39,21 @@
  			'batterymeasurement': ['/Settings/{0}/BatteryService', 'default', 0, 0],
  			'minimumruntime': ['/Settings/{0}/MinimumRuntime', 0, 0, 86400],  # minutes
  			'stoponac1enabled': ['/Settings/{0}/StopWhenAc1Available', 0, 0, 1],
+@@ -181,7 +197,7 @@
+ 			'nogeneratoratacinalarm': ['/Settings/{0}/Alarms/NoGeneratorAtAcIn', 0, 0, 1],
+ 			'autostartdisabledalarm': ['/Settings/{0}/Alarms/AutoStartDisabled', 0, 0, 1],
+ 			# Warm-up and Cool-down
+-			'warmuptime': ['/Settings/{0}/WarmUpTime', 0, 0, 1800],
++			'warmuptime': ['/Settings/{0}/WarmUpTime', 0, 0, 600],
+ 			'cooldowntime': ['/Settings/{0}/CoolDownTime', 0, 0, 600],
+ 			'generatorstoptime': ['/Settings/{0}/GeneratorStopTime', 0, 0, 600]
+ 			}
+@@ -282,7 +298,7 @@
+ 	def _add_device(self, service):
+ 		for i in self._modules:
+ 			# Check if module can handle this service
+-			if re.match(i.remoteprefix, service) is None:
++			if i.remoteprefix not in service:
+ 				continue
+ 			# Check and create start/stop instance for the device
+ 			if i.check_device(self._dbusmonitor, service):

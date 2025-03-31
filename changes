@@ -1,3 +1,6 @@
+v10.85:
+	add support for v3.60~53
+
 v10.84:
 	added log messages for manual start / auto stop
 v10.83:

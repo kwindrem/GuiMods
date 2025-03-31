@@ -1,0 +1,47 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.60~53.orig	2018-03-09 04:34:56
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.60~53	2025-03-30 21:15:51
+@@ -3,9 +3,14 @@
+ Rectangle {
+ 	id: root
+ 
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
+ 	color: "#009ec6"
+-	border.width: 1
+-	border.color: "#fff"
++	border.width: 2
++////// GuiMods — DarkMode
++	border.color: !darkMode ? "#fff" : "#202020"
+ 	clip: true
+ 
+ 	property string title
+@@ -21,7 +26,8 @@
+ 		id: titleField
+ 		font.pixelSize: 13
+ 		text: title
+-		color: "white"
++////// GuiMods — DarkMode
++		color: !darkMode ? "white" : "#ddd"
+ 		height: text === "" ? 0 : paintedHeight
+ 		anchors {
+ 			top: parent.top; topMargin: 5
+@@ -34,7 +40,8 @@
+ 		width: parent.width - 10
+ 		height: 1
+ 		visible: title !== ""
+-		color: "white"
++////// GuiMods — DarkMode
++		color: !darkMode ? "white" : "#ddd"
+ 		anchors {
+ 			top: titleField.bottom
+ 			left: titleField.left
+@@ -43,7 +50,6 @@
+ 
+ 	Column {
+ 		id: column
+-		width: root.width
+ 		anchors {
+ 			top: titleLine.bottom; topMargin: 3
+ 			horizontalCenter: parent.horizontalCenter

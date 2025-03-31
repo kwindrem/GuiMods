@@ -1,5 +1,5 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml.orig	2024-07-09 10:20:00
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml	2024-05-14 07:00:12
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.41.orig	2024-07-09 10:20:00
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.41	2024-05-14 07:00:12
 @@ -3,9 +3,14 @@
  Rectangle {
  	id: root
