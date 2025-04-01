@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.60~53.orig	2018-03-09 04:34:56
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.60~53	2025-03-30 21:15:51
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Tile.qml-v3.60~53	2025-03-31 16:47:30
 @@ -3,9 +3,14 @@
  Rectangle {
  	id: root
@@ -9,9 +9,8 @@
 +	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 +
  	color: "#009ec6"
--	border.width: 1
+ 	border.width: 1
 -	border.color: "#fff"
-+	border.width: 2
 +////// GuiMods — DarkMode
 +	border.color: !darkMode ? "#fff" : "#202020"
  	clip: true
@@ -37,11 +36,3 @@
  		anchors {
  			top: titleField.bottom
  			left: titleField.left
-@@ -43,7 +50,6 @@
- 
- 	Column {
- 		id: column
--		width: root.width
- 		anchors {
- 			top: titleLine.bottom; topMargin: 3
- 			horizontalCenter: parent.horizontalCenter

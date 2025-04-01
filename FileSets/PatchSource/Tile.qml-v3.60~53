@@ -8,7 +8,7 @@ Rectangle {
 	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
 
 	color: "#009ec6"
-	border.width: 2
+	border.width: 1
 ////// GuiMods — DarkMode
 	border.color: !darkMode ? "#fff" : "#202020"
 	clip: true
@@ -50,6 +50,7 @@ Rectangle {
 
 	Column {
 		id: column
+		width: root.width
 		anchors {
 			top: titleLine.bottom; topMargin: 3
 			horizontalCenter: parent.horizontalCenter

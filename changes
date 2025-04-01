@@ -1,3 +1,7 @@
+v10.86:
+	fixed: Enhanced Mobile Overview formatting errors in v3.60~53
+	note: Victron removed notifications from it's status tile so I needed to do the same
+
 v10.85:
 	add support for v3.60~53
 
