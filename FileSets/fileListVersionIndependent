@@ -1,3 +1,8 @@
+/opt/victronenergy/gui/qml/DetailAcInput.qml
+/opt/victronenergy/gui/qml/DetailInverter.qml
+/opt/victronenergy/gui/qml/DetailLoadsCombined.qml
+/opt/victronenergy/gui/qml/DetailLoadsOnInput.qml
+/opt/victronenergy/gui/qml/DetailLoadsOnOutput.qml
 /opt/victronenergy/gui/qml/DcSystemRow.qml
 /opt/victronenergy/gui/qml/DetailAcCharger.qml
 /opt/victronenergy/gui/qml/DetailAlternator.qml
@@ -14,7 +19,10 @@
 /opt/victronenergy/gui/qml/MarqueeEnhanced.qml
 /opt/victronenergy/gui/qml/MultiEnhanced.qml
 /opt/victronenergy/gui/qml/MultiEnhancedGP.qml
+/opt/victronenergy/gui/qml/OverviewAcValuesEnhanced.qml
 /opt/victronenergy/gui/qml/OverviewRelays.qml
+/opt/victronenergy/gui/qml/OverviewTanksTempsDigInputs.qml
+/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml
 /opt/victronenergy/gui/qml/PageSettingsGuiModsGauges.qml
 /opt/victronenergy/gui/qml/PowerGaugeBattery.qml
 /opt/victronenergy/gui/qml/PowerGaugeMulti.qml
@@ -26,6 +34,8 @@
 /opt/victronenergy/gui/qml/TileManualStartEnhanced.qml
 /opt/victronenergy/gui/qml/TileTankEnhanced.qml
 /opt/victronenergy/gui/qml/TileTemp.qml
+/opt/victronenergy/gui/qml/TileRelay.qml
+/opt/victronenergy/gui/qml/TileDigIn.qml
 /opt/victronenergy/gui/qml/enhancedFormat.js
 /opt/victronenergy/gui/qml/timeToGo.js
 /opt/victronenergy/themes/ccgx/images/overview-renewable-light.svg

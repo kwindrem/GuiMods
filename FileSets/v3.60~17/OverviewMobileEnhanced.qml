@@ -47,8 +47,6 @@ OverviewPage {
     property variant sys: theSystem
     property string settingsBindPreffix: "com.victronenergy.settings"
     property string pumpBindPreffix: "com.victronenergy.pump.startstop0"
-    property variant activeNotifications: NotificationCenter.notifications.filter(
-                                              function isActive(obj) { return obj.active} )
     property string noAdjustableByDmc: qsTr("This setting is disabled when a Digital Multi Control " +
                                             "is connected. If it was recently disconnected execute " +
                                             "\"Redetect system\" that is available on the inverter menu page.")
@@ -181,15 +179,9 @@ OverviewPage {
 				text: wallClock.running ? wallClock.time : ""
 				font.pixelSize: 15
 			},
-//////// combine SystemReason with notifications
+//////// SystemReason only now (Victron removed notifications around v3.60~53)
 			MarqueeEnhanced {
-				text:
-				{
-					if (activeNotifications.length === 0)
-						return systemReasonMessage.text
-					else
-						return notificationText() + " || " + systemReasonMessage.text
-				}
+				text:systemReasonMessage.text
 				width: statusTile.width
 				textHorizontalAlignment: Text.AlignHCenter
 				interval: 100

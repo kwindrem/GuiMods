@@ -1,17 +1,7 @@
-/opt/victronenergy/gui/qml/DetailAcInput.qml
-/opt/victronenergy/gui/qml/DetailInverter.qml
-/opt/victronenergy/gui/qml/DetailLoadsCombined.qml
-/opt/victronenergy/gui/qml/DetailLoadsOnInput.qml
-/opt/victronenergy/gui/qml/DetailLoadsOnOutput.qml
-/opt/victronenergy/gui/qml/OverviewAcValuesEnhanced.qml
 /opt/victronenergy/gui/qml/OverviewFlowComplex.qml
 /opt/victronenergy/gui/qml/OverviewGeneratorEnhanced.qml
-/opt/victronenergy/gui/qml/OverviewGeneratorRelayEnhanced.qml
 /opt/victronenergy/gui/qml/OverviewHubEnhanced.qml
 /opt/victronenergy/gui/qml/OverviewMobileEnhanced.qml
-/opt/victronenergy/gui/qml/OverviewTanksTempsDigInputs.qml
 /opt/victronenergy/gui/qml/PageGenerator.qml
 /opt/victronenergy/gui/qml/PageSettingsGuiMods.qml
 /opt/victronenergy/gui/qml/PowerGauge.qml
-/opt/victronenergy/gui/qml/TileDigIn.qml
-/opt/victronenergy/gui/qml/TileRelay.qml

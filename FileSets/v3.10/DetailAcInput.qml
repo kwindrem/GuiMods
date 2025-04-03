@@ -1,1 +1,0 @@
-../v3.34/DetailAcInput.qml
