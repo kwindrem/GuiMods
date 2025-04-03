@@ -1,3 +1,6 @@
+v10.88:
+	fixed: another blank overview page on v3.54 firmware
+
 v10.87:
 	fixed: white/black screen for Temps/Tanks/Dig In overview (som OS versions)
 	move more files to version independent
