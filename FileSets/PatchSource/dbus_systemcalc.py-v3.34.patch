@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_systemcalc.py-v3.34.orig	2024-07-08 07:47:23
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_systemcalc.py-v3.34	2024-10-01 15:26:58
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_systemcalc.py-v3.34	2025-04-06 10:03:59
 @@ -1,6 +1,8 @@
  #!/usr/bin/python3 -u
  # -*- coding: utf-8 -*-
@@ -149,26 +149,10 @@
  		self._handleservicechange()
  		self._updatevalues()
  
-@@ -596,15 +671,49 @@
- 		# ==== ALTERNATOR ====
- 		alternators = self._dbusmonitor.get_service_list('com.victronenergy.alternator')
- 		for alternator in alternators:
-+#### modified for GuiMods
-+			# some alternators do not provide a valid power value if not running
-+			#	or below a minimum power/current
-+			# so fill in a zero power so that the systemcalc power becomes valid
- 			# Assume the battery connected to output 0 is the main battery
- 			p = self._dbusmonitor.get_value(alternator, '/Dc/0/Power')
- 			if p is None:
--				continue
-+				#### continue
-+				p = 0
- 
- 			if '/Dc/Alternator/Power' not in newvalues:
- 				newvalues['/Dc/Alternator/Power'] = p
+@@ -606,6 +681,35 @@
  			else:
  				newvalues['/Dc/Alternator/Power'] += p
-+
+ 
 +
 +#### added for GuiMods
 +		# ==== MOTOR DRIVE ====
@@ -197,10 +181,11 @@
 +					newvalues['/Dc/WindGenerator/Power'] = p
 +				else:
 +					newvalues['/Dc/WindGenerator/Power'] += p
- 
++
  		# ==== CHARGERS ====
  		chargers = self._dbusmonitor.get_service_list('com.victronenergy.charger')
-@@ -767,6 +876,9 @@
+ 		charger_batteryvoltage = None
+@@ -767,6 +871,9 @@
  				charger_power = newvalues.get('/Dc/Charger/Power', 0)
  				fuelcell_power = newvalues.get('/Dc/FuelCell/Power', 0)
  				alternator_power = newvalues.get('/Dc/Alternator/Power', 0)
@@ -210,7 +195,7 @@
  
  				# If there are VE.Direct inverters, remove their power from the
  				# DC estimate. This is done using the AC value when the DC
-@@ -787,7 +899,12 @@
+@@ -787,7 +894,12 @@
  				# displayed. For now, we leave it out so that in the current
  				# version of Venus it does not break user's expectations.
  				#newvalues['/Dc/System/Power'] = dc_pv_power + charger_power + fuelcell_power + vebuspower + inverter_power - battery_power - alternator_power
@@ -224,7 +209,7 @@
  
  		elif self._settings['hasdcsystem'] == 1 and solarchargers_loadoutput_power is not None:
  			newvalues['/Dc/System/MeasurementType'] = 0 # estimated
-@@ -849,6 +966,13 @@
+@@ -849,6 +961,13 @@
  
  		consumption = { "L1" : None, "L2" : None, "L3" : None }
  		currentconsumption = { "L1" : None, "L2" : None, "L3" : None }
@@ -238,7 +223,7 @@
  		for device_type, em, _types in (('Grid', grid_meter, (1, 3)), ('Genset', genset_meter, (2,))):
  			# If a grid meter is present we use values from it. If not, we look at the multi. If it has
  			# AcIn1 or AcIn2 connected to the grid, we use those values.
-@@ -864,6 +988,12 @@
+@@ -864,6 +983,12 @@
  				if em is not None:
  					p = self._dbusmonitor.get_value(em.service, '/Ac/%s/Power' % phase)
  					mc = self._dbusmonitor.get_value(em.service, '/Ac/%s/Current' % phase)
@@ -251,7 +236,7 @@
  					# Compute consumption between energy meter and multi (meter power - multi AC in) and
  					# add an optional PV inverter on input to the mix.
  					c = None
-@@ -873,6 +1003,12 @@
+@@ -873,6 +998,12 @@
  							try:
  								c = _safeadd(c, -self._dbusmonitor.get_value(multi_path, '/Ac/ActiveIn/%s/P' % phase))
  								cc = _safeadd(cc, -self._dbusmonitor.get_value(multi_path, '/Ac/ActiveIn/%s/I' % phase))
@@ -264,7 +249,7 @@
  							except TypeError:
  								pass
  						elif non_vebus_inverter is not None and active_input in (0, 1):
-@@ -880,6 +1016,12 @@
+@@ -880,6 +1011,12 @@
  								try:
  									c = _safeadd(c, -self._dbusmonitor.get_value(i, '/Ac/In/%d/%s/P' % (active_input+1, phase)))
  									cc = _safeadd(cc, -self._dbusmonitor.get_value(i, '/Ac/In/%d/%s/I' % (active_input+1, phase)))
@@ -277,7 +262,7 @@
  								except TypeError:
  									pass
  
-@@ -897,16 +1039,30 @@
+@@ -897,15 +1034,29 @@
  							consumption[phase] = _safeadd(0, consumption[phase])
  							currentconsumption[phase] = _safeadd(0, currentconsumption[phase])
  							mc = self._dbusmonitor.get_value(multi_path, '/Ac/ActiveIn/%s/I' % phase)
@@ -303,15 +288,14 @@
 +									voltageIn[phase] = self._dbusmonitor.get_value(i, '/Ac/In/%d/%s/V' % (active_input + 1, phase))
 +								if frequencyIn == None:
 +									frequencyIn = self._dbusmonitor.get_value(i, '/Ac/In/%d/%s/F' % (active_input + 1, phase))
- 
++
 +								if p is not None:
 +									consumption[phase] = _safeadd(0, consumption[phase])
 +									currentconsumption[phase] = _safeadd(0, currentconsumption[phase])
-+
+ 
  					# No relevant energy meter present. Assume there is no load between the grid and the multi.
  					# There may be a PV inverter present though (Hub-3 setup).
- 					try:
-@@ -917,9 +1073,18 @@
+@@ -917,9 +1068,18 @@
  
  				newvalues['/Ac/%s/%s/Power' % (device_type, phase)] = p
  				newvalues['/Ac/%s/%s/Current' % (device_type, phase)] = mc
@@ -332,7 +316,7 @@
  
  			self._compute_number_of_phases('/Ac/%s' % device_type, newvalues)
  			self._compute_number_of_phases('/Ac/ActiveIn', newvalues)
-@@ -950,19 +1115,31 @@
+@@ -950,19 +1110,31 @@
  			if use_ac_out:
  				c = newvalues.get('/Ac/PvOnOutput/%s/Power' % phase)
  				a = newvalues.get('/Ac/PvOnOutput/%s/Current' % phase)
@@ -367,7 +351,7 @@
  						c = _safeadd(c, ac_out)
  						a = _safeadd(a, i)
  				else:
-@@ -970,6 +1147,11 @@
+@@ -970,6 +1142,11 @@
  					c = _safeadd(c, ac_out)
  					i_out = self._dbusmonitor.get_value(multi_path, '/Ac/Out/%s/I' % phase)
  					a = _safeadd(a, i_out)
@@ -379,7 +363,7 @@
  				c = _safemax(0, c)
  				a = _safemax(0, a)
  			newvalues['/Ac/ConsumptionOnOutput/%s/Power' % phase] = c
-@@ -978,6 +1160,22 @@
+@@ -978,6 +1155,22 @@
  			newvalues['/Ac/ConsumptionOnInput/%s/Current' % phase] = currentconsumption[phase]
  			newvalues['/Ac/Consumption/%s/Power' % phase] = _safeadd(consumption[phase], c)
  			newvalues['/Ac/Consumption/%s/Current' % phase] = _safeadd(currentconsumption[phase], a)
@@ -402,7 +386,7 @@
  		self._compute_number_of_phases('/Ac/Consumption', newvalues)
  		self._compute_number_of_phases('/Ac/ConsumptionOnOutput', newvalues)
  		self._compute_number_of_phases('/Ac/ConsumptionOnInput', newvalues)
-@@ -989,7 +1187,7 @@
+@@ -989,7 +1182,7 @@
  		with self._dbusservice as sss:
  			for path in self._summeditems.keys():
  				# Why the None? Because we want to invalidate things we don't have anymore.
