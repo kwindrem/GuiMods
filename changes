@@ -1,3 +1,11 @@
+v10.89:
+	changed the way alternator tiles are shown/hidden
+		previously they were only shown if one alternator provided a power value
+		however Wakespeed does not alwyas do
+		so so now the overviews show the tile if any alternator device exists
+		NOTE: this means the tile may show no power value even if it is displayed !!!!
+		This is consistent with the "New UI"
+
 v10.88:
 	fixed: another blank overview page on v3.54 firmware
 

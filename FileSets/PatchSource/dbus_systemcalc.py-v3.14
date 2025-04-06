@@ -648,15 +648,10 @@ class SystemCalc:
 		# ==== ALTERNATOR ====
 		alternators = self._dbusmonitor.get_service_list('com.victronenergy.alternator')
 		for alternator in alternators:
-#### modified for GuiMods
-			# some alternators do not provide a valid power value if not running
-			#	or below a minimum power/current
-			# so fill in a zero power so that the systemcalc power becomes valid
 			# Assume the battery connected to output 0 is the main battery
 			p = self._dbusmonitor.get_value(alternator, '/Dc/0/Power')
 			if p is None:
-				#### continue
-				p = 0
+				continue
 
 			if '/Dc/Alternator/Power' not in newvalues:
 				newvalues['/Dc/Alternator/Power'] = p

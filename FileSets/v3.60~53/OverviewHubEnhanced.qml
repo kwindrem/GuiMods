@@ -36,10 +36,9 @@ OverviewPage {
 	property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
 
 	VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
-	property bool hasAlternator: sys.alternator.power.valid
-	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && (sys.acSource == 0 || sys.acSource == 240)
+	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && numberOfAlternators > 0 && (sys.acSource == 0 || sys.acSource == 240)
 	property bool showAcInput: ((isMulti || sys.acInput.power.valid) && ! replaceAcIn) || showAllTiles
-	property bool showAlternator: !showAcInput && hasAlternator
+	property bool showAlternator: !showAcInput && numberOfAlternators > 0
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
 	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles

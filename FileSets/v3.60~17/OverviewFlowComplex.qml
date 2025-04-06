@@ -55,7 +55,8 @@ OverviewPage {
     property bool showPvOnOutput: (!dcCoupled || !hasFuelCell) && hasPvOnOutput
 	property bool showPvCharger: sys.pvCharger.power.valid
     property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
-    property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && sys.alternator.power.valid
+	property int numberOfAlternators: 0
+	property bool showAlternator: (dcCoupled || !hasLoadsOnInput) && numberOfAlternators > 0
 	property bool hasFuelCell: sys.fuelCell.power.valid
     property bool showFuelCell: (dcCoupled || !hasPvOnOutput) && hasFuelCell
     property bool showWindGen: sys.windGenerator.power.valid
@@ -1390,6 +1391,9 @@ OverviewPage {
 				tempsModel.append({serviceName: service.name})
 			}
             break;;
+		case DBusService.DBUS_SERVICE_ALTERNATOR:
+			numberOfAlternators++
+			break;;
         }
     }
 
@@ -1397,7 +1401,8 @@ OverviewPage {
     function discoverServices()
     {
         numberOfTemps = 0
-        tempsModel.clear()
+		numberOfAlternators = 0
+		tempsModel.clear()
 		veDirectInverterService = ""
 		hasInverter = false
         for (var i = 0; i < DBusServices.count; i++)

@@ -37,9 +37,10 @@ OverviewPage {
 
 	VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
 	property bool hasAlternator: sys.alternator.power.valid
-	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && hasAlternator && (sys.acSource == 0 || sys.acSource == 240)
+	property int numberOfAlternators: 0
+	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && numberOfAlternators > 0 && (sys.acSource == 0 || sys.acSource == 240)
 	property bool showAcInput: ((isMulti || sys.acInput.power.valid) && ! replaceAcIn) || showAllTiles
-	property bool showAlternator: !showAcInput && hasAlternator
+	property bool showAlternator: !showAcInput && numberOfAlternators > 0
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
 	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
@@ -97,7 +98,6 @@ OverviewPage {
 //////// add for alternator - alternator replaces AC in if AC in is not present
 	property string alternatorPrefix1: ""
 	property string alternatorPrefix2: ""
-	property int numberOfAlternators: 0
 	VBusItem { id: alternatorName1;  bind: Utils.path(alternatorPrefix1, "/CustomName") }
 	VBusItem { id: alternatorPower1; bind: Utils.path(alternatorPrefix1, "/Dc/0/Power") }
 	VBusItem { id: alternatorVoltage1; bind: Utils.path(alternatorPrefix1, "/Dc/0/Voltage") }
