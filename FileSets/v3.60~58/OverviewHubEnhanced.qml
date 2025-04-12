@@ -11,7 +11,7 @@
 //////  bar gauge on PV Charger tile
 //////  add support for VE.Direct inverters
 
-import QtQuick 1.1
+import QtQuick 2
 import "utils.js" as Utils
 ////// ADDED to show tanks
 import com.victron.velib 1.0
@@ -208,6 +208,7 @@ OverviewPage {
 	}
 
 	title: qsTr("Simple Overview")
+	focus: active
 
 	OverviewBox {
 		id: acInBox
@@ -351,7 +352,6 @@ OverviewPage {
 		}
 		DetailTarget { id: acChargerTarget; detailsPage: "DetailAcCharger.qml" }
 	}
-
 
 	//// add alternator if AC input not present
 	OverviewBox {
@@ -1077,7 +1077,6 @@ OverviewPage {
 
 	OverviewConnection {
 		id: acInToMulti
-		visible: showAcInput
 		ballCount: 2
 		path: straight
 		active: root.active && showAcInput && showInverter
@@ -1133,7 +1132,7 @@ OverviewPage {
 		ballCount: 2
 		path: straight
 		active: root.active && ( showInverter || showDcSolar )
-		value: -Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.vebusDc.power))
+		value: -Utils.sign (noNoise (sys.pvCharger.power) + noNoise (sys.inverterChargerDc.power))
 		startPointVisible: false
 		endPointVisible: false
 
@@ -1187,7 +1186,7 @@ OverviewPage {
 		ballCount: showTanksTemps ? 2 : 4
 		path: straight
 		active: root.active && showInverter
-		value: -flow(sys.vebusDc.power);
+		value: -flow(sys.inverterChargerDc.power);
 		startPointVisible: false
 
 		anchors {
@@ -1439,7 +1438,6 @@ OverviewPage {
 			else if (numberOfAlternators === 2)
 				alternatorPrefix2 = service.name;
 			break;;
-		}
 //////// add for acCharger
 		case DBusService.DBUS_SERVICE_AC_CHARGER:
 			numberOfAcChargers++
@@ -1448,6 +1446,7 @@ OverviewPage {
 			else if (numberOfAcChargers === 2)
 				acChargerPrefix2 = service.name;
 			break;;
+		}
 	}
 
 	// Detect available services of interest

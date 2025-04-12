@@ -36,10 +36,11 @@ OverviewPage {
 	property string inverterService: vebusService.valid ? vebusService.value : veDirectInverterService
 
 	VBusItem { id: replaceAcInItem; bind: Utils.path(guiModsPrefix, "/ReplaceInactiveAcIn") }
-	property bool hasAlternator: sys.alternator.power.valid
-	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && numberOfAlternators > 0 && (sys.acSource == 0 || sys.acSource == 240)
+	property bool replaceAcIn: replaceAcInItem.valid && replaceAcInItem.value == 1 && ( numberOfAlternators > 0 || numberOfAcChargers > 0 ) && (sys.acSource == undefined || sys.acSource == 0 || sys.acSource == 240)
 	property bool showAcInput: ((isMulti || sys.acInput.power.valid) && ! replaceAcIn) || showAllTiles
-	property bool showAlternator: !showAcInput && numberOfAlternators > 0
+	property bool showAcCharger: replaceAcIn && numberOfAcChargers > 0
+	property bool showAlternator: replaceAcIn && numberOfAlternators > 0 && ! showAcCharger
+	property double acChargerFlow: showAcCharger ? noNoise (sys.acCharger.power) : 0
 	property double alternatorFlow: showAlternator ? noNoise (sys.alternator.power) : 0
 	property bool showAcLoads: isMulti || sys.acLoad.power.valid || veDirectInverterService != ""
 	property bool showDcSystem: (hasDcSystemItem.valid && hasDcSystemItem.value > 0) || showAllTiles
@@ -94,7 +95,7 @@ OverviewPage {
 	property string pvInverterPrefix3: ""
 	property int numberOfPvInverters: 0
 
-//////// add for alternator - alternator replaces AC in if AC in is not present
+//////// add for alternator - alternator replaces AC in if AC in and AC charger are not present
 	property string alternatorPrefix1: ""
 	property string alternatorPrefix2: ""
 	property int numberOfAlternators: 0
@@ -104,6 +105,19 @@ OverviewPage {
 	VBusItem { id: alternatorCurrent1; bind: Utils.path(alternatorPrefix1, "/Dc/0/Current") }
 	VBusItem { id: alternatorName2;  bind: Utils.path(alternatorPrefix2, "/CustomName") }
 	VBusItem { id: alternatorPower2; bind: Utils.path(alternatorPrefix2, "/Dc/0/Power") }
+
+////// add for AC charger - replaces AC in if AC in not present
+	property string acChargerPrefix1: ""
+	property string acChargerPrefix2: ""
+	property int numberOfAcChargers: 0
+	VBusItem { id: acChargerName1;  bind: Utils.path(acChargerPrefix1, "/CustomName") }
+	VBusItem { id: acChargerPower1; bind: Utils.path(acChargerPrefix1, "/Dc/0/Power") }
+	VBusItem { id: acChargerVoltage1; bind: Utils.path(acChargerPrefix1, "/Dc/0/Voltage") }
+	VBusItem { id: acChargerCurrent1; bind: Utils.path(acChargerPrefix1, "/Dc/0/Current") }
+	VBusItem { id: acChargerName2;  bind: Utils.path(acChargerPrefix2, "/CustomName") }
+	VBusItem { id: acChargerPower2; bind: Utils.path(acChargerPrefix2, "/Dc/0/Power") }
+	VBusItem { id: acChargerVoltage2; bind: Utils.path(acChargerPrefix2, "/Dc/0/Voltage") }
+	VBusItem { id: acChargerCurrent2; bind: Utils.path(acChargerPrefix2, "/Dc/0/Current") }
 
 //////// added for control show/hide gauges, tanks and temps from menus
 	VBusItem { id: showGaugesItem; bind: Utils.path(guiModsPrefix, "/ShowGauges") }
@@ -263,6 +277,81 @@ OverviewPage {
 	}
 
 
+	//// add Ac Charger if AC input not present
+	OverviewBox {
+		id: acChargerBox
+		title: qsTr ("Ac Charger")
+		color: !darkMode ? "#157894" : "#0a3c4a"
+		titleColor: !darkMode ? "#419FB9" : "#204f5c"
+		opacity: showAcCharger ? 1 : disabledTileOpacity
+		visible: showAcCharger || showInactiveTiles && ! acInBox.visible
+		width: 148
+		height: showStatusBar ? 100 : 120
+		anchors.fill: acInBox
+		values: Column
+		{
+			width: parent.width
+			TileText
+			{
+				text: " "
+				font.pixelSize: 6
+			}
+			TileText
+			{
+				text: EnhFmt.formatVBusItem (sys.acCharger.power, "W")
+				font.pixelSize: 19
+			}
+			TileText
+			{
+				text: acChargerName1.valid ? acChargerName1.value : "-"
+				visible: showAcCharger && numberOfAcChargers >= 1
+			}
+			TileText
+			{
+				text:  EnhFmt.formatVBusItem (acChargerPower1, "W")
+				font.pixelSize: 15
+				visible: showAcCharger && numberOfAcChargers > 1
+			}
+			TileText {
+				text: EnhFmt.formatVBusItem (acChargerVoltage1, "V")
+				font.pixelSize: 15
+				visible: showAcCharger && numberOfAcChargers == 1
+			}
+			TileText {
+				text: EnhFmt.formatVBusItem (acChargerCurrent1, "A")
+				font.pixelSize: 15
+				visible: showAcCharger && numberOfAcChargers == 1
+			}
+			TileText
+			{
+				text: acChargerName2.valid ? acChargerName2.value : "-"
+				visible: showAcCharger && numberOfAcChargers >= 2
+			}
+			TileText
+			{
+				text:  EnhFmt.formatVBusItem (acChargerPower2, "W")
+				font.pixelSize: 15
+				visible: showAcCharger && numberOfAcChargers >= 2
+			}
+		}
+
+		PowerGauge
+		{
+			id: acChargerBar
+			width: parent.width
+			height: 12
+			anchors
+			{
+				top: parent.top; topMargin: 16
+				horizontalCenter: parent.horizontalCenter
+			}
+			connection: sys.acCharger
+			maxForwardPowerParameter: "com.victronenergy.settings/Settings/GuiMods/GaugeLimits/MaxAcChargerPower"
+			visible: showGauges && showAcCharger
+		}
+		DetailTarget { id: acChargerTarget; detailsPage: "DetailAcCharger.qml" }
+	}
+
 	//// add alternator if AC input not present
 	OverviewBox {
 		id: alternatorBox
@@ -315,7 +404,7 @@ OverviewPage {
 			}
 			TileText
 			{
-				text:  EnhFmt.formatVBusItem (alternatorPower1, "W")
+				text:  EnhFmt.formatVBusItem (alternatorPower2, "W")
 				font.pixelSize: 15
 				visible: showAlternator && numberOfAlternators >= 2
 			}
@@ -1057,6 +1146,24 @@ OverviewPage {
 
 	OverviewConnection
 	{
+		id: acChargerToDcBus2
+		ballCount: 3
+		path: corner
+		active: root.active && showAcCharger
+		value: Utils.sign (acChargerFlow)
+		endPointVisible: false
+		anchors
+		{
+			left: acChargerBox.right; leftMargin: -10
+			top: acChargerBox.bottom; topMargin: -15
+
+			right: dcBus2.left
+			bottom: dcBus2.bottom
+		}
+	}
+
+	OverviewConnection
+	{
 		id: alternatorToDcBus2
 		ballCount: 3
 		path: corner
@@ -1111,8 +1218,8 @@ OverviewPage {
 		id: batteryToDcBus2
 		ballCount: 1
 		path: straight
-		active: root.active && ( showInverter || showDcSolar )
-		value: Utils.sign(noNoise(sys.pvCharger.power) + noNoise(sys.inverterChargerDc.power) + alternatorFlow)
+		active: root.active && ( showInverter || showDcSolar || showAcCharger || showAlternator )
+		value: Utils.sign(noNoise(sys.pvCharger.power) + noNoise(sys.inverterChargerDc.power) + alternatorFlow + acChargerFlow)
 		startPointVisible: false
 
 		anchors {
@@ -1330,6 +1437,14 @@ OverviewPage {
 			else if (numberOfAlternators === 2)
 				alternatorPrefix2 = service.name;
 			break;;
+//////// add for acCharger
+		case DBusService.DBUS_SERVICE_AC_CHARGER:
+			numberOfAcChargers++
+			if (numberOfAcChargers === 1)
+				acChargerPrefix1 = service.name;
+			else if (numberOfAcChargers === 2)
+				acChargerPrefix2 = service.name;
+			break;;
 		}
 	}
 
@@ -1340,6 +1455,7 @@ OverviewPage {
 		numberOfPvChargers = 0
 		numberOfPvInverters = 0
 		numberOfAlternators = 0
+		numberOfAcChargers = 0
 		veDirectInverterService = ""
 		hasInverter = false
 		pvChargerPrefix1 = ""
@@ -1354,6 +1470,8 @@ OverviewPage {
 		pvInverterPrefix3 = ""
 		alternatorPrefix1 = ""
 		alternatorPrefix2 = ""
+		acChargerPrefix1 = ""
+		acChargerPrefix2 = ""
 		tempsModel.clear()
 		for (var i = 0; i < DBusServices.count; i++)
 		{
@@ -1399,7 +1517,7 @@ OverviewPage {
 	// list of all details touchable areas
 	property variant targetList:
 	[
-		acInputTarget, alternatorTarget, batteryTarget,
+		acInputTarget, acChargerTarget, alternatorTarget, batteryTarget,
 		multiTarget, dcSystemTarget,
 		loadsOnOutputTarget, pvInverterTarget, pvChargerTarget
 	]

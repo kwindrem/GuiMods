@@ -1,0 +1,139 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Battery.qml-v3.40.orig	2024-07-09 10:19:41
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Battery.qml-v3.40	2024-05-14 07:00:12
+@@ -7,9 +7,18 @@
+ 	height: 101
+ 
+ 	property real soc: 80
+-	property string color: "#4789d0"
+-	property string emptyColor: "#1abc9c"
++////// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++	property string color: !darkMode ? "#4789d0" : "#234468"
++	property string emptyColor: !darkMode ? "#1abc9c" : "#0d5e4e"
++
+ 	property alias values: _values.children
++	property bool renewablePreferred: sys.preferRenewableEnergy.valid
++	property bool renewableOverride: renewablePreferred
++			&& (sys.preferRenewableEnergy.value === 0 || sys.preferRenewableEnergy.value === 2 || sys.acSource == 2)
++
++	//// dummies for backward compatiblity - not actually used - values grabbed from sys. directly
+ 	property bool preferRenewable: false
+ 	property bool preferRenewableOverride: false
+ 	property bool preferRenewableOverrideGenset: false
+@@ -42,7 +51,8 @@
+ 		id: background
+ 
+ 		// NOTE: to remove the bottom of the terminals
+-		border {width: 2; color: "white"}
++////// GuiMods — DarkMode
++		border {width: 2; color: !darkMode ? "white" : "#202020"}
+ 		height: root.height - leftTerminal.height
+ 		width: root.width
+ 		y: leftTerminal.height - 1
+@@ -67,7 +77,8 @@
+ 			height: parent.height
+ 			width: parent.width * 0.7
+ 			anchors.centerIn: parent
+-			color: "#ffffff"
++////// GuiMods — DarkMode
++			color: !darkMode ? "#ffffff" : "#202020"
+ 			opacity: 0.06
+ 		}
+ 	}
+@@ -91,56 +102,57 @@
+ 		}
+ 	}
+ 
+-	SvgRectangle {
+-		height: background.height
+-		width: 20
+-		visible: preferRenewableOverride
+-		color: "#b84b00"
++	Rectangle {
++		height: 30
++		width: 25
++		visible: renewablePreferred
++		color: renewableOverride ? "#b84b00" : "transparent"
+ 		clip: true
+-		radius: 3
+ 		anchors {
+ 			top: background.top
++			topMargin: 13
+ 		}
+ 
+-		SvgRectangle {
+-			height: parent.height
+-			width: 3
+-			color: parent.color
+-			anchors.right: parent.right
+-		}
+-
+ 		MbIcon {
+ 			iconId: "double-arrow-up"
++			visible: renewableOverride
+ 			anchors {
+-				top: parent.top; topMargin: 16
++				verticalCenter: parent.verticalCenter
+ 				horizontalCenter: parent.horizontalCenter
+ 			}
+ 		}
+-
+ 		MbIcon {
+-			iconId: preferRenewableOverrideGenset ? "overview-generator-background" : "overview-tower-background"
++			iconId:
++			{
++				if (renewableOverride)
++				{
++					if (sys.acSource == 2)
++						return "overview-generator-background"
++					else
++						return "overview-tower-background"
++				}
++				else if (darkMode)
++					return "overview-renewable-light"
++				else
++					return "overview-renewable"
++			}
++			height: parent.height * 0.9
++			width: parent.width * 0.8
++			fillMode: Image.PreserveAspectFit
+ 			anchors {
+-				left: parent.left
+-				bottom: parent.bottom
++				horizontalCenter: parent.horizontalCenter
++				verticalCenter: parent.verticalCenter
+ 			}
+ 		}
+ 	}
+ 
+-	MbIcon {
+-		iconId: "overview-renewable"
+-		visible: preferRenewable
+-		anchors {
+-			left: parent.left; leftMargin: 2
+-			bottom: parent.bottom; bottomMargin: 2
+-		}
+-	}
+-
+ 	Text {
+ 		text: "-"
+ 		font.pixelSize: 13; font.bold: true
+ 		anchors.centerIn: leftTerminal
+ 		anchors.verticalCenterOffset: 12
+-		color: "#fff"
++////// GuiMods — DarkMode
++		color: !darkMode ? "#fff" : "#e1e1e1"
+ 	}
+ 
+ 	Text {
+@@ -148,7 +160,8 @@
+ 		font.pixelSize: 13; font.bold: true
+ 		anchors.centerIn: rightTerminal
+ 		anchors.verticalCenterOffset: 12
+-		color: "#fff"
++////// GuiMods — DarkMode
++		color: !darkMode ? "#fff" : "#e1e1e1"
+ 	}
+ 
+ 	Item {

@@ -1,3 +1,8 @@
+v10.91:
+	added support for v3.55, v3.60~57 and v3.60~58
+	added Ac Charger tile replacing AC Input if not present (GuiMods Simple overview)
+	fixed: second alternator shows alternator 1 power (GuiMods Simple overview)
+
 v10.90:
 	updated system calc patch files (forgot to do so for v10.89)
 

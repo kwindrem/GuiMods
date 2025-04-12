@@ -1,5 +1,5 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.60~16.orig	2025-01-12 08:43:07
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.60~16	2024-10-02 11:49:18
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.55.orig	2025-01-12 08:43:07
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.55	2024-10-02 11:49:18
 @@ -1,5 +1,7 @@
  #!/usr/bin/python3 -u
  
