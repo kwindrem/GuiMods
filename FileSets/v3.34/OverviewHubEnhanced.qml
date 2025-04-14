@@ -1439,7 +1439,6 @@ OverviewPage {
 			else if (numberOfAlternators === 2)
 				alternatorPrefix2 = service.name;
 			break;;
-		}
 //////// add for acCharger
 		case DBusService.DBUS_SERVICE_AC_CHARGER:
 			numberOfAcChargers++
@@ -1448,6 +1447,7 @@ OverviewPage {
 			else if (numberOfAcChargers === 2)
 				acChargerPrefix2 = service.name;
 			break;;
+		}
 	}
 
 	// Detect available services of interest
