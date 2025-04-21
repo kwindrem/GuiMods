@@ -24,6 +24,7 @@
 /opt/victronenergy/gui/qml/OverviewTanks.qml
 /opt/victronenergy/gui/qml/PageDigitalInput.qml
 /opt/victronenergy/gui/qml/PageSettingsGenerator.qml
+/opt/victronenergy/gui/qml/PageGeneratorConditions.qml
 /opt/victronenergy/gui/qml/PageSettingsDisplay.qml
 /opt/victronenergy/gui/qml/PageSettingsRelay.qml
 /opt/victronenergy/gui/qml/Tile.qml

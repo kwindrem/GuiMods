@@ -670,8 +670,18 @@ class StartStop(object):
 			# Evaluate stop on AC IN conditions first, when this conditions are enabled and reached the generator
 			# will stop as soon as AC IN in active. Manual and testrun conditions will make the generator start
 			# or keep it running.
-			stop_on_ac_reached = (self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name]) or
-						       self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name]))
+#### GuiMods 
+			# ignore stop on AC 1 or 2 condition if THAT source type is generator
+			if self._ac1_is_generator:
+				stopOnAc1Reached = False
+			else:
+				stopOnAc1Reached = self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name]
+			if self._ac2_is_generator:
+				stopOnAc2Reached = False
+			else:
+				stopOnAc2Reached = self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name]
+			stop_on_ac_reached = stopOnAc1Reached or stopOnAc2Reached
+#### end GuiMods 
 			stop_by_ac1_ac2 = startbycondition not in ['manual', 'testrun'] and stop_on_ac_reached
 
 			if stop_by_ac1_ac2 and running and activecondition not in ['manual', 'testrun']:

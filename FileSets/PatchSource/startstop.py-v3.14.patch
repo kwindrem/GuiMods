@@ -1,9 +1,9 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.14.orig	2025-01-09 14:05:38
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.14	2025-03-07 23:29:40
-@@ -1,6 +1,20 @@
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.14	2025-04-18 09:17:05
+@@ -1,5 +1,19 @@
  #!/usr/bin/python -u
  # -*- coding: utf-8 -*-
- 
++
 +#### GuiMods
 +#### This file has been modified to allow the generator running state derived from the generator digital input
 +####	or the genset AC input
@@ -17,10 +17,9 @@
 +#### warm-up and cool-down periods have been modified in order to work well with an external transfer switch
 +####	selecting grid or generator ahead of a MultiPlus input.
 +#### Search for #### GuiMods to find changes
-+
+ 
  # Function
  # dbus_generator monitors the dbus for batteries (com.victronenergy.battery.*) and
- # vebus com.victronenergy.vebus.*
 @@ -47,7 +61,6 @@
  SYSTEM_SERVICE = 'com.victronenergy.system'
  BATTERY_PREFIX = '/Dc/Battery'
@@ -110,7 +109,7 @@
 +		
 +#### GuiMods warm-up / cool-down
 +		state = self._dbusservice['/State']
- 
++
 +		# shed load for active generator input in warm-up and cool-down
 +		# note that external transfer switch might change the state of on generator
 +		# so this needs to be checked and load adjusted every pass
@@ -121,7 +120,7 @@
 +			self._ignore_ac (True)
 +		else:
 +			self._ignore_ac (False)
-+
+ 
 +		# update cool down end time while running and generator has the load
 +		# this is done because acInIsGenerator may change by an external transfer switch
 +		#	and the input type changed by the ExtTransferSwitch service
@@ -177,7 +176,28 @@
  
  		# Conditions will only be evaluated if the autostart functionality is enabled
  		if self._settings['autostart'] == 1:
-@@ -611,6 +711,12 @@
+@@ -572,8 +672,18 @@
+ 			# Evaluate stop on AC IN conditions first, when this conditions are enabled and reached the generator
+ 			# will stop as soon as AC IN in active. Manual and testrun conditions will make the generator start
+ 			# or keep it running.
+-			stop_on_ac_reached = (self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name]) or
+-						       self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name]))
++#### GuiMods 
++			# ignore stop on AC 1 or 2 condition if THAT source type is generator
++			if self._ac1_is_generator:
++				stopOnAc1Reached = False
++			else:
++				stopOnAc1Reached = self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name]
++			if self._ac2_is_generator:
++				stopOnAc2Reached = False
++			else:
++				stopOnAc2Reached = self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name]
++			stop_on_ac_reached = stopOnAc1Reached or stopOnAc2Reached
++#### end GuiMods 
+ 			stop_by_ac1_ac2 = startbycondition not in ['manual', 'testrun'] and stop_on_ac_reached
+ 
+ 			if stop_by_ac1_ac2 and running and activecondition not in ['manual', 'testrun']:
+@@ -611,6 +721,12 @@
  					start = True
  					startbycondition = 'lossofcommunication'
  
@@ -190,7 +210,7 @@
  		if not start and self._errorstate:
  			self._stop_generator()
  
-@@ -619,8 +725,12 @@
+@@ -619,8 +735,12 @@
  
  		if start:
  			self._start_generator(startbycondition)
@@ -204,7 +224,7 @@
  			self._stop_generator()
  
  	def _evaluate_autostart_disabled_alarm(self):
-@@ -639,17 +749,16 @@
+@@ -639,17 +759,16 @@
  			self._dbusservice['/Alarms/AutoStartDisabled'] = 2
  
  
@@ -226,7 +246,7 @@
  		vebus_service = self._vebusservice if self._vebusservice else ''
  		activein_state = self._dbusmonitor.get_value(
  			vebus_service, '/Ac/ActiveIn/Connected')
-@@ -664,10 +773,24 @@
+@@ -664,10 +783,24 @@
  		# Not connected = 0, connected = 1
  		activein_connected = activein_state == 1
  
@@ -252,7 +272,7 @@
  		elif self._acpower_inverter_input['timeout'] < self.RETRIES_ON_ERROR:
  			self._acpower_inverter_input['timeout'] += 1
  		elif not self._acpower_inverter_input['unabletostart']:
-@@ -675,6 +798,7 @@
+@@ -675,6 +808,7 @@
  			self._dbusservice['/Alarms/NoGeneratorAtAcIn'] = 2
  			self.log_info('Generator not detected at inverter AC input, triggering alarm')
  
@@ -260,11 +280,10 @@
  	def _reset_acpower_inverter_input(self, clear_error=True):
  		if self._acpower_inverter_input['timeout'] != 0:
  			self._acpower_inverter_input['timeout'] = 0
-@@ -759,6 +883,15 @@
- 		# When the condition is already reached only the stop value can set it to False
+@@ -760,6 +894,15 @@
  		start = condition['reached'] or (value >= startvalue if start_is_greater else value <= startvalue)
  		stop = value <= stopvalue if start_is_greater else value >= stopvalue
-+
+ 
 +#### GuiMods
 +		# when starting manually and stopping based on conditions,
 +		#	start if stop condition is not yet satisfied
@@ -273,10 +292,11 @@
 +			condition['reached'] = True
 +			logging.info ("starting manually, stop based on %s reaching %d", name, stopvalue)
 +#### end GuiMods
- 
++
  		# Timed conditions must start/stop after the condition has been reached for a minimum
  		# time.
-@@ -792,7 +925,8 @@
+ 		if condition['timed']:
+@@ -792,7 +935,8 @@
  		# If /ManualStartTimer has a value greater than zero will use it to set a stop timer.
  		# If no timer is set, the generator will not stop until the user stops it manually.
  		# Once started by manual start, each evaluation the timer is decreased
@@ -286,7 +306,7 @@
  			self._manualstarttimer += time.time() if self._manualstarttimer == 0 else 0
  			self._dbusservice['/ManualStartTimer'] -= int(time.time()) - int(self._manualstarttimer)
  			self._manualstarttimer = time.time()
-@@ -1074,102 +1208,125 @@
+@@ -1074,102 +1218,125 @@
  		# already running. When differs, the RunningByCondition is updated
  		running = state in (States.WARMUP, States.COOLDOWN, States.STOPPING, States.RUNNING)
  		if not (running and remote_running): # STOPPED, ERROR
@@ -310,12 +330,13 @@
  				self._dbusservice['/State'] = States.RUNNING
 +				self._warmUpEndTime = 0
  
+-			self._update_remote_switch()
+-			self._starttime = monotonic_time.monotonic_time().to_seconds_double()
+-			self.log_info('Starting generator by %s condition' % condition)
 +			self._coolDownEndTime = 0
 +			self._stoptime = 0
 +
- 			self._update_remote_switch()
--			self._starttime = monotonic_time.monotonic_time().to_seconds_double()
--			self.log_info('Starting generator by %s condition' % condition)
++			self._update_remote_switch()
  		else: # WARMUP, COOLDOWN, RUNNING, STOPPING
 -			if state == States.WARMUP:
 -				if monotonic_time.monotonic_time().to_seconds_double() - self._starttime > self._settings['warmuptime']:
@@ -323,11 +344,10 @@
 -					self._set_ignore_ac2(False)
 -					self._dbusservice['/State'] = States.RUNNING
 -			elif state in (States.COOLDOWN, States.STOPPING):
--				# Start request during cool-down run, go back to RUNNING
++			if state in (States.COOLDOWN, States.STOPPING):
+ 				# Start request during cool-down run, go back to RUNNING
 -				self._set_ignore_ac1(False) # Put load back onto Generator
 -				self._set_ignore_ac2(False)
-+			if state in (States.COOLDOWN, States.STOPPING):
-+				# Start request during cool-down run, go back to RUNNING
 +				self.log_info ("aborting cool-down - returning to running")
  				self._dbusservice['/State'] = States.RUNNING
  
@@ -370,6 +390,25 @@
 -						self._set_ignore_ac1(True)
 -					if self._ac2_is_generator:
 -						self._set_ignore_ac2(True)
+-
+-					return
+-				elif state == States.COOLDOWN:
+-					if monotonic_time.monotonic_time().to_seconds_double() - \
+-							self._stoptime <= self._settings['cooldowntime']:
+-						return # Don't stop engine yet
+-
+-			# When we arrive here, a stop command was given during warmup, the
+-			# cooldown timer expired, or no cooldown was configured. Stop
+-			# the engine, but if we're coming from cooldown, delay another
+-			# while in the STOPPING state before reactivating AC-in.
+-			if state == States.COOLDOWN:
+-				self._dbusservice['/State'] = States.STOPPING
+-				self._update_remote_switch() # Stop engine
+-				return
+-			elif state == States.STOPPING:
+-				if monotonic_time.monotonic_time().to_seconds_double() - \
+-						self._stoptime <= self._settings['cooldowntime'] + WAIT_FOR_ENGINE_STOP:
+-					return # Wait for engine stop
 +			# warm-up should also transition to stopping
 +			#	cool-down time will have expired since it's set to 0 when starting
 +			#	and there has not yet been a load on the generator
@@ -400,27 +439,6 @@
 +					self._manualstarttimer = 0
 +					self._last_runtime_update = 0
  
--					return
--				elif state == States.COOLDOWN:
--					if monotonic_time.monotonic_time().to_seconds_double() - \
--							self._stoptime <= self._settings['cooldowntime']:
--						return # Don't stop engine yet
-+		self._dbusservice['/State'] = state
-+#### end GuiMods warm-up / cool-down
- 
--			# When we arrive here, a stop command was given during warmup, the
--			# cooldown timer expired, or no cooldown was configured. Stop
--			# the engine, but if we're coming from cooldown, delay another
--			# while in the STOPPING state before reactivating AC-in.
--			if state == States.COOLDOWN:
--				self._dbusservice['/State'] = States.STOPPING
--				self._update_remote_switch() # Stop engine
--				return
--			elif state == States.STOPPING:
--				if monotonic_time.monotonic_time().to_seconds_double() - \
--						self._stoptime <= self._settings['cooldowntime'] + WAIT_FOR_ENGINE_STOP:
--					return # Wait for engine stop
- 
 -			# All other possibilities are handled now. Cooldown is over or not
 -			# configured and we waited for the generator to shut down.
 -			self._dbusservice['/State'] = States.STOPPED
@@ -437,15 +455,23 @@
 -			self._dbusservice['/ManualStartTimer'] = 0
 -			self._manualstarttimer = 0
 -			self._last_runtime_update = 0
-+	# This is here so the Multi/Quattro can be told to disconnect AC-in,
-+	# so that we can do warm-up and cool-down.
-+#### GuiMods warm-up / cool-down
-+	# there may be two AC inputs (Quattro). process both
++		self._dbusservice['/State'] = state
++#### end GuiMods warm-up / cool-down
  
 -	@property
 -	def _ac1_is_generator(self):
 -		return self._dbusmonitor.get_value('com.victronenergy.settings',
 -			'/Settings/SystemSetup/AcInput1') == 2
+ 
+-	@property
+-	def _ac2_is_generator(self):
+-		return self._dbusmonitor.get_value('com.victronenergy.settings',
+-			'/Settings/SystemSetup/AcInput2') == 2
++	# This is here so the Multi/Quattro can be told to disconnect AC-in,
++	# so that we can do warm-up and cool-down.
++#### GuiMods warm-up / cool-down
++	# there may be two AC inputs (Quattro). process both
+ 
 +	def _ignore_ac (self, state):
 +			self._activeAcInIsIgnored = state
 +			state1 = False
@@ -454,11 +480,7 @@
 +				state1 = state
 +			elif self._generatorAcInput == 2:
 +				state2 = state
- 
--	@property
--	def _ac2_is_generator(self):
--		return self._dbusmonitor.get_value('com.victronenergy.settings',
--			'/Settings/SystemSetup/AcInput2') == 2
++
 +			if state1 != self._ac1isIgnored:
 +				if state1:
 +					self.log_info ("shedding load - AC input 1")
@@ -466,7 +488,7 @@
 +					self.log_info ("restoring load - AC input 1")
 +				self._set_ignore_ac1 (state1)
 +				self._ac1isIgnored = state1
- 
++
 +			if state2 != self._ac2isIgnored:
 +				if state2:
 +					self.log_info ("shedding load - AC input 2")
@@ -479,7 +501,7 @@
  	def _set_ignore_ac1(self, ignore):
  		# This is here so the Multi/Quattro can be told to disconnect AC-in,
  		# so that we can do warm-up and cool-down.
-@@ -1184,6 +1341,11 @@
+@@ -1184,6 +1351,11 @@
  		# Engine should be started in these states
  		v = self._dbusservice['/State'] in (States.RUNNING, States.WARMUP, States.COOLDOWN)
  		self._set_remote_switch_state(dbus.Int32(v, variant_level=1))
@@ -491,7 +513,7 @@
  
  	def _get_remote_switch_state(self):
  		raise Exception('This function should be overridden')
-@@ -1206,3 +1368,192 @@
+@@ -1206,3 +1378,192 @@
  
  	def _create_dbus_service(self):
  		return create_dbus_service(self._instance)

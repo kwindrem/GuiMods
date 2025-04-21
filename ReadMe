@@ -516,9 +516,11 @@ External transfer switch:
 		returns to that position again.
 
 		If you wish to prevent the generator from running when On Grid, make sure the system is not On Generator and
-			turn on the Do not run generator when AC1 is in use in:
+			turn on the Stop generator when AC-input is available:
 				Device List / Settings / Generator start/stop settings /Settings / Conditions
 			The transfer switch logic will turn this off when switching to On Generator and restore it when switching to On Grid.
+			Ignore the warning to not set this when the input is set to generator
+				GuiMods changes the behavior to ignore the setting when the source is generator so the generator will not stop if so
 
 Installation:
 

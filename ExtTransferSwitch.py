@@ -59,8 +59,6 @@ class Monitor:
 			self.remoteGeneratorSelectedLocalValue = -1
 			self.dbusOk = False
 			self.numberOfAcInputs = 0
-			self.stopWhenAcAvailableObj = None
-			self.stopWhenAcAvailableFpObj = None
 			self.acInputTypeObj = None
 			self.veBusService = ""
 			self.transferSwitchLocation = 0
@@ -125,8 +123,6 @@ class Monitor:
 			if transferSwitchLocation != 0:
 				logging.info ("Transfer switch is on AC %d in" % transferSwitchLocation)
 			self.transferSwitchLocation = transferSwitchLocation
-			self.stopWhenAcAvailableObj = None
-			self.stopWhenAcAvailableFpObj = None
 			try:
 				if self.transferSwitchLocation == 2:
 					self.acInputTypeObj = self.theBus.get_object (dbusSettingsPath, "/Settings/SystemSetup/AcInput2")
@@ -136,32 +132,6 @@ class Monitor:
 			except:
 				self.dbusOk = False
 				logging.error ("AC input dbus setup failed - changes can't be made")
-
-			# set up objects for stop when AC available
-			#	there's one for "Generator" and one for "FischerPanda"
-			#	ignore errors if these aren't present
-			try:
-				if self.transferSwitchLocation == 2:
-					self.stopWhenAcAvailableObj = self.theBus.get_object (dbusSettingsPath, "/Settings/Generator0/StopWhenAc2Available")
-				else:
-					self.stopWhenAcAvailableObj = self.theBus.get_object (dbusSettingsPath, "/Settings/Generator0/StopWhenAc1Available")
-			except:
-				self.stopWhenAcAvailableObj = None
-			# first try new settings
-			try:
-				if self.transferSwitchLocation == 2:
-					self.stopWhenAcAvailableFpObj = self.theBus.get_object (dbusSettingsPath, "/Settings/Generator1/StopWhenAc2Available")
-				else:
-					self.stopWhenAcAvailableFpObj = self.theBus.get_object (dbusSettingsPath, "/Settings/Generator1/StopWhenAc1Available")
-			# next try old settings
-			except:
-				try:
-					if self.transferSwitchLocation == 2:
-						self.stopWhenAcAvailableFpObj = self.theBus.get_object (dbusSettingsPath, "/Settings/FischerPanda0/StopWhenAc2Available")
-					else:
-						self.stopWhenAcAvailableFpObj = self.theBus.get_object (dbusSettingsPath, "/Settings/FischerPanda0/StopWhenAc1Available")
-				except:
-					self.stopWhenAcAvailableFpObj = None
 
 
 	def updateTransferSwitchState (self):
@@ -240,14 +210,6 @@ class Monitor:
 			except:
 				logging.error ("dbus error AC input current limit not changed switching to grid")
 
-			try:
-				if self.stopWhenAcAvailableObj != None:
-					self.stopWhenAcAvailableObj.SetValue (self.DbusSettings['stopWhenAcAvaiable'])
-				if self.stopWhenAcAvailableFpObj != None:
-					self.stopWhenAcAvailableFpObj.SetValue (self.DbusSettings['stopWhenAcAvaiableFp'])
-			except:
-				logging.error ("stopWhenAcAvailable update not changed when switching to grid")
-
 	def transferToGenerator (self):
 		if self.dbusOk:
 			logging.info ("switching to generator settings")
@@ -266,17 +228,6 @@ class Monitor:
 				self.DbusSettings['gridCurrentLimit'] = self.currentLimitObj.GetValue ()
 			except:
 				logging.error ("dbus error AC input current limit not saved when switching to generator")
-			try:
-				if self.stopWhenAcAvailableObj != None:
-					self.DbusSettings['stopWhenAcAvaiable'] = self.stopWhenAcAvailableObj.GetValue ()
-				else:
-					self.DbusSettings['stopWhenAcAvaiable'] = 0
-				if self.stopWhenAcAvailableFpObj != None:
-					self.DbusSettings['stopWhenAcAvaiableFp'] = self.stopWhenAcAvailableFpObj.GetValue ()
-				else:
-					self.DbusSettings['stopWhenAcAvaiableFp'] = 0
-			except:
-				logging.error ("dbus error stop when AC available settings not saved when switching to generator")
 
 			try:
 				self.acInputTypeObj.SetValue (2)
@@ -289,14 +240,6 @@ class Monitor:
 					logging.warning ("Input current limit not adjustable - not changed")
 			except:
 				logging.error ("dbus error AC input current limit not changed when switching to generator")
-
-			try:
-				if self.stopWhenAcAvailableObj != None:
-					self.stopWhenAcAvailableObj.SetValue (0)
-				if self.stopWhenAcAvailableFpObj != None:
-					self.stopWhenAcAvailableFpObj.SetValue (0)
-			except:
-				logging.error ("stopWhenAcAvailable update not changed switching to generator")
 
 
 	def background (self):
@@ -348,8 +291,6 @@ class Monitor:
 		self.numberOfAcInputs = 0
 		self.currentLimitObj = None
 		self.currentLimitIsAdjustableObj = None
-		self.stopWhenAcAvailableObj = None
-		self.stopWhenAcAvailableFpObj = None
 		self.remoteGeneratorSelectedItem = None
 		self.remoteGeneratorSelectedLocalValue = -1
 

@@ -1,0 +1,13 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageGeneratorConditions.qml.orig	2018-03-09 04:34:56
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageGeneratorConditions.qml	2025-04-18 09:28:02
+@@ -65,9 +65,7 @@
+ 			onOptionSelected: {
+ 				stopOnAc1Item.setValue(newValue & 1)
+ 				stopOnAc2Item.setValue((newValue & 2) >> 1)
+-				if (newValue > 0) {
+-					toast.createToast(qsTr("Make sure that the generator is not connected to AC input %1 when using this option.").arg(newValue), 10000, "icon-info-active")
+-				}
++//// GuiMods - remove warning since startstop.py ignores the setting if on generator
+ 			}
+ 		}
+ 

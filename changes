@@ -1,3 +1,7 @@
+v10.93:
+	add support for v3.60~60
+	changes to ExtTransferSwitch and startstop.py (stop when AC available) logic
+
 v10.92:
 	fixed: GuiMods Simple overview blank in firmware prior to v3.40
 
