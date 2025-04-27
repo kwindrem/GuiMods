@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~25.orig	2025-02-25 09:42:59
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~25	2025-04-18 09:13:47
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/startstop.py-v3.60~25	2025-04-27 10:18:37
 @@ -1,6 +1,17 @@
  #!/usr/bin/python -u
  # -*- coding: utf-8 -*-
@@ -160,11 +160,11 @@
 +			if self._ac1_is_generator:
 +				stopOnAc1Reached = False
 +			else:
-+				stopOnAc1Reached = self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name]
++				stopOnAc1Reached = self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name])
 +			if self._ac2_is_generator:
 +				stopOnAc2Reached = False
 +			else:
-+				stopOnAc2Reached = self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name]
++				stopOnAc2Reached = self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name])
 +			stop_on_ac_reached = stopOnAc1Reached or stopOnAc2Reached
 +#### end GuiMods 
  			stop_by_ac1_ac2 = startbycondition not in ['manual', 'testrun'] and stop_on_ac_reached

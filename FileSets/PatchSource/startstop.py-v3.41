@@ -675,11 +675,11 @@ class StartStop(object):
 			if self._ac1_is_generator:
 				stopOnAc1Reached = False
 			else:
-				stopOnAc1Reached = self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name]
+				stopOnAc1Reached = self._evaluate_condition(self._condition_stack[StopOnAc1Condition.name])
 			if self._ac2_is_generator:
 				stopOnAc2Reached = False
 			else:
-				stopOnAc2Reached = self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name]
+				stopOnAc2Reached = self._evaluate_condition(self._condition_stack[StopOnAc2Condition.name])
 			stop_on_ac_reached = stopOnAc1Reached or stopOnAc2Reached
 #### end GuiMods 
 			stop_by_ac1_ac2 = startbycondition not in ['manual', 'testrun'] and stop_on_ac_reached
