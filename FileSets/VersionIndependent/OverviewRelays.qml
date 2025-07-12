@@ -18,6 +18,14 @@ OverviewPage
 	property int listWidth: tileWidth * Math.min ( numberOfRelaysShown, relaysOnPage)
 	property int listHeight: root.height - 30
 
+	property VBusItem switchableItem: VBusItem { bind: "com.victronenergy.system/SwitchableOutput/0/State" }
+	property bool useSwitchable: switchableItem.valid
+	
+	property string showPrefix: useSwitchable ? "com.victronenergy.system/SwitchableOutput/" : "com.victronenergy.settings/Settings/Relay/"
+	property string showParameter: useSwitchable ? "/Settings/ShowUIControl" : "/Show"
+	property string statePrefix: useSwitchable ? "com.victronenergy.system/SwitchableOutput" : "com.victronenergy.system/Relay"
+	
+
 
 	// timer is used to minimize calls to updateRelays since so many parameters can change at the same
 	//	time when initializing
@@ -42,218 +50,218 @@ OverviewPage
 	VBusItem
 	{
 		id: relay0ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/0/Show")
+		bind: Utils.path(showPrefix, "0", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay1ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/1/Show")
+		bind: Utils.path(showPrefix, "1", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay2ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/2/Show")
+		bind: Utils.path(showPrefix, "2", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay3ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/3/Show")
+		bind: Utils.path(showPrefix, "3", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay4ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/4/Show")
+		bind: Utils.path(showPrefix, "4", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay5ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/5/Show")
+		bind: Utils.path(showPrefix, "5", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay6ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/6/Show")
+		bind: Utils.path(showPrefix, "6", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay7ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/7/Show")
+		bind: Utils.path(showPrefix, "7", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay8ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/8/Show")
+		bind: Utils.path(showPrefix, "8", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay9ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/9/Show")
+		bind: Utils.path(showPrefix, "9", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay10ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/10/Show")
+		bind: Utils.path(showPrefix, "10", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay11ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/11/Show")
+		bind: Utils.path(showPrefix, "11", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay12ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/12/Show")
+		bind: Utils.path(showPrefix, "12", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay13ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/13/Show")
+		bind: Utils.path(showPrefix, "13", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay14ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/14/Show")
+		bind: Utils.path(showPrefix, "14", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay15ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/15/Show")
+		bind: Utils.path(showPrefix, "15", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay16ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/16/Show")
+		bind: Utils.path(showPrefix, "16", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay17ShowItem
-		bind: Utils.path("com.victronenergy.settings", "/Settings/Relay/17/Show")
+		bind: Utils.path(showPrefix, "17", showParameter)
 		onValueChanged: refreshTimer.restart ()
 	}
 
 	VBusItem
 	{
 		id: relay0StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/0/State")
+		bind: Utils.path(statePrefix, "/0/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay1StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/1/State")
+		bind: Utils.path(statePrefix, "/1/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay2StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/2/State")
+		bind: Utils.path(statePrefix, "/2/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay3StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/3/State")
+		bind: Utils.path(statePrefix, "/3/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay4StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/4/State")
+		bind: Utils.path(statePrefix, "/4/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay5StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/5/State")
+		bind: Utils.path(statePrefix, "/5/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay6StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/6/State")
+		bind: Utils.path(statePrefix, "/6/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay7StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/7/State")
+		bind: Utils.path(statePrefix, "/7/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay8StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/8/State")
+		bind: Utils.path(statePrefix, "/8/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay9StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/9/State")
+		bind: Utils.path(statePrefix, "/9/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay10StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/10/State")
+		bind: Utils.path(statePrefix, "/10/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay11StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/11/State")
+		bind: Utils.path(statePrefix, "/11/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay12StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/12/State")
+		bind: Utils.path(statePrefix, "/12/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay13StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/13/State")
+		bind: Utils.path(statePrefix, "/13/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay14StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/14/State")
+		bind: Utils.path(statePrefix, "/14/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay15StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/15/State")
+		bind: Utils.path(statePrefix, "/15/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay16StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/16/State")
+		bind: Utils.path(statePrefix, "/16/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 	VBusItem
 	{
 		id: relay17StateItem
-		bind: Utils.path("com.victronenergy.system", "/Relay/17/State")
+		bind: Utils.path(statePrefix, "/17/State")
 		onValidChanged: refreshTimer.restart ()
 	}
 

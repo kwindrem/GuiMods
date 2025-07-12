@@ -1,3 +1,7 @@
+v10.95:
+	add support /Switchable (v3.70~9)
+	removed v3.60 beta versions
+
 v10.94:
 	fixed: generator not working
 

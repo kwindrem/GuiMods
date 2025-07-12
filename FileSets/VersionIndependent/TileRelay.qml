@@ -6,8 +6,11 @@ import "utils.js" as Utils
 Tile {
 	id: root
 
-    property string systemPrefix: "com.victronenergy.system"
-    property string settingsPrefix: "com.victronenergy.settings"
+	property string settingsPrefix: "com.victronenergy.settings"
+
+	property VBusItem switchableItem: VBusItem { bind: "com.victronenergy.system/SwitchableOutput/0/State" }
+	property bool useSwitchable: switchableItem.valid
+	
     property string functionPath: relayNumber === 0 ? "/Settings/Relay/Function" : "/Settings/Relay/" + relayNumber + "/Function"
     property string polarityPath: relayNumber === 0 ? "/Settings/Relay/Polarity" : "/Settings/Relay/" + relayNumber + "/Polarity"
 
@@ -33,13 +36,26 @@ Tile {
     VBusItem
     {
         id: stateItem
-        bind: Utils.path(systemPrefix, "/Relay/", relayNumber, "/State")
+        bind:
+		{
+			if (useSwitchable)
+				Utils.path("com.victronenergy.system/SwitchableOutput/", relayNumber, "/State")
+			else
+				Utils.path("com.victronenergy.system/Relay/", relayNumber, "/State")
+				
+		}
         onValueChanged: updateButtons ()
     }
     VBusItem
     {
         id: nameItem
-        bind: Utils.path(settingsPrefix, "/Settings/Relay/", relayNumber, "/CustomName")
+		bind:
+		{
+			if (useSwitchable)
+				Utils.path("com.victronenergy.system/SwitchableOutput/", relayNumber, "/Settings/CustomName")
+			else
+				Utils.path("com.victronenergy.settings/Settings/Relay/", relayNumber, "/CustomName")
+		}
     }
     VBusItem
     {
