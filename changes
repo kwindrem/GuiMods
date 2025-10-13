@@ -1,3 +1,7 @@
+v10.97:
+	add support for v3.70~45
+	note: lots of Venus OS work on relays which may not be fully supported in GuiMods !!!
+
 v10.96:
 	add support for v3.70~25
 
