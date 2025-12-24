@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50.orig	2024-10-29 13:29:52
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50	2025-02-02 17:46:37
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.50	2025-12-23 16:07:16
 @@ -16,7 +16,8 @@
  	property bool completed: false
  	property bool alarm: alarmNotification.valid ? alarmNotification.value : 0
@@ -300,21 +300,6 @@
 -			anchors {
 -				horizontalCenter: parent.horizontalCenter
 -				verticalCenter: mbTools.verticalCenter
--			}
--			iconId: pageStack.currentPage ? pageStack.currentPage.scrollIndicator : ""
--		}
--
--		Item {
--			anchors.verticalCenter: parent.verticalCenter
--			height: mbTools.height
--			anchors.right: mbTools.right
--			width: 200
--
--			MouseArea {
--				anchors.fill: parent
--				onClicked: {
--					if (pageStack.currentPage)
--						pageStack.currentPage.toolbarHandler.rightAction(true)
 +			Item
 +			{
 +				id: centerScrollIndicator
@@ -324,20 +309,27 @@
 +				MbIcon {
 +					anchors.verticalCenter: parent.verticalCenter
 +					iconId: pageStack.currentPage ? pageStack.currentPage.scrollIndicator : ""
- 				}
++				}
  			}
+-			iconId: pageStack.currentPage ? pageStack.currentPage.scrollIndicator : ""
+-		}
  
--			Row {
--				anchors.centerIn: parent
+-		Item {
+-			anchors.verticalCenter: parent.verticalCenter
+-			height: mbTools.height
+-			anchors.right: mbTools.right
+-			width: 200
 +			Item {
 +				id: menusItem
 +				anchors.verticalCenter: parent.verticalCenter
 +				height: mbTools.height
 +				width: pagesItem.width
  
--				MbIcon {
--					iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
--					anchors.verticalCenter: parent.verticalCenter
+-			MouseArea {
+-				anchors.fill: parent
+-				onClicked: {
+-					if (pageStack.currentPage)
+-						pageStack.currentPage.toolbarHandler.rightAction(true)
 +				MouseArea {
 +					anchors.fill: parent
 +					onClicked: {
@@ -345,6 +337,21 @@
 +							pageStack.currentPage.toolbarHandler.rightAction(true)
 +					}
  				}
+-			}
+ 
+-			Row {
+-				anchors.centerIn: parent
++				Row {
++					anchors.centerIn: parent
+ 
+-				MbIcon {
+-					iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
+-					anchors.verticalCenter: parent.verticalCenter
+-				}
++					MbIcon {
++						iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
++						anchors.verticalCenter: parent.verticalCenter
++					}
  
 -				Text {
 -					text: pageStack.currentPage ? pageStack.currentPage.rightText : ""
@@ -352,14 +359,6 @@
 -					color: "white"
 -					font.bold: true
 -					font.pixelSize: 16
-+				Row {
-+					anchors.centerIn: parent
-+
-+					MbIcon {
-+						iconId: pageStack.currentPage ? pageStack.currentPage.rightIcon : ""
-+						anchors.verticalCenter: parent.verticalCenter
-+					}
-+
 +					Text {
 +						text: pageStack.currentPage ? pageStack.currentPage.rightText : ""
 +						anchors.verticalCenter: parent.verticalCenter
@@ -384,21 +383,7 @@
  	}
  
  	Component {
-@@ -284,7 +465,12 @@
- 		id: newUiPopupTimer
- 		interval: 10000
- 		running: false
--		onTriggered: rootWindow.pageStack.push(popupNewUi)
-+		onTriggered:
-+        {
-+//// GuiMods - modified for OverviewGridParallelEnhanced page
-+            selectHubOverview ()
-+            if (startWithMenu.value === 0) showOverview()
-+        }
- 	}
- 
- 	function showNewUiPopup()
-@@ -350,11 +536,19 @@
+@@ -350,11 +531,19 @@
  		}
  	}
  

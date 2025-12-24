@@ -1,5 +1,5 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.51.orig	2024-11-04 09:10:11
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.51	2025-02-02 17:46:52
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/main.qml-v3.51	2025-12-23 16:09:05
 @@ -8,7 +8,7 @@
  	id: rootWindow
  
@@ -406,34 +406,7 @@
  	}
  
  	Component {
-@@ -274,6 +461,26 @@
- 		onTriggered: if (startWithMenu.value === 0) showOverview()
- 	}
- 
-+	Timer {
-+		id: newUiPopupTimer
-+		interval: 10000
-+		running: false
-+		onTriggered:
-+        {
-+//// GuiMods - modified for OverviewGridParallelEnhanced page
-+            selectHubOverview ()
-+            if (startWithMenu.value === 0) showOverview()
-+        }
-+	}
-+
-+	function showNewUiPopup()
-+	{
-+		var announce = newUiAnnouncement.value < newUiAnnouncementVersion
-+		if (announce && vePlatform.isGuiv2Installed() && vePlatform.displayPresent()) {
-+			newUiPopupTimer.start()
-+		}
-+	}
-+
- 	function getDefaultOverviewIndex()
- 	{
- 		if(!defaultOverview.valid)
-@@ -324,11 +531,19 @@
+@@ -324,11 +511,19 @@
  		}
  	}
  

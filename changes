@@ -1,3 +1,7 @@
+v10.98:
+	add support for v3.70~71
+	Note: REQUIRES SetupHelper v9.2 or later !!!
+
 v10.97:
 	add support for v3.70~45
 	note: lots of Venus OS work on relays which may not be fully supported in GuiMods !!!

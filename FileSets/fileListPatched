@@ -2,6 +2,7 @@
 /opt/victronenergy/dbus-systemcalc-py/dbus_systemcalc.py
 /opt/victronenergy/gui/qml/Battery.qml
 /opt/victronenergy/gui/qml/main.qml
+/opt/victronenergy/gui/qml/Main.qml
 /opt/victronenergy/gui/qml/HubData.qml
 /opt/victronenergy/gui/qml/PageMain.qml
 /opt/victronenergy/gui/qml/MbEditBox.qml

@@ -465,12 +465,7 @@ PageStackWindow {
 		id: newUiPopupTimer
 		interval: 10000
 		running: false
-		onTriggered:
-        {
-//// GuiMods - modified for OverviewGridParallelEnhanced page
-            selectHubOverview ()
-            if (startWithMenu.value === 0) showOverview()
-        }
+		onTriggered: rootWindow.pageStack.push(popupNewUi)
 	}
 
 	function showNewUiPopup()

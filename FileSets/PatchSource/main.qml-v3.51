@@ -461,26 +461,6 @@ PageStackWindow {
 		onTriggered: if (startWithMenu.value === 0) showOverview()
 	}
 
-	Timer {
-		id: newUiPopupTimer
-		interval: 10000
-		running: false
-		onTriggered:
-        {
-//// GuiMods - modified for OverviewGridParallelEnhanced page
-            selectHubOverview ()
-            if (startWithMenu.value === 0) showOverview()
-        }
-	}
-
-	function showNewUiPopup()
-	{
-		var announce = newUiAnnouncement.value < newUiAnnouncementVersion
-		if (announce && vePlatform.isGuiv2Installed() && vePlatform.displayPresent()) {
-			newUiPopupTimer.start()
-		}
-	}
-
 	function getDefaultOverviewIndex()
 	{
 		if(!defaultOverview.valid)

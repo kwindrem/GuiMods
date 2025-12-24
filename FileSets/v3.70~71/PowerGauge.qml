@@ -1,7 +1,7 @@
 // displays value as a bar surrounded by three range regions
 // use for I/O, PV inverter & charger
 
-import QtQuick 1.1
+import QtQuick 2
 import "utils.js" as Utils
 import com.victron.velib 1.0
 

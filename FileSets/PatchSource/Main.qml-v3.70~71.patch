@@ -1,0 +1,402 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Main.qml-v3.70~71.orig	2025-12-23 15:01:36
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Main.qml-v3.70~71	2025-12-23 22:10:17
+@@ -14,7 +14,8 @@
+ 	property bool completed: false
+ 	property bool alarm: alarmNotification.valid ? alarmNotification.value : 0
+ 	property bool showAlert: alertNotification.valid ? alertNotification.value : 0
+-	property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid
++//// added for GuiMods flow pages
++	property bool overviewsLoaded: defaultOverview.valid && generatorOverview.valid && mobileOverview.valid && tanksOverview.valid && startWithMenu.valid && mobileOverviewEnhanced.valid && guiModsFlowOverview.valid && generatorOverviewEnhanced.valid
+ 	property string bindPrefix: "com.victronenergy.settings"
+ 
+ 	property bool isNotificationPage: pageStack.currentItem && pageStack.currentItem.title === qsTr("Notifications")
+@@ -25,19 +26,154 @@
+ 	property bool showInputLoads: theSystem.acInLoad.power.valid && (hasVebusEss ? (theSystem.hasGridMeter && withoutGridMeter.value === 0) : theSystem.hasGridMeter)
+ 	property int newUiAnnouncementVersion: 2 // Increase to make the popup appear again
+ 
++//// added for GuiMods pages
++    property string currentHubOverview: "OverviewHub.qml"
++    property string currentMobileOverview: ""
++    property string currentGeneratorOverview: ""
++
+ 	// Keep track of the current view (menu/overview) to show as default next time the
+ 	// CCGX is restarted
+ 	onIsOverviewPageChanged: startWithMenu.setValue(isOverviewPage ? 0 : 1)
+ 
+ 	// Add the correct OverviewHub page
+-	onShowInputLoadsChanged: {
+-		if (showInputLoads) {
+-			replaceOverview("OverviewHub.qml", "OverviewGridParallel.qml");
+-		} else {
+-			replaceOverview("OverviewGridParallel.qml", "OverviewHub.qml");
++//// modified for OverviewHubEnhanced page
++	onShowInputLoadsChanged: selectHubOverview ()
++
++	VBusItem
++    {
++        id: guiModsFlowOverview
++        bind: "com.victronenergy.settings/Settings/GuiMods/FlowOverview"
++        onValueChanged: selectHubOverview ()
++    }
++
++//// GuiMods — DarkMode
++	property VBusItem darkModeItem: VBusItem { bind: "com.victronenergy.settings/Settings/GuiMods/DarkMode" }
++	property bool darkMode: darkModeItem.valid && darkModeItem.value == 1
++
++//// GuiMods — DarkMode
++	Rectangle {
++		anchors
++		{
++			fill: parent
+ 		}
++		color: !darkMode ? "transparent" : "#202020"
++		z: -1
+ 	}
+ 
++//// GuiMods - base a new hub selection on the hub type and the enhanced flow overview flag
++    function selectHubOverview ()
++    {
++        var newHubOverview = currentHubOverview
++		// Victron stock overviews with automatic selection
++        if (guiModsFlowOverview.value == 0)
++        {
++			if (showInputLoads)
++				newHubOverview = "OverviewGridParallel.qml"
++			else
++				newHubOverview = "OverviewHub.qml"
++		}
++		// Gui Mods simple flow
++		else if (guiModsFlowOverview.value === 1)
++        {
++			newHubOverview = "OverviewHubEnhanced.qml"
++		}
++		// Gui Mods complex flow (AC coupled or DC coupled)
++		else
++		{
++			newHubOverview = "OverviewFlowComplex.qml"
++        }
++
++        if (newHubOverview != currentHubOverview)
++        {
++            replaceOverview(currentHubOverview, newHubOverview);
++            currentHubOverview = newHubOverview
++        }
++    }
++
++    VBusItem
++    {
++        id: generatorOverviewEnhanced
++        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedGeneratorOverview"
++        onValueChanged: selectGeneratorOverview ()
++    }
++
++	VBusItem {
++		id: generatorOverview
++		bind: "com.victronenergy.settings/Settings/Relay/Function"
++		onValueChanged: selectGeneratorOverview ()
++	}
++
++    VBusItem
++    {
++        id: mobileOverviewEnhanced
++        bind: "com.victronenergy.settings/Settings/GuiMods/UseEnhancedMobileOverview"
++        onValueChanged: selectMobileOverview ()
++    }
++
++////// GuiMods - show/hide the OverviewTiles page
++    VBusItem
++    {
++        id: showOverviewTiles
++        bind: "com.victronenergy.settings/Settings/GuiMods/ShowTileOverview"
++        onValueChanged: extraOverview ("OverviewTiles.qml", value === 1)
++    }
++
++
++	function selectGeneratorOverview ()
++	{
++        var newGeneratorOverview
++        if (generatorOverview.value === 1)
++        {
++            if (generatorOverviewEnhanced.value === 1)
++				newGeneratorOverview = "OverviewGeneratorRelayEnhanced.qml"
++            else
++				newGeneratorOverview = "OverviewGeneratorRelay.qml"
++            if (currentGeneratorOverview === "")
++                extraOverview (newGeneratorOverview, true)
++            else
++                replaceOverview (currentGeneratorOverview, newGeneratorOverview)
++			currentGeneratorOverview = newGeneratorOverview
++        }
++        else
++        {
++            // hide existing generator overview if any
++            if (currentGeneratorOverview != "")
++            {
++                extraOverview (currentGeneratorOverview, false)
++				currentGeneratorOverview  = ""
++            }
++        }
++	}
++
++    // base a new mobile overview selection on the the mobile overview and enhanced mobile overview flags
++    function selectMobileOverview ()
++    {
++        var newMobileOverview
++        if (mobileOverview.value === 1)
++        {
++            if (mobileOverviewEnhanced.value === 1)
++                newMobileOverview = "OverviewMobileEnhanced.qml"
++            else
++                newMobileOverview = "OverviewMobile.qml"
++            if (currentMobileOverview === "")
++                extraOverview (newMobileOverview, true)
++            else
++                replaceOverview (currentMobileOverview, newMobileOverview)
++			currentMobileOverview = newMobileOverview
++        }
++        else
++        {
++            // hide existing mobile overview if any
++            if (currentMobileOverview != "")
++            {
++                extraOverview (currentMobileOverview, false)
++                currentMobileOverview = ""
++            }
++        }
++    }
++
++////// end GuiMods
++
+ 	header: VeStatusBar {
+ 		id: statusBar
+ 
+@@ -69,12 +205,6 @@
+ 	}
+ 
+ 	VBusItem {
+-		id: generatorOverview
+-		bind: "com.victronenergy.settings/Settings/Relay/Function"
+-		onValueChanged: extraOverview("OverviewGeneratorRelay.qml", value === 1)
+-	}
+-
+-	VBusItem {
+ 		bind: "com.victronenergy.generator.startstop1/GensetProductId"
+ 		onValueChanged: {
+ 			// Show specific overview for FischerPanda
+@@ -91,12 +221,11 @@
+ 		}
+ 	}
+ 
++//////// modified for GuiMods
+ 	VBusItem {
+ 		id: mobileOverview
+ 		bind: "com.victronenergy.settings/Settings/Gui/MobileOverview"
+-		onValueChanged:{
+-			extraOverview("OverviewMobile.qml", value === 1)
+-		}
++        onValueChanged: selectMobileOverview ()
+ 	}
+ 	VBusItem {
+ 		id: tanksOverview
+@@ -200,82 +329,109 @@
+ 		width: parent.width
+ 		anchors.bottom: parent.bottom
+ 
+-		Item {
+-			anchors.verticalCenter: parent.verticalCenter
+-			anchors.left: mbTools.left
+-			height: mbTools.height
+-			width: 200
+-
+-			MouseArea {
+-				anchors.fill: parent
+-				onClicked: {
+-					if (pageStack.currentItem)
+-						pageStack.currentItem.toolbarHandler.leftAction(true)
+-				}
+-			}
++//// GuiMods - DarkMode - add clickable light/dark mode button to center section
++		Row
++		{
++			spacing: 0
++			anchors.fill: parent
++			Item {
++				id: pagesItem
++				anchors.verticalCenter: parent.verticalCenter
++				height: mbTools.height
++				width: 170
+ 
+-			Row {
+-				anchors.centerIn: parent
+-
+-				MbIcon {
+-					anchors.verticalCenter: parent.verticalCenter
+-					iconId: pageStack.currentItem ? pageStack.currentItem.leftIcon : ""
++				MouseArea {
++					anchors.fill: parent
++					onClicked: {
++						if (pageStack.currentItem)
++							pageStack.currentItem.toolbarHandler.leftAction(true)
++					}
+ 				}
+ 
+-				Text {
+-					anchors.verticalCenter: parent.verticalCenter
+-					text: pageStack.currentItem ? pageStack.currentItem.leftText : ""
+-					color: "white"
+-					font.bold: true
+-					font.pixelSize: 16
+-				}
+-			}
+-		}
++				Row {
++					anchors.centerIn: parent
+ 
+-		MbIcon {
+-			id: centerScrollIndicator
++					MbIcon {
++						anchors.verticalCenter: parent.verticalCenter
++						iconId: pageStack.currentItem ? pageStack.currentItem.leftIcon : ""
++					}
+ 
+-			anchors {
+-				horizontalCenter: parent.horizontalCenter
+-				verticalCenter: mbTools.verticalCenter
+-			}
+-			iconId: pageStack.currentItem ? pageStack.currentItem.scrollIndicator : ""
+-		}
+-
+-		Item {
+-			anchors.verticalCenter: parent.verticalCenter
+-			height: mbTools.height
+-			anchors.right: mbTools.right
+-			width: 200
+-
+-			MouseArea {
+-				anchors.fill: parent
+-				onClicked: {
+-					if (pageStack.currentItem)
+-						pageStack.currentItem.toolbarHandler.rightAction(true)
++					Text {
++						anchors.verticalCenter: parent.verticalCenter
++						text: pageStack.currentItem ? pageStack.currentItem.leftText : ""
++						color: "white"
++						font.bold: true
++						font.pixelSize: 16
++					}
+ 				}
+ 			}
+ 
+-			Row {
+-				anchors.centerIn: parent
++			Item {
++				anchors.verticalCenter: parent.verticalCenter
++				height: mbTools.height
++				width: mbTools.width - pagesItem.width - menusItem.width - centerScrollIndicator.width
+ 
+-				MbIcon {
+-					iconId: pageStack.currentItem ? pageStack.currentItem.rightIcon : ""
+-					anchors.verticalCenter: parent.verticalCenter
++				MouseArea
++				{
++					anchors.fill: parent
++					onClicked:
++					{
++						if (darkModeItem.valid)
++							darkModeItem.setValue (! darkMode)
++					}
+ 				}
+ 
+-				Text {
+-					text: pageStack.currentItem ? pageStack.currentItem.rightText : ""
+-					anchors.verticalCenter: parent.verticalCenter
++				Text
++				{
++					anchors.fill: parent
++					horizontalAlignment: Text.AlignHCenter
++					text: qsTr ("change to") + "\n" + (darkMode ? qsTr ("Light mode") : qsTr ("Dark mode"))
+ 					color: "white"
+ 					font.bold: true
+-					font.pixelSize: 16
++					font.pixelSize: 12
++					visible: darkModeItem.valid
+ 				}
+ 			}
++			MbIcon {
++				id: centerScrollIndicator
++				anchors.verticalCenter: parent.verticalCenter
++				iconId: pageStack.currentItem ? pageStack.currentItem.scrollIndicator : ""
++			}
++
++			Item {
++				id: menusItem
++				anchors.verticalCenter: parent.verticalCenter
++				height: mbTools.height
++				width: pagesItem.width
++
++				MouseArea {
++					anchors.fill: parent
++					onClicked: {
++						if (pageStack.currentItem)
++							pageStack.currentItem.toolbarHandler.rightAction(true)
++					}
++				}
++
++				Row {
++					anchors.centerIn: parent
++
++					MbIcon {
++						iconId: pageStack.currentItem ? pageStack.currentItem.rightIcon : ""
++						anchors.verticalCenter: parent.verticalCenter
++					}
++
++					Text {
++						text: pageStack.currentItem ? pageStack.currentItem.rightText : ""
++						anchors.verticalCenter: parent.verticalCenter
++						color: "white"
++						font.bold: true
++						font.pixelSize: 16
++					}
++				}
++			}
+ 		}
+ 	}
+ 
+-
+ 	Component.onCompleted: {
+ 		completed = true
+ 	}
+@@ -285,9 +441,10 @@
+ 		ListElement {
+ 			pageSource: "OverviewHub.qml"
+ 		}
+-		ListElement {
+-			pageSource: "OverviewTiles.qml"
+-		}
++//// GuiMods - (commented out) -- added dynamically above
++//		ListElement {
++//			pageSource: "OverviewTiles.qml"
++//		}
+ 	}
+ 
+ 	Component {
+@@ -382,11 +539,19 @@
+ 		}
+ 	}
+ 
++//// GuiMods -  Modified to append page if oldPage not found
+ 	function replaceOverview(oldPage, newPage)
+ 	{
+ 		for (var i = 0; i < overviewModel.count; i++)
++        {
+ 			if (overviewModel.get(i).pageSource === oldPage)
++            {
+ 				overviewModel.get(i).pageSource = newPage
++                return
++            }
++        }
++        // here if oldPage wasn't found -- append the new page
++        overviewModel.append({"pageSource": newPage})
+ 	}
+ 
+ 	// Central mover for the ball animation on the overviews
