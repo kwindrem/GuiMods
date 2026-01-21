@@ -1,3 +1,6 @@
+v10.99:
+	fixed: tap to access details page not working as of about v3.70~71
+
 v10.98:
 	add support for v3.70~71
 	Note: REQUIRES SetupHelper v9.2 or later !!!

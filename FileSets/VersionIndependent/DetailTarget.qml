@@ -8,17 +8,23 @@ import QtQuick 1.1
 
 MouseArea
 {
-    property color detailsBackgroundColor: "#b3b3b3"
+	property color detailsBackgroundColor: "#b3b3b3"
 	property string detailsPage: ""
 	property string detailsPath: "/opt/victronenergy/gui/qml/" + detailsPage
-
+	
 	property variant target: undefined
 	property bool targetVisible: false
-
+	
 	anchors.centerIn: parent
 	enabled: parent.visible
 	height: 40; width: 40
-	onClicked: { rootWindow.pageStack.push (detailsPath, {backgroundColor: detailsBackgroundColor} ) }
+	onClicked:
+	{
+		if (pageStack != undefined)
+			pageStack.push (detailsPath, {backgroundColor: detailsBackgroundColor} )
+		else
+			rootWindow.pageStack.push (detailsPath, {backgroundColor: detailsBackgroundColor} )
+	}
 	Rectangle
 	{
 		id: _rect
