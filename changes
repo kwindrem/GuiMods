@@ -1,3 +1,7 @@
+v11.0:
+	add support for v3.80~5
+	added v3.70 file set, removed v3.70 betas
+
 v10.99:
 	fixed: tap to access details page not working as of about v3.70~71
 

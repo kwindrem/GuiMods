@@ -92,6 +92,9 @@ MbIcon {
                 case 5:
                     return "E c o"
                     break;
+				case 251:
+					return "P T"
+					break;
                 default:
                     return "?"
                     break;
