@@ -239,7 +239,7 @@ Tile {
                 horizontalAlignment: Text.AlignHCenter
                 text: " "
             }
-            Button
+            DetailButton
             {
                 id: onButton
 ////// GuiMods - DarkMode
@@ -255,7 +255,7 @@ Tile {
                     color: onButtonActive ? "white" : "black"
                 }
             }
-            Button
+            DetailButton
             {
                 id: offButton
 ////// GuiMods - DarkMode
@@ -271,7 +271,7 @@ Tile {
                     color: offButtonActive ? "white" : "black"
                 }
             }
-            Button
+            DetailButton
             {
                 id: autoButton
 ////// GuiMods - DarkMode                                          

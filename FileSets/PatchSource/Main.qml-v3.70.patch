@@ -1,5 +1,5 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Main.qml-v3.70~71.orig	2025-12-23 15:01:36
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Main.qml-v3.70~71	2025-12-23 22:10:17
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Main.qml-v3.70.orig	2025-12-23 15:01:36
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/Main.qml-v3.70	2026-03-20 15:21:38
 @@ -14,7 +14,8 @@
  	property bool completed: false
  	property bool alarm: alarmNotification.valid ? alarmNotification.value : 0
@@ -10,7 +10,7 @@
  	property string bindPrefix: "com.victronenergy.settings"
  
  	property bool isNotificationPage: pageStack.currentItem && pageStack.currentItem.title === qsTr("Notifications")
-@@ -25,19 +26,154 @@
+@@ -25,19 +26,167 @@
  	property bool showInputLoads: theSystem.acInLoad.power.valid && (hasVebusEss ? (theSystem.hasGridMeter && withoutGridMeter.value === 0) : theSystem.hasGridMeter)
  	property int newUiAnnouncementVersion: 2 // Increase to make the popup appear again
  
@@ -111,6 +111,19 @@
 +        onValueChanged: extraOverview ("OverviewTiles.qml", value === 1)
 +    }
 +
++////// GuiMods - show/hide the OverviewRelays page
++    VBusItem {
++        id: showOverviewRelays
++        bind: "com.victronenergy.settings/Settings/GuiMods/ShowRelayOverview"
++        onValueChanged: extraOverview ("OverviewRelays.qml", value === 1)
++    }
++
++////// GuiMods - show/hide the Overview Tanks/Temps/Digital Inputs page
++    VBusItem {
++        id: showOverviewTanksTemps
++        bind: "com.victronenergy.settings/Settings/GuiMods/ShowTanksTempsDigIn"
++        onValueChanged: extraOverview ("OverviewTanksTempsDigInputs.qml", value === 1)
++    }
 +
 +	function selectGeneratorOverview ()
 +	{
@@ -170,7 +183,7 @@
  	header: VeStatusBar {
  		id: statusBar
  
-@@ -69,12 +205,6 @@
+@@ -69,12 +218,6 @@
  	}
  
  	VBusItem {
@@ -183,7 +196,7 @@
  		bind: "com.victronenergy.generator.startstop1/GensetProductId"
  		onValueChanged: {
  			// Show specific overview for FischerPanda
-@@ -91,12 +221,11 @@
+@@ -91,12 +234,11 @@
  		}
  	}
  
@@ -198,7 +211,7 @@
  	}
  	VBusItem {
  		id: tanksOverview
-@@ -200,82 +329,109 @@
+@@ -200,82 +342,109 @@
  		width: parent.width
  		anchors.bottom: parent.bottom
  
@@ -207,14 +220,6 @@
 -			anchors.left: mbTools.left
 -			height: mbTools.height
 -			width: 200
--
--			MouseArea {
--				anchors.fill: parent
--				onClicked: {
--					if (pageStack.currentItem)
--						pageStack.currentItem.toolbarHandler.leftAction(true)
--				}
--			}
 +//// GuiMods - DarkMode - add clickable light/dark mode button to center section
 +		Row
 +		{
@@ -226,12 +231,11 @@
 +				height: mbTools.height
 +				width: 170
  
--			Row {
--				anchors.centerIn: parent
--
--				MbIcon {
--					anchors.verticalCenter: parent.verticalCenter
--					iconId: pageStack.currentItem ? pageStack.currentItem.leftIcon : ""
+-			MouseArea {
+-				anchors.fill: parent
+-				onClicked: {
+-					if (pageStack.currentItem)
+-						pageStack.currentItem.toolbarHandler.leftAction(true)
 +				MouseArea {
 +					anchors.fill: parent
 +					onClicked: {
@@ -239,6 +243,21 @@
 +							pageStack.currentItem.toolbarHandler.leftAction(true)
 +					}
  				}
+-			}
+ 
+-			Row {
+-				anchors.centerIn: parent
++				Row {
++					anchors.centerIn: parent
+ 
+-				MbIcon {
+-					anchors.verticalCenter: parent.verticalCenter
+-					iconId: pageStack.currentItem ? pageStack.currentItem.leftIcon : ""
+-				}
++					MbIcon {
++						anchors.verticalCenter: parent.verticalCenter
++						iconId: pageStack.currentItem ? pageStack.currentItem.leftIcon : ""
++					}
  
 -				Text {
 -					anchors.verticalCenter: parent.verticalCenter
@@ -246,19 +265,20 @@
 -					color: "white"
 -					font.bold: true
 -					font.pixelSize: 16
--				}
--			}
++					Text {
++						anchors.verticalCenter: parent.verticalCenter
++						text: pageStack.currentItem ? pageStack.currentItem.leftText : ""
++						color: "white"
++						font.bold: true
++						font.pixelSize: 16
++					}
+ 				}
+ 			}
 -		}
-+				Row {
-+					anchors.centerIn: parent
  
 -		MbIcon {
 -			id: centerScrollIndicator
-+					MbIcon {
-+						anchors.verticalCenter: parent.verticalCenter
-+						iconId: pageStack.currentItem ? pageStack.currentItem.leftIcon : ""
-+					}
- 
+-
 -			anchors {
 -				horizontalCenter: parent.horizontalCenter
 -				verticalCenter: mbTools.verticalCenter
@@ -277,16 +297,9 @@
 -				onClicked: {
 -					if (pageStack.currentItem)
 -						pageStack.currentItem.toolbarHandler.rightAction(true)
-+					Text {
-+						anchors.verticalCenter: parent.verticalCenter
-+						text: pageStack.currentItem ? pageStack.currentItem.leftText : ""
-+						color: "white"
-+						font.bold: true
-+						font.pixelSize: 16
-+					}
- 				}
- 			}
- 
+-				}
+-			}
+-
 -			Row {
 -				anchors.centerIn: parent
 +			Item {
@@ -366,7 +379,7 @@
  	Component.onCompleted: {
  		completed = true
  	}
-@@ -285,9 +441,10 @@
+@@ -285,9 +454,10 @@
  		ListElement {
  			pageSource: "OverviewHub.qml"
  		}
@@ -380,7 +393,7 @@
  	}
  
  	Component {
-@@ -382,11 +539,19 @@
+@@ -382,11 +552,19 @@
  		}
  	}
  

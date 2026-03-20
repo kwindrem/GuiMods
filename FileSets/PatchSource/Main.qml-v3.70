@@ -118,6 +118,19 @@ Page {
         onValueChanged: extraOverview ("OverviewTiles.qml", value === 1)
     }
 
+////// GuiMods - show/hide the OverviewRelays page
+    VBusItem {
+        id: showOverviewRelays
+        bind: "com.victronenergy.settings/Settings/GuiMods/ShowRelayOverview"
+        onValueChanged: extraOverview ("OverviewRelays.qml", value === 1)
+    }
+
+////// GuiMods - show/hide the Overview Tanks/Temps/Digital Inputs page
+    VBusItem {
+        id: showOverviewTanksTemps
+        bind: "com.victronenergy.settings/Settings/GuiMods/ShowTanksTempsDigIn"
+        onValueChanged: extraOverview ("OverviewTanksTempsDigInputs.qml", value === 1)
+    }
 
 	function selectGeneratorOverview ()
 	{
