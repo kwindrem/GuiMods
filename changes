@@ -1,3 +1,6 @@
+v11.3:
+	add support for v3.80~13
+
 v11.2:
 	fixed: relay and dig inputs overviews not showing up in v3.70 and newer
 
