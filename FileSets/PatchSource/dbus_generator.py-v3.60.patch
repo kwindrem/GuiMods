@@ -1,9 +1,9 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py-v3.60.orig	2018-03-09 04:34:56
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py-v3.60	2025-03-30 17:12:51
-@@ -1,6 +1,16 @@
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_generator.py-v3.60	2026-09-28 15:33:09
+@@ -1,5 +1,15 @@
  #!/usr/bin/python3 -u
  # -*- coding: utf-8 -*-
- 
++
 +#### GuiMods
 +#### This file has been modified to allow the generator running state derived from the generator digital input
 +####	or the genset AC input
@@ -13,10 +13,9 @@
 +#### It is now possible to start the generator manually and have it stop automatically based on the preset conditions
 +####	for automaitc start / stop
 +#### Search for #### GuiMods to find changes
-+
+ 
  from dbus.mainloop.glib import DBusGMainLoop
  import dbus
- import argparse
 @@ -92,7 +102,10 @@
  				'/VebusService': dummy,
  				'/Dc/Battery/Voltage': dummy,
@@ -48,12 +47,3 @@
  			'cooldowntime': ['/Settings/{0}/CoolDownTime', 0, 0, 600],
  			'generatorstoptime': ['/Settings/{0}/GeneratorStopTime', 0, 0, 600]
  			}
-@@ -282,7 +298,7 @@
- 	def _add_device(self, service):
- 		for i in self._modules:
- 			# Check if module can handle this service
--			if re.match(i.remoteprefix, service) is None:
-+			if i.remoteprefix not in service:
- 				continue
- 			# Check and create start/stop instance for the device
- 			if i.check_device(self._dbusmonitor, service):

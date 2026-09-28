@@ -1,5 +1,5 @@
---- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.70~45.orig	2025-10-09 10:54:00
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.70~45	2025-10-12 16:57:10
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.70.orig	2025-10-09 10:54:00
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/PageSettingsRelay.qml-v3.70	2025-10-12 16:57:10
 @@ -5,16 +5,117 @@
  MbPage {
  	id: pageRelaySettings

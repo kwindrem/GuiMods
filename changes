@@ -1,3 +1,7 @@
+v11.5:
+	fixed: generator service isn't creating startstop instance (v3.60 and newer)
+	added v3.80, removed v3.80 betas
+
 v11.4:
 	add support for v3.80~21
 
