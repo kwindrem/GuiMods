@@ -1347,6 +1347,16 @@ class StartStop(object):
 				self._ac2isIgnored = state2
 
 
+	@property
+	def _ac1_is_generator(self):
+		return self._dbusmonitor.get_value('com.victronenergy.settings',
+			'/Settings/SystemSetup/AcInput1') == 2
+
+	@property
+	def _ac2_is_generator(self):
+		return self._dbusmonitor.get_value('com.victronenergy.settings',
+			'/Settings/SystemSetup/AcInput2') == 2
+
 	def _set_ignore_ac1(self, ignore):
 		# This is here so the Multi/Quattro can be told to disconnect AC-in,
 		# so that we can do warm-up and cool-down.

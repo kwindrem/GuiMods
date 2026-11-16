@@ -152,7 +152,7 @@ class Monitor:
 			logging.info ("Transfer switch digital input no longer valid")
 			self.transferSwitchActive = False
 
-		# current digital input (if any)n not valid
+		# current digital input (if any) not valid
 		# search for a new one only every 10 seconds to avoid unnecessary processing
 		elif not inputValid and self.tsInputSearchDelay >= 10:
 			newInputService = ""
