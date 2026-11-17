@@ -334,7 +334,7 @@ def main():
 	# Have a mainloop, so we can send/receive asynchronous calls to and from dbus
 	DBusGMainLoop(set_as_default=True)
 
-	installedVersion = "(no version installed)"
+	installedVersion = "(version unknown)"
 	versionFile = "/etc/venus/installedVersion-GuiMods"
 	if os.path.exists (versionFile):
 		try:

@@ -1,9 +1,9 @@
 --- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.55.orig	2025-01-12 08:43:07
-+++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.55	2024-10-02 11:49:18
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.55	2026-11-16 15:35:52
 @@ -1,5 +1,7 @@
  #!/usr/bin/python3 -u
  
-+#### modified for ExtTransferSwitch package
++#### modified for ExtTransferSwitch
 +
  import sys, os
  import signal
@@ -12,7 +12,7 @@
      'Generator',
      'Generic I/O',
      'Touch enable',
-+#### added for ExtTransferSwitch package -- must be LAST in the list
++#### added for ExtTransferSwitch -- must be LAST in the list
 +    'Transfer switch'
  ]
  
@@ -23,7 +23,7 @@
      Translation('ok', 'alarm'),
 -    Translation('running', 'stopped')
 +    Translation('running', 'stopped'),
-+#### added for ExtTransferSwitch package
++#### added for ExtTransferSwitch
 +    Translation('on generator', 'on grid')
  ]
  
@@ -32,7 +32,7 @@
          self._timer = GLib.timeout_add(30000,
              lambda: self.select_generator(self.level ^ self.settings['invert'] ^ 1) or True)
  
-+#### added for ExtTransferSwitch package
++#### added for ExtTransferSwitch
 +        self.mainVeBusServiceItem = None
 +
 +
@@ -42,7 +42,7 @@
              services = [n for n in self.bus.list_names() if n.startswith(
                  'com.victronenergy.vebus.')]
              for n in services:
-+#### added for ExtTransferSwitch package
++#### added for ExtTransferSwitch
 +                # skip this service if it is the main VE.Bus device
 +                # processing for that is handled in ExtTransferSwitch
 +                try:
@@ -53,7 +53,7 @@
 +                        continue
 +                except:
 +                    pass
-+#### end added for ExtTransferSwitch package
++#### end added for ExtTransferSwitch
 +
                  self.bus.call_async(n, '/Ac/Control/RemoteGeneratorSelected', 'com.victronenergy.BusItem',
                      'SetValue', 'v', [v], None, None)
@@ -62,7 +62,7 @@
      type_id = 10
      translation = 0 # low, high
  
-+#### added for ExtTransferSwitch package
++#### added for ExtTransferSwitch
 +class TransferSwitch(PinAlarm):
 +    _product_name = "External AC Input transfer switch"
 +    type_id = 12

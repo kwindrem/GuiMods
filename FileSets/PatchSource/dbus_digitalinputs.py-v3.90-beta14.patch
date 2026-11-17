@@ -1,0 +1,72 @@
+--- /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.90-beta14.orig	2026-11-16 14:36:49
++++ /Users/Kevin/GitHub/GuiMods.copy/FileSets/PatchSource/dbus_digitalinputs.py-v3.90-beta14	2026-11-16 15:36:21
+@@ -1,5 +1,7 @@
+ #!/usr/bin/python3 -u
+ 
++#### modified for ExtTransferSwitch
++
+ import sys, os
+ import signal
+ from threading import Thread
+@@ -40,6 +42,8 @@
+     'Generic I/O',
+     'Touch enable',
+     'Surge protection alarm',
++#### added for ExtTransferSwitch -- must be LAST in the list to avoid other conflicts
++    'Transfer switch'
+ ]
+ 
+ # Translations. The text will be used only for GetText, it will be translated
+@@ -50,7 +54,9 @@
+     Translation('no', 'yes'),
+     Translation('open', 'closed'),
+     Translation('ok', 'alarm'),
+-    Translation('running', 'stopped')
++    Translation('running', 'stopped'),
++#### added for ExtTransferSwitch
++    Translation('on generator', 'on grid')
+ ]
+ 
+ class SystemBus(dbus.bus.BusConnection):
+@@ -452,12 +458,28 @@
+         self._timer = GLib.timeout_add(30000,
+             lambda: self.select_generator(self.level ^ self.settings['InvertTranslation'] ^ 1) or True)
+ 
++#### added for ExtTransferSwitch
++        self.mainVeBusServiceItem = None
++
+     def select_generator(self, v):
+         # Find all vebus services, and let them know
+         try:
+             services = [n for n in self.bus.list_names() if n.startswith(
+                 'com.victronenergy.vebus.')]
+             for n in services:
++#### added for ExtTransferSwitch
++                # skip this service if it is the main VE.Bus device
++                # processing for that is handled in ExtTransferSwitch
++                try:
++                    if self.mainVeBusServiceItem == None:
++                        self.mainVeBusServiceItem = VeDbusItemImport(self.bus,
++                            "com.victronenergy.service", "/VebusService")
++                    if n == self.mainVeBusService.get_value ():
++                        continue
++                except:
++                    pass
++#### end added for ExtTransferSwitch
++
+                 self.bus.call_async(n, '/Ac/Control/RemoteGeneratorSelected', 'com.victronenergy.BusItem',
+                     'SetValue', 'v', [v], None, None)
+         except dbus.exceptions.DBusException:
+@@ -536,6 +558,12 @@
+     _product_name = "Surge protection alarm"
+     type_id = 12
+     translation = 4 # ok, alarm
++
++#### added for ExtTransferSwitch
++class TransferSwitch(PinAlarm):
++    _product_name = "External AC Input transfer switch"
++    type_id = 12
++    translation = 6 # Grid In / Generator In
+ 
+ 
+ def dbusconnection():

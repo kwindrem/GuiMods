@@ -1,4 +1,7 @@
-v11.6:
+v11.7:
+	add support for v3.90-beta14
+
+v11.6: (improperly labeled v11.6a1)
 	fixed: generator service crashes in firmware prior to v3.41
 
 v11.5:
